@@ -1,11 +1,15 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native';
+import {useFonts} from 'expo-font';
+import {Stack} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import {useEffect} from 'react';
 
-import { useColorScheme } from '@/components/useColorScheme';
+import {useColorScheme} from '@/src/components/useColorScheme';
+import AuthProvider from "@/src/providers/AuthProvider";
+import QueryProvider from "@/src/providers/QueryProvider";
+import NotificationProvider from "@/src/providers/NotificationProvider";
+import {SafeAreaView} from "react-native-safe-area-context";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -22,7 +26,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
 
@@ -41,7 +45,7 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return <RootLayoutNav/>;
 }
 
 function RootLayoutNav() {
@@ -49,10 +53,16 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
+      <AuthProvider>
+        <QueryProvider>
+          {/*<NotificationProvider>*/}
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+            <Stack.Screen name="(auth)" options={{headerShown: false}}/>
+          </Stack>
+          {/*</NotificationProvider>*/}
+        </QueryProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
