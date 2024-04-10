@@ -4,6 +4,7 @@ import Button from '../../components/Button';
 import Colors from '../../constants/Colors';
 import {Link, Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
@@ -19,11 +20,15 @@ const SignInScreen = () => {
     setLoading(false);
   }
 
-  async function signInWithGoogle() {
+  const signInWithGoogle = () => {
     setLoading(true);
     console.log("Sign in with google");
     setLoading(false);
-  }
+  };
+
+  const renderGoogleIcon = () => {
+    return <Icon name="google" size={30} color="black" />;
+  };
 
   return (
     <View style={styles.container}>
@@ -47,13 +52,12 @@ const SignInScreen = () => {
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
       </Link>
-      {/*<ButtonK*/}
-      {/*  // accessoryLeft={GoogleIcon}*/}
-      {/*  disabled={loading}*/}
-      {/*  onPress={signInWithGoogle}*/}
-      {/*  text={loading ? "Signing in..." : "Sign in with Google"}*/}
-      {/*  style={{backgroundColor: 'white'}}*/}
-      {/*/>*/}
+      <Button
+        text={'Login with Google'}
+        accessoryLeft={<Icon name="google" size={22} color="black" />}
+        onPress={signInWithGoogle} style={styles.googleBtn}
+        textStyle={styles.googleBtnText}
+      />
     </View>
   );
 };
@@ -86,6 +90,13 @@ const styles = StyleSheet.create({
     height: 200,
     aspectRatio: 1,
     alignSelf: "center",
+  },
+  googleBtn: {
+    backgroundColor: 'white',
+    borderWidth: 0.5,
+  },
+  googleBtnText: {
+    color: 'black',
   },
 });
 
