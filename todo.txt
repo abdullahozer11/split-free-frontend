@@ -1,3 +1,2 @@
-todo we need to have that modal on down
 todo we need to have profile rendered
 todo we need to have sidebards like for settings
