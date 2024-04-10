@@ -2,7 +2,6 @@ import {FlatList, StyleSheet, Text} from 'react-native';
 import ActivityItem from "@/src/components/ActivityItem";
 import {activity} from "@/assets/data/activity";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {gray} from "colorette";
 
 export default function ActivityScreen() {
   return (
