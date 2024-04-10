@@ -1,4 +1,4 @@
-import {View, Image, TextInput, StyleSheet, Alert} from 'react-native';
+import {Image, StyleSheet, TextInput, Alert, View} from 'react-native';
 import React, {useState} from 'react';
 import Button from '../../components/Button';
 import Colors from '../../constants/Colors';
@@ -16,6 +16,12 @@ const SignInScreen = () => {
     if (error) {
       Alert.alert(error.message);
     }
+    setLoading(false);
+  }
+
+  async function signInWithGoogle() {
+    setLoading(true);
+    console.log("Sign in with google");
     setLoading(false);
   }
 
@@ -41,6 +47,13 @@ const SignInScreen = () => {
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
       </Link>
+      {/*<ButtonK*/}
+      {/*  // accessoryLeft={GoogleIcon}*/}
+      {/*  disabled={loading}*/}
+      {/*  onPress={signInWithGoogle}*/}
+      {/*  text={loading ? "Signing in..." : "Sign in with Google"}*/}
+      {/*  style={{backgroundColor: 'white'}}*/}
+      {/*/>*/}
     </View>
   );
 };
@@ -59,8 +72,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     padding: 10,
-    marginTop: 5,
-    marginBottom: 20,
+    marginBottom: 10,
     backgroundColor: 'white',
     borderRadius: 5,
   },

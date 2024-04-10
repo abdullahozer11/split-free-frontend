@@ -1,9 +1,10 @@
-import {View, TextInput, StyleSheet, Alert, Image, Text} from 'react-native';
+import {View, TextInput, StyleSheet, Alert, Image} from 'react-native';
 import React, {useState} from 'react';
 import Button from '../../components/Button';
 import Colors from '../../constants/Colors';
 import {Link, Stack, useRouter} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
+
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState('');
@@ -59,8 +60,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     padding: 10,
-    marginTop: 5,
-    marginBottom: 20,
+    marginBottom: 10,
     backgroundColor: 'white',
     borderRadius: 5,
   },
