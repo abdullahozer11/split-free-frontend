@@ -7,8 +7,7 @@ import {useAuth} from "@/src/providers/AuthProvider";
 
 export default function ProfileScreen() {
 
-  const user = useAuth();
-
+  const {session, profile, loading} = useAuth();
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
@@ -17,8 +16,9 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Profile Screen</Text>
 
-      <Image source={{uri: user?.avatar_url}} style={styles.avatar}/>
-
+      <Image source={{uri: profile?.avatar_url}} style={styles.avatar}/>
+      {/*add fallback*/}
+      <Text style={styles.name}>{profile?.full_name || 'John Doe' }</Text>
       <Button text="Sign Out" onPress={handleSignOut}/>
     </View>
   );
@@ -46,4 +46,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0099ff',
   },
+  name: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  }
 });
