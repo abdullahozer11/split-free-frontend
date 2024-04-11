@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthData>({
 
 export default function AuthProvider({children}: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState(null); // put Profile type
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
