@@ -75,7 +75,6 @@ const CreateGroupScreen = ({}) => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingTop: 16,
     borderRadius: 200,
     padding: 20,
     justifyContent: 'center',
@@ -126,7 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 5,
-    minHeight: 60,
+    minHeight: 20,
   },
   buttons: {
     flexDirection: 'row',
