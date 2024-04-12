@@ -40,7 +40,7 @@ export default function ProfileScreen() {
         style={styles.avatar}/>
       <Text onPress={pickImage} style={styles.textButton}> Select Image </Text>
       <View style={styles.btnRow}>
-        <Button text="Edit" onPress={handleSignOut} style={styles.editBtn} textStyle={styles.editBtnText}/>
+        <Button text="Edit" onPress={() => {}} style={styles.editBtn} textStyle={styles.editBtnText}/>
         <Button text="Sign Out" onPress={handleSignOut}/>
       </View>
     </View>

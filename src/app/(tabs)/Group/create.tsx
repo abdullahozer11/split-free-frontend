@@ -2,7 +2,7 @@ import {Text, View, StyleSheet, TextInput, Pressable, ScrollView} from 'react-na
 
 import React, {useState} from "react";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useNavigation} from "expo-router";
+import {Link, useNavigation} from "expo-router";
 import {Icon} from "react-native-elements";
 import Button from '@/src/components/Button';
 
@@ -65,8 +65,8 @@ const CreateGroupScreen = ({}) => {
         ))}
       </ScrollView>
       <View style={styles.buttons}>
-        <Button style={styles.button} text="Back" mode="flat" onPressed={() => navigation.goBack()}/>
-        <Button style={styles.button} text={'Save'} onPressed={saveData}/>
+        <Button style={styles.button} text="Back" onPress={() => navigation.goBack()}/>
+        <Button style={styles.button} text={'Save'} onPress={saveData}/>
       </View>
     </View>
   );
