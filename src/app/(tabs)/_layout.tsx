@@ -1,7 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {Redirect, Tabs} from 'expo-router';
-
 import Colors from '@/src/constants/Colors';
 import {useColorScheme} from '@/src/components/useColorScheme';
 import {useClientOnlyValue} from '@/src/components/useClientOnlyValue';
@@ -33,12 +32,22 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        headerStyle: {
+          height: 130,
+        },
+        headerTitleStyle: {
+          fontSize: 40,
+        },
+        tabBarStyle: {
+          height: 60,
+          paddingTop: 5,
+        },
+        // headerTitleAlign: 'center',
       }}>
       <Tabs.Screen
         name="Activity"
         options={{
           title: 'Activity',
-          headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="bell" color={color}/>,
         }}
       />

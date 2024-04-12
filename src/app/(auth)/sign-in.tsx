@@ -27,34 +27,35 @@ const SignInScreen = () => {
   };
 
   const renderGoogleIcon = () => {
-    return <Icon name="google" size={30} color="black" />;
+    return <Icon name="google" size={30} color="black"/>;
   };
 
   return (
     <View style={styles.container}>
       <Stack.Screen options={{title: 'Sign in'}}/>
-      <Image source={require('@/assets/images/logo.png')} style={styles.logo} />
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        style={styles.input}
-      />
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-      />
-
+      <Image source={require('@/assets/images/logo.png')} style={styles.logo}/>
+      <View style={styles.inputs}>
+        <TextInput
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email"
+          style={styles.input}
+        />
+        <TextInput
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Password"
+          style={styles.input}
+          secureTextEntry
+        />
+      </View>
       <Button disabled={loading} onPress={signInWithEmail} text={loading ? "Signing in..." : "Sign in"}/>
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
       </Link>
       <Button
         text={'Login with Google'}
-        accessoryLeft={<Icon name="google" size={22} color="black" />}
+        accessoryLeft={<Icon name="google" size={22} color="black"/>}
         onPress={signInWithGoogle} style={styles.googleBtn}
         textStyle={styles.googleBtnText}
       />
@@ -72,11 +73,13 @@ const styles = StyleSheet.create({
   label: {
     color: 'gray',
   },
+  inputs: {
+    gap: 10,
+  },
   input: {
     borderWidth: 1,
     borderColor: 'gray',
     padding: 10,
-    marginBottom: 10,
     backgroundColor: 'white',
     borderRadius: 5,
   },
