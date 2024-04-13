@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {FlatList, Text, View, StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import ActivityItem from '@/src/components/ActivityItem';
-import { activity } from '@/assets/data/activity';
-import { useAuth } from '@/src/providers/AuthProvider';
+import {activity} from '@/assets/data/activity';
+import {useAuth} from '@/src/providers/AuthProvider';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {Ionicons} from "@expo/vector-icons";
 
+const groupActivitiesByDay = (activities) => {
+  const groupedActivities = {};
+  activities.forEach((activity) => {
+    const createdDate = new Date(activity.created_at);
+    const dayKey = createdDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+    });
+    if (!groupedActivities[dayKey]) {
+      groupedActivities[dayKey] = [];
+    }
+    groupedActivities[dayKey].push(activity);
+  });
+  return groupedActivities;
+};
+
 export default function ActivityScreen() {
-  const { profile } = useAuth();
+  const {profile} = useAuth();
   const [scrollY] = useState(new Animated.Value(0));
   const headerHeight = 80;
 
@@ -25,27 +42,36 @@ export default function ActivityScreen() {
   });
 
   const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+  const groupedActivities = groupActivitiesByDay(activity);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Animated.View style={[styles.header, { opacity: headerOpacity, transform: [{ translateY: headerTranslateY }] }]}>
-        <FontAwesome size={16} style={styles.bell} name={'bell'} />
+      <Animated.View style={[styles.header, {opacity: headerOpacity, transform: [{translateY: headerTranslateY}]}]}>
+        <FontAwesome size={16} style={styles.bell} name={'bell'}/>
         <Text style={styles.headerTitle}>My Balance</Text>
         <Text style={styles.headerBalance}>{profile?.currency || '$'}{profile?.balance || '0.00'}</Text>
       </Animated.View>
       <View style={styles.body}>
         <View style={styles.row}>
           <Text style={styles.activity}>Activity</Text>
-          <TouchableOpacity style={styles.icon} onPress={() => { }}>
+          <TouchableOpacity style={styles.icon} onPress={() => {
+          }}>
             <Text style={styles.activity}>See All</Text>
             <Ionicons name="chevron-forward-outline" size={24} color="black"/>
           </TouchableOpacity>
         </View>
         <AnimatedFlatList
-          data={activity}
-          renderItem={({ item }) => <ActivityItem key={item.id} activity={item} />}
-          contentContainerStyle={{ padding: 10 }}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+          data={Object.keys(groupedActivities)}
+          renderItem={({item}) => (
+            <View style={styles.activityGroup}>
+              <Text style={styles.date}>{item}</Text>
+              {groupedActivities[item].map((activity) => (
+                <ActivityItem key={activity.id} activity={activity}/>
+              ))}
+            </View>
+          )}
+          contentContainerStyle={{padding: 10}}
+          onScroll={Animated.event([{nativeEvent: {contentOffset: {y: scrollY}}}], {useNativeDriver: true})}
           scrollEventThrottle={16}
         />
       </View>
@@ -99,6 +125,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
   },
+  activityGroup: {
+    marginTop: 10,
+  },
   activity: {
     fontSize: 18,
     fontWeight: '500',
@@ -107,5 +136,10 @@ const styles = StyleSheet.create({
   },
   icon: {
     flexDirection: 'row',
-  }
+  },
+  date: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'black',
+  },
 });
