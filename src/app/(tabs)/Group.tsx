@@ -2,21 +2,24 @@ import {FlatList, Pressable, View, StyleSheet} from 'react-native';
 
 import {group} from "@/assets/data/group";
 import GroupItem from "@/src/components/GroupItem";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigation, useRouter} from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {Text} from "@/src/components/Themed";
+import CreateGroup from "@/src/modals/CreateGroup";
 
 const GroupScreen = ({}) => {
   const navigation = useNavigation();
   const router = useRouter();
 
+   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
   function handleSearch() {
     console.log('searching');
-  }
-
-  function handleAdd() {
-    router.push('/Group/create');
   }
 
   useEffect(() => {
@@ -26,7 +29,7 @@ const GroupScreen = ({}) => {
           <Pressable onPress={handleSearch} style={[styles.iconContainer, {backgroundColor: "white"}]}>
             <FontAwesome size={24} name={'search'}/>
           </Pressable>
-          <Pressable onPress={handleAdd} style={styles.iconContainer}>
+          <Pressable onPress={() => {setIsModalVisible(true)}} style={styles.iconContainer}>
             <FontAwesome size={24} name={'plus'}/>
           </Pressable>
         </View>
@@ -42,6 +45,7 @@ const GroupScreen = ({}) => {
         renderItem={({item}) => <GroupItem group={item}/>}
         keyExtractor={(item) => item.id.toString()} // Key extractor for FlatList
       />
+      <CreateGroup isVisible={isModalVisible} onClose={closeModal} />
     </View>
   );
 };

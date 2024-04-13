@@ -48,6 +48,7 @@ export default function TabLayout() {
         name="Activity"
         options={{
           title: 'Activity',
+          headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="bell" color={color}/>,
         }}
       />
@@ -55,7 +56,6 @@ export default function TabLayout() {
         name="Group"
         options={{
           title: 'Group',
-          headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="group" color={color}/>,
         }}
       />
@@ -70,6 +70,7 @@ export default function TabLayout() {
         name="Profile"
         options={{
           title: 'Profile',
+          headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="user" color={color}/>,
         }}
       />

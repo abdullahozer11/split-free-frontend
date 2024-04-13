@@ -9,7 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      Activity: {
+      activity: {
         Row: {
           created_at: string
           id: number
@@ -33,12 +33,12 @@ export type Database = {
             foreignKeyName: "public_Activity_member_fkey"
             columns: ["member"]
             isOneToOne: false
-            referencedRelation: "Member"
+            referencedRelation: "member"
             referencedColumns: ["id"]
           },
         ]
       }
-      Balance: {
+      balance: {
         Row: {
           amount: number | null
           created_at: string
@@ -65,12 +65,12 @@ export type Database = {
             foreignKeyName: "public_Balance_owner_fkey"
             columns: ["owner"]
             isOneToOne: false
-            referencedRelation: "Member"
+            referencedRelation: "member"
             referencedColumns: ["id"]
           },
         ]
       }
-      Debt: {
+      debt: {
         Row: {
           amount: number
           borrower: number
@@ -100,19 +100,19 @@ export type Database = {
             foreignKeyName: "public_Debt_borrower_fkey"
             columns: ["borrower"]
             isOneToOne: false
-            referencedRelation: "Member"
+            referencedRelation: "member"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_Debt_lender_fkey"
             columns: ["lender"]
             isOneToOne: false
-            referencedRelation: "Member"
+            referencedRelation: "member"
             referencedColumns: ["id"]
           },
         ]
       }
-      Expense: {
+      expense: {
         Row: {
           amount: number
           created_at: string
@@ -151,19 +151,19 @@ export type Database = {
             foreignKeyName: "public_Expense_participants_fkey"
             columns: ["participants"]
             isOneToOne: false
-            referencedRelation: "Member"
+            referencedRelation: "member"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_Expense_payers_fkey"
             columns: ["payers"]
             isOneToOne: false
-            referencedRelation: "Member"
+            referencedRelation: "member"
             referencedColumns: ["id"]
           },
         ]
       }
-      Group: {
+      group: {
         Row: {
           created_at: string
           creator: string
@@ -195,7 +195,7 @@ export type Database = {
           },
         ]
       }
-      Member: {
+      member: {
         Row: {
           created_at: string
           group: number
@@ -230,6 +230,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          balance: number
           full_name: string | null
           id: string
           updated_at: string | null
@@ -238,6 +239,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          balance?: number
           full_name?: string | null
           id: string
           updated_at?: string | null
@@ -246,6 +248,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          balance?: number
           full_name?: string | null
           id?: string
           updated_at?: string | null

@@ -1,15 +1,26 @@
-import {Image, StyleSheet} from 'react-native';
+import {Image, ScrollView, StyleSheet} from 'react-native';
 import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
 import Button from '../../components/Button';
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useState} from "react";
+import {SafeAreaView} from "react-native-safe-area-context";
+
+const CurrencyCard = ({currency}) => {
+  return (
+    <View style={styles.card}>
+      <Text>{currency}</Text>
+    </View>
+  );
+};
 
 export default function ProfileScreen() {
 
   const {session, profile, loading} = useAuth();
   const [image, setImage] = useState('');
+
+  const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'TRY'];
 
   // const {mutate: updateProfile} = useUpdateProfile();
   // const {mutate: deleteProfile} = useDeleteProfile();
@@ -33,17 +44,28 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.name}>{profile?.full_name || 'John Doe'}</Text>
+    <SafeAreaView style={styles.container}>
       <Image
         source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
         style={styles.avatar}/>
-      <Text onPress={pickImage} style={styles.textButton}> Select Image </Text>
-      <View style={styles.btnRow}>
-        <Button text="Edit" onPress={() => {}} style={styles.editBtn} textStyle={styles.editBtnText}/>
-        <Button text="Sign Out" onPress={handleSignOut}/>
+      <Text style={{}}>Select Image </Text>
+      <Text style={styles.nameTitle}>FULL NAME</Text>
+      <View style={styles.nameBox}>
+        <Text style={styles.name}>{profile?.full_name || 'John Doe'}</Text>
       </View>
-    </View>
+      <Text style={{}}>Select Primary Currency</Text>
+      <Text style={{}}>Don't worry! You can change it.</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {currencies.map((currency, index) => (
+          <CurrencyCard key={index} currency={currency}/>
+        ))}
+      </ScrollView>
+
+      <Button text="I'm Done" onPress={() => {
+        console.log('DONE');
+      }}/>
+      <Button text="Sign Out" onPress={handleSignOut}/>
+    </SafeAreaView>
   );
 }
 
@@ -51,7 +73,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
+    backgroundColor: 'white',
+    paddingTop: 60,
   },
   title: {
     fontSize: 20,
@@ -77,15 +100,25 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "500",
   },
-  editBtn: {
+  nameBox: {
     backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
   },
-  editBtnText: {
-    color: 'black',
+  nameTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
-  btnRow: {
-    flexDirection: 'row',
-    justifyContent:'space-between',
-    width: '60%',
-  }
+  card: {
+    backgroundColor: '#f0f0f0',
+    padding: 20,
+    marginRight: 10,
+    borderRadius: 10,
+    height: 100,
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
 });

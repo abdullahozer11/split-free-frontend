@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     borderRadius: 10,
-    padding: 10,
   },
   activity: {},
   time: {
