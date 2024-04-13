@@ -43,7 +43,7 @@ const GroupScreen = ({}) => {
       <FlatList
         data={group}
         renderItem={({item}) => <GroupItem group={item}/>}
-        keyExtractor={(item) => item.id.toString()} // Key extractor for FlatList
+        keyExtractor={(item) => item.id.toString()}
       />
       <CreateGroup isVisible={isModalVisible} onClose={closeModal} />
     </View>

@@ -9,7 +9,6 @@ import {useColorScheme} from '@/src/components/useColorScheme';
 import AuthProvider from "@/src/providers/AuthProvider";
 import QueryProvider from "@/src/providers/QueryProvider";
 import NotificationProvider from "@/src/providers/NotificationProvider";
-import {SafeAreaView} from "react-native-safe-area-context";
 
 export {
   // Catch any errors thrown by the Layout component.

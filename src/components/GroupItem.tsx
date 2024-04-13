@@ -11,16 +11,18 @@ const GroupItem = ({group}) => {
       </View>
       <View style={styles.row}>
         <View style={{flexDirection: "row"}}>
-          <FontAwesome size={22} style={styles.fixWidth} name={'user'} />
-          <Text style={{color: 'gray'}}>8 Friends</Text>
+          <FontAwesome size={22} style={styles.fixWidth} name={'user'}/>
+          <Text style={{color: 'gray'}}>{group.members?.length || 0} Friends</Text>
         </View>
       </View>
       <View style={styles.row}>
         <View style={{flexDirection: "row"}}>
-          <FontAwesome size={22} style={styles.fixWidth} name={'info'} />
-          <Text style={{color: '#aaa'}}>5 Expense</Text>
+          <FontAwesome size={22} style={styles.fixWidth} name={'info'}/>
+          <Text style={{color: '#aaa'}}>{group.expenses?.length} Expense</Text>
         </View>
-        <Text>Settled!</Text>
+        <Text style={{color: group.status === 'settled' ? 'green' : 'red'}}>
+          {group.status === 'settled' ? `${group.status}!` : group.status}
+        </Text>
       </View>
     </View>
   );
