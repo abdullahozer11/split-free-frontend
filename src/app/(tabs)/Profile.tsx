@@ -1,4 +1,4 @@
-import {Image, ScrollView, StyleSheet} from 'react-native';
+import {Image, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
@@ -6,21 +6,26 @@ import Button from '../../components/Button';
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
-
-const CurrencyCard = ({currency}) => {
-  return (
-    <View style={styles.card}>
-      <Text>{currency}</Text>
-    </View>
-  );
-};
+import CurrencyCard from "@/src/components/CurrencyItem";
+import {useNavigation} from "expo-router";
 
 export default function ProfileScreen() {
-
+  const [selectedCurrency, setSelectedCurrency] = useState('USD'); // should be dynamic
   const {session, profile, loading} = useAuth();
   const [image, setImage] = useState('');
 
-  const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'TRY'];
+  // const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'TRY'];
+  const currencies = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'JPY': '¥',
+    'CAD': '$',
+    'AUD': '$',
+    'CHF': 'r',
+    'CNY': '¥',
+    'TRY': '₺'
+  };
 
   // const {mutate: updateProfile} = useUpdateProfile();
   // const {mutate: deleteProfile} = useDeleteProfile();
@@ -43,29 +48,45 @@ export default function ProfileScreen() {
     }
   };
 
+  const navigation = useNavigation();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Button text="Done" onPress={() => {
+          navigation.goBack();
+        }}/>
+        <Button text="Sign Out" onPress={handleSignOut}/>
+      </View>
       <Image
         source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
         style={styles.avatar}/>
-      <Text style={{}}>Select Image </Text>
+      <Text style={styles.imageSelector}>Select Image </Text>
       <Text style={styles.nameTitle}>FULL NAME</Text>
       <View style={styles.nameBox}>
-        <Text style={styles.name}>{profile?.full_name || 'John Doe'}</Text>
+        <Text style={styles.name}>{profile?.full_name || "No Name"}</Text>
       </View>
       <Text style={{}}>Select Primary Currency</Text>
       <Text style={{}}>Don't worry! You can change it.</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {currencies.map((currency, index) => (
-          <CurrencyCard key={index} currency={currency}/>
+      <ScrollView
+        style={styles.scrollView}
+        horizontal showsHorizontalScrollIndicator={false}
+      >
+        {Object.entries(currencies).map(([currencyCode, currencySymbol]) => (
+          <TouchableOpacity
+            key={currencyCode}
+            onPress={() => setSelectedCurrency(currencyCode)}
+            style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5}}
+          >
+            <CurrencyCard
+              currencyCode={currencyCode}
+              currencySymbol={currencySymbol}
+              selected={currencyCode === selectedCurrency}
+            />
+          </TouchableOpacity>
         ))}
       </ScrollView>
-
-      <Button text="I'm Done" onPress={() => {
-        console.log('DONE');
-      }}/>
-      <Button text="Sign Out" onPress={handleSignOut}/>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -74,7 +95,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingTop: 60,
   },
   title: {
     fontSize: 20,
@@ -110,15 +130,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  card: {
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-    marginRight: 10,
-    borderRadius: 10,
-    height: 100,
-    width: 100,
-    justifyContent: 'center',
+  imageSelector: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'black',
+  },
+  scrollView: {
+    marginHorizontal: 5,
+  },
+  header: {
+    backgroundColor: 'black',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent:'space-between',
     alignItems: 'center',
-    marginVertical: 10,
+    marginHorizontal: 10,
+    marginBottom: 40,
+    paddingTop: 40,
   },
 });

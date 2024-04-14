@@ -13,10 +13,14 @@ import {useNavigation} from "expo-router";
 import MemberRow from "@/src/components/MemberRow";
 import {Ionicons} from "@expo/vector-icons";
 
-const CreateGroupModal = ({isVisible, onClose}) => {
+const CreateGroupModal = ({isVisible, onClose, onDraw}) => {
   const [title, setTitle] = useState("");
-  const [members, setMembers] = useState([]);
   const {profile} = useAuth();
+  const initialMember = {
+    name: profile?.name || "John Doe",
+    profile: profile,
+  }
+  const [members, setMembers] = useState([initialMember]);
   const navigation = useNavigation();
 
   function addNewMember() {
@@ -54,7 +58,9 @@ const CreateGroupModal = ({isVisible, onClose}) => {
             value={title}
             onChangeText={(text) => setTitle(text)}
           />
-          <Text style={styles.parTitle}>Add Participants</Text>
+          <TouchableOpacity style={styles.addParticipants} onPress={onDraw}>
+            <Text style={styles.parTitle}>Add Participants</Text>
+          </TouchableOpacity>
           <ScrollView>
             {members.map((member, index) => (
               <MemberRow key={index} member={member}/>
@@ -90,10 +96,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
   },
   parTitle: {
-    marginTop: 20,
     fontSize: 20,
     fontWeight: "500",
-    marginBottom: 10,
   },
   tabBar: {
     flexDirection: "row",
@@ -106,6 +110,16 @@ const styles = StyleSheet.create({
   doneText: {
     fontWeight: "bold",
     fontSize: 20,
+  },
+  addParticipants: {
+    marginTop: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    paddingVertical: 10,
+    marginBottom: 5,
   },
 });
 
