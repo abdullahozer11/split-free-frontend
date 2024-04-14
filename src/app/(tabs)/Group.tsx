@@ -29,7 +29,9 @@ const GroupScreen = ({}) => {
           <Pressable onPress={handleSearch} style={[styles.iconContainer, {backgroundColor: "white"}]}>
             <FontAwesome size={24} name={'search'}/>
           </Pressable>
-          <Pressable onPress={() => {setIsModalVisible(true)}} style={styles.iconContainer}>
+          <Pressable onPress={() => {
+            setIsModalVisible(true);
+          }} style={styles.iconContainer}>
             <FontAwesome size={24} name={'plus'}/>
           </Pressable>
         </View>
