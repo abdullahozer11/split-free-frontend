@@ -5,6 +5,7 @@ import Colors from '@/src/constants/Colors';
 import {useColorScheme} from '@/src/components/useColorScheme';
 import {useClientOnlyValue} from '@/src/components/useClientOnlyValue';
 import {useAuth} from "@/src/providers/AuthProvider";
+import AccountScreen from "@/src/app/(tabs)/Account/account";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -67,9 +68,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Profile"
+        name="Account"
         options={{
-          title: 'Profile',
+          title: 'Account',
           headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="user" color={color}/>,
         }}

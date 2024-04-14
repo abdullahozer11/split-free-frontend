@@ -2,10 +2,9 @@ import {Image, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
-import Button from '../../components/Button';
+import Button from '@/src/components/Button';
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useState} from "react";
-import {SafeAreaView} from "react-native-safe-area-context";
 import CurrencyCard from "@/src/components/CurrencyItem";
 import {useNavigation} from "expo-router";
 
@@ -143,7 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     width: '100%',
     flexDirection: 'row',
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 10,
     marginBottom: 40,
