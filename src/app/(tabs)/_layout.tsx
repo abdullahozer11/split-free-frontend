@@ -28,7 +28,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({route}) => ({
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
@@ -42,9 +42,10 @@ export default function TabLayout() {
         tabBarStyle: {
           height: 60,
           paddingTop: 5,
+          display: route.name === 'account' ? 'none' : 'flex',
         },
         // headerTitleAlign: 'center',
-      }}>
+      })}>
       <Tabs.Screen
         name="activity"
         options={{
