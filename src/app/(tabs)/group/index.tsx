@@ -1,14 +1,12 @@
-import {View, StyleSheet, SectionList} from 'react-native'; // Import SectionList
+import {View, StyleSheet, SectionList} from 'react-native';
 import {group} from "@/assets/data/group";
 import GroupItem from "@/src/components/GroupItem";
-import React, {useEffect, useState} from "react";
-import {useNavigation} from "expo-router";
+import React, {useState} from "react";
 import {Text} from "@/src/components/Themed";
 import CreateGroup from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 
 const GroupScreen = ({}) => {
-  const navigation = useNavigation();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
@@ -31,32 +29,27 @@ const GroupScreen = ({}) => {
     }
   };
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <CustomHeader handleSearch={handleSearch} setIsModalVisible={setIsModalVisible}/>
-      ),
-    });
-  }, [navigation]);
-
   // Define sections for SectionList
   const sections = [];
   if (anchoredGroups.length > 0) {
-    sections.push({ title: "Quick Access", data: anchoredGroups });
+    sections.push({title: "Quick Access", data: anchoredGroups});
   }
-  sections.push({ title: "All Groups", data: group.filter(g => !anchoredGroups.some(ag => ag.id === g.id)) });
+  sections.push({title: "All Groups", data: group.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
 
   return (
     <View style={styles.container}>
-      <SectionList
-        sections={sections}
-        renderItem={({item}) => <GroupItem group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>}
-        renderSectionHeader={({section: {title}}) => (
-          <Text style={styles.sectionHeader}>{title}</Text>
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
-      <CreateGroup isVisible={isModalVisible} onClose={closeModal}/>
+      <CustomHeader title={'Groups'} handleSearch={handleSearch} setIsModalVisible={setIsModalVisible}/>
+      <View style={styles.body}>
+        <SectionList
+          sections={sections}
+          renderItem={({item}) => <GroupItem group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>}
+          renderSectionHeader={({section: {title}}) => (
+            <Text style={styles.sectionHeader}>{title}</Text>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
+        <CreateGroup isVisible={isModalVisible} onClose={closeModal}/>
+      </View>
     </View>
   );
 };
@@ -64,14 +57,16 @@ const GroupScreen = ({}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
   },
   sectionHeader: {
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 8,
   },
+  body: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  }
 });
 
 export default GroupScreen;

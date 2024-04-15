@@ -1,30 +1,22 @@
-import {StyleSheet} from 'react-native';
-
-import {Text, View} from '@/src/components/Themed';
-import React, {useEffect, useState} from "react";
+import {StyleSheet, View} from 'react-native';
+import {Text} from '@/src/components/Themed';
+import React, {useState} from "react";
 import CustomHeader from "@/src/components/CustomHeader";
-import {useNavigation} from "expo-router";
+import {SafeAreaView} from "react-native-safe-area-context";
 
 export default function FriendScreen() {
-  const navigation = useNavigation();
-
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleSearch = () => {
     console.log('searching');
   };
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <CustomHeader handleSearch={handleSearch} setIsModalVisible={setIsModalVisible}/>
-      ),
-    });
-  }, [navigation]);
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Friends Screen</Text>
+    <View>
+      <CustomHeader title={'Friends'} handleSearch={handleSearch} setIsModalVisible={setIsModalVisible}/>
+      <View style={styles.body}>
+        <Text style={styles.title}>Friends Screen</Text>
+      </View>
     </View>
   );
 }
@@ -32,8 +24,6 @@ export default function FriendScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 20,
@@ -43,5 +33,13 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  header: {
+    borderWidth: 1,
+    borderColor: "orange",
+    backgroundColor: 'white',
+  },
+  body: {
+    padding: 16,
   },
 });

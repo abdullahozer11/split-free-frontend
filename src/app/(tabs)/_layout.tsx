@@ -30,15 +30,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={({route}) => ({
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-        headerStyle: {
-          height: 130,
-        },
-        headerTitleStyle: {
-          fontSize: 40,
-        },
+        headerShown: false,
         tabBarStyle: {
           height: 60,
           paddingTop: 5,
@@ -50,7 +42,6 @@ export default function TabLayout() {
         name="activity"
         options={{
           title: 'Activity',
-          headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="bell" color={color}/>,
         }}
       />
@@ -65,7 +56,6 @@ export default function TabLayout() {
         name="expense"
         options={{
           title: 'Expense',
-          headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="plus-circle" color={color}/>,
         }}
       />
@@ -80,7 +70,6 @@ export default function TabLayout() {
         name="account"
         options={{
           title: 'Account',
-          headerShown: false,
           tabBarIcon: ({color}) => <TabBarIcon name="user" color={color}/>,
         }}
       />
