@@ -33,9 +33,11 @@ const SettingsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AntDesign name="arrowleft" size={30} color="white" onPress={() => {
+      <Pressable style={styles.backContainer} onPress={() => {
         navigation.goBack();
-      }}/>
+      }}>
+        <AntDesign name="arrowleft" size={30} color="white"/>
+      </Pressable>
       <Text style={styles.title}>Settings</Text>
       <SettingsItem page={'notifications'} containerColor={'blue'} iconName={'bell'} title={'Notifications'}/>
       <SettingsItem page={'currency'} containerColor={'lightblue'} iconName={'dollar-sign'} title={'Currency'}/>
@@ -126,4 +128,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 20,
   },
+  backContainer: {
+    height: 52,
+    width: 52,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#2c282d',
+  }
 });

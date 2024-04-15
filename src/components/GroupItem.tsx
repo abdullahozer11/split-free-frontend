@@ -1,13 +1,13 @@
 import {StyleSheet, View, Text} from 'react-native';
 import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import {Feather, FontAwesome} from "@expo/vector-icons";
 
 const GroupItem = ({group}) => {
   return (
     <View style={styles.container}>
       <View style={[styles.row, styles.firstRow]}>
         <Text style={styles.title}>{group.title}</Text>
-        <FontAwesome size={28} style={{}} name={'star'} />
+        <Feather size={28} style={{opacity: group.anchored ? 1 : 0.3}} name={'anchor'}/>
       </View>
       <View style={styles.row}>
         <View style={{flexDirection: "row"}}>
