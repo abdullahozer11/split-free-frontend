@@ -5,9 +5,9 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {Ionicons} from "@expo/vector-icons";
 import {Link} from "expo-router";
 
-const Card = ({iconName, title}) => {
+const Card = ({iconName, title, page}) => {
   return (
-    <Link href={`/(tabs)/Account/profile`} asChild>
+    <Link href={`/(tabs)/Account/${page}`} asChild>
       <Pressable style={styles.cardContainer}>
         <View/>
         <Ionicons name={iconName} size={24} color="black"/>
@@ -47,9 +47,9 @@ const AccountScreen = () => {
       </Animated.View>
       <View style={styles.body}>
         <View style={styles.row}>
-          <Card iconName={"close"} title={"Profile"}/>
-          <Card iconName={"close"} title={"Spending"}/>
-          <Card iconName={"close"} title={"Settings"}/>
+          <Card iconName={"close"} page={'profile'} title={"Profile"}/>
+          <Card iconName={"close"} page={'spending'} title={"Spending"}/>
+          <Card iconName={"close"} page={'settings'} title={"Settings"}/>
         </View>
       </View>
     </SafeAreaView>
