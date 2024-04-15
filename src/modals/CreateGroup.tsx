@@ -11,7 +11,7 @@ import {
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useNavigation} from "expo-router";
 import MemberRow from "@/src/components/MemberRow";
-import {Ionicons} from "@expo/vector-icons";
+import {Feather, Ionicons} from "@expo/vector-icons";
 
 const CreateGroupModal = ({isVisible, onClose, onDraw}) => {
   const [title, setTitle] = useState("");
@@ -46,7 +46,7 @@ const CreateGroupModal = ({isVisible, onClose, onDraw}) => {
         <View style={styles.container}>
           <View style={styles.tabBar}>
             <TouchableOpacity onPress={onClose}>
-              <Ionicons name="close" size={24} color="black"/>
+              <Feather name="x" size={24} color="black"/>
             </TouchableOpacity>
             <Pressable textstyle={styles.done} onPress={saveData}>
               <Text style={styles.doneText}>Done</Text>
