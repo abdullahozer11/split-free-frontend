@@ -1,7 +1,14 @@
-import React from 'react';
-import {Stack} from 'expo-router';
+import React, {useEffect} from 'react';
+import {Stack, useNavigation} from 'expo-router';
 
 export default function SettingsStack() {
+  const navigation = useNavigation();
+  useEffect(() => {
+    navigation.setOptions({
+      tabBarVisible: false, // why does this not work? fixme
+    });
+  }, [navigation]);
+
   return (
     <Stack>
       <Stack.Screen name="index" options={{headerShown: false, title: 'Settings'}}/>

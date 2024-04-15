@@ -5,7 +5,6 @@ import Colors from '@/src/constants/Colors';
 import {useColorScheme} from '@/src/components/useColorScheme';
 import {useClientOnlyValue} from '@/src/components/useClientOnlyValue';
 import {useAuth} from "@/src/providers/AuthProvider";
-import AccountScreen from "@/src/app/(tabs)/Account/account";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -58,6 +57,14 @@ export default function TabLayout() {
         options={{
           title: 'Group',
           tabBarIcon: ({color}) => <TabBarIcon name="group" color={color}/>,
+        }}
+      />
+      <Tabs.Screen
+        name="Expense"
+        options={{
+          title: 'Expense',
+          headerShown: false,
+          tabBarIcon: ({color}) => <TabBarIcon name="plus" color={color}/>,
         }}
       />
       <Tabs.Screen
