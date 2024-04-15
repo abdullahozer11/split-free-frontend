@@ -7,7 +7,7 @@ import {Feather} from "@expo/vector-icons";
 
 const Card = ({iconName, title, page}) => {
   return (
-    <Link href={`/(tabs)/Account/${page}`} asChild>
+    <Link href={`/(tabs)/account/${page}`} asChild>
       <Pressable style={styles.cardContainer}>
         <View/>
         <Feather name={iconName} size={24} color="black"/>
