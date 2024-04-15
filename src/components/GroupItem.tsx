@@ -1,13 +1,22 @@
-import {StyleSheet, View, Text} from 'react-native';
-import React from "react";
+import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import React, {useState} from "react";
 import {Feather, FontAwesome} from "@expo/vector-icons";
 
 const GroupItem = ({group, onAnchor}) => {
+  const [anchored, setAnchored] = useState(group.anchored);
+
+  const handleAnchor = async () => {
+    onAnchor(!anchored);
+    setAnchored(!anchored);
+  }
+
   return (
     <View style={styles.container}>
       <View style={[styles.row, styles.firstRow]}>
         <Text style={styles.title}>{group.title}</Text>
-        <Feather onPress={onAnchor} size={28} style={{opacity: group.anchored ? 1 : 0.3}} name={'anchor'}/>
+        <TouchableOpacity onPress={handleAnchor}>
+          <Feather size={28} style={anchored ? styles.anchorIcon : styles.unanchorIcon} name={'anchor'}/>
+        </TouchableOpacity>
       </View>
       <View style={styles.row}>
         <View style={{flexDirection: "row"}}>
@@ -56,4 +65,10 @@ const styles = StyleSheet.create({
     marginRight: 15,
     color: '#aaa',
   },
+  anchorIcon: {
+    opacity: 1,
+  },
+  unanchorIcon: {
+    opacity: 0.3,
+  }
 });

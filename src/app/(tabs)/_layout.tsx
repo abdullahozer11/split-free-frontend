@@ -46,7 +46,7 @@ export default function TabLayout() {
         // headerTitleAlign: 'center',
       }}>
       <Tabs.Screen
-        name="Activity"
+        name="activity"
         options={{
           title: 'Activity',
           headerShown: false,
