@@ -60,7 +60,7 @@ export default function ProfileScreen() {
       <Image
         source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
         style={styles.avatar}/>
-      <Text style={styles.imageSelector}>Select Image </Text>
+      <Text onPress={pickImage} style={styles.imageSelector}>Select Image </Text>
       <Text style={styles.nameTitle}>FULL NAME</Text>
       <View style={styles.nameBox}>
         <Text style={styles.name}>{profile?.full_name || "No Name"}</Text>
