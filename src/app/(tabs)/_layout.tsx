@@ -54,14 +54,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Group"
+        name="group"
         options={{
           title: 'Group',
           tabBarIcon: ({color}) => <TabBarIcon name="users" color={color}/>,
         }}
       />
       <Tabs.Screen
-        name="Expense"
+        name="expense"
         options={{
           title: 'Expense',
           headerShown: false,
@@ -69,14 +69,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Friend"
+        name="friend"
         options={{
           title: 'Friend',
           tabBarIcon: ({color}) => <TabBarIcon name="users" color={color}/>,
         }}
       />
       <Tabs.Screen
-        name="Account"
+        name="account"
         options={{
           title: 'Account',
           headerShown: false,

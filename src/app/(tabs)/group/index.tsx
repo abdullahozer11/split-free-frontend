@@ -22,6 +22,11 @@ const GroupScreen = ({}) => {
     console.log('searching');
   }
 
+  const handleAnchor = ({group}) => {
+    console.log("group is ", group);
+    // group.anchored = !group.anchored;
+  };
+
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -35,7 +40,9 @@ const GroupScreen = ({}) => {
       <Text style={styles.allGroupsTitle}>All Groups</Text>
       <FlatList
         data={group}
-        renderItem={({item}) => <GroupItem group={item}/>}
+        renderItem={({item}) => <GroupItem group={item} onAnchor={() => {
+          handleAnchor(item);
+        }}/>}
         keyExtractor={(item) => item.id.toString()}
       />
       <CreateGroup isVisible={isModalVisible} onClose={closeModal}/>
