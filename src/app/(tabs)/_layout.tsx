@@ -5,13 +5,14 @@ import Colors from '@/src/constants/Colors';
 import {useColorScheme} from '@/src/components/useColorScheme';
 import {useClientOnlyValue} from '@/src/components/useClientOnlyValue';
 import {useAuth} from "@/src/providers/AuthProvider";
+import {Feather} from "@expo/vector-icons";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{marginBottom: -3}} {...props} />;
+  return <Feather size={28} style={{marginBottom: -3}} {...props} />;
 }
 
 export default function TabLayout() {
@@ -56,7 +57,7 @@ export default function TabLayout() {
         name="Group"
         options={{
           title: 'Group',
-          tabBarIcon: ({color}) => <TabBarIcon name="group" color={color}/>,
+          tabBarIcon: ({color}) => <TabBarIcon name="users" color={color}/>,
         }}
       />
       <Tabs.Screen
@@ -64,7 +65,7 @@ export default function TabLayout() {
         options={{
           title: 'Expense',
           headerShown: false,
-          tabBarIcon: ({color}) => <TabBarIcon name="plus" color={color}/>,
+          tabBarIcon: ({color}) => <TabBarIcon name="plus-circle" color={color}/>,
         }}
       />
       <Tabs.Screen

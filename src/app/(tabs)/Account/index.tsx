@@ -2,15 +2,15 @@ import {StyleSheet, View, Text, Image, Animated, Pressable} from 'react-native';
 import React, {useState} from "react";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {Ionicons} from "@expo/vector-icons";
 import {Link} from "expo-router";
+import {Feather} from "@expo/vector-icons";
 
 const Card = ({iconName, title, page}) => {
   return (
     <Link href={`/(tabs)/Account/${page}`} asChild>
       <Pressable style={styles.cardContainer}>
         <View/>
-        <Ionicons name={iconName} size={24} color="black"/>
+        <Feather name={iconName} size={24} color="black"/>
         <Text style={styles.cardText}>{title}</Text>
       </Pressable>
     </Link>
@@ -47,9 +47,9 @@ const AccountScreen = () => {
       </Animated.View>
       <View style={styles.body}>
         <View style={styles.row}>
-          <Card iconName={"close"} page={'profile'} title={"Profile"}/>
-          <Card iconName={"close"} page={'spending'} title={"Spending"}/>
-          <Card iconName={"close"} page={'settings'} title={"Settings"}/>
+          <Card iconName={"folder"} page={'profile'} title={"Profile"}/>
+          <Card iconName={"pie-chart"} page={'spending'} title={"Spending"}/>
+          <Card iconName={"settings"} page={'settings'} title={"Settings"}/>
         </View>
       </View>
     </SafeAreaView>
