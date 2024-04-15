@@ -3,6 +3,7 @@ import React from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {AntDesign} from '@expo/vector-icons';
 import {supabase} from "@/src/lib/supabase";
+import {useNavigation} from "expo-router";
 
 
 const SettingsItem = ({iconName, title, containerColor}) => {
@@ -12,19 +13,22 @@ const SettingsItem = ({iconName, title, containerColor}) => {
         <AntDesign name={iconName} size={32} color="white"/>
       </View>
       <Text style={styles.settingsItemText}>{title}</Text>
-      <AntDesign name={iconName} size={24} color="arrowright"/>
+      <AntDesign name={"right"} size={24} color="white"/>
     </View>
   );
 };
 
 const SettingsScreen = () => {
+
+  const navigation = useNavigation();
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <AntDesign name="arrowleft" size={30} color="white"/>
+      <AntDesign name="arrowleft" size={30} color="white" onPress={() => {navigation.goBack();}} />
       <Text style={styles.title}>Settings</Text>
       <SettingsItem containerColor={'blue'} iconName={'question'} title={'Notifications'}/>
       <SettingsItem containerColor={'lightblue'} iconName={'question'} title={'Currency'}/>
