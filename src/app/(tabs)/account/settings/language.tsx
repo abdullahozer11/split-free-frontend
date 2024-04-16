@@ -2,15 +2,15 @@ import {StyleSheet, View, Text} from 'react-native';
 import React from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 
-const Notifications = () => {
+const LanguageScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Notifications</Text>
+      <Text>LanguageScreen</Text>
     </SafeAreaView>
   );
 };
 
-export default Notifications;
+export default LanguageScreen;
 
 const styles = StyleSheet.create({
   container: {},

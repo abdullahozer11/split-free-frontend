@@ -13,17 +13,16 @@ export default function ProfileScreen() {
   const {session, profile, loading} = useAuth();
   const [image, setImage] = useState('');
 
-  // const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'TRY'];
   const currencies = {
     'USD': '$',
     'EUR': '€',
-    'GBP': '£',
-    'JPY': '¥',
-    'CAD': '$',
-    'AUD': '$',
-    'CHF': 'r',
-    'CNY': '¥',
     'TRY': '₺'
+    // 'GBP': '£',
+    // 'JPY': '¥',
+    // 'CAD': '$',
+    // 'AUD': '$',
+    // 'CHF': 'r',
+    // 'CNY': '¥',
   };
 
   // const {mutate: updateProfile} = useUpdateProfile();

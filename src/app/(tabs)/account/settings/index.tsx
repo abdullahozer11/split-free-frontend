@@ -8,7 +8,7 @@ import {Link, useNavigation} from "expo-router";
 
 const SettingsItem = ({page, iconName, title, containerColor}) => {
   return (
-    <Link href={`/(tabs)/Account/settings/${page}`} asChild>
+    <Link href={`/(tabs)/account/settings/${page}`} asChild>
       <Pressable style={styles.settingsItemRow}>
         <View style={styles.innerRow}>
           <View style={[styles.settingsItemIconContainer, {backgroundColor: containerColor}]}>
@@ -41,6 +41,7 @@ const SettingsScreen = () => {
       <Text style={styles.title}>Settings</Text>
       <SettingsItem page={'notifications'} containerColor={'blue'} iconName={'bell'} title={'Notifications'}/>
       <SettingsItem page={'currency'} containerColor={'lightblue'} iconName={'dollar-sign'} title={'Currency'}/>
+      <SettingsItem page={'language'} containerColor={'darkorange'} iconName={'globe'} title={'Language'}/>
       <SettingsItem page={'faq'} containerColor={'orange'} iconName={'help-circle'} title={'FAQ'}/>
       <SettingsItem page={'terms'} containerColor={'blue'} iconName={'check'} title={'Term of Use'}/>
       <View style={styles.settingsItemRow}>
