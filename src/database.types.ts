@@ -169,6 +169,7 @@ export type Database = {
           creator: string
           description: string | null
           id: number
+          status: string
           title: string | null
         }
         Insert: {
@@ -176,6 +177,7 @@ export type Database = {
           creator?: string
           description?: string | null
           id?: number
+          status?: string
           title?: string | null
         }
         Update: {
@@ -183,6 +185,7 @@ export type Database = {
           creator?: string
           description?: string | null
           id?: number
+          status?: string
           title?: string | null
         }
         Relationships: [
