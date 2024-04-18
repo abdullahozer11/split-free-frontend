@@ -3,7 +3,7 @@ import {group} from "@/assets/data/group";
 import GroupItem from "@/src/components/GroupItem";
 import React, {useRef, useState} from "react";
 import {Text} from "@/src/components/Themed";
-import CreateGroup from "@/src/modals/CreateGroup";
+import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import Button from "@/src/components/Button";
 
@@ -71,7 +71,7 @@ const GroupScreen = ({}) => {
           )}
           keyExtractor={(item) => item.id.toString()}
         />
-        <CreateGroup isVisible={isModalVisible} onClose={closeModal} onDraw={toggleDrawer}/>
+        <CreateGroupModal isVisible={isModalVisible} onClose={closeModal} onDraw={toggleDrawer}/>
       </View>
       <Animated.View style={[styles.sideBar, {
         transform: [{
