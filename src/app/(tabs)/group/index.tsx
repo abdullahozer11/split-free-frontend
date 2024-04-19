@@ -1,14 +1,24 @@
-import {View, StyleSheet, SectionList} from 'react-native';
-import {group} from "@/assets/data/group";
+import {View, StyleSheet, SectionList, ActivityIndicator} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useRef, useState} from "react";
 import {Text} from "@/src/components/Themed";
 import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
+import {useGroupList} from "@/src/api/groups";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
+
+  const { data: groups, error, isLoading } = useGroupList();
+
+  if (isLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (error) {
+    return <Text>Failed to fetch products</Text>;
+  }
 
   function handleSearch() {
     console.log('searching');
@@ -33,7 +43,7 @@ const GroupScreen = ({}) => {
   if (anchoredGroups.length > 0) {
     sections.push({title: "Quick Access", data: anchoredGroups});
   }
-  sections.push({title: "All Groups", data: group.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
+  sections.push({title: "All Groups", data: groups.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
 
   return (
     <View style={styles.container}>

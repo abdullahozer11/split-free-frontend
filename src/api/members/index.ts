@@ -2,11 +2,11 @@ import {supabase} from "@/src/lib/supabase";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 
 
-export const useGroupList = () => {
+export const useMemberList = () => {
   return useQuery({
-    queryKey: ['groups'],
+    queryKey: ['members'],
     queryFn: async () => {
-      const {data, error} = await supabase.from('groups').select('*');
+      const {data, error} = await supabase.from('members').select('*');
       if (error) {
         throw new Error(error.message);
       }
@@ -15,12 +15,12 @@ export const useGroupList = () => {
   });
 };
 
-export const useGroup = (id: number) => {
+export const useMember = (id: number) => {
   return useQuery({
-    queryKey: ['groups', id],
+    queryKey: ['members', id],
     queryFn: async () => {
       const {data, error} = await supabase
-        .from('groups')
+        .from('members')
         .select('*')
         .eq('id', id)
         .single();
@@ -32,14 +32,13 @@ export const useGroup = (id: number) => {
   });
 };
 
-export const useInsertGroup = () => {
+export const useInsertMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    async mutationFn(data) {
-      // console.log('Data received for insertion:', data);
-      const { error, data: newGroup } = await supabase
-        .from('groups')
+    async mutationFn(data: any) {
+      const {error, data: newMember} = await supabase
+        .from('grop')
         .insert({
           title: data.title,
           description: data.description,
@@ -47,25 +46,23 @@ export const useInsertGroup = () => {
         })
         .single();
       if (error) {
-        console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      return newGroup;
+      return newMember;
     },
     async onSuccess() {
-      // console.log('Mutation succeeded. Invalidating "groups" query.');
-      await queryClient.invalidateQueries(['groups']);
+      await queryClient.invalidateQueries(['members']);
     }
   });
 };
 
-export const useUpdateGroup = () => {
+export const useUpdateMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     async mutationFn(data: any) {
-      const {error, data: updatedGroup} = await supabase
-        .from('groups')
+      const {error, data: updatedMember} = await supabase
+        .from('members')
         .update({
           title: data.title,
           description: data.description,
@@ -76,23 +73,23 @@ export const useUpdateGroup = () => {
       if (error) {
         throw new Error(error.message);
       }
-      return updatedGroup;
+      return updatedMember;
     },
     async onSuccess(_, {id}) {
-      await queryClient.invalidateQueries(['groups']);
-      await queryClient.invalidateQueries(['groups', id]);
+      await queryClient.invalidateQueries(['members']);
+      await queryClient.invalidateQueries(['members', id]);
     }
   });
 };
 
-export const useDeleteGroup = () => {
+export const useDeleteMember = () => {
   const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(id: number) {
-      const {error} = await supabase.from('groups').delete().eq('id', id);
+      const {error} = await supabase.from('members').delete().eq('id', id);
     },
     async onSuccess(_, {id}) {
-      await queryClient.invalidateQueries(['groups']);
+      await queryClient.invalidateQueries(['members']);
     }
   });
 };

@@ -12,6 +12,7 @@ import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertGroup} from "@/src/api/groups";
+import {useInsertMember} from "@/src/api/members";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
@@ -19,6 +20,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   const [error, setError] = useState('');
 
   const {mutate: insertGroup} = useInsertGroup();
+  // const {mutate: insertMember} = useInsertMember();
 
   const {profile} = useAuth();
   const [members, setMembers] = useState([profile?.full_name]);
@@ -33,7 +35,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   };
 
   const saveData = async () => {
-    if (validateData()) {
+    if (!validateData()) {
       return;
     }
     // Save in the database
@@ -42,10 +44,15 @@ const CreateGroupModal = ({isVisible, onClose}) => {
       owner: profile.id,
     }, {
       onSuccess: () => {
+        saveMembers();
         resetFields();
         onClose();
       }
     });
+  };
+
+  const saveMembers = () => {
+    console.log("saving members...");
   };
 
   const validateData = () => {
