@@ -1,14 +1,25 @@
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
 import {Feather, FontAwesome} from "@expo/vector-icons";
+import {useDeleteGroup} from "@/src/api/groups";
 
 const GroupItem = ({group, onAnchor}) => {
   const [anchored, setAnchored] = useState(group.anchored);
+
+  const {mutate: deleteGroup} = useDeleteGroup();
 
   const handleAnchor = async () => {
     onAnchor(!anchored);
     setAnchored(!anchored);
   }
+
+  const handleDelete = () => {
+    deleteGroup(group.id, {
+      onSuccess: () => {
+        // console.log("Successfully deleted group");
+      }
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -16,6 +27,9 @@ const GroupItem = ({group, onAnchor}) => {
         <Text style={styles.title}>{group.title}</Text>
         <TouchableOpacity onPress={handleAnchor}>
           <Feather size={28} style={anchored ? styles.anchorIcon : styles.unanchorIcon} name={'anchor'}/>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleDelete}>
+          <Feather size={28} name={'trash-2'} color={'maroon'}/>
         </TouchableOpacity>
       </View>
       <View style={styles.row}>

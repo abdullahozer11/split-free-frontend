@@ -1,5 +1,6 @@
 import {supabase} from "@/src/lib/supabase";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {useAuth} from "@/src/providers/AuthProvider";
 
 
 export const useGroupList = () => {
@@ -34,6 +35,7 @@ export const useGroup = (id: number) => {
 
 export const useInsertGroup = () => {
   const queryClient = useQueryClient();
+  const {profile} = useAuth();
 
   return useMutation({
     async mutationFn(data) {
@@ -43,13 +45,15 @@ export const useInsertGroup = () => {
         .insert({
           title: data.title,
           description: data.description,
-          owner: data.owner,
+          owner: profile.id,
         })
+        .select()
         .single();
       if (error) {
-        console.error('Error during insertion:', error);
+        // console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
+      console.log('New group inserted:', newGroup);
       return newGroup;
     },
     async onSuccess() {

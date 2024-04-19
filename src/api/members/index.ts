@@ -38,14 +38,14 @@ export const useInsertMember = () => {
   return useMutation({
     async mutationFn(data: any) {
       const {error, data: newMember} = await supabase
-        .from('grop')
+        .from('members')
         .insert({
-          title: data.title,
-          description: data.description,
-          owner: data.owner,
+          name: data.name,
+          group: data.group,
         })
         .single();
       if (error) {
+        console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
       return newMember;
@@ -64,8 +64,7 @@ export const useUpdateMember = () => {
       const {error, data: updatedMember} = await supabase
         .from('members')
         .update({
-          title: data.title,
-          description: data.description,
+          name: data.name,
         })
         .eq('id', data.id)
         .select()

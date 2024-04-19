@@ -20,7 +20,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   const [error, setError] = useState('');
 
   const {mutate: insertGroup} = useInsertGroup();
-  // const {mutate: insertMember} = useInsertMember();
+  const {mutate: insertMember} = useInsertMember();
 
   const {profile} = useAuth();
   const [members, setMembers] = useState([profile?.full_name]);
@@ -38,21 +38,31 @@ const CreateGroupModal = ({isVisible, onClose}) => {
     if (!validateData()) {
       return;
     }
-    // Save in the database
+    // Save group in the database
     insertGroup({
       title,
-      owner: profile.id,
     }, {
-      onSuccess: () => {
-        saveMembers();
+      onSuccess: (data) => {
+        saveMembers(data?.id);
         resetFields();
         onClose();
       }
     });
   };
 
-  const saveMembers = () => {
-    console.log("saving members...");
+  const saveMembers = (group_id) => {
+    console.log("group id is ", group_id);
+    // Save members in the database
+    members.forEach((member) => {
+      insertMember({
+        name: member,
+        group: group_id,
+      }, {
+        onSuccess: () => {
+          console.log("saved member:", member);
+        }
+      });
+    })
   };
 
   const validateData = () => {
