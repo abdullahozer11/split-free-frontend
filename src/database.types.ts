@@ -9,7 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      activity: {
+      activities: {
         Row: {
           created_at: string
           id: number
@@ -33,12 +33,12 @@ export type Database = {
             foreignKeyName: "public_Activity_member_fkey"
             columns: ["member"]
             isOneToOne: false
-            referencedRelation: "member"
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
         ]
       }
-      balance: {
+      balances: {
         Row: {
           amount: number | null
           created_at: string
@@ -65,12 +65,12 @@ export type Database = {
             foreignKeyName: "public_Balance_owner_fkey"
             columns: ["owner"]
             isOneToOne: false
-            referencedRelation: "member"
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
         ]
       }
-      debt: {
+      debts: {
         Row: {
           amount: number
           borrower: number
@@ -100,19 +100,19 @@ export type Database = {
             foreignKeyName: "public_Debt_borrower_fkey"
             columns: ["borrower"]
             isOneToOne: false
-            referencedRelation: "member"
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_Debt_lender_fkey"
             columns: ["lender"]
             isOneToOne: false
-            referencedRelation: "member"
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
         ]
       }
-      expense: {
+      expenses: {
         Row: {
           amount: number
           created_at: string
@@ -151,54 +151,54 @@ export type Database = {
             foreignKeyName: "public_Expense_participants_fkey"
             columns: ["participants"]
             isOneToOne: false
-            referencedRelation: "member"
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_Expense_payers_fkey"
             columns: ["payers"]
             isOneToOne: false
-            referencedRelation: "member"
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
         ]
       }
-      group: {
+      groups: {
         Row: {
           created_at: string
-          creator: string
           description: string | null
           id: number
+          owner: string | null
           status: string
           title: string | null
         }
         Insert: {
           created_at?: string
-          creator?: string
           description?: string | null
           id?: number
+          owner?: string | null
           status?: string
           title?: string | null
         }
         Update: {
           created_at?: string
-          creator?: string
           description?: string | null
           id?: number
+          owner?: string | null
           status?: string
           title?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "public_Group_creator_fkey"
-            columns: ["creator"]
+            foreignKeyName: "public_groups_owner_fkey"
+            columns: ["owner"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-      member: {
+      members: {
         Row: {
           created_at: string
           group: number

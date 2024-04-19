@@ -5,20 +5,56 @@ import {
   StyleSheet,
   TextInput,
   Pressable,
-  ScrollView,
   Modal,
   TouchableOpacity,
 } from "react-native";
 import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
+import {useAuth} from "@/src/providers/AuthProvider";
+import {useInsertGroup} from "@/src/api/groups";
 
-const CreateGroupModal = ({isVisible, onClose, onDraw}) => {
+const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+  const [error, setError] = useState('');
+
+  const {mutate: insertGroup} = useInsertGroup();
+
+  const {profile} = useAuth();
+  const [members, setMembers] = useState([profile?.full_name]);
+
+  const handleParticipantsSubmit = (members) => {
+    setShowParticipantsModal(false);
+    setMembers(members);
+  };
+
+  const resetFields = () => {
+    setTitle('');
+  };
 
   const saveData = async () => {
-    console.log("Saving data");
-    // Logic to save group data
+    if (validateData()) {
+      return;
+    }
+    // Save in the database
+    insertGroup({
+      title,
+      owner: profile.id,
+    }, {
+      onSuccess: () => {
+        resetFields();
+        onClose();
+      }
+    });
+  };
+
+  const validateData = () => {
+    setError('');
+    if (!title) {
+      setError('Group name cannot be empty');
+      return false;
+    }
+    return true;
   };
 
   const openParticipantsModal = () => {
@@ -55,9 +91,17 @@ const CreateGroupModal = ({isVisible, onClose, onDraw}) => {
           <TouchableOpacity style={styles.addParticipants} onPress={openParticipantsModal}>
             <Text style={styles.parTitle}>Add Participants</Text>
           </TouchableOpacity>
+          <Text style={{color: 'red'}}>{error}</Text>
         </View>
       </View>
-      {showParticipantsModal && ( <Participants isVisible={showParticipantsModal} onClose={closeParticipantsModal}/> )}
+      {showParticipantsModal && (
+        <Participants
+          isVisible={showParticipantsModal}
+          onClose={closeParticipantsModal}
+          onSubmit={handleParticipantsSubmit}
+          members={members}
+        />
+      )}
     </Modal>
   );
 };

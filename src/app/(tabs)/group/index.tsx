@@ -9,18 +9,6 @@ import CustomHeader from "@/src/components/CustomHeader";
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [newParticipants, setNewParticipants] = useState([]);
-
-  const toggleDrawer = () => {
-    console.log('toggle drawer');
-    setDrawerOpen(!drawerOpen);
-  };
-
-  const handleNewParticipants = () => {
-    console.log("handling new participants");
-  };
 
   function handleSearch() {
     console.log('searching');
@@ -59,7 +47,7 @@ const GroupScreen = ({}) => {
           )}
           keyExtractor={(item) => item.id.toString()}
         />
-        <CreateGroupModal isVisible={isModalVisible} onClose={closeModal} onDraw={toggleDrawer}/>
+        <CreateGroupModal isVisible={isModalVisible} onClose={closeModal} />
       </View>
     </View>
   );

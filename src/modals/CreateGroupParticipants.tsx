@@ -16,18 +16,17 @@ const Member = ({name, onRemove, owner}) => {
   );
 };
 
-const Participants = ({isVisible, onClose}) => {
+const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
   const [name, setName] = useState('');
-  const {profile} = useAuth();
-  const [members, setMembers] = useState([profile?.full_name]);
+  const [members, setMembers] = useState([membersP]);
+  const [error, setError] = useState('');
 
   const addMember = () => {
-    if (validateMemberName()) {
-      setMembers([...members, name]);
-      setName('');
-    } else {
-      Alert.alert('Name is already in the list');
+    if (!validateMemberName()) {
+      return;
     }
+    setMembers([...members, name]);
+    setName('');
   };
 
   const removeMember = (memberName) => {
@@ -35,7 +34,11 @@ const Participants = ({isVisible, onClose}) => {
   };
 
   const validateMemberName = () => {
-    return !members.includes(name);
+    if (members.includes(name)) {
+      setError('Name is already in the list');
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -69,11 +72,12 @@ const Participants = ({isVisible, onClose}) => {
               )
             ))}
           </View>
+          <Text style={{color: 'red'}}>{error}</Text>
           <View style={styles.footer}>
             <TouchableOpacity style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
+            <TouchableOpacity style={styles.button} onPress={() => onSubmit(members)}>
               <Feather name={"check"} size={24} color="black"/>
               <Text style={styles.buttonText}>Done</Text>
             </TouchableOpacity>
