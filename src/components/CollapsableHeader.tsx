@@ -17,7 +17,8 @@ const CollapsibleHeader = ({content, headerContent, H_MAX_HEIGHT, H_MIN_HEIGHT})
       <ScrollView
         onScroll={Animated.event([
           {nativeEvent: {contentOffset: {y: scrollOffsetY}}}
-        ])}
+        ], {useNativeDriver: false}
+        )}
         scrollEventThrottle={16}
       >
         <View style={[styles.content, {paddingTop: H_MAX_HEIGHT}]}>
