@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList, Text, View, StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import ActivityItem from '@/src/components/ActivityItem';
 import {activity} from '@/assets/data/activity';
 import {useAuth} from '@/src/providers/AuthProvider';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {Ionicons} from "@expo/vector-icons";
+import CollapsableHeader from "@/src/components/CollapsableHeader";
 
 const groupActivitiesByDay = (activities) => {
   const groupedActivities = {};
@@ -26,41 +26,22 @@ const groupActivitiesByDay = (activities) => {
 
 export default function ActivityScreen() {
   const {profile} = useAuth();
-  const [scrollY] = useState(new Animated.Value(0));
-  const headerHeight = 80;
 
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, headerHeight],
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
-
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, headerHeight],
-    outputRange: [0, -headerHeight],
-    extrapolate: 'clamp',
-  });
-
-  const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
   const groupedActivities = groupActivitiesByDay(activity);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Animated.View style={[styles.header, {opacity: headerOpacity, transform: [{translateY: headerTranslateY}]}]}>
-        <FontAwesome size={16} style={styles.bell} name={'bell'}/>
-        <Text style={styles.headerTitle}>My Balance</Text>
-        <Text style={styles.headerBalance}>{profile?.currency || '$'}{profile?.balance || '0.00'}</Text>
-      </Animated.View>
-      <View style={styles.body}>
-        <View style={styles.row}>
-          <Text style={styles.activity}>Activity</Text>
-          <TouchableOpacity style={styles.icon} onPress={() => {
-          }}>
-            <Text style={styles.activity}>See All</Text>
-            <Ionicons name="chevron-forward-outline" size={24} color="black"/>
-          </TouchableOpacity>
-        </View>
-        <AnimatedFlatList
+    <View style={styles.container}>
+      <CollapsableHeader content={
+        <>
+          <View style={styles.row}>
+            <Text style={styles.activity}>Activity</Text>
+            <TouchableOpacity style={styles.icon} onPress={() => {
+            }}>
+              <Text style={styles.activity}>See All</Text>
+              <Ionicons name="chevron-forward-outline" size={24} color="black"/>
+            </TouchableOpacity>
+          </View>
+          <FlatList
           data={Object.keys(groupedActivities)}
           renderItem={({item}) => (
             <View style={styles.activityGroup}>
@@ -71,32 +52,28 @@ export default function ActivityScreen() {
             </View>
           )}
           contentContainerStyle={{padding: 10}}
-          onScroll={Animated.event([{nativeEvent: {contentOffset: {y: scrollY}}}], {useNativeDriver: true})}
-          scrollEventThrottle={16}
         />
-      </View>
-    </SafeAreaView>
+        </>
+      } headerContent={
+        <View style={styles.header}>
+          <FontAwesome size={16} style={styles.bell} name={'bell'}/>
+          <Text style={styles.headerTitle}>My Balance</Text>
+          <Text style={styles.headerBalance}>{profile?.currency || '$'}{profile?.balance || '0.00'}</Text>
+        </View>
+      } />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
-  },
-  body: {
     backgroundColor: 'white',
-    flex: 1,
-    borderTopEndRadius: 20,
-    borderTopStartRadius: 20,
-    padding: 20,
   },
   header: {
-    height: 180,
-    backgroundColor: 'black',
-    zIndex: 1,
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
   tabBar: {
     justifyContent: "space-between",
@@ -133,6 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginBottom: 7,
     color: 'black',
+    backgroundColor: 'white'
   },
   icon: {
     flexDirection: 'row',

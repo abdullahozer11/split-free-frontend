@@ -1,7 +1,6 @@
 import {StyleSheet, View, Text} from 'react-native';
 import {useLocalSearchParams} from "expo-router";
 import React from "react";
-import {SafeAreaView} from "react-native-safe-area-context";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 
 const GroupDetailsScreen = () => {
@@ -29,16 +28,31 @@ const GroupDetailsScreen = () => {
             <Text>View 1</Text>
           </View>
         </>
-      }/>
+      } headerContent={
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Group Details Screen</Text>
+        </View>
+      }
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: "black",
     flex: 1,
   },
+  header: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+  }
 });
 
 export default GroupDetailsScreen;

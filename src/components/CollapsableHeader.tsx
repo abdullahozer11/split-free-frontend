@@ -2,11 +2,11 @@ import React, {useRef} from "react";
 import {View, Animated, Image, ScrollView, Text} from "react-native";
 import {StyleSheet} from 'react-native';
 
-const H_MAX_HEIGHT = 150;
-const H_MIN_HEIGHT = 52;
+const H_MAX_HEIGHT = 160;
+const H_MIN_HEIGHT = 60;
 const H_SCROLL_DISTANCE = H_MAX_HEIGHT - H_MIN_HEIGHT;
 
-const CollapsibleHeader = ({content}) => {
+const CollapsibleHeader = ({content, headerContent}) => {
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const headerScrollHeight = scrollOffsetY.interpolate({
     inputRange: [0, H_SCROLL_DISTANCE],
@@ -21,7 +21,6 @@ const CollapsibleHeader = ({content}) => {
           {nativeEvent: {contentOffset: {y: scrollOffsetY}}}
         ])}
         scrollEventThrottle={16}
-        style={{borderRadius: 30}}
       >
         <View style={styles.content}>
           {content}
@@ -30,11 +29,7 @@ const CollapsibleHeader = ({content}) => {
       <Animated.View
         style={[styles.header, {height: headerScrollHeight}]}
       >
-        <Image
-          source={{uri: "https://via.placeholder.com/300"}}
-          style={{flex: 1}}
-          resizeMode={"contain"}
-        />
+        {headerContent}
       </Animated.View>
     </View>
   );
@@ -48,6 +43,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingTop: H_MAX_HEIGHT,
+    minHeight: 900,
   },
   header: {
     position: "absolute",
@@ -58,9 +54,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     zIndex: 999,
     // STYLE
-    borderBottomColor: "#EFEFF4",
-    borderBottomWidth: 2,
     padding: 10,
     backgroundColor: "black",
-  }
+  },
 });
