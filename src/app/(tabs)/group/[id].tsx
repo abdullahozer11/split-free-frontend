@@ -48,7 +48,6 @@ const GroupDetailsScreen = () => {
             </View>
 
             <Hidden>Second Section</Hidden>
-            <Text style={{fontSize: 18, fontWeight: '500', marginBottom: 20}}>Jan 15, 2024</Text>
             <FlatList
               data={Object.keys(groupedExpenses)}
               renderItem={({item}) => (
@@ -127,9 +126,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   date: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '500',
-    color: 'black',
   },
 });
 

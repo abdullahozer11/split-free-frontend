@@ -9,10 +9,10 @@ const ExpenseItem = ({expense}) => {
         <Feather name={'shopping-cart'} source={require('@/assets/images/logo.png')} style={styles.icon}/>
       </View>
       <View>
-        <Text style={{fontSize: 18, fontWeight: '600'}}>Coffee at Versailles</Text>
-        <Text style={{fontSize: 14, fontWeight: '300'}}>Total €16.50</Text>
+        <Text style={{fontSize: 18, fontWeight: '600'}}>{expense.title}</Text>
+        <Text style={{fontSize: 14, fontWeight: '300'}}>Total €{expense.amount}</Text>
       </View>
-      <Text style={{color: "green", fontSize: 16, fontWeight: "500"}}>+ €46.00</Text>
+      <Text style={styles.balanceEffect}>+ €46.00</Text>
     </View>
   );
 };
@@ -21,13 +21,13 @@ export default ExpenseItem;
 
 const styles = StyleSheet.create({
   container: {},
-    expenseItem: {
+  expenseItem: {
     backgroundColor: 'white',
     flexDirection: "row",
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderRadius: 20,
-    justifyContent: "space-between"
+    gap: 15,
   },
   expenseCatIcon: {
     justifyContent: "center",
@@ -40,5 +40,13 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 25,
+  },
+  balanceEffect: {
+    color: "green",
+    fontSize: 16,
+    fontWeight: "500",
+    position: "absolute",
+    right: 20,
+    alignSelf: "center",
   },
 });
