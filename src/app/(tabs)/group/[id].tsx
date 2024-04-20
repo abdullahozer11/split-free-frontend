@@ -1,10 +1,14 @@
-import {StyleSheet, View, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, FlatList} from 'react-native';
 import React from "react";
 import {Feather} from "@expo/vector-icons";
 import {useGroup} from "@/src/api/groups";
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
+import {expenses} from "@/assets/data/expense";
+import ActivityItem from "@/src/components/ActivityItem";
+import {groupElementsByDay} from "@/src/utils/date";
+import {activity} from "@/assets/data/activity";
 
 function Hidden(props: { children }) {
   return null;
@@ -13,8 +17,8 @@ function Hidden(props: { children }) {
 const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
-
   const navigation = useNavigation();
+  const groupedExpenses = groupElementsByDay(expenses);
 
   const {data: group, isLoading, error} = useGroup(id);
 
@@ -45,17 +49,25 @@ const GroupDetailsScreen = () => {
 
             <Hidden>Second Section</Hidden>
             <Text style={{fontSize: 18, fontWeight: '500', marginBottom: 20}}>Jan 15, 2024</Text>
-            <View style={{gap: 15}}>
-              <ExpenseItem/>
-              <ExpenseItem/>
-              <ExpenseItem/>
-            </View>
+            <FlatList
+              data={Object.keys(groupedExpenses)}
+              renderItem={({item}) => (
+                <View style={styles.activityGroup}>
+                  <Text style={styles.date}>{item}</Text>
+                  {groupedExpenses[item].map((expense) => (
+                    <ExpenseItem key={expense.id} expense={expense}/>
+                  ))}
+                </View>
+              )}
+            />
           </View>
         </View>
       } headerContent={
         <View style={styles.header}>
           <View style={styles.headerBar}>
-            <TouchableOpacity onPress={() => {navigation.goBack()}}>
+            <TouchableOpacity onPress={() => {
+              navigation.goBack();
+            }}>
               <Feather name="arrow-left" size={36} color="gold"/>
             </TouchableOpacity>
             <View style={{flexDirection: "row", gap: 10}}>
@@ -109,6 +121,15 @@ const styles = StyleSheet.create({
     top: 20,
     left: 0,
     backgroundColor: "transparent",
+  },
+  activityGroup: {
+    marginTop: 10,
+    gap: 10,
+  },
+  date: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'black',
   },
 });
 

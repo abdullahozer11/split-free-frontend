@@ -1,16 +1,16 @@
-export const groupActivitiesByDay = (activities) => {
-  const groupedActivities = {};
-  activities.forEach((activity) => {
+export const groupElementsByDay = (elements) => {
+  const groupedElements = {};
+  elements.forEach((activity) => {
     const createdDate = new Date(activity.created_at);
     const dayKey = createdDate.toLocaleDateString('en-US', {
       month: 'short',
       day: '2-digit',
       year: 'numeric',
     });
-    if (!groupedActivities[dayKey]) {
-      groupedActivities[dayKey] = [];
+    if (!groupedElements[dayKey]) {
+      groupedElements[dayKey] = [];
     }
-    groupedActivities[dayKey].push(activity);
+    groupedElements[dayKey].push(activity);
   });
-  return groupedActivities;
+  return groupedElements;
 };

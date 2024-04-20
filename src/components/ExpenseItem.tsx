@@ -2,7 +2,7 @@ import {StyleSheet, View, Text} from 'react-native';
 import React from "react";
 import {Feather} from "@expo/vector-icons";
 
-const ExpenseItem = () => {
+const ExpenseItem = ({expense}) => {
   return (
     <View style={styles.expenseItem}>
       <View style={styles.expenseCatIcon}>

@@ -6,28 +6,12 @@ import {useAuth} from '@/src/providers/AuthProvider';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {Ionicons} from "@expo/vector-icons";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-
-const groupActivitiesByDay = (activities) => {
-  const groupedActivities = {};
-  activities.forEach((activity) => {
-    const createdDate = new Date(activity.created_at);
-    const dayKey = createdDate.toLocaleDateString('en-US', {
-      month: 'short',
-      day: '2-digit',
-      year: 'numeric',
-    });
-    if (!groupedActivities[dayKey]) {
-      groupedActivities[dayKey] = [];
-    }
-    groupedActivities[dayKey].push(activity);
-  });
-  return groupedActivities;
-};
+import {groupElementsByDay} from "@/src/utils/date";
 
 export default function ActivityScreen() {
   const {profile} = useAuth();
 
-  const groupedActivities = groupActivitiesByDay(activity);
+  const groupedActivities = groupElementsByDay(activity);
 
   return (
     <View style={styles.container}>
@@ -105,6 +89,11 @@ const styles = StyleSheet.create({
   activityGroup: {
     marginTop: 10,
   },
+  date: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'black',
+  },
   activity: {
     fontSize: 18,
     fontWeight: '500',
@@ -114,10 +103,5 @@ const styles = StyleSheet.create({
   },
   icon: {
     flexDirection: 'row',
-  },
-  date: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: 'black',
   },
 });
