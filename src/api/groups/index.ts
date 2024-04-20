@@ -7,10 +7,14 @@ export const useGroupList = () => {
   return useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
-      const {data, error} = await supabase.from('groups').select('*');
+      const { data, error} = await supabase
+        .from('groups')
+        .select('*, members(count), expenses(count)');
       if (error) {
+        console.log(error.message);
         throw new Error(error.message);
       }
+      // console.log('data is ', data[0]['expenses']);
       return data;
     },
   });

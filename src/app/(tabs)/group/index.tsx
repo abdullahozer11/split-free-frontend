@@ -17,8 +17,10 @@ const GroupScreen = ({}) => {
   }
 
   if (error) {
-    return <Text>Failed to fetch products</Text>;
+    return <Text>Failed to fetch groups</Text>;
   }
+
+  //
 
   function handleSearch() {
     console.log('searching');

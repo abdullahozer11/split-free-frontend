@@ -12,23 +12,33 @@ export type Database = {
       activities: {
         Row: {
           created_at: string
+          group: number | null
           id: number
           member: number
           text: string
         }
         Insert: {
           created_at?: string
+          group?: number | null
           id?: number
           member: number
           text: string
         }
         Update: {
           created_at?: string
+          group?: number | null
           id?: number
           member?: number
           text?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "public_activities_group_fkey"
+            columns: ["group"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "public_Activity_member_fkey"
             columns: ["member"]
@@ -43,6 +53,7 @@ export type Database = {
           amount: number | null
           created_at: string
           currency: string | null
+          group: number | null
           id: number
           owner: number | null
         }
@@ -50,6 +61,7 @@ export type Database = {
           amount?: number | null
           created_at?: string
           currency?: string | null
+          group?: number | null
           id?: number
           owner?: number | null
         }
@@ -57,6 +69,7 @@ export type Database = {
           amount?: number | null
           created_at?: string
           currency?: string | null
+          group?: number | null
           id?: number
           owner?: number | null
         }
@@ -68,6 +81,13 @@ export type Database = {
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_balances_group_fkey"
+            columns: ["group"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
         ]
       }
       debts: {
@@ -76,6 +96,7 @@ export type Database = {
           borrower: number
           created_at: string
           currency: string
+          group: number | null
           id: number
           lender: number
         }
@@ -84,6 +105,7 @@ export type Database = {
           borrower: number
           created_at?: string
           currency?: string
+          group?: number | null
           id?: number
           lender: number
         }
@@ -92,6 +114,7 @@ export type Database = {
           borrower?: number
           created_at?: string
           currency?: string
+          group?: number | null
           id?: number
           lender?: number
         }
@@ -110,6 +133,13 @@ export type Database = {
             referencedRelation: "members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "public_debts_group_fkey"
+            columns: ["group"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
         ]
       }
       expenses: {
@@ -119,6 +149,7 @@ export type Database = {
           currency: string
           date: string
           description: string | null
+          group: number | null
           id: number
           participants: number | null
           payers: number | null
@@ -130,6 +161,7 @@ export type Database = {
           currency?: string
           date?: string
           description?: string | null
+          group?: number | null
           id?: number
           participants?: number | null
           payers?: number | null
@@ -141,6 +173,7 @@ export type Database = {
           currency?: string
           date?: string
           description?: string | null
+          group?: number | null
           id?: number
           participants?: number | null
           payers?: number | null
@@ -159,6 +192,13 @@ export type Database = {
             columns: ["payers"]
             isOneToOne: false
             referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_expenses_group_fkey"
+            columns: ["group"]
+            isOneToOne: false
+            referencedRelation: "groups"
             referencedColumns: ["id"]
           },
         ]
@@ -229,6 +269,13 @@ export type Database = {
             columns: ["profile"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_members_group_fkey"
+            columns: ["group"]
+            isOneToOne: false
+            referencedRelation: "groups"
             referencedColumns: ["id"]
           },
         ]
