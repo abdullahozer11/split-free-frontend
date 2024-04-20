@@ -1,7 +1,8 @@
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Pressable} from 'react-native';
 import React, {useState} from "react";
 import {Feather, FontAwesome} from "@expo/vector-icons";
 import {useDeleteGroup} from "@/src/api/groups";
+import {Link} from "expo-router";
 
 const GroupItem = ({group, onAnchor}) => {
   const [anchored, setAnchored] = useState(group.anchored);
@@ -11,7 +12,8 @@ const GroupItem = ({group, onAnchor}) => {
   const handleAnchor = async () => {
     onAnchor(!anchored);
     setAnchored(!anchored);
-  }
+    return true;
+  };
 
   const handleDelete = () => {
     deleteGroup(group.id, {
@@ -22,30 +24,32 @@ const GroupItem = ({group, onAnchor}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.row, styles.firstRow]}>
-        <Text style={styles.title}>{group.title}</Text>
-        <TouchableOpacity onPress={handleAnchor}>
-          <Feather size={28} style={anchored ? styles.anchorIcon : styles.unanchorIcon} name={'anchor'}/>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleDelete}>
-          <Feather size={28} name={'trash-2'} color={'maroon'}/>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.row}>
-        <View style={{flexDirection: "row"}}>
-          <FontAwesome size={22} style={styles.fixWidth} name={'user'}/>
-          <Text style={{color: 'gray'}}>{group['members'][0]['count']} Friends</Text>
+    <Link href={`/group/${group.id}`} asChild>
+      <Pressable style={styles.container}>
+        <View style={[styles.row, styles.firstRow]}>
+          <Text style={styles.title}>{group.title}</Text>
+          <TouchableOpacity onPress={handleAnchor}>
+            <Feather size={28} style={anchored ? styles.anchorIcon : styles.unanchorIcon} name={'anchor'}/>
+          </TouchableOpacity>
+          {/*<TouchableOpacity onPress={handleDelete}>*/}
+          {/*  <Feather size={28} name={'trash-2'} color={'maroon'}/>*/}
+          {/*</TouchableOpacity>*/}
         </View>
-      </View>
-      <View style={styles.row}>
-        <View style={{flexDirection: "row"}}>
-          <FontAwesome size={22} style={styles.fixWidth} name={'info'}/>
-          <Text style={{color: '#aaa'}}>{group['expenses'][0]['count']} Expenses</Text>
+        <View style={styles.row}>
+          <View style={{flexDirection: "row"}}>
+            <FontAwesome size={22} style={styles.fixWidth} name={'user'}/>
+            <Text style={{color: 'gray'}}>{group['members'][0]['count']} Friends</Text>
+          </View>
         </View>
-        <Text style={{color: group.status === 'settled' ? 'green' : 'red'}}>{group.status}</Text>
-      </View>
-    </View>
+        <View style={styles.row}>
+          <View style={{flexDirection: "row"}}>
+            <FontAwesome size={22} style={styles.fixWidth} name={'info'}/>
+            <Text style={{color: '#aaa'}}>{group['expenses'][0]['count']} Expenses</Text>
+          </View>
+          <Text style={{color: group.status === 'settled' ? 'green' : 'red'}}>{group.status}</Text>
+        </View>
+      </Pressable>
+    </Link>
   );
 };
 

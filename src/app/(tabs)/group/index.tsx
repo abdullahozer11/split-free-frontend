@@ -1,4 +1,4 @@
-import {View, StyleSheet, SectionList, ActivityIndicator} from 'react-native';
+import {View, StyleSheet, SectionList, ActivityIndicator, TouchableOpacity} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useRef, useState} from "react";
 import {Text} from "@/src/components/Themed";
