@@ -31,7 +31,7 @@ export default function ActivityScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsableHeader content={
+      <CollapsableHeader H_MAX_HEIGHT={160} H_MIN_HEIGHT={50} content={
         <>
           <View style={styles.row}>
             <Text style={styles.activity}>Activity</Text>

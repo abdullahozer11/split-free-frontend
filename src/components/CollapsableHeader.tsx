@@ -2,11 +2,9 @@ import React, {useRef} from "react";
 import {View, Animated, Image, ScrollView, Text} from "react-native";
 import {StyleSheet} from 'react-native';
 
-const H_MAX_HEIGHT = 160;
-const H_MIN_HEIGHT = 60;
-const H_SCROLL_DISTANCE = H_MAX_HEIGHT - H_MIN_HEIGHT;
 
-const CollapsibleHeader = ({content, headerContent}) => {
+const CollapsibleHeader = ({content, headerContent, H_MAX_HEIGHT, H_MIN_HEIGHT}) => {
+  const H_SCROLL_DISTANCE = H_MAX_HEIGHT - H_MIN_HEIGHT;
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const headerScrollHeight = scrollOffsetY.interpolate({
     inputRange: [0, H_SCROLL_DISTANCE],
@@ -22,7 +20,7 @@ const CollapsibleHeader = ({content, headerContent}) => {
         ])}
         scrollEventThrottle={16}
       >
-        <View style={styles.content}>
+        <View style={[styles.content, {paddingTop: H_MAX_HEIGHT}]}>
           {content}
         </View>
       </ScrollView>
@@ -42,7 +40,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingTop: H_MAX_HEIGHT,
     minHeight: 900,
   },
   header: {
