@@ -25,7 +25,7 @@ export default CustomHeader;
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: 'white',
+    backgroundColor: '#F6F6F6FF',
     width: "100%",
     height: 130,
     flexDirection: "row",

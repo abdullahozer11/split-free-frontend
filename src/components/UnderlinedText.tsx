@@ -1,32 +1,26 @@
 import {StyleSheet, View, Text} from 'react-native';
 import React from "react";
 
-const underlinedText = ({ text }) => {
+const UnderlinedText = ({ text, fontSize, fontWeight }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{text}</Text>
-      <View style={styles.underline} />
+      <Text style={{fontSize: fontSize, fontWeight: fontWeight}}>{text}</Text>
+      <View style={[styles.underline, {top: fontSize - 4}]} />
     </View>
   );
 };
 
-export default underlinedText;
+export default UnderlinedText;
 
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
   },
-  text: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 5,
-  },
   underline: {
-    backgroundColor: '#FCC157FF',
+    backgroundColor: 'orange',
     height: 10,
     width: '100%',
     position: 'absolute',
-    top: 14,
     opacity: 0.55,
   },
 });

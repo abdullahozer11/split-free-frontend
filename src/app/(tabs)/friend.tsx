@@ -33,10 +33,11 @@ export default function FriendScreen() {
         </View>
         <View>
           <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
-            <UnderlinedText text={"All Friends"}/>
+            <UnderlinedText text={"All Friends"} fontSize={20} fontWeight={"700"} />
             <Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20} />
           </View>
           <View style={styles.personContainer}>
+            <Person />
             <Person />
           </View>
         </View>

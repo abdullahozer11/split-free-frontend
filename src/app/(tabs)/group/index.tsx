@@ -20,8 +20,6 @@ const GroupScreen = ({}) => {
     return <Text>Failed to fetch groups</Text>;
   }
 
-  //
-
   function handleSearch() {
     console.log('searching');
   }

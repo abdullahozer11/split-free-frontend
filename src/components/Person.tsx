@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     flexDirection: "row",
-    padding: 10,
+    padding: 13,
     alignItems: "center",
     borderRadius: 15,
     paddingHorizontal: 20,
@@ -33,14 +33,14 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   avatar: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 25,
     marginRight: 10,
   },
   memberName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
   },
   balanceP: {
     fontSize: 16,

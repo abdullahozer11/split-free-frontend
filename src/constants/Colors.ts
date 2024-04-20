@@ -20,3 +20,4 @@ export default {
 };
 
 // background for body >> #F6F6F6FF
+// orange tone >> #FCC157FF

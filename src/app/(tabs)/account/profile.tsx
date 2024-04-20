@@ -1,89 +1,73 @@
-import {Image, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
-import Button from '@/src/components/Button';
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useState} from "react";
-import CurrencyCard from "@/src/components/CurrencyItem";
 import {useNavigation} from "expo-router";
+import {Feather} from "@expo/vector-icons";
 
 export default function ProfileScreen() {
-  const [selectedCurrency, setSelectedCurrency] = useState('USD'); // should be dynamic
   const {session, profile, loading} = useAuth();
   const [image, setImage] = useState('');
-
-  const currencies = {
-    'USD': '$',
-    'EUR': '€',
-    'TRY': '₺'
-    // 'GBP': '£',
-    // 'JPY': '¥',
-    // 'CAD': '$',
-    // 'AUD': '$',
-    // 'CHF': 'r',
-    // 'CNY': '¥',
-  };
-
-  // const {mutate: updateProfile} = useUpdateProfile();
-  // const {mutate: deleteProfile} = useDeleteProfile();
+  const navigation = useNavigation();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.5,
     });
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
 
-  const navigation = useNavigation();
+  const handleEdit = () => {
+    console.log('handleEdit');
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button text="Done" onPress={() => {
+        <TouchableOpacity onPress={() => {
           navigation.goBack();
-        }}/>
-        <Button text="Sign Out" onPress={handleSignOut}/>
+        }}>
+          <Feather style={styles.icon} name={"x"} size={24}/>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleEdit}>
+          <Feather style={styles.icon} name={"edit"} size={24}/>
+        </TouchableOpacity>
       </View>
-      <Image
-        source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
-        style={styles.avatar}/>
-      <Text onPress={pickImage} style={styles.imageSelector}>Select Image </Text>
-      <Text style={styles.nameTitle}>FULL NAME</Text>
-      <View style={styles.nameBox}>
-        <Text style={styles.name}>{profile?.full_name || "No Name"}</Text>
+      <Text style={styles.title}>Profile</Text>
+      <View style={styles.avatarContainer}>
+        <Image
+          source={profile.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
+          style={styles.avatar}/>
       </View>
-      <Text style={{}}>Select Primary Currency</Text>
-      <Text style={{}}>Don't worry! You can change it.</Text>
-      <ScrollView
-        style={styles.scrollView}
-        horizontal showsHorizontalScrollIndicator={false}
-      >
-        {Object.entries(currencies).map(([currencyCode, currencySymbol]) => (
-          <TouchableOpacity
-            key={currencyCode}
-            onPress={() => setSelectedCurrency(currencyCode)}
-            style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5}}
-          >
-            <CurrencyCard
-              currencyCode={currencyCode}
-              currencySymbol={currencySymbol}
-              selected={currencyCode === selectedCurrency}
-            />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.infoSection}>
+        <View style={styles.transparent}>
+          <Text style={styles.label}>Full Name</Text>
+          <Text style={styles.info}>{profile.full_name || "John Doe"}</Text>
+        </View>
+        <View style={styles.transparent}>
+          <Text style={styles.label}>Email</Text>
+          <Text style={styles.info}>{profile.email || "john.doe@gmail.com"}</Text>
+        </View>
+        <View style={styles.transparent}>
+          <Text style={styles.label}>Phone Number</Text>
+          <Text style={styles.info}>{profile.phone_number || "+33 7 77 77 77 77"}</Text>
+        </View>
+        <View style={styles.transparent}>
+          <Text style={styles.label}>Password</Text>
+          <Text style={styles.info}>********</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -91,17 +75,25 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F6F6F6FF',
+    padding: 40,
+    gap: 20,
+  },
+  header: {
+    marginTop: 10,
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'white',
   },
   title: {
-    fontSize: 20,
+    fontSize: 36,
     fontWeight: 'bold',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  avatarContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   avatar: {
     width: 200,
@@ -110,41 +102,24 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#eee',
   },
-  name: {
-    fontSize: 32,
-    fontWeight: '600',
+  infoSection: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    gap: 10,
   },
-  textButton: {
-    alignSelf: "center",
-    fontWeight: "500",
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    opacity: 0.7,
   },
-  nameBox: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 10,
-  },
-  nameTitle: {
-    color: '#fff',
+  info: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
-  imageSelector: {
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'black',
+  icon: {
+    fontSize: 30,
   },
-  scrollView: {
-    marginHorizontal: 5,
-  },
-  header: {
-    backgroundColor: 'black',
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 10,
-    marginBottom: 40,
-    paddingTop: 40,
+  transparent: {
+    backgroundColor: 'transparent',
   },
 });
