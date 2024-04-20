@@ -4,6 +4,8 @@ import React, {useState} from "react";
 import CustomHeader from "@/src/components/CustomHeader";
 import LineGraph from "@/src/components/LineGraph";
 import {Feather} from "@expo/vector-icons";
+import UnderlinedText from "@/src/components/UnderlinedText";
+import Person from "@/src/components/Person";
 
 export default function FriendScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -30,9 +32,12 @@ export default function FriendScreen() {
           <LineGraph leftPercentage={0.7}/>
         </View>
         <View>
-          <View style={{flexDirection: "row", gap: 5}}>
-            <Text>All Friends</Text>
-            <Feather name={"arrow-down"} size={24} />
+          <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
+            <UnderlinedText text={"All Friends"}/>
+            <Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20} />
+          </View>
+          <View style={styles.personContainer}>
+            <Person />
           </View>
         </View>
       </View>
@@ -54,5 +59,9 @@ const styles = StyleSheet.create({
   balanceSection: {
     marginBottom: 30,
     gap: 15,
+  },
+  personContainer: {
+    gap: 10,
+    padding: 10,
   },
 });
