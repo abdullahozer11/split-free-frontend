@@ -6,7 +6,7 @@ import {useAuth} from '@/src/providers/AuthProvider';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {Ionicons} from "@expo/vector-icons";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {groupElementsByDay} from "@/src/utils/date";
+import {groupElementsByDay} from "@/src/utils/helpers";
 
 export default function ActivityScreen() {
   const {profile} = useAuth();
@@ -25,18 +25,16 @@ export default function ActivityScreen() {
               <Ionicons name="chevron-forward-outline" size={24} color="black"/>
             </TouchableOpacity>
           </View>
-          <FlatList
-          data={Object.keys(groupedActivities)}
-          renderItem={({item}) => (
-            <View style={styles.activityGroup}>
-              <Text style={styles.date}>{item}</Text>
-              {groupedActivities[item].map((activity) => (
-                <ActivityItem key={activity.id} activity={activity}/>
-              ))}
-            </View>
-          )}
-          contentContainerStyle={{padding: 10}}
-        />
+          <View style={{padding: 10}}>
+            {Object.keys(groupedActivities).map((item) => (
+              <View style={styles.activityGroup} key={item}>
+                <Text style={styles.date}>{item}</Text>
+                {groupedActivities[item].map((activity) => (
+                  <ActivityItem key={activity.id} activity={activity}/>
+                ))}
+              </View>
+            ))}
+          </View>
         </View>
       } headerContent={
         <View style={styles.header}>
@@ -44,7 +42,7 @@ export default function ActivityScreen() {
           <Text style={styles.headerTitle}>My Balance</Text>
           <Text style={styles.headerBalance}>{profile?.currency || '$'}{profile?.balance || '0.00'}</Text>
         </View>
-      } />
+      }/>
     </View>
   );
 }

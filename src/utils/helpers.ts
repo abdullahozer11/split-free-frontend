@@ -14,3 +14,7 @@ export const groupElementsByDay = (elements) => {
   });
   return groupedElements;
 };
+
+export function Hidden(props: { children }) {
+  return null;
+}

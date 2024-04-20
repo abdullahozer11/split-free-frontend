@@ -6,13 +6,7 @@ import {useLocalSearchParams, useNavigation} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {expenses} from "@/assets/data/expense";
-import ActivityItem from "@/src/components/ActivityItem";
-import {groupElementsByDay} from "@/src/utils/date";
-import {activity} from "@/assets/data/activity";
-
-function Hidden(props: { children }) {
-  return null;
-}
+import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 
 const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
@@ -46,19 +40,18 @@ const GroupDetailsScreen = () => {
                 <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ $324.00</Text>
               </View>
             </View>
-
             <Hidden>Second Section</Hidden>
-            <FlatList
-              data={Object.keys(groupedExpenses)}
-              renderItem={({item}) => (
-                <View style={styles.activityGroup}>
+            <View style={{}}>
+              {Object.keys(groupedExpenses).map((item) => (
+                <View style={styles.activityGroup} key={item}>
                   <Text style={styles.date}>{item}</Text>
                   {groupedExpenses[item].map((expense) => (
                     <ExpenseItem key={expense.id} expense={expense}/>
                   ))}
                 </View>
-              )}
-            />
+              ))}
+            </View>
+
           </View>
         </View>
       } headerContent={
