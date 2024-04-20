@@ -15,8 +15,8 @@ export default function ActivityScreen() {
 
   return (
     <View style={styles.container}>
-      <CollapsableHeader H_MAX_HEIGHT={160} H_MIN_HEIGHT={50} content={
-        <>
+      <CollapsableHeader H_MAX_HEIGHT={200} H_MIN_HEIGHT={52} content={
+        <View style={styles.content}>
           <View style={styles.row}>
             <Text style={styles.activity}>Activity</Text>
             <TouchableOpacity style={styles.icon} onPress={() => {
@@ -37,7 +37,7 @@ export default function ActivityScreen() {
           )}
           contentContainerStyle={{padding: 10}}
         />
-        </>
+        </View>
       } headerContent={
         <View style={styles.header}>
           <FontAwesome size={16} style={styles.bell} name={'bell'}/>
@@ -53,6 +53,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  content: {
+    flex: 1,
+    paddingTop: 20,
+    padding: 10,
   },
   header: {
     justifyContent: "center",
