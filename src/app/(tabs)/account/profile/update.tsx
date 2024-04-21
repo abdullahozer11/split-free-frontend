@@ -14,8 +14,6 @@ export default function UpdateProfile() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [password2, setPassword2] = useState('');
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -33,6 +31,10 @@ export default function UpdateProfile() {
     }
   };
 
+  const handleSubmit = () => {
+    console.log("Submit");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -40,6 +42,11 @@ export default function UpdateProfile() {
           navigation.goBack();
         }}>
           <Feather style={styles.icon} name={"arrow-left"} size={24}/>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => {
+          handleSubmit();
+        }}>
+          <Text style={styles.icon}>Save</Text>
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.body}>
@@ -49,7 +56,7 @@ export default function UpdateProfile() {
             source={profile.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
             style={styles.avatar}/>
         </View>
-        <Text onPress={pickImage} style={styles.textButton}> Select Image </Text>
+        <Text onPress={pickImage} style={styles.pickImageButton}> Select Image </Text>
         <View style={styles.inputSection}>
           <View style={styles.transparent}>
             <Text style={styles.label}>Full Name</Text>
@@ -73,17 +80,6 @@ export default function UpdateProfile() {
               style={styles.input}
               defaultValue={profile.phone_number || "+33 7 77 77 77 77"}
               onChangeText={(text) => setPhoneNumber(text)}
-            />
-          </View>
-          <View style={styles.transparent}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setPassword(text)}
-            />
-            <TextInput
-              style={styles.input}
-              onChangeText={(text) => setPassword2(text)}
             />
           </View>
         </View>
@@ -128,11 +124,14 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     marginBottom: 10,
   },
-  textButton: {
+  pickImageButton: {
     alignSelf: "center",
     fontWeight: "bold",
     color: 'black',
-    opacity: 0.7,
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    opacity: 0.6,
   },
   inputSection: {
     backgroundColor: 'transparent',
@@ -153,7 +152,8 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   icon: {
-    fontSize: 30,
+    fontSize: 28,
+    fontWeight: "400",
   },
   transparent: {
     backgroundColor: 'transparent',
