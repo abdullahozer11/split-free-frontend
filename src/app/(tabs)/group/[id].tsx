@@ -7,12 +7,19 @@ import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {expenses} from "@/assets/data/expense";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
+import {Button, Divider, Menu, PaperProvider} from 'react-native-paper';
 
 const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
   const groupedExpenses = groupElementsByDay(expenses);
+
+  // menu related
+  const [visible, setVisible] = React.useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+
 
   const {data: group, isLoading, error} = useGroup(id);
 
@@ -24,12 +31,8 @@ const GroupDetailsScreen = () => {
     return <Text>Failed to fetch group</Text>;
   }
 
-  const handleMore = () => {
-      console.log('more');
-  };
-
   const handleStats = () => {
-      console.log('stats');
+    console.log('stats');
   };
 
   return (
@@ -74,9 +77,26 @@ const GroupDetailsScreen = () => {
               <TouchableOpacity onPress={handleStats}>
                 <Feather name="pie-chart" size={36} color="gold"/>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleMore}>
-                <Feather name="more-horizontal" size={36} color="gold"/>
-              </TouchableOpacity>
+              <Menu
+                visible={visible}
+                onDismiss={closeMenu}
+                contentStyle={{backgroundColor: "white"}}
+                anchor={
+                  <TouchableOpacity onPress={openMenu}>
+                    <Feather name="more-horizontal" size={36} color="gold"/>
+                  </TouchableOpacity>
+                }>
+                <Menu.Item onPress={() => {
+                  console.log("Edit Group");
+                  closeMenu();
+                }} title="Edit Group"/>
+                <Menu.Item onPress={() => {
+                  console.log("Delete group");
+                  closeMenu();
+                }} title="Delete Group"
+                   titleStyle={{color: "red"}}
+                />
+              </Menu>
             </View>
           </View>
           <View/>

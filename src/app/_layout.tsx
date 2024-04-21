@@ -9,6 +9,7 @@ import {useColorScheme} from '@/src/components/useColorScheme';
 import AuthProvider from "@/src/providers/AuthProvider";
 import QueryProvider from "@/src/providers/QueryProvider";
 import NotificationProvider from "@/src/providers/NotificationProvider";
+import {PaperProvider} from "react-native-paper";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -54,12 +55,14 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AuthProvider>
         <QueryProvider>
-          {/*<NotificationProvider>*/}
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-            <Stack.Screen name="(auth)" options={{headerShown: false}}/>
-          </Stack>
-          {/*</NotificationProvider>*/}
+          <PaperProvider>
+            {/*<NotificationProvider>*/}
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+              <Stack.Screen name="(auth)" options={{headerShown: false}}/>
+            </Stack>
+            {/*</NotificationProvider>*/}
+          </PaperProvider>
         </QueryProvider>
       </AuthProvider>
     </ThemeProvider>
