@@ -3,17 +3,33 @@ import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useState} from "react";
-import {Link, useNavigation} from "expo-router";
+import {useEffect, useState} from "react";
+import {useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
+import {useUpdateProfile} from "@/src/api/profiles";
 
 export default function UpdateProfile() {
   const {session, profile, loading} = useAuth();
-  const [image, setImage] = useState('');
   const navigation = useNavigation();
+  const [image, setImage] = useState('');
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+
+  const {mutate: updateProfile} = useUpdateProfile();
+
+  useEffect(() => {
+    setFullName(profile.full_name);
+    setWebsite(profile.website);
+    setPhoneNumber(profile.phone_number);
+    setImage(profile.avatar_url);
+  }, [profile]);
+
+  const resetFields = () => {
+    setFullName('');
+    setWebsite('');
+    setPhoneNumber('');
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -33,6 +49,17 @@ export default function UpdateProfile() {
 
   const handleSubmit = () => {
     console.log("Submit");
+    updateProfile({
+      id: profile.id,
+      full_name: fullName,
+      website: website,
+      phone_number: phoneNumber,
+      avatar_url: image,
+    }, {
+      onSuccess: () => {
+        console.log("Successfully updated profile");
+      }
+    });
   };
 
   return (
@@ -62,24 +89,24 @@ export default function UpdateProfile() {
             <Text style={styles.label}>Full Name</Text>
             <TextInput
               style={styles.input}
-              defaultValue={profile.full_name || "John Doe"}
+              value={fullName}
               onChangeText={(text) => setFullName(text)}
-            />
-          </View>
-          <View style={styles.transparent}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              defaultValue={profile.email || "john.doe@gmail.com"}
-              onChangeText={(text) => setEmail(text)}
             />
           </View>
           <View style={styles.transparent}>
             <Text style={styles.label}>Phone Number</Text>
             <TextInput
               style={styles.input}
-              defaultValue={profile.phone_number || "+33 7 77 77 77 77"}
+              value={phoneNumber}
               onChangeText={(text) => setPhoneNumber(text)}
+            />
+          </View>
+          <View style={styles.transparent}>
+            <Text style={styles.label}>Website</Text>
+            <TextInput
+              style={styles.input}
+              value={website}
+              onChangeText={(text) => setWebsite(text)}
             />
           </View>
         </View>

@@ -24,6 +24,14 @@ const GroupDetailsScreen = () => {
     return <Text>Failed to fetch group</Text>;
   }
 
+  const handleMore = () => {
+      console.log('more');
+  };
+
+  const handleStats = () => {
+      console.log('stats');
+  };
+
   return (
     <View style={styles.container}>
       <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
@@ -63,8 +71,12 @@ const GroupDetailsScreen = () => {
               <Feather name="arrow-left" size={36} color="gold"/>
             </TouchableOpacity>
             <View style={{flexDirection: "row", gap: 10}}>
-              <Feather name="pie-chart" size={36} color="gold"/>
-              <Feather name="more-horizontal" size={36} color="gold"/>
+              <TouchableOpacity onPress={handleStats}>
+                <Feather name="pie-chart" size={36} color="gold"/>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleMore}>
+                <Feather name="more-horizontal" size={36} color="gold"/>
+              </TouchableOpacity>
             </View>
           </View>
           <View/>

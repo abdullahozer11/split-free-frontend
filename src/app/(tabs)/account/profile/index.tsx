@@ -35,15 +35,15 @@ export default function ProfileScreen() {
       <View style={styles.infoSection}>
         <View style={styles.transparent}>
           <Text style={styles.label}>Full Name</Text>
-          <Text style={styles.info}>{profile.full_name || "John Doe"}</Text>
+          <Text style={styles.info}>{profile.full_name}</Text>
         </View>
         <View style={styles.transparent}>
           <Text style={styles.label}>Email</Text>
-          <Text style={styles.info}>{profile.email || "john.doe@gmail.com"}</Text>
+          <Text style={styles.info}>{session?.user.email}</Text>
         </View>
         <View style={styles.transparent}>
           <Text style={styles.label}>Phone Number</Text>
-          <Text style={styles.info}>{profile.phone_number || "+33 7 77 77 77 77"}</Text>
+          <Text style={styles.info}>{profile.phone_number}</Text>
         </View>
         <View style={styles.transparent}>
           <Text style={styles.label}>Password</Text>
