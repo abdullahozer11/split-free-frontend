@@ -3,33 +3,15 @@ import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useState} from "react";
-import {useNavigation} from "expo-router";
+import {Link, useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
 
 export default function ProfileScreen() {
   const {session, profile, loading} = useAuth();
-  const [image, setImage] = useState('');
   const navigation = useNavigation();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-  };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-    });
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  const handleEdit = () => {
-    console.log('handleEdit');
   };
 
   return (
@@ -40,9 +22,9 @@ export default function ProfileScreen() {
         }}>
           <Feather style={styles.icon} name={"x"} size={24}/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleEdit}>
+        <Link href={'account/profile/update'}  >
           <Feather style={styles.icon} name={"edit"} size={24}/>
-        </TouchableOpacity>
+        </Link>
       </View>
       <Text style={styles.title}>Profile</Text>
       <View style={styles.avatarContainer}>
