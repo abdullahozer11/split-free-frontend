@@ -11,7 +11,7 @@ export const useGroupList = () => {
         .from('groups')
         .select('id, status, title, members(count), expenses(count)');
       if (error) {
-        console.log(error.message);
+        // console.log(error.message);
         throw new Error(error.message);
       }
       return data;
@@ -56,7 +56,7 @@ export const useInsertGroup = () => {
         // console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      console.log('New group inserted:', newGroup);
+      // console.log('New group inserted:', newGroup);
       return newGroup;
     },
     async onSuccess() {

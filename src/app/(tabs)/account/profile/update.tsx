@@ -48,7 +48,6 @@ export default function UpdateProfile() {
   };
 
   const handleSubmit = () => {
-    console.log("Submit");
     updateProfile({
       id: profile.id,
       full_name: fullName,

@@ -20,7 +20,7 @@ export const useUpdateProfile = () => {
       if (error) {
         throw new Error(error.message);
       }
-      console.log("updatedProfile: ", updatedProfile);
+      // console.log("updatedProfile: ", updatedProfile);
       return updatedProfile;
     },
     async onSuccess(_, {id}) {

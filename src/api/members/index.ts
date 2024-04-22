@@ -10,10 +10,9 @@ export const useMemberList = () => {
         .from('members')
         .select('id, name');
       if (error) {
-        console.log(error.message);
+        // console.log(error.message);
         throw new Error(error.message);
       }
-      console.log(data);
       return data;
     },
   });
