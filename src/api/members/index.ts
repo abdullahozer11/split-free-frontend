@@ -6,10 +6,14 @@ export const useMemberList = () => {
   return useQuery({
     queryKey: ['members'],
     queryFn: async () => {
-      const {data, error} = await supabase.from('members').select('*');
+      const {data, error} = await supabase
+        .from('members')
+        .select('id, name');
       if (error) {
+        console.log(error.message);
         throw new Error(error.message);
       }
+      console.log(data);
       return data;
     },
   });

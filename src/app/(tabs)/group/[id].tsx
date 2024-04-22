@@ -1,4 +1,4 @@
-import {StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, FlatList} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import React from "react";
 import {Feather} from "@expo/vector-icons";
 import {useGroup} from "@/src/api/groups";
@@ -7,7 +7,7 @@ import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {expenses} from "@/assets/data/expense";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
-import {Button, Divider, Menu, PaperProvider} from 'react-native-paper';
+import {Menu, ActivityIndicator} from 'react-native-paper';
 
 const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();

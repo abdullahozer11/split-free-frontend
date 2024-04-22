@@ -2,17 +2,13 @@ import React, {useState} from 'react';
 import {StyleSheet, Image, View, Text} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 
-const MyDropdown = ({}) => {
-  const [isFocus, setIsFocus] = useState();
+const MyDropdown = ({selected, label, data, onChange}) => {
+  const [isFocus, setIsFocus] = useState<boolean>(false);
 
-  return (<View style={styles.bigContainer}>
-    <Image
-      style={styles.profilePhoto}
-      // source={(data.find(person => person.id === value) || {}).photo}
-      source={require('../../../assets/blank.webp')}/>
+  return (
     <View style={styles.container}>
       <Text style={styles.label}>
-        Who paid?
+        {label}
       </Text>
       <Dropdown
         style={[
@@ -23,39 +19,33 @@ const MyDropdown = ({}) => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={['TODO']}
+        data={data}
         search
         maxHeight={300}
         labelField="name"
         valueField="id"
         searchPlaceholder="Search..."
-        value={'selected'}
+        value={selected}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
+          onChange(item.id);
           setIsFocus(false);
         }}
       />
     </View>
-  </View>);
+  );
 };
 
 export default MyDropdown;
 
 const styles = StyleSheet.create({
-  bigContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 15,
-  },
   container: {
     backgroundColor: 'white',
     borderColor: 'black',
     borderWidth: 0.5,
     borderRadius: 8,
-    marginLeft: 10,
     flex: 1,
-    height: 68,
   },
   dropdown: {
     paddingLeft: 30,
@@ -87,10 +77,5 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
-  },
-  profilePhoto: {
-    height: 50,
-    width: 50,
-    borderRadius: 50,
   },
 });

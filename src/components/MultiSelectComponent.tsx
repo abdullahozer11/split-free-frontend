@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {MultiSelect} from 'react-native-element-dropdown';
 
-const MyMultiSelect = ({}) => {
+const MyMultiSelect = ({selected, members, onChange}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>
@@ -15,13 +15,14 @@ const MyMultiSelect = ({}) => {
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         search
-        data={['TODO']}
+        data={members}
         labelField="name"
         valueField="id"
         placeholder={'Select participants'}
         searchPlaceholder="Search..."
-        value={'selected'}
+        value={selected}
         onChange={(item) => {
+          onChange(item);
         }}
         selectedStyle={styles.selectedStyle}
       />
@@ -37,11 +38,7 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 0.5,
     borderRadius: 8,
-    marginLeft: 10,
-    minHeight: 180,
-    maxHeight: 240,
     paddingHorizontal: 10,
-    marginVertical: 15,
   },
   dropdown: {
     paddingLeft: 30,

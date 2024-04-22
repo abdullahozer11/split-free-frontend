@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, View, StyleSheet, ActivityIndicator } from 'react-native';
+import { Modal, View, StyleSheet } from 'react-native';
+import {ActivityIndicator} from "react-native-paper";
 
 const AnimatedLoader = () => {
   return (
