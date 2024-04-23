@@ -107,7 +107,7 @@ export default function Layout() {
           <Text style={styles.icon}>Save</Text>
         </TouchableOpacity>
       </View>
-      <Text variant="headlineLarge">New Expense</Text>
+      <Text variant="headlineLarge" style={styles.title} >New Expense</Text>
       <View style={styles.inputs}>
         <View>
           <TextInput
@@ -116,8 +116,9 @@ export default function Layout() {
             value={title}
             error={!_isTitleValid()}
             onChangeText={setTitle}
+            style={{backgroundColor: 'white'}}
           />
-          <HelperText type="error" visible={!_isTitleValid()}>
+          <HelperText type="error" visible={!_isTitleValid()} style={_isTitleValid() && {height: 0}}>
             Title cannot be empty
           </HelperText>
         </View>
@@ -128,6 +129,7 @@ export default function Layout() {
             value={description}
             onChangeText={setDescription}
             multiline={true}
+            style={{backgroundColor: 'white'}}
           />
         </View>
         <View style={{flexDirection: "row", gap: 5}}>
@@ -137,7 +139,7 @@ export default function Layout() {
             value={amount}
             onChangeText={(text) => setAmount(Number(text))}
             keyboardType="numeric"
-            style={{flex: 1}}
+            style={{flex: 1, backgroundColor: 'white'}}
           />
           <Dropdown
             placeholder={'Select currency'}
@@ -171,9 +173,9 @@ export default function Layout() {
             <MyDropdown selected={payer} data={members} onChange={setPayer} label={"Who paid"}/>
           </View>
           <MyMultiSelect selected={participants} members={members} onChange={setParticipants}/>
-          <View style={{flexDirection: "row", gap: 15}}>
+          <View style={{flexDirection: "row", gap: 15, backgroundColor: 'white', borderRadius: 10, padding: 12, alignItems: "center" }}>
             <Text>Proof of payment: (optional)</Text>
-            <Text onPress={pickImage}>Select Image </Text>
+            <Text variant={'labelLarge'} style={{borderWidth: 1, borderColor: 'maroon', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 3}} onPress={pickImage}>Select Image </Text>
             <Avatar.Image style={{display: image ? 1 : "none"}} size={24}
                           source={require('@/assets/images/blank-profile.png')}/>
           </View>
@@ -221,5 +223,8 @@ const styles = StyleSheet.create({
   },
   inputs: {
     gap: 10,
-  }
+  },
+  title: {
+    marginBottom: 20,
+  },
 });
