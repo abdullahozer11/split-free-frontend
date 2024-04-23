@@ -68,6 +68,31 @@ export const useInsertExpense = () => {
   });
 };
 
+export const useBulkInsertPayers = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn(data: any) {
+      const {error, data: newPayers} = await supabase
+        .from('expense_payers')
+        .insert({
+          member_id: data.member,
+          expense_id: data.expense,
+        })
+        .select();
+      if (error) {
+        console.error('Error during insertion:', error);
+        throw new Error(error.message);
+      }
+      console.log(newPayers);
+      return newPayers;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['expense_payers']);
+    }
+  });
+};
+
 export const useUpdateExpense = () => {
   const queryClient = useQueryClient();
 
