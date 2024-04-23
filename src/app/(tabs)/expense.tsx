@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import {Pressable, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Alert, Pressable, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
-import {Text, HelperText, TextInput, Avatar, ActivityIndicator} from "react-native-paper";
+import {Text, TextInput, Avatar, ActivityIndicator} from "react-native-paper";
 import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
 import {useMemberList} from "@/src/api/members";
@@ -13,8 +13,9 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import {getFormattedDate} from "@/src/utils/helpers";
 import {currencyOptions} from "@/src/constants";
 import {Dropdown} from "react-native-element-dropdown";
+import {useGroupList} from "@/src/api/groups";
 
-export default function Layout() {
+export default function ExpenseForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [payer, setPayer] = useState(null);
@@ -27,7 +28,8 @@ export default function Layout() {
   const [inputDate, setInputDate] = useState<Date | undefined>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const onChange = (event, selectedDate) => {
+
+  const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
       const date = selectedDate;
       setShowDatePicker(false);
@@ -37,31 +39,59 @@ export default function Layout() {
     }
   };
 
+  const {data: groups} = useGroupList();
   const {data: members, error, isLoading} = useMemberList();
   const {mutate: insertExpense} = useInsertExpense();
 
   const validateData = () => {
+    if (!title) {
+      console.log('Title is empty');
+      Alert.alert('Title is empty');
+      return false;
+    }
+
+    if (!group) {
+      console.log('Pick a group for this expense');
+      Alert.alert('Pick a group for this expense');
+      return false;
+    }
+
+    if (!amount || parseFloat(amount) <= 0) {
+      console.log('Amount is not valid');
+      Alert.alert('Amount is not valid');
+      return false;
+    }
+
+    if (!payer) {
+      console.log('Add who paid this expense');
+      Alert.alert('Add who paid this expense');
+      return false;
+    }
+
+    if (!participants.length) {
+      console.log('Add at least one participant');
+      Alert.alert('Add at least one participant');
+      return false;
+    }
+
     return true;
   };
 
   const handleSubmit = () => {
     if (!validateData()) {
-      console.log("error");
       return;
     }
 
     insertExpense({
       title: title,
       description: description,
-      participants: participants,
-      payers: [payer],
-      date: inputDate.toString(),
+      date: inputDate,
       amount: amount,
       currency: currency,
-      group: 1, // fixme
+      group: group.id,
     }, {
       onSuccess: () => {
-        console.log("Successfully updated profile");
+        console.log("Successfully inserted expense");
       }
     });
   };
@@ -73,11 +103,6 @@ export default function Layout() {
   if (error) {
     return <Text>Failed to fetch members</Text>;
   }
-
-  const _isTitleValid = () => {
-    // return !!title;
-    return true;
-  };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -107,20 +132,16 @@ export default function Layout() {
           <Text style={styles.icon}>Save</Text>
         </TouchableOpacity>
       </View>
-      <Text variant="headlineLarge" style={styles.title} >New Expense</Text>
+      <Text variant="headlineLarge" style={styles.title}>New Expense</Text>
       <View style={styles.inputs}>
         <View>
           <TextInput
             label="Enter expense title"
             placeholder="Describe your expense"
             value={title}
-            error={!_isTitleValid()}
             onChangeText={setTitle}
             style={{backgroundColor: 'white'}}
           />
-          <HelperText type="error" visible={!_isTitleValid()} style={_isTitleValid() && {height: 0}}>
-            Title cannot be empty
-          </HelperText>
         </View>
         <View>
           <TextInput
@@ -132,12 +153,20 @@ export default function Layout() {
             style={{backgroundColor: 'white'}}
           />
         </View>
+        <Dropdown
+          placeholder={'Select group'}
+          style={styles.groupDropdown}
+          data={groups}
+          labelField={'title'}
+          valueField={'id'}
+          value={'selected'}
+          onChange={(gr) => setGroup(gr)}/>
         <View style={{flexDirection: "row", gap: 5}}>
           <TextInput
             label="Enter amount"
             placeholder="Enter amount"
             value={amount}
-            onChangeText={(text) => setAmount(Number(text))}
+            onChangeText={setAmount}
             keyboardType="numeric"
             style={{flex: 1, backgroundColor: 'white'}}
           />
@@ -164,7 +193,7 @@ export default function Layout() {
               mode={"date"}
               display={"spinner"}
               value={inputDate}
-              onChange={onChange}/>
+              onChange={onDateChange}/>
           )}
         </View>
         <View style={{gap: 20}}>
@@ -173,9 +202,22 @@ export default function Layout() {
             <MyDropdown selected={payer} data={members} onChange={setPayer} label={"Who paid"}/>
           </View>
           <MyMultiSelect selected={participants} members={members} onChange={setParticipants}/>
-          <View style={{flexDirection: "row", gap: 15, backgroundColor: 'white', borderRadius: 10, padding: 12, alignItems: "center" }}>
+          <View style={{
+            flexDirection: "row",
+            gap: 15,
+            backgroundColor: 'white',
+            borderRadius: 10,
+            padding: 12,
+            alignItems: "center"
+          }}>
             <Text>Proof of payment: (optional)</Text>
-            <Text variant={'labelLarge'} style={{borderWidth: 1, borderColor: 'maroon', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 3}} onPress={pickImage}>Select Image </Text>
+            <Text variant={'labelLarge'} style={{
+              borderWidth: 1,
+              borderColor: 'maroon',
+              borderRadius: 5,
+              paddingHorizontal: 5,
+              paddingVertical: 3
+            }} onPress={pickImage}>Select Image </Text>
             <Avatar.Image style={{display: image ? 1 : "none"}} size={24}
                           source={require('@/assets/images/blank-profile.png')}/>
           </View>
@@ -225,6 +267,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   title: {
+    marginTop: 10,
     marginBottom: 20,
+  },
+  groupDropdown: {
+    backgroundColor: "white",
+    padding: 10,
+    paddingHorizontal: 15,
   },
 });

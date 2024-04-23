@@ -52,8 +52,6 @@ export const useInsertExpense = () => {
           date: data.date,
           description: data.description,
           group: data.group,
-          participants: data.participants,
-          payers: data.payers,
           title: data.title,
         })
         .select();
