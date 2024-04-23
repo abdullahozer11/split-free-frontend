@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Pressable, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
 import {Text, HelperText, TextInput, Avatar, ActivityIndicator} from "react-native-paper";
 import MyDropdown from "@/src/components/DropdownComponent";
@@ -8,7 +8,11 @@ import {useMemberList} from "@/src/api/members";
 import * as ImagePicker from "expo-image-picker";
 import {Feather} from "@expo/vector-icons";
 import {useNavigation} from "expo-router";
-import { DatePickerInput } from 'react-native-paper-dates'
+import {useInsertExpense} from "@/src/api/expenses";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import {getFormattedDate} from "@/src/utils/helpers";
+import {currencyOptions} from "@/src/constants";
+import {Dropdown} from "react-native-element-dropdown";
 
 export default function Layout() {
   const [title, setTitle] = useState('');
@@ -16,29 +20,51 @@ export default function Layout() {
   const [payer, setPayer] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [image, setImage] = useState(null);
+  const [currency, setCurrency] = useState("EUR");
+  const [amount, setAmount] = useState('0');
   const navigation = useNavigation();
-  const [inputDate, setInputDate] = useState<Date | undefined>(undefined);
+  const [group, setGroup] = useState(null);
+  const [inputDate, setInputDate] = useState<Date | undefined>(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const onChange = (event, selectedDate) => {
+    if (event.type === "set") {
+      const date = selectedDate;
+      setShowDatePicker(false);
+      setInputDate(date);
+    } else {
+      setShowDatePicker(false);
+    }
+  };
 
   const {data: members, error, isLoading} = useMemberList();
- const {mutate: insertExpense} = useInsertExpense();
+  const {mutate: insertExpense} = useInsertExpense();
+
+  const validateData = () => {
+    return true;
+  };
 
   const handleSubmit = () => {
+    if (!validateData()) {
+      console.log("error");
+      return;
+    }
+
     insertExpense({
       title: title,
       description: description,
       participants: participants,
-      payer: payer,
-      date: inputDate?.toString(),
-      amount: amount, // todo implement
-      currency: currency, // todo implement
-      // group: group, // current group
+      payers: [payer],
+      date: inputDate.toString(),
+      amount: amount,
+      currency: currency,
+      group: 1, // fixme
     }, {
       onSuccess: () => {
         console.log("Successfully updated profile");
       }
     });
   };
-
 
   if (isLoading) {
     return <ActivityIndicator/>;
@@ -82,49 +108,75 @@ export default function Layout() {
         </TouchableOpacity>
       </View>
       <Text variant="headlineLarge">New Expense</Text>
-      <View>
-        <TextInput
-          label="Enter expense title"
-          placeholder="Describe your expense"
-          value={title}
-          error={!_isTitleValid()}
-          onChangeText={setTitle}
-        />
-        <HelperText type="error" visible={!_isTitleValid()}>
-          Title cannot be empty
-        </HelperText>
-      </View>
-      <View>
-        <TextInput
-          label="Enter expense description"
-          placeholder="Give additional information"
-          value={description}
-          onChangeText={setDescription}
-          multiline={true}
-        />
-        <DatePickerInput
-          locale="en"
-          label="Birthdate"
-          value={inputDate}
-          onChange={(d) => setInputDate(d)}
-          inputMode="start"
-          autoComplete="birthdate-full"
-          // mode="outlined" (see react-native-paper docs)
-          // other react native TextInput props
-        />
-      </View>
-
-      <View style={{gap: 20, marginTop: 20}}>
-        <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
-          <Avatar.Image size={48} source={require('@/assets/images/blank-profile.png')}/>
-          <MyDropdown selected={payer} data={members} onChange={setPayer} label={"Who paid"}/>
+      <View style={styles.inputs}>
+        <View>
+          <TextInput
+            label="Enter expense title"
+            placeholder="Describe your expense"
+            value={title}
+            error={!_isTitleValid()}
+            onChangeText={setTitle}
+          />
+          <HelperText type="error" visible={!_isTitleValid()}>
+            Title cannot be empty
+          </HelperText>
         </View>
-        <MyMultiSelect selected={participants} members={members} onChange={setParticipants}/>
-        <View style={{flexDirection: "row", gap: 15}}>
-          <Text>Proof of payment: (optional)</Text>
-          <Text onPress={pickImage}>Select Image </Text>
-          <Avatar.Image style={{display: image ? 1 : "none"}} size={24}
-                        source={require('@/assets/images/blank-profile.png')}/>
+        <View>
+          <TextInput
+            label="Enter expense description"
+            placeholder="Give additional information"
+            value={description}
+            onChangeText={setDescription}
+            multiline={true}
+          />
+        </View>
+        <View style={{flexDirection: "row", gap: 5}}>
+          <TextInput
+            label="Enter amount"
+            placeholder="Enter amount"
+            value={amount}
+            onChangeText={(text) => setAmount(Number(text))}
+            keyboardType="numeric"
+            style={{flex: 1}}
+          />
+          <Dropdown
+            placeholder={'Select currency'}
+            style={styles.currencyDropdown}
+            data={currencyOptions}
+            labelField={'label'}
+            valueField={'value'}
+            value={currency}
+            onChange={cu => {
+              setCurrency(cu);
+            }}/>
+          <Pressable
+            onPress={() => {
+              setShowDatePicker(!showDatePicker);
+            }}
+            style={styles.datetimeButton}
+          >
+            <Text variant={"labelMedium"}>{getFormattedDate(inputDate)}</Text>
+          </Pressable>
+          {showDatePicker && (
+            <DateTimePicker
+              mode={"date"}
+              display={"spinner"}
+              value={inputDate}
+              onChange={onChange}/>
+          )}
+        </View>
+        <View style={{gap: 20}}>
+          <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+            <Avatar.Image size={48} source={require('@/assets/images/blank-profile.png')}/>
+            <MyDropdown selected={payer} data={members} onChange={setPayer} label={"Who paid"}/>
+          </View>
+          <MyMultiSelect selected={participants} members={members} onChange={setParticipants}/>
+          <View style={{flexDirection: "row", gap: 15}}>
+            <Text>Proof of payment: (optional)</Text>
+            <Text onPress={pickImage}>Select Image </Text>
+            <Avatar.Image style={{display: image ? 1 : "none"}} size={24}
+                          source={require('@/assets/images/blank-profile.png')}/>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -147,4 +199,27 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "400",
   },
+  datetimeButton: {
+    backgroundColor: "white",
+    paddingHorizontal: 2,
+    borderRadius: 10,
+    justifyContent: "center",
+  },
+  currencyLabel: {
+    fontSize: 14,
+    color: 'pink',
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+  currencyDropdown: {
+    backgroundColor: "white",
+    color: 'pink',
+    padding: 6,
+    borderRadius: 6,
+    fontSize: 18,
+    width: 60,
+  },
+  inputs: {
+    gap: 10,
+  }
 });

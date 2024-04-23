@@ -18,3 +18,9 @@ export const groupElementsByDay = (elements) => {
 export function Hidden(props: { children }) {
   return null;
 }
+
+// Generate a formatted date
+export function getFormattedDate(date) {
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return date.toLocaleDateString('en-US', options);
+}
