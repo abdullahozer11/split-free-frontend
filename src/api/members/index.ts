@@ -59,6 +59,26 @@ export const useInsertMember = () => {
   });
 };
 
+export const useBulkInsertMembers = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn(data: any) {
+      const {error, data: newMembers} = await supabase
+        .from('members')
+        .insert(data);
+      if (error) {
+        console.error('Error during insertion:', error);
+        throw new Error(error.message);
+      }
+      return newMembers;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['members']);
+    }
+  });
+};
+
 export const useUpdateMember = () => {
   const queryClient = useQueryClient();
 

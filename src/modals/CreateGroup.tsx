@@ -12,7 +12,7 @@ import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertGroup} from "@/src/api/groups";
-import {useInsertMember} from "@/src/api/members";
+import {useBulkInsertMembers, useInsertMember} from "@/src/api/members";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
@@ -21,6 +21,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
   const {mutate: insertGroup} = useInsertGroup();
   const {mutate: insertMember} = useInsertMember();
+  const {mutate: bulkInsertMembers} = useBulkInsertMembers();
 
   const {profile} = useAuth();
   const [members, setMembers] = useState([profile?.full_name]);
@@ -51,18 +52,16 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   };
 
   const saveMembers = (group_id) => {
-    console.log("group id is ", group_id);
-    // Save members in the database
-    members.forEach((member) => {
-      insertMember({
-        name: member,
-        group: group_id,
-      }, {
-        onSuccess: () => {
-          console.log("saved member:", member);
-        }
-      });
-    })
+    // Bulk insert members in the database
+    const _members = members.map(member => ({
+      name: member,
+      group: group_id,
+    }))
+    bulkInsertMembers(_members, {
+      onSuccess: () => {
+        console.log("Members are successfully inserted");
+      }
+    });
   };
 
   const validateData = () => {
