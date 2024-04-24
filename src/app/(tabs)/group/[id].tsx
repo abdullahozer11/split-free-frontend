@@ -5,23 +5,20 @@ import {useGroup} from "@/src/api/groups";
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {expenses} from "@/assets/data/expense";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, ActivityIndicator} from 'react-native-paper';
+import {useExpenseList} from "@/src/api/expenses";
 
 const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
-  const groupedExpenses = groupElementsByDay(expenses);
-
+  const {data: group} = useGroup(id);
+  const {data: expenses, error, isLoading} = useExpenseList(id);
   // menu related
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
-
-
-  const {data: group, isLoading, error} = useGroup(id);
 
   if (isLoading) {
     return <ActivityIndicator/>;
@@ -30,6 +27,8 @@ const GroupDetailsScreen = () => {
   if (error) {
     return <Text>Failed to fetch group</Text>;
   }
+
+  const groupedExpenses = groupElementsByDay(expenses);
 
   const handleStats = () => {
     console.log('stats');
@@ -94,7 +93,7 @@ const GroupDetailsScreen = () => {
                   console.log("Delete group");
                   closeMenu();
                 }} title="Delete Group"
-                   titleStyle={{color: "red"}}
+                           titleStyle={{color: "red"}}
                 />
               </Menu>
             </View>

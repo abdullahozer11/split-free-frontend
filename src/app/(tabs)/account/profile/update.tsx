@@ -56,7 +56,7 @@ export default function UpdateProfile() {
       avatar_url: image,
     }, {
       onSuccess: () => {
-        console.log("Successfully updated profile");
+        // console.log("Successfully updated profile");
       }
     });
   };

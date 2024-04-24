@@ -93,7 +93,7 @@ export default function ExpenseForm() {
       group: group.id,
     }, {
       onSuccess: (data) => {
-        console.log("Successfully inserted expense");
+        // console.log("Successfully inserted expense");
         // Formulate payers list
         const payers = [payer];
         const _payers = payers.map(_payer => ({
@@ -102,7 +102,7 @@ export default function ExpenseForm() {
         }));
         bulkInsertPayers(_payers, {
           onSuccess: () => {
-            console.log("Successfully inserted payers");
+            // console.log("Successfully inserted payers");
             // Formulate participants list
             const _participants = participants.map(participant => ({
               member_id: participant,
@@ -110,8 +110,8 @@ export default function ExpenseForm() {
             }));
             bulkInsertParticipants(_participants, {
               onSuccess: () => {
-                console.log("Successfully inserted participants");
-                // navigation.goBack();
+                // console.log("Successfully inserted participants");
+                navigation.goBack();
               }
             });
           }

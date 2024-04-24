@@ -2,19 +2,19 @@ import {supabase} from "@/src/lib/supabase";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 
 
-export const useExpenseList = ({group_id}) => {
+export const useExpenseList = (group_id: number) => {
   return useQuery({
     queryKey: ['expenses'],
     queryFn: async () => {
       const {data, error} = await supabase
         .from('expenses')
-        .select('*')
+        .select('id, title, amount, created_at')
         .eq('group', group_id);
       if (error) {
         console.log(error.message);
         throw new Error(error.message);
       }
-      console.log(data);
+      console.log("Expense data is ", data);
       return data;
     },
   });
