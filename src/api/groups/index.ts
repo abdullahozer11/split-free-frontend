@@ -29,8 +29,10 @@ export const useGroup = (id: number) => {
         .eq('id', id)
         .single();
       if (error) {
+        console.log(error.message);
         throw new Error(error.message);
       }
+      console.log("data received is ", data);
       return data;
     }
   });

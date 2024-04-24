@@ -13,18 +13,18 @@ const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
-  const {data: group} = useGroup(id);
-  const {data: expenses, error, isLoading} = useExpenseList(id);
+  const {data: group, error: groupError, isLoading: groupLoading} = useGroup(id);
+  const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(id);
   // menu related
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
-  if (isLoading) {
+  if (groupLoading || expenseLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (error) {
+  if (groupError || expenseError) {
     return <Text>Failed to fetch group</Text>;
   }
 

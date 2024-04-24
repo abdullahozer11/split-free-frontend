@@ -1,8 +1,8 @@
-import {StyleSheet, View, Text, Image, Animated, Pressable} from 'react-native';
+import {StyleSheet, View, Text, Image, Animated, Pressable, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {Link} from "expo-router";
+import {Link, useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
 
 const Card = ({iconName, title, page}) => {
@@ -34,9 +34,16 @@ const AccountScreen = () => {
     extrapolate: 'clamp',
   });
 
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View style={[styles.header, {opacity: headerOpacity, transform: [{translateY: headerTranslateY}]}]}>
+        <TouchableOpacity onPress={() => {
+          navigation.goBack();
+        }}>
+          <Feather name={"arrow-left"} style={styles.back} color={'white'} />
+        </TouchableOpacity>
         <Image
           source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
           style={styles.avatar}/>
@@ -126,4 +133,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'black',
   },
+  back: {
+    fontSize: 30,
+  }
 });

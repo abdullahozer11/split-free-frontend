@@ -3,11 +3,10 @@ import {useNavigation} from "expo-router";
 import {useGroupList} from "@/src/api/groups";
 import {useMemberList} from "@/src/api/members";
 import {useBulkInsertParticipants, useBulkInsertPayers, useInsertExpense} from "@/src/api/expenses";
-import {Alert, Pressable, StyleSheet, TouchableOpacity, View} from "react-native";
+import {Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
 import {getFormattedDate, uploadImage} from "@/src/utils/helpers";
 import {ActivityIndicator, Avatar, Text, TextInput} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
-import {SafeAreaView} from "react-native-safe-area-context";
 import {Dropdown} from "react-native-element-dropdown";
 import {currencyOptions} from "@/src/constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -152,7 +151,7 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
   };
 
   return (
-    <SafeAreaView style={styles.form}>
+    <ScrollView style={styles.form}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => {
           navigation.goBack();
@@ -255,7 +254,7 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
 }
 
