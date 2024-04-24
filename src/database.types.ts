@@ -217,6 +217,7 @@ export type Database = {
           description: string | null
           group: number | null
           id: number
+          proof: string | null
           title: string
         }
         Insert: {
@@ -227,6 +228,7 @@ export type Database = {
           description?: string | null
           group?: number | null
           id?: number
+          proof?: string | null
           title: string
         }
         Update: {
@@ -237,6 +239,7 @@ export type Database = {
           description?: string | null
           group?: number | null
           id?: number
+          proof?: string | null
           title?: string
         }
         Relationships: [

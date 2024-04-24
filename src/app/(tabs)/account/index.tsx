@@ -18,7 +18,7 @@ const Card = ({iconName, title, page}) => {
 };
 
 const AccountScreen = () => {
-  const {profile} = useAuth();
+  const {profile, session} = useAuth();
   const [scrollY] = useState(new Animated.Value(0));
   const headerHeight = 80;
 
@@ -41,8 +41,8 @@ const AccountScreen = () => {
           source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
           style={styles.avatar}/>
         <View>
-          <Text style={styles.name}>John Doe</Text>
-          <Text style={styles.email}>john.doe@gmail.com</Text>
+          <Text style={styles.name}>{profile.full_name}</Text>
+          <Text style={styles.email}>{session?.user.email}</Text>
         </View>
       </Animated.View>
       <View style={styles.body}>

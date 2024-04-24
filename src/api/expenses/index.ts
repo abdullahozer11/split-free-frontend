@@ -53,6 +53,7 @@ export const useInsertExpense = () => {
           description: data.description,
           group: data.group,
           title: data.title,
+          proof: data.proof,
         })
         .select()
         .single();
