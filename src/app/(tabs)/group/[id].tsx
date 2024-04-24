@@ -25,7 +25,7 @@ const GroupDetailsScreen = () => {
   }
 
   if (groupError || expenseError) {
-    return <Text>Failed to fetch group</Text>;
+    return <Text>Failed to fetch data</Text>;
   }
 
   const groupedExpenses = groupElementsByDay(expenses);

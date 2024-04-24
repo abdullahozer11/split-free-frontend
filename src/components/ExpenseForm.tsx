@@ -20,6 +20,17 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
   } else {
     console.log("creating");
   }
+  const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
+  const {data: members, error: membersError, isLoading: membersLoading} = useMemberList();
+
+  if (groupsLoading || membersLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (groupsError || membersError) {
+    return <Text>Failed to fetch data</Text>;
+  }
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [payer, setPayer] = useState(null);
@@ -32,6 +43,9 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
   const [inputDate, setInputDate] = useState<Date | undefined>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const {mutate: insertExpense} = useInsertExpense();
+  const {mutate: bulkInsertPayers} = useBulkInsertPayers();
+  const {mutate: bulkInsertParticipants} = useBulkInsertParticipants();
 
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
@@ -42,12 +56,6 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
       setShowDatePicker(false);
     }
   };
-
-  const {data: groups} = useGroupList();
-  const {data: members, error, isLoading} = useMemberList();
-  const {mutate: insertExpense} = useInsertExpense();
-  const {mutate: bulkInsertPayers} = useBulkInsertPayers();
-  const {mutate: bulkInsertParticipants} = useBulkInsertParticipants();
 
   const validateData = () => {
     if (!title) {
@@ -127,14 +135,6 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
       }
     });
   };
-
-  if (isLoading) {
-    return <ActivityIndicator/>;
-  }
-
-  if (error) {
-    return <Text>Failed to fetch members</Text>;
-  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
