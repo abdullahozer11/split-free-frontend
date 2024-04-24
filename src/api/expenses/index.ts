@@ -54,12 +54,12 @@ export const useInsertExpense = () => {
           group: data.group,
           title: data.title,
         })
-        .select();
+        .select()
+        .single();
       if (error) {
         console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      console.log(newExpense);
       return newExpense;
     },
     async onSuccess() {
@@ -75,20 +75,37 @@ export const useBulkInsertPayers = () => {
     async mutationFn(data: any) {
       const {error, data: newPayers} = await supabase
         .from('expense_payers')
-        .insert({
-          member_id: data.member,
-          expense_id: data.expense,
-        })
-        .select();
+        .insert(data);
       if (error) {
         console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      console.log(newPayers);
+      // console.log(newPayers);
       return newPayers;
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['expense_payers']);
+    }
+  });
+};
+
+export const useBulkInsertParticipants = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn(data: any) {
+      const {error, data: newParticipants} = await supabase
+        .from('expense_participants')
+        .insert(data);
+      if (error) {
+        console.error('Error during insertion:', error);
+        throw new Error(error.message);
+      }
+      // console.log(newParticipants);
+      return newParticipants;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['expense_participants']);
     }
   });
 };

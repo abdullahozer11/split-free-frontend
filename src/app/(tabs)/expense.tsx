@@ -8,7 +8,7 @@ import {useMemberList} from "@/src/api/members";
 import * as ImagePicker from "expo-image-picker";
 import {Feather} from "@expo/vector-icons";
 import {useNavigation} from "expo-router";
-import {useInsertExpense} from "@/src/api/expenses";
+import {useBulkInsertParticipants, useBulkInsertPayers, useInsertExpense} from "@/src/api/expenses";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {getFormattedDate} from "@/src/utils/helpers";
 import {currencyOptions} from "@/src/constants";
@@ -42,6 +42,8 @@ export default function ExpenseForm() {
   const {data: groups} = useGroupList();
   const {data: members, error, isLoading} = useMemberList();
   const {mutate: insertExpense} = useInsertExpense();
+  const {mutate: bulkInsertPayers} = useBulkInsertPayers();
+  const {mutate: bulkInsertParticipants} = useBulkInsertParticipants();
 
   const validateData = () => {
     if (!title) {
@@ -90,8 +92,31 @@ export default function ExpenseForm() {
       currency: currency,
       group: group.id,
     }, {
-      onSuccess: () => {
+      onSuccess: (data) => {
         console.log("Successfully inserted expense");
+        // Formulate payers list
+        const payers = [payer];
+        const _payers = payers.map(_payer => ({
+          member_id: _payer,
+          expense_id: data.id,
+        }));
+        bulkInsertPayers(_payers, {
+          onSuccess: () => {
+            console.log("Successfully inserted payers");
+            // Formulate participants list
+            const _participants = participants.map(participant => ({
+              member_id: participant,
+              expense_id: data.id,
+            }));
+            bulkInsertParticipants(_participants, {
+              onSuccess: () => {
+                console.log("Successfully inserted participants");
+                // navigation.goBack();
+              }
+            });
+          }
+        });
+
       }
     });
   };
