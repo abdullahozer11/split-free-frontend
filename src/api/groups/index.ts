@@ -32,7 +32,7 @@ export const useGroup = (id: number) => {
         console.log(error.message);
         throw new Error(error.message);
       }
-      console.log("data received is ", data);
+      // console.log("data received is ", data);
       return data;
     }
   });

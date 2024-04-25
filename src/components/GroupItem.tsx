@@ -2,7 +2,7 @@ import {StyleSheet, View, Text, TouchableOpacity, Pressable} from 'react-native'
 import React, {useState} from "react";
 import {Feather, FontAwesome} from "@expo/vector-icons";
 import {useDeleteGroup} from "@/src/api/groups";
-import {Link} from "expo-router";
+import {Link, useRouter} from "expo-router";
 
 const GroupItem = ({group, onAnchor}) => {
   const [anchored, setAnchored] = useState(group.anchored);

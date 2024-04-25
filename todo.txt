@@ -1,4 +1,4 @@
-update expense
 expense details
+update expense
 test bulk insert members
 how to invite members

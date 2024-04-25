@@ -14,7 +14,7 @@ export const useExpenseList = (group_id: number) => {
         console.log(error.message);
         throw new Error(error.message);
       }
-      console.log("Expense data is ", data);
+      // console.log("Expense data is ", data);
       return data;
     },
   });
@@ -30,10 +30,10 @@ export const useExpense = (id: number) => {
         .eq('id', id)
         .single();
       if (error) {
-        console.log(error.message);
+        // console.log(error.message);
         throw new Error(error.message);
       }
-      console.log(data);
+      // console.log(data);
       return data;
     }
   });

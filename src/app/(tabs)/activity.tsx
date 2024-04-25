@@ -18,12 +18,12 @@ export default function ActivityScreen() {
       <CollapsableHeader H_MAX_HEIGHT={200} H_MIN_HEIGHT={52} content={
         <View style={styles.content}>
           <View style={styles.row}>
-            <Text style={styles.activity}>Activity</Text>
-            <TouchableOpacity style={styles.icon} onPress={() => {
-            }}>
-              <Text style={styles.activity}>See All</Text>
-              <Ionicons name="chevron-forward-outline" size={24} color="black"/>
-            </TouchableOpacity>
+            <Text style={styles.activity}>Activities</Text>
+            {/*<TouchableOpacity style={styles.icon} onPress={() => {*/}
+            {/*}}>*/}
+            {/*  <Text style={styles.activity}>See All</Text>*/}
+            {/*  <Ionicons name="chevron-forward-outline" size={24} color="black"/>*/}
+            {/*</TouchableOpacity>*/}
           </View>
           <View style={{padding: 10}}>
             {Object.keys(groupedActivities).map((item) => (

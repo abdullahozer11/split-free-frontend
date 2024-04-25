@@ -144,31 +144,31 @@ export type Database = {
       }
       expense_participants: {
         Row: {
-          expense_id: number | null
+          expense: number | null
           id: number
-          member_id: number | null
+          member: number | null
         }
         Insert: {
-          expense_id?: number | null
+          expense?: number | null
           id?: number
-          member_id?: number | null
+          member?: number | null
         }
         Update: {
-          expense_id?: number | null
+          expense?: number | null
           id?: number
-          member_id?: number | null
+          member?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "public_expense_participants_expense_id_fkey"
-            columns: ["expense_id"]
+            foreignKeyName: "expense_participants_expense_fkey"
+            columns: ["expense"]
             isOneToOne: false
             referencedRelation: "expenses"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "public_expense_participants_member_id_fkey"
-            columns: ["member_id"]
+            foreignKeyName: "expense_participants_member_fkey"
+            columns: ["member"]
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
@@ -177,31 +177,31 @@ export type Database = {
       }
       expense_payers: {
         Row: {
-          expense_id: number | null
+          expense: number | null
           id: number
-          member_id: number | null
+          member: number | null
         }
         Insert: {
-          expense_id?: number | null
+          expense?: number | null
           id?: number
-          member_id?: number | null
+          member?: number | null
         }
         Update: {
-          expense_id?: number | null
+          expense?: number | null
           id?: number
-          member_id?: number | null
+          member?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "public_expense_payer_expense_id_fkey"
-            columns: ["expense_id"]
+            foreignKeyName: "expense_payers_expense_fkey"
+            columns: ["expense"]
             isOneToOne: false
             referencedRelation: "expenses"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "public_expense_payer_member_id_fkey"
-            columns: ["member_id"]
+            foreignKeyName: "expense_payers_member_fkey"
+            columns: ["member"]
             isOneToOne: false
             referencedRelation: "members"
             referencedColumns: ["id"]
@@ -219,6 +219,7 @@ export type Database = {
           id: number
           proof: string | null
           title: string
+          updated_at: string | null
         }
         Insert: {
           amount?: number
@@ -230,6 +231,7 @@ export type Database = {
           id?: number
           proof?: string | null
           title: string
+          updated_at?: string | null
         }
         Update: {
           amount?: number
@@ -241,6 +243,7 @@ export type Database = {
           id?: number
           proof?: string | null
           title?: string
+          updated_at?: string | null
         }
         Relationships: [
           {

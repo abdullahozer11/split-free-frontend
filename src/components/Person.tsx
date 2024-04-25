@@ -1,7 +1,7 @@
 import {StyleSheet, View, Text, Image} from 'react-native';
 import React from "react";
 
-const Person = ({profile}) => {
+export const Person = ({profile}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
@@ -15,7 +15,34 @@ const Person = ({profile}) => {
   );
 };
 
-export default Person;
+export const Payer = ({payer}) => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.subContainer}>
+        <Image
+          source={payer.member.profile?.avatar_url ? {uri: payer.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
+          style={styles.avatar}/>
+        <Text style={styles.memberName}>{payer.member.name}</Text>
+      </View>
+      <Text style={styles.balanceP}>€36.62</Text>
+    </View>
+  );
+};
+
+export const Participant = ({participant}) => {
+  console.log("participant is ", participant);
+  return (
+    <View style={styles.container}>
+      <View style={styles.subContainer}>
+        <Image
+          source={participant.member.profile?.avatar_url ? {uri: participant.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
+          style={styles.avatar}/>
+        <Text style={styles.memberName}>{participant.member.name}</Text>
+      </View>
+      <Text style={styles.balanceP}>€36.62</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

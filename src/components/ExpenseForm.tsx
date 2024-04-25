@@ -112,16 +112,16 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
         // Formulate payers list
         const payers = [payer];
         const _payers = payers.map(_payer => ({
-          member_id: _payer,
-          expense_id: data.id,
+          member: _payer,
+          expense: data.id,
         }));
         bulkInsertPayers(_payers, {
           onSuccess: () => {
             // console.log("Successfully inserted payers");
             // Formulate participants list
             const _participants = participants.map(participant => ({
-              member_id: participant,
-              expense_id: data.id,
+              member: participant,
+              expense: data.id,
             }));
             bulkInsertParticipants(_participants, {
               onSuccess: () => {

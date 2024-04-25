@@ -12,7 +12,7 @@ import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertGroup} from "@/src/api/groups";
-import {useBulkInsertMembers, useInsertMember} from "@/src/api/members";
+import {useBulkInsertMembers} from "@/src/api/members";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
@@ -20,7 +20,6 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   const [error, setError] = useState('');
 
   const {mutate: insertGroup} = useInsertGroup();
-  const {mutate: insertMember} = useInsertMember();
   const {mutate: bulkInsertMembers} = useBulkInsertMembers();
 
   const {profile} = useAuth();
