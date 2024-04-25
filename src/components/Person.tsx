@@ -1,44 +1,39 @@
-import {StyleSheet, View, Text, Image} from 'react-native';
+import {StyleSheet, View, Image} from 'react-native';
+import {Avatar, Text} from 'react-native-paper';
 import React from "react";
 
 export const Person = ({profile}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Image
-          source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
-          style={styles.avatar}/>
-        <Text style={styles.memberName}>{profile?.full_name || 'John Doe'}</Text>
+        <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Text variant={'labelMedium'}>{profile?.full_name || 'John Doe'}</Text>
       </View>
-      <Text style={styles.balanceP}>+ €36.62</Text>
+      <Text variant={"bodyLarge"} style={{color: "white"}}>+ €36.62</Text>
     </View>
   );
 };
 
-export const Payer = ({payer}) => {
+export const Payer = ({payer, amount}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Image
-          source={payer.member.profile?.avatar_url ? {uri: payer.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
-          style={styles.avatar}/>
-        <Text style={styles.memberName}>{payer.member.name}</Text>
+        <Avatar.Image size={36} source={payer.member.profile?.avatar_url ? {uri: payer.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Text variant={"bodyLarge"}>{payer.member.name}</Text>
       </View>
-      <Text style={styles.balanceP}>€36.62</Text>
+      <Text variant={"bodyLarge"} style={{color: "green"}}>${amount}</Text>
     </View>
   );
 };
 
-export const Participant = ({participant}) => {
+export const Participant = ({participant, amount}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Image
-          source={participant.member.profile?.avatar_url ? {uri: participant.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
-          style={styles.avatar}/>
-        <Text style={styles.memberName}>{participant.member.name}</Text>
+        <Avatar.Image size={36} source={participant.member.profile?.avatar_url ? {uri: participant.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Text variant={"bodyLarge"}>{participant.member.name}</Text>
       </View>
-      <Text style={styles.balanceP}>€36.62</Text>
+      <Text variant={"bodyLarge"} style={{color: "red"}}>${amount}</Text>
     </View>
   );
 };
@@ -58,19 +53,4 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 10,
   },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  memberName: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  balanceP: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: 'green',
-  }
 });
