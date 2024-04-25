@@ -1,24 +1,29 @@
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
-import React from "react";
+import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
-import {useGroup} from "@/src/api/groups";
+import {useDeleteGroup, useGroup} from "@/src/api/groups";
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
-import {Menu, ActivityIndicator} from 'react-native-paper';
+import {Menu, ActivityIndicator, Dialog, Button, Portal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 
 const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
+
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(id);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(id);
+
+  const {mutate: deleteGroup} = useDeleteGroup();
+
   // menu related
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
 
   if (groupLoading || expenseLoading) {
     return <ActivityIndicator/>;
@@ -33,6 +38,20 @@ const GroupDetailsScreen = () => {
   const handleStats = () => {
     console.log('stats');
   };
+
+  const promptDelete = () => {
+    setIsDialogVisible(true);
+  };
+
+  const handleDelete = () => {
+    deleteGroup(group.id, {
+      onSuccess: () => {
+        // console.log("Successfully deleted group");
+        navigation.goBack();
+      }
+    });
+  };
+
 
   return (
     <View style={styles.container}>
@@ -90,7 +109,7 @@ const GroupDetailsScreen = () => {
                   closeMenu();
                 }} title="Edit Group"/>
                 <Menu.Item onPress={() => {
-                  console.log("Delete group");
+                  promptDelete();
                   closeMenu();
                 }} title="Delete Group"
                            titleStyle={{color: "red"}}
@@ -104,6 +123,21 @@ const GroupDetailsScreen = () => {
         </View>
       }
       />
+      <Portal>
+        <Dialog visible={isDialogVisible} onDismiss={() => {
+          setIsDialogVisible(false);
+        }}>
+          <Dialog.Icon icon="alert"/>
+          <Dialog.Title>Are you sure to delete this group?</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">This action cannot be taken back</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+            <Button onPress={handleDelete}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 };
