@@ -136,10 +136,10 @@ export const usePayerList = (expense_id: number) => {
 
 export const useParticipantList = (expense_id: number) => {
   return useQuery({
-    queryKey: ['expense_participants'],
+    queryKey: ['participants'],
     queryFn: async () => {
       const {data, error} = await supabase
-        .from('expense_participants')
+        .from('participants')
         .select('id, member(name, profile(avatar_url))')
         .eq('expense', expense_id);
       if (error) {

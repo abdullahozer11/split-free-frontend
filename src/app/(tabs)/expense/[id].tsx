@@ -1,6 +1,6 @@
 import {StyleSheet, View, SafeAreaView, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
-import {useLocalSearchParams, useNavigation} from "expo-router";
+import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {useDeleteExpense, useExpense} from "@/src/api/expenses";
 import {Text, ActivityIndicator, Menu, Portal, Dialog, Button} from 'react-native-paper';
@@ -21,6 +21,7 @@ const ExpenseDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
+  const router = useRouter();
 
   // menu related
   const [visible, setVisible] = React.useState(false);
@@ -96,8 +97,8 @@ const ExpenseDetailsScreen = () => {
                 </TouchableOpacity>
               }>
               <Menu.Item onPress={() => {
-                console.log("Edit expense");
                 closeMenu();
+                router.push({ pathname: "/expense/update", params: { id } });
               }} title="Edit expense"/>
               <Menu.Item onPress={() => {
                 promptDelete();

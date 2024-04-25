@@ -255,6 +255,42 @@ export type Database = {
           },
         ]
       }
+      friends: {
+        Row: {
+          created_at: string
+          friend: string
+          id: number
+          profile: string
+        }
+        Insert: {
+          created_at?: string
+          friend: string
+          id?: number
+          profile: string
+        }
+        Update: {
+          created_at?: string
+          friend?: string
+          id?: number
+          profile?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friends_friend_fkey"
+            columns: ["friend"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friends_profile_fkey"
+            columns: ["profile"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       groups: {
         Row: {
           created_at: string

@@ -22,7 +22,7 @@ export function Hidden(props: { children }) {
 // Generate a formatted date
 export function getFormattedDate(date) {
   const options = { day: 'numeric', month: 'short', year: 'numeric' };
-  return date.toLocaleDateString('en-US', options);
+  return date?.toLocaleDateString('en-US', options);
 }
 
 import * as FileSystem from 'expo-file-system';

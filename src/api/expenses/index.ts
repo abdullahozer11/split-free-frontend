@@ -21,12 +21,15 @@ export const useExpenseList = (group_id: number) => {
 };
 
 export const useExpense = (id: number) => {
+  if (!id) {
+    return null;
+  }
   return useQuery({
     queryKey: ['expenses', id],
     queryFn: async () => {
       const {data, error} = await supabase
         .from('expenses')
-        .select('*')
+        .select('*, expense_payers(member), expense_participants(member)')
         .eq('id', id)
         .single();
       if (error) {
@@ -118,15 +121,15 @@ export const useUpdateExpense = () => {
     async mutationFn(data: any) {
       const {error, data: updatedExpense} = await supabase
         .from('expenses')
-        .update({
-          name: data.name,
-        })
+        .update(data)
         .eq('id', data.id)
         .select()
         .single();
       if (error) {
+        console.log(error.message);
         throw new Error(error.message);
       }
+      console.log(updatedExpense);
       return updatedExpense;
     },
     async onSuccess(_, {id}) {
@@ -144,6 +147,34 @@ export const useDeleteExpense = () => {
     },
     async onSuccess(_, {id}) {
       await queryClient.invalidateQueries(['expenses']);
+    }
+  });
+};
+
+export const useBulkDeletePayers = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(expense_id: number) {
+      const {error} = await supabase.from('expense_payers')
+        .delete()
+        .eq('expense', expense_id);
+    },
+    async onSuccess(_, {id}) {
+      await queryClient.invalidateQueries(['expense_payers']);
+    }
+  });
+};
+
+export const useBulkDeleteParticipants = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(expense_id: number) {
+      const {error} = await supabase.from('expense_participants')
+        .delete()
+        .eq('expense', expense_id);
+    },
+    async onSuccess(_, {id}) {
+      await queryClient.invalidateQueries(['expense_participants']);
     }
   });
 };

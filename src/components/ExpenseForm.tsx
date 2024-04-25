@@ -2,7 +2,12 @@ import React, {useState} from "react";
 import {useNavigation} from "expo-router";
 import {useGroupList} from "@/src/api/groups";
 import {useMemberList} from "@/src/api/members";
-import {useBulkInsertParticipants, useBulkInsertPayers, useInsertExpense} from "@/src/api/expenses";
+import {
+  useBulkInsertParticipants,
+  useBulkInsertPayers,
+  useInsertExpense,
+  useUpdateExpense
+} from "@/src/api/expenses";
 import {Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
 import {getFormattedDate, uploadImage} from "@/src/utils/helpers";
 import {ActivityIndicator, Avatar, Text, TextInput} from "react-native-paper";
@@ -14,28 +19,31 @@ import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
 import {Feather} from "@expo/vector-icons";
 
-export default function ExpenseForm({title: headerTitle, expenseId}) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [payer, setPayer] = useState(null);
-  const [participants, setParticipants] = useState([]);
-  const [image, setImage] = useState(null);
-  const [currency, setCurrency] = useState("EUR");
-  const [amount, setAmount] = useState('0');
+export default function ExpenseForm({title: headerTitle, updatingExpense}) {
   const navigation = useNavigation();
-  const [group, setGroup] = useState(null);
-  const [inputDate, setInputDate] = useState<Date | undefined>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [formState, setFormState] = useState(updatingExpense ? {
+    ...updatingExpense,
+    amount: updatingExpense.amount.toString()
+  } : {
+    title: '',
+    description: '',
+    payers: [],
+    participants: [],
+    image: null,
+    currency: 'EUR',
+    amount: '0',
+    group: null,
+    inputDate: new Date(),
+  });
+  const [modifiedFields, setModifiedFields] = useState({});
+
+  const isUpdating = !!updatingExpense;
 
   const {mutate: insertExpense} = useInsertExpense();
+  const {mutate: updateExpense} = useUpdateExpense();
   const {mutate: bulkInsertPayers} = useBulkInsertPayers();
   const {mutate: bulkInsertParticipants} = useBulkInsertParticipants();
-
-  if (expenseId) {
-    console.log("updating");
-  } else {
-    console.log("creating");
-  }
   const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
   const {data: members, error: membersError, isLoading: membersLoading} = useMemberList();
 
@@ -47,11 +55,13 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
     return <Text>Failed to fetch data</Text>;
   }
 
+  const {title, description, payers, participants, image, currency, amount, group, inputDate} = formState;
+
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
       const date = selectedDate;
       setShowDatePicker(false);
-      setInputDate(date);
+      handleInputChange('inputDate', date);
     } else {
       setShowDatePicker(false);
     }
@@ -76,7 +86,7 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
       return false;
     }
 
-    if (!payer) {
+    if (!payers) {
       console.log('Add who paid this expense');
       Alert.alert('Add who paid this expense');
       return false;
@@ -91,11 +101,58 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
     return true;
   };
 
-  const handleSubmit = async () => {
+  const onSubmit = () => {
     if (!validateData()) {
+      console.log('Validation failed');
       return;
     }
 
+    if (isUpdating) {
+      onUpdate();
+    } else {
+      onCreate();
+    }
+  };
+
+  const onUpdate = async () => {
+    const modifiedKeys = Object.keys(modifiedFields);
+    let hasAnyFieldModified = modifiedKeys.some(key => ['title', 'description', 'image', 'currency', 'amount', 'group', 'inputDate'].includes(key));
+    if (hasAnyFieldModified) {
+      updateExpense({
+        id: updatingExpense.id,
+        title: title,
+        description: description,
+        image: image,
+        currency: currency,
+        amount: amount,
+        group: group,
+        inputDate: inputDate,
+      }, {
+        onSuccess: () => {
+          // console.log('Expense updated');
+        }
+      });
+      // hasAnyFieldModified = modifiedKeys.some(key => ['payers'].includes(key));
+      // if (hasAnyFieldModified) {
+      //   // bulk delete payers
+      //   const payers = payers?.map(payer => ({
+      //     member: payer,
+      //     expense: updatingExpense.id,
+      //   }));
+      // }
+      // hasAnyFieldModified = modifiedKeys.some(key => ['participants'].includes(key));
+      // if (hasAnyFieldModified) {
+      //   // Formulate participants list
+      //   const participants = participants?.map(participant => ({
+      //     member: participant,
+      //     expense: updatingExpense.id,
+      //   }));
+      // }
+      navigation.goBack();
+    }
+  };
+
+  const onCreate = async () => {
     const imagePath = await uploadImage(image);
 
     insertExpense({
@@ -110,20 +167,19 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
       onSuccess: (data) => {
         // console.log("Successfully inserted expense");
         // Formulate payers list
-        const payers = [payer];
-        const _payers = payers.map(_payer => ({
-          member: _payer,
+        const payers = payers?.map(payer => ({
+          member: payer,
           expense: data.id,
         }));
-        bulkInsertPayers(_payers, {
+        bulkInsertPayers(payers, {
           onSuccess: () => {
             // console.log("Successfully inserted payers");
             // Formulate participants list
-            const _participants = participants.map(participant => ({
+            const participants = participants.map(participant => ({
               member: participant,
               expense: data.id,
             }));
-            bulkInsertParticipants(_participants, {
+            bulkInsertParticipants(participants, {
               onSuccess: () => {
                 // console.log("Successfully inserted participants");
                 navigation.goBack();
@@ -131,7 +187,6 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
             });
           }
         });
-
       }
     });
   };
@@ -146,8 +201,19 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      handleInputChange('image', result.assets[0].uri);
     }
+  };
+
+  const handleInputChange = (fieldName, value) => {
+    setModifiedFields(prevModifiedFields => ({
+      ...prevModifiedFields,
+      [fieldName]: value !== formState[fieldName],
+    }));
+    setFormState(prevFormState => ({
+      ...prevFormState,
+      [fieldName]: value,
+    }));
   };
 
   return (
@@ -159,7 +225,7 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
           <Feather style={styles.icon} name={"arrow-left"} size={24}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => {
-          handleSubmit();
+          onSubmit();
         }}>
           <Text style={styles.icon}>Save</Text>
         </TouchableOpacity>
@@ -171,7 +237,9 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
             label="Enter expense title"
             placeholder="Describe your expense"
             value={title}
-            onChangeText={setTitle}
+            onChangeText={(text) => {
+              handleInputChange('title', text);
+            }}
             style={{backgroundColor: 'white'}}
           />
         </View>
@@ -180,7 +248,9 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
             label="Enter expense description"
             placeholder="Give additional information"
             value={description}
-            onChangeText={setDescription}
+            onChangeText={(text) => {
+              handleInputChange('description', text);
+            }}
             multiline={true}
             style={{backgroundColor: 'white'}}
           />
@@ -192,13 +262,13 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
           labelField={'title'}
           valueField={'id'}
           value={'selected'}
-          onChange={(gr) => setGroup(gr)}/>
+          onChange={(gr) => handleInputChange('group', gr)}/>
         <View style={{flexDirection: "row", gap: 5}}>
           <TextInput
             label="Enter amount"
             placeholder="Enter amount"
             value={amount}
-            onChangeText={setAmount}
+            onChangeText={(text) => handleInputChange('amount', text)}
             keyboardType="numeric"
             style={{flex: 1, backgroundColor: 'white'}}
           />
@@ -210,7 +280,7 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
             valueField={'value'}
             value={currency}
             onChange={cu => {
-              setCurrency(cu);
+              handleInputChange('currency', cu);
             }}/>
           <Pressable
             onPress={() => {
@@ -231,9 +301,12 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
         <View style={{gap: 20}}>
           <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
             <Avatar.Image size={48} source={require('@/assets/images/blank-profile.png')}/>
-            <MyDropdown selected={payer} data={members} onChange={setPayer} label={"Who paid"}/>
+            <MyDropdown selected={payers[0]} data={members} onChange={(payer) => {
+              handleInputChange('payers', [payer]);
+            }} label={"Who paid"}/>
           </View>
-          <MyMultiSelect selected={participants} members={members} onChange={setParticipants}/>
+          <MyMultiSelect selected={participants} members={members}
+                         onChange={(participants) => handleInputChange('participants', participants)}/>
           <View style={{
             flexDirection: "row",
             gap: 15,
@@ -250,7 +323,7 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
               paddingHorizontal: 5,
               paddingVertical: 3
             }} onPress={pickImage}>Select Image </Text>
-            {image && <Avatar.Image source={{ uri: image }} size={24} />}
+            {image && <Avatar.Image source={{uri: image}} size={24}/>}
           </View>
         </View>
       </View>
