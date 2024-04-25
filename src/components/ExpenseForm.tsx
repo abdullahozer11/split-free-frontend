@@ -15,22 +15,6 @@ import MyMultiSelect from "@/src/components/MultiSelectComponent";
 import {Feather} from "@expo/vector-icons";
 
 export default function ExpenseForm({title: headerTitle, expenseId}) {
-  if (expenseId) {
-    console.log("updating");
-  } else {
-    console.log("creating");
-  }
-  const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
-  const {data: members, error: membersError, isLoading: membersLoading} = useMemberList();
-
-  if (groupsLoading || membersLoading) {
-    return <ActivityIndicator/>;
-  }
-
-  if (groupsError || membersError) {
-    return <Text>Failed to fetch data</Text>;
-  }
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [payer, setPayer] = useState(null);
@@ -46,6 +30,22 @@ export default function ExpenseForm({title: headerTitle, expenseId}) {
   const {mutate: insertExpense} = useInsertExpense();
   const {mutate: bulkInsertPayers} = useBulkInsertPayers();
   const {mutate: bulkInsertParticipants} = useBulkInsertParticipants();
+
+  if (expenseId) {
+    console.log("updating");
+  } else {
+    console.log("creating");
+  }
+  const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
+  const {data: members, error: membersError, isLoading: membersLoading} = useMemberList();
+
+  if (groupsLoading || membersLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (groupsError || membersError) {
+    return <Text>Failed to fetch data</Text>;
+  }
 
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
