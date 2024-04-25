@@ -85,7 +85,7 @@ export const useBulkInsertPayers = () => {
         console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      // console.log(newPayers);
+      // console.log("new payers are ", newPayers);
       return newPayers;
     },
     async onSuccess() {
@@ -152,13 +152,15 @@ export const useDeleteExpense = () => {
   });
 };
 
-export const useBulkDeletePayers = () => {
+export const useDeletePayer = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    async mutationFn(expense_id: number) {
+    async mutationFn(payer) {
+      // console.log("payer to be deleted is ", payer);
       const {error} = await supabase.from('expense_payers')
         .delete()
-        .eq('expense', expense_id);
+        .eq('member', payer.member)
+       .eq('expense', payer.expense);
     },
     async onSuccess(_, {id}) {
       await queryClient.invalidateQueries(['expense_payers']);
@@ -166,13 +168,14 @@ export const useBulkDeletePayers = () => {
   });
 };
 
-export const useBulkDeleteParticipants = () => {
+export const useDeleteParticipant = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    async mutationFn(expense_id: number) {
+    async mutationFn(participant) {
       const {error} = await supabase.from('expense_participants')
         .delete()
-        .eq('expense', expense_id);
+        .eq('member', participant.member)
+        .eq('expense', participant.expense);
     },
     async onSuccess(_, {id}) {
       await queryClient.invalidateQueries(['expense_participants']);

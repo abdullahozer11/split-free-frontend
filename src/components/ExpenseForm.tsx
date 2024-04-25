@@ -4,7 +4,7 @@ import {useGroupList} from "@/src/api/groups";
 import {useMemberList} from "@/src/api/members";
 import {
   useBulkInsertParticipants,
-  useBulkInsertPayers,
+  useBulkInsertPayers, useDeleteParticipant, useDeletePayer,
   useInsertExpense,
   useUpdateExpense
 } from "@/src/api/expenses";
@@ -43,6 +43,8 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
   const {mutate: insertExpense} = useInsertExpense();
   const {mutate: updateExpense} = useUpdateExpense();
   const {mutate: bulkInsertPayers} = useBulkInsertPayers();
+  const {mutate: deletePayer} = useDeletePayer();
+  const {mutate: deleteParticipant} = useDeleteParticipant();
   const {mutate: bulkInsertParticipants} = useBulkInsertParticipants();
   const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
   const {data: members, error: membersError, isLoading: membersLoading} = useMemberList();
@@ -101,16 +103,16 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
     return true;
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!validateData()) {
       console.log('Validation failed');
       return;
     }
 
     if (isUpdating) {
-      onUpdate();
+      await onUpdate();
     } else {
-      onCreate();
+      await onCreate();
     }
   };
 
@@ -118,42 +120,68 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
     const modifiedKeys = Object.keys(modifiedFields);
     let hasAnyFieldModified = modifiedKeys.some(key => ['title', 'description', 'image', 'currency', 'amount', 'group', 'inputDate'].includes(key));
     if (hasAnyFieldModified) {
-      // updateExpense({
-      //   id: updatingExpense.id,
-      //   title: title,
-      //   description: description,
-      //   image: image,
-      //   currency: currency,
-      //   amount: amount,
-      //   group: group,
-      //   inputDate: inputDate,
-      // }, {
-      //   onSuccess: () => {
-      //     console.log('Expense updated');
-      //   }
-      // });
-      const diff = findArrayDiff(payers, updatingExpense.payers);
-      console.log("diff is ")
-      console.log(diff)
-
-      // hasAnyFieldModified = modifiedKeys.some(key => ['payers'].includes(key));
-      // if (hasAnyFieldModified) {
-      //   // bulk delete payers
-      //   const payers = payers?.map(payer => ({
-      //     member: payer,
-      //     expense: updatingExpense.id,
-      //   }));
-      // }
-      // hasAnyFieldModified = modifiedKeys.some(key => ['participants'].includes(key));
-      // if (hasAnyFieldModified) {
-      //   // Formulate participants list
-      //   const participants = participants?.map(participant => ({
-      //     member: participant,
-      //     expense: updatingExpense.id,
-      //   }));
-      // }
-      // navigation.goBack();
+      updateExpense({
+        id: updatingExpense.id,
+        title: title,
+        description: description,
+        image: image,
+        currency: currency,
+        amount: amount,
+        group: group,
+        inputDate: inputDate,
+      }, {
+        onSuccess: () => {
+          console.log('Expense updated');
+        }
+      });
     }
+
+    const diff = findArrayDiff(payers, updatingExpense.payers);
+    const payers_to_add = diff.subtracted.map(payer => (
+      {
+        member: payer,
+        expense: updatingExpense.id,
+      }
+    ));
+    bulkInsertPayers(payers_to_add, {
+      onSuccess: () => {
+        console.log("Successfully inserted new payers");
+      }
+    });
+    const payers_to_delete = diff.added.map(payer => (
+      {
+        member: payer,
+        expense: updatingExpense.id,
+      }
+    ));
+    console.log("payers_to_delete", payers_to_delete);
+    payers_to_delete.forEach(payer => {
+      deletePayer(payer);
+    });
+
+    const diff2 = findArrayDiff(participants, updatingExpense.participants);
+    const participants_to_add = diff2.subtracted.map(par => (
+      {
+        member: par,
+        expense: updatingExpense.id,
+      }
+    ));
+    bulkInsertParticipants(participants_to_add, {
+      onSuccess: () => {
+        console.log("Successfully inserted new participants");
+      }
+    });
+    const participants_to_delete = diff2.added.map(par => (
+      {
+        member: par,
+        expense: updatingExpense.id,
+      }
+    ));
+    participants_to_delete.forEach(par => {
+      deleteParticipant(par);
+    });
+
+    navigation.goBack();
   };
 
   const onCreate = async () => {

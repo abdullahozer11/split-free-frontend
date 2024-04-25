@@ -42,7 +42,6 @@ const CreateGroupModal = ({isVisible, onClose}) => {
     // Save group in the database
     insertGroup({
       title,
-      owner: profile?.id,
     }, {
       onSuccess: (data) => {
         saveMembers(data?.id);

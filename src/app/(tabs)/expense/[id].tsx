@@ -86,7 +86,7 @@ const ExpenseDetailsScreen = () => {
             }}>
               <Feather name="arrow-left" size={36} color="white"/>
             </TouchableOpacity>
-            <Text variant={'displayMedium'} style={styles.headerTitle}>{expense?.title}</Text>
+            <Text variant={'displaySmall'} style={styles.headerTitle}>{expense?.title}</Text>
             <Menu
               visible={visible}
               onDismiss={closeMenu}
@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: 'white',
     marginBottom: 10,
+    maxWidth: "70%",
   },
   syncInfo: {
     fontSize: 12,
