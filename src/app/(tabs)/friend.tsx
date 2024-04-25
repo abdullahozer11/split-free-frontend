@@ -5,7 +5,7 @@ import CustomHeader from "@/src/components/CustomHeader";
 import LineGraph from "@/src/components/LineGraph";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
-import Person from "@/src/components/Person";
+import {Person} from "@/src/components/Person";
 
 export default function FriendScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
