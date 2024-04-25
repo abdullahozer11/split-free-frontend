@@ -1,9 +1,9 @@
 import {StyleSheet, View, SafeAreaView, TouchableOpacity} from 'react-native';
-import React from "react";
+import React, {useState} from "react";
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {useExpense} from "@/src/api/expenses";
-import {Text, ActivityIndicator} from 'react-native-paper';
+import {Text, ActivityIndicator, Menu} from 'react-native-paper';
 import {Feather} from "@expo/vector-icons";
 import {useParticipantList, usePayerList} from "@/src/api/members";
 import {Participant, Payer} from "@/src/components/Person";
@@ -22,6 +22,12 @@ const ExpenseDetailsScreen = () => {
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
 
+  // menu related
+  const [visible, setVisible] = React.useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const {data: expense, expenseError, expenseLoading} = useExpense(id);
   const {data: payers, payersError, payersLoading} = usePayerList(id);
   const {data: participants, participantsError, participantsLoading} = useParticipantList(id);
@@ -33,6 +39,10 @@ const ExpenseDetailsScreen = () => {
   if (expenseError || payersError || participantsError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
+
+  const promptDelete = () => {
+    setIsModalVisible(true);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -58,12 +68,33 @@ const ExpenseDetailsScreen = () => {
       } headerContent={
         <View style={styles.header}>
           <View style={styles.row}>
-            <TouchableOpacity style={styles.backHolder} onPress={() => {
+            <TouchableOpacity onPress={() => {
               navigation.goBack();
             }}>
               <Feather name="arrow-left" size={36} color="white"/>
             </TouchableOpacity>
             <Text variant={'displayMedium'} style={styles.headerTitle}>{expense?.title}</Text>
+            <Menu
+                visible={visible}
+                onDismiss={closeMenu}
+                contentStyle={{backgroundColor: "white"}}
+                anchor={
+                  <TouchableOpacity onPress={openMenu}>
+                    <Feather name="more-horizontal" size={36} color="white"/>
+                  </TouchableOpacity>
+                }>
+                <Menu.Item onPress={() => {
+                  console.log("Edit expense");
+                  closeMenu();
+                }} title="Edit expense"/>
+                <Menu.Item onPress={() => {
+                  console.log("Delete expense");
+                  promptDelete();
+                  closeMenu();
+                }} title="Delete expense"
+                           titleStyle={{color: "red"}}
+                />
+              </Menu>
           </View>
           <Text style={styles.syncInfo}>Last modified on January 21, 2024</Text>
         </View>
@@ -99,11 +130,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: 'center'
-  },
-  backHolder: {
-    position: "absolute",
-    left: 10,
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
   },
   members: {
     marginVertical: 10,

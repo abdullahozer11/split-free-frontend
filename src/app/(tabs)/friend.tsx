@@ -2,10 +2,10 @@ import {StyleSheet, View} from 'react-native';
 import {Text} from '@/src/components/Themed';
 import React, {useState} from "react";
 import CustomHeader from "@/src/components/CustomHeader";
-import LineGraph from "@/src/components/LineGraph";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
 import {Person} from "@/src/components/Person";
+import {ProgressBar} from "react-native-paper";
 
 export default function FriendScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -29,7 +29,7 @@ export default function FriendScreen() {
               <Text style={{fontSize: 24, fontWeight: "bold"}}>- $254.84</Text>
             </View>
           </View>
-          <LineGraph leftPercentage={0.7}/>
+          <ProgressBar animatedValue={0.7} theme={{ colors: { primary: 'green' } }} style={{height: 18, borderRadius: 10}} />
         </View>
         <View>
           <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
