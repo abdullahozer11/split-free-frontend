@@ -55,10 +55,10 @@ export const useInsertGroup = () => {
         .select()
         .single();
       if (error) {
-        // console.error('Error during insertion:', error);
+        console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      // console.log('New group inserted:', newGroup);
+      console.log('New group inserted:', newGroup);
       return newGroup;
     },
     async onSuccess() {

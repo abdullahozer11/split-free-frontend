@@ -64,6 +64,7 @@ export const useInsertExpense = () => {
         console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
+      console.log('New expense inserted:', newExpense);
       return newExpense;
     },
     async onSuccess() {

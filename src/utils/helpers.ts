@@ -51,3 +51,24 @@ export const uploadImage = async (image) => {
     return data.path;
   }
 };
+
+export function findArrayDiff(array1, array2) {
+    const added = [];
+    const subtracted = [];
+
+    // Find added numbers
+    array2.forEach(num => {
+        if (!array1.includes(num)) {
+            added.push(num);
+        }
+    });
+
+    // Find subtracted numbers
+    array1.forEach(num => {
+        if (!array2.includes(num)) {
+            subtracted.push(num);
+        }
+    });
+
+    return { added, subtracted };
+}

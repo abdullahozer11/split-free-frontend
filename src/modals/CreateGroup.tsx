@@ -36,11 +36,13 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
   const saveData = async () => {
     if (!validateData()) {
+      console.log('Invalid group data');
       return;
     }
     // Save group in the database
     insertGroup({
       title,
+      owner: profile?.id,
     }, {
       onSuccess: (data) => {
         saveMembers(data?.id);

@@ -9,7 +9,7 @@ import {
   useUpdateExpense
 } from "@/src/api/expenses";
 import {Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
-import {getFormattedDate, uploadImage} from "@/src/utils/helpers";
+import {findArrayDiff, getFormattedDate, uploadImage} from "@/src/utils/helpers";
 import {ActivityIndicator, Avatar, Text, TextInput} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import {Dropdown} from "react-native-element-dropdown";
@@ -118,20 +118,24 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
     const modifiedKeys = Object.keys(modifiedFields);
     let hasAnyFieldModified = modifiedKeys.some(key => ['title', 'description', 'image', 'currency', 'amount', 'group', 'inputDate'].includes(key));
     if (hasAnyFieldModified) {
-      updateExpense({
-        id: updatingExpense.id,
-        title: title,
-        description: description,
-        image: image,
-        currency: currency,
-        amount: amount,
-        group: group,
-        inputDate: inputDate,
-      }, {
-        onSuccess: () => {
-          // console.log('Expense updated');
-        }
-      });
+      // updateExpense({
+      //   id: updatingExpense.id,
+      //   title: title,
+      //   description: description,
+      //   image: image,
+      //   currency: currency,
+      //   amount: amount,
+      //   group: group,
+      //   inputDate: inputDate,
+      // }, {
+      //   onSuccess: () => {
+      //     console.log('Expense updated');
+      //   }
+      // });
+      const diff = findArrayDiff(payers, updatingExpense.payers);
+      console.log("diff is ")
+      console.log(diff)
+
       // hasAnyFieldModified = modifiedKeys.some(key => ['payers'].includes(key));
       // if (hasAnyFieldModified) {
       //   // bulk delete payers
@@ -148,7 +152,7 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
       //     expense: updatingExpense.id,
       //   }));
       // }
-      navigation.goBack();
+      // navigation.goBack();
     }
   };
 
@@ -167,21 +171,23 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
       onSuccess: (data) => {
         // console.log("Successfully inserted expense");
         // Formulate payers list
-        const payers = payers?.map(payer => ({
-          member: payer,
+        const _payers = payers?.map(_payer => ({
+          member: _payer,
           expense: data.id,
         }));
-        bulkInsertPayers(payers, {
+        console.log("payers are ", _payers);
+        bulkInsertPayers(_payers, {
           onSuccess: () => {
             // console.log("Successfully inserted payers");
             // Formulate participants list
-            const participants = participants.map(participant => ({
-              member: participant,
+            const _participants = participants?.map(_participant => ({
+              member: _participant,
               expense: data.id,
             }));
-            bulkInsertParticipants(participants, {
+            // console.log("participants are ", _participants);
+            bulkInsertParticipants(_participants, {
               onSuccess: () => {
-                // console.log("Successfully inserted participants");
+                console.log("Successfully inserted participants");
                 navigation.goBack();
               }
             });
