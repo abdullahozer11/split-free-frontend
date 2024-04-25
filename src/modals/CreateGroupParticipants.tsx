@@ -18,7 +18,7 @@ const Member = ({name, onRemove, owner}) => {
 
 const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
   const [name, setName] = useState('');
-  const [members, setMembers] = useState([membersP]);
+  const [members, setMembers] = useState(membersP);
   const [error, setError] = useState('');
 
   const addMember = () => {
@@ -39,6 +39,12 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
       return false;
     }
     return true;
+  };
+
+  const resetFields = () => {
+    setMembers([]);
+    setName('');
+    setError('');
   };
 
   return (
@@ -77,7 +83,10 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
             <TouchableOpacity style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => onSubmit(members)}>
+            <TouchableOpacity style={styles.button} onPress={() => {
+              resetFields();
+              onSubmit(members);
+            }}>
               <Feather name={"check"} size={24} color="black"/>
               <Text style={styles.buttonText}>Done</Text>
             </TouchableOpacity>
@@ -191,6 +200,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     paddingHorizontal: 20,
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 5,
+    marginHorizontal: 10,
   },
   icon: {
     fontSize: 22,

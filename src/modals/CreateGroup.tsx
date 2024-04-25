@@ -12,7 +12,7 @@ import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertGroup} from "@/src/api/groups";
-import {useBulkInsertMembers} from "@/src/api/members";
+import {useBulkInsertMembers, useInsertMember} from "@/src/api/members";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
@@ -21,6 +21,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
   const {mutate: insertGroup} = useInsertGroup();
   const {mutate: bulkInsertMembers} = useBulkInsertMembers();
+  const {mutate: insertMember} = useInsertMember();
 
   const {profile} = useAuth();
   const [members, setMembers] = useState([profile?.full_name]);
@@ -52,11 +53,26 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   };
 
   const saveMembers = (group_id) => {
-    // Bulk insert members in the database
-    const _members = members.map(member => ({
+    console.log('owner is ', members[0]);
+    // create owner member
+    insertMember({
+      name: members[0],
+      group: group_id,
+      profile: profile.id,
+      role: 'owner',
+    }, {
+      onSuccess: () => {
+        console.log("Owner is successfully created: ");
+      },
+    })
+    // Bulk insert other members in the database
+    const _members = members.slice(1).map(member => ({
       name: member,
       group: group_id,
     }))
+
+    console.log("_members are ", _members);
+
     bulkInsertMembers(_members, {
       onSuccess: () => {
         console.log("Members are successfully inserted");

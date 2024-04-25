@@ -42,10 +42,7 @@ export const useInsertMember = () => {
     async mutationFn(data: any) {
       const {error, data: newMember} = await supabase
         .from('members')
-        .insert({
-          name: data.name,
-          group: data.group,
-        })
+        .insert(data)
         .single();
       if (error) {
         console.error('Error during insertion:', error);
@@ -71,7 +68,8 @@ export const useBulkInsertMembers = () => {
         console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      return newMembers;
+      console.log("Insert members successfully")
+      return true;
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['members']);

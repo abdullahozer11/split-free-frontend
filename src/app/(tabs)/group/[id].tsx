@@ -1,4 +1,4 @@
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {useDeleteGroup, useGroup} from "@/src/api/groups";
@@ -6,8 +6,10 @@ import {useLocalSearchParams, useNavigation} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
-import {Menu, ActivityIndicator, Dialog, Button, Portal} from 'react-native-paper';
+import {Menu, Text, ActivityIndicator, Dialog, Button, Portal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
+import {Member} from "@/src/components/Person";
+
 
 const GroupDetailsScreen = () => {
   const {id: idString} = useLocalSearchParams();
@@ -30,7 +32,7 @@ const GroupDetailsScreen = () => {
   }
 
   if (groupError || expenseError) {
-    return <Text>Failed to fetch data</Text>;
+    return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
   const groupedExpenses = groupElementsByDay(expenses);
@@ -46,12 +48,11 @@ const GroupDetailsScreen = () => {
   const handleDelete = () => {
     deleteGroup(group.id, {
       onSuccess: () => {
-        // console.log("Successfully deleted group");
+        console.log("Successfully deleted group with id ", group.id);
         navigation.goBack();
       }
     });
   };
-
 
   return (
     <View style={styles.container}>
@@ -69,18 +70,26 @@ const GroupDetailsScreen = () => {
                 <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ $324.00</Text>
               </View>
             </View>
-            <Hidden>Second Section</Hidden>
-            <View style={{}}>
-              {Object.keys(groupedExpenses).map((item) => (
-                <View style={styles.activityGroup} key={item}>
-                  <Text style={styles.date}>{item}</Text>
-                  {groupedExpenses[item].map((expense) => (
-                    <ExpenseItem key={expense.id} expense={expense}/>
-                  ))}
-                </View>
-              ))}
+            <View style={styles.section}>
+              {groupedExpenses ? null : <Text variant={'titleLarge'}>Expenses</Text>}
+              <View>
+                {Object.keys(groupedExpenses).map((item) => (
+                  <View style={styles.activityGroup} key={item}>
+                    <Text style={styles.date}>{item}</Text>
+                    {groupedExpenses[item].map((expense) => (
+                      <ExpenseItem key={expense.id} expense={expense}/>
+                    ))}
+                  </View>
+                ))}
+              </View>
             </View>
-
+            <View style={styles.section}>
+              <Text variant={'titleLarge'}>Members</Text>
+              {group?.members && group?.members?.map(member => (
+                  <Member key={member.name} member={member}/>
+                )
+              )}
+            </View>
           </View>
         </View>
       } headerContent={
@@ -186,6 +195,10 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 18,
     fontWeight: '500',
+  },
+  section: {
+    marginBottom: 10,
+    gap: 10
   },
 });
 

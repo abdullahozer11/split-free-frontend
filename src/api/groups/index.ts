@@ -7,7 +7,7 @@ export const useGroupList = () => {
   return useQuery({
     queryKey: ['groups'],
     queryFn: async () => {
-      const { data, error} = await supabase
+      const {data, error} = await supabase
         .from('groups')
         .select('id, status, title, members(count), expenses(count)');
       if (error) {
@@ -25,7 +25,7 @@ export const useGroup = (id: number) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('groups')
-        .select('*')
+        .select('id, title, members(name, profile(avatar_url))')
         .eq('id', id)
         .single();
       if (error) {
@@ -45,7 +45,7 @@ export const useInsertGroup = () => {
   return useMutation({
     async mutationFn(data) {
       // console.log('Data received for insertion:', data);
-      const { error, data: newGroup } = await supabase
+      const {error, data: newGroup} = await supabase
         .from('groups')
         .insert({
           title: data.title,
@@ -75,16 +75,15 @@ export const useUpdateGroup = () => {
     async mutationFn(data: any) {
       const {error, data: updatedGroup} = await supabase
         .from('groups')
-        .update({
-          title: data.title,
-          description: data.description,
-        })
+        .update(data)
         .eq('id', data.id)
         .select()
         .single();
       if (error) {
+        console.error('Error during update:', error);
         throw new Error(error.message);
       }
+      console.log("updated group is", updatedGroup);
       return updatedGroup;
     },
     async onSuccess(_, {id}) {
@@ -96,11 +95,21 @@ export const useUpdateGroup = () => {
 
 export const useDeleteGroup = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
-    async mutationFn(id: number) {
-      const {error} = await supabase.from('groups').delete().eq('id', id);
+    async mutationFn(id) {
+      const {error} = await supabase
+        .from('groups')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        console.error('Error during delete:', error);
+        throw new Error(error.message);
+      }
+      console.log("group is deleted");
+      return true;
     },
-    async onSuccess(_, {id}) {
+    async onSuccess() {
       await queryClient.invalidateQueries(['groups']);
     }
   });

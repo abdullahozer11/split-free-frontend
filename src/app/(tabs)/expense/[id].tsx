@@ -68,13 +68,13 @@ const ExpenseDetailsScreen = () => {
           <Text variant={'titleSmall'}>Who paid?</Text>
           <View style={styles.members}>
             {payers?.map(payer => (
-              <Payer key={payer.member} payer={payer} amount={expense?.amount}/>)
+              <Payer key={payer.id} payer={payer} amount={expense?.amount}/>)
             )}
           </View>
           <Text variant={'titleSmall'}>Who shared?</Text>
           <View style={styles.members}>
             {participants?.map(participant => (
-                <Participant key={participant.member} participant={participant}
+                <Participant key={participant.id} participant={participant}
                              amount={expense?.amount / participants.length}/>
               )
             )}

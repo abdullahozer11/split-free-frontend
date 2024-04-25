@@ -38,6 +38,17 @@ export const Participant = ({participant, amount}) => {
   );
 };
 
+export const Member = ({member}) => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.subContainer}>
+        <Avatar.Image size={36} source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Text variant={"bodyLarge"}>{member.name}</Text>
+      </View>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
