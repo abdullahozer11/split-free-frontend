@@ -30,7 +30,6 @@ export const Payer = ({payer}) => {
 };
 
 export const Participant = ({participant}) => {
-  console.log("participant is ", participant);
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>

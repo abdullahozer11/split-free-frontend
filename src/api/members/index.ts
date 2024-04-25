@@ -128,7 +128,7 @@ export const usePayerList = (expense_id: number) => {
         console.log(error.message);
         throw new Error(error.message);
       }
-      console.log('expense payers are', data);
+      // console.log('expense payers are', data);
       return data;
     },
   });

@@ -2,8 +2,8 @@ import {StyleSheet, View, SafeAreaView, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {useExpense} from "@/src/api/expenses";
-import {Text, ActivityIndicator, Menu} from 'react-native-paper';
+import {useDeleteExpense, useExpense} from "@/src/api/expenses";
+import {Text, ActivityIndicator, Menu, Portal, Dialog, Button} from 'react-native-paper';
 import {Feather} from "@expo/vector-icons";
 import {useParticipantList, usePayerList} from "@/src/api/members";
 import {Participant, Payer} from "@/src/components/Person";
@@ -26,11 +26,13 @@ const ExpenseDetailsScreen = () => {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
 
   const {data: expense, expenseError, expenseLoading} = useExpense(id);
   const {data: payers, payersError, payersLoading} = usePayerList(id);
   const {data: participants, participantsError, participantsLoading} = useParticipantList(id);
+
+  const {mutate: deleteExpense} = useDeleteExpense();
 
   if (expenseLoading || payersLoading || participantsLoading) {
     return <ActivityIndicator/>;
@@ -41,7 +43,17 @@ const ExpenseDetailsScreen = () => {
   }
 
   const promptDelete = () => {
-    setIsModalVisible(true);
+    setIsDialogVisible(true);
+  };
+
+  const handleDelete = () => {
+    console.log("deleting expense");
+    deleteExpense(expense.id, {
+      onSuccess: () => {
+        console.log("Successfully deleted expense");
+        navigation.goBack();
+      }
+    });
   };
 
   return (
@@ -75,30 +87,42 @@ const ExpenseDetailsScreen = () => {
             </TouchableOpacity>
             <Text variant={'displayMedium'} style={styles.headerTitle}>{expense?.title}</Text>
             <Menu
-                visible={visible}
-                onDismiss={closeMenu}
-                contentStyle={{backgroundColor: "white"}}
-                anchor={
-                  <TouchableOpacity onPress={openMenu}>
-                    <Feather name="more-horizontal" size={36} color="white"/>
-                  </TouchableOpacity>
-                }>
-                <Menu.Item onPress={() => {
-                  console.log("Edit expense");
-                  closeMenu();
-                }} title="Edit expense"/>
-                <Menu.Item onPress={() => {
-                  console.log("Delete expense");
-                  promptDelete();
-                  closeMenu();
-                }} title="Delete expense"
-                           titleStyle={{color: "red"}}
-                />
-              </Menu>
+              visible={visible}
+              onDismiss={closeMenu}
+              contentStyle={{backgroundColor: "white"}}
+              anchor={
+                <TouchableOpacity onPress={openMenu}>
+                  <Feather name="more-horizontal" size={36} color="white"/>
+                </TouchableOpacity>
+              }>
+              <Menu.Item onPress={() => {
+                console.log("Edit expense");
+                closeMenu();
+              }} title="Edit expense"/>
+              <Menu.Item onPress={() => {
+                promptDelete();
+                closeMenu();
+              }} title="Delete expense"
+                         titleStyle={{color: "red"}}
+              />
+            </Menu>
           </View>
           <Text style={styles.syncInfo}>Last modified on January 21, 2024</Text>
         </View>
       }/>
+      <Portal>
+        <Dialog visible={isDialogVisible} onDismiss={() => {setIsDialogVisible(false)}}>
+          <Dialog.Icon icon="alert"/>
+          <Dialog.Title>Are you sure to delete this expense?</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">This action cannot be taken back</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+            <Button onPress={handleDelete}>Ok</Button>
+        </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 };
