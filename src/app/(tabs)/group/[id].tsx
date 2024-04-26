@@ -54,6 +54,10 @@ const GroupDetailsScreen = () => {
     });
   };
 
+  const promptInvite = () => {
+      console.log('invite');
+  };
+
   return (
     <View style={styles.container}>
       <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
@@ -121,6 +125,11 @@ const GroupDetailsScreen = () => {
                   closeMenu();
                 }} title="Delete Group"
                            titleStyle={{color: "red"}}
+                />
+                <Menu.Item onPress={() => {
+                  promptInvite();
+                }} title="Invite a person"
+                           titleStyle={{color: "blue"}}
                 />
               </Menu>
             </View>

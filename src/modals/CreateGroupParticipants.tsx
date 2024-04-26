@@ -84,8 +84,8 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => {
-              resetFields();
               onSubmit(members);
+              resetFields();
             }}>
               <Feather name={"check"} size={24} color="black"/>
               <Text style={styles.buttonText}>Done</Text>

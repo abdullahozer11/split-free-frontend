@@ -1,1 +1,3 @@
 how to invite members
+remove hard coded quantities
+calculate stuff and display
