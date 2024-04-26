@@ -38,13 +38,13 @@ export default function TabLayout() {
         },
         // headerTitleAlign: 'center',
       })}>
-      <Tabs.Screen
-        name="activity"
-        options={{
-          title: 'Activity',
-          tabBarIcon: ({color}) => <TabBarIcon name="bell" color={color}/>,
-        }}
-      />
+      {/*<Tabs.Screen*/}
+      {/*  name="activity"*/}
+      {/*  options={{*/}
+      {/*    title: 'Activity',*/}
+      {/*    tabBarIcon: ({color}) => <TabBarIcon name="bell" color={color}/>,*/}
+      {/*  }}*/}
+      {/*/>*/}
       <Tabs.Screen
         name="group"
         options={{
