@@ -60,7 +60,7 @@ const GroupDetailsScreen = () => {
         <View style={styles.content}>
           <Hidden>First Section</Hidden>
           <View style={{padding: 20, flex: 1}}>
-            <View style={{flexDirection: "row", marginHorizontal: 15, paddingBottom: 60}}>
+            <View style={{flexDirection: "row", marginHorizontal: 15, paddingBottom: 30}}>
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Group spent:</Text>
                 <Text style={{fontSize: 24, fontWeight: "bold"}}>$934.00</Text>
@@ -71,11 +71,10 @@ const GroupDetailsScreen = () => {
               </View>
             </View>
             <View style={styles.section}>
-              {groupedExpenses ? null : <Text variant={'titleLarge'}>Expenses</Text>}
               <View>
                 {Object.keys(groupedExpenses).map((item) => (
                   <View style={styles.activityGroup} key={item}>
-                    <Text style={styles.date}>{item}</Text>
+                    <Text variant={'titleMedium'}>{item}</Text>
                     {groupedExpenses[item].map((expense) => (
                       <ExpenseItem key={expense.id} expense={expense}/>
                     ))}
@@ -84,7 +83,7 @@ const GroupDetailsScreen = () => {
               </View>
             </View>
             <View style={styles.section}>
-              <Text variant={'titleLarge'}>Members</Text>
+              <Text variant={'titleMedium'}>Members</Text>
               {group?.members && group?.members?.map(member => (
                   <Member key={member.name} member={member}/>
                 )
@@ -191,10 +190,6 @@ const styles = StyleSheet.create({
   activityGroup: {
     marginTop: 10,
     gap: 10,
-  },
-  date: {
-    fontSize: 18,
-    fontWeight: '500',
   },
   section: {
     marginBottom: 10,

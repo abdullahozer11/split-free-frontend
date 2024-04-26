@@ -1,6 +1,7 @@
 import {StyleSheet, View, Image} from 'react-native';
 import {Avatar, Text} from 'react-native-paper';
 import React from "react";
+import {Feather} from "@expo/vector-icons";
 
 export const Person = ({profile}) => {
   return (
@@ -44,6 +45,7 @@ export const Member = ({member}) => {
       <View style={styles.subContainer}>
         <Avatar.Image size={36} source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
         <Text variant={"bodyLarge"}>{member.name}</Text>
+        {member.role === 'owner' ? <Feather style={styles.badge} name={'award'} size={24} color={'silver'}/> : null}
       </View>
     </View>
   );
@@ -63,5 +65,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     gap: 10,
+  },
+  badge: {
+    position: "absolute",
+    right: 10,
   },
 });

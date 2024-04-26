@@ -53,8 +53,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   };
 
   const saveMembers = (group_id) => {
-    console.log('owner is ', members[0]);
-    // create owner member
+    // insert owner member
     insertMember({
       name: members[0],
       group: group_id,
@@ -63,22 +62,20 @@ const CreateGroupModal = ({isVisible, onClose}) => {
     }, {
       onSuccess: () => {
         console.log("Owner is successfully created: ");
+        // Bulk insert other members in the database
+        const _members = members.slice(1).map(member => ({
+          name: member,
+          group: group_id,
+        }));
+        bulkInsertMembers(_members, {
+          onSuccess: () => {
+            console.log("Members are successfully inserted");
+          }
+        });
       },
-    })
-    // Bulk insert other members in the database
-    const _members = members.slice(1).map(member => ({
-      name: member,
-      group: group_id,
-    }))
-
-    console.log("_members are ", _members);
-
-    bulkInsertMembers(_members, {
-      onSuccess: () => {
-        console.log("Members are successfully inserted");
-      }
     });
   };
+
 
   const validateData = () => {
     setError('');
