@@ -9,7 +9,7 @@ export const useExpenseList = (group_id: number) => {
       const {data, error} = await supabase
         .from('expenses')
         .select('id, title, amount, created_at')
-        .eq('group', group_id);
+        .eq('group_id', group_id);
       if (error) {
         console.log(error.message);
         throw new Error(error.message);

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
   Text,
   View,
@@ -11,20 +11,22 @@ import {
 import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useInsertGroup} from "@/src/api/groups";
-import {useBulkInsertMembers, useInsertMember} from "@/src/api/members";
+import {useInsertGroupSmart} from "@/src/api/groups";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
   const [error, setError] = useState('');
 
-  const {mutate: insertGroup} = useInsertGroup();
-  const {mutate: bulkInsertMembers} = useBulkInsertMembers();
-  const {mutate: insertMember} = useInsertMember();
+  const {mutate: insertGroup} = useInsertGroupSmart();
 
   const {profile} = useAuth();
-  const [members, setMembers] = useState([profile?.full_name]);
+
+  const [members, setMembers] = useState([]);
+
+  useEffect(() => {
+    setMembers([profile.full_name])
+  }, [profile]);
 
   const handleParticipantsSubmit = (members) => {
     setShowParticipantsModal(false);
@@ -43,39 +45,14 @@ const CreateGroupModal = ({isVisible, onClose}) => {
     // Save group in the database
     insertGroup({
       title,
-    }, {
-      onSuccess: (data) => {
-        saveMembers(data?.id);
-        resetFields();
-        onClose();
-      }
-    });
-  };
-
-  const saveMembers = (group_id) => {
-    // insert owner member
-    insertMember({
-      name: members[0],
-      group: group_id,
-      profile: profile.id,
-      role: 'owner',
+      member_names: members,
     }, {
       onSuccess: () => {
-        console.log("Owner is successfully created: ");
-        // Bulk insert other members in the database
-        const _members = members.slice(1).map(member => ({
-          name: member,
-          group: group_id,
-        }));
-        bulkInsertMembers(_members, {
-          onSuccess: () => {
-            console.log("Members are successfully inserted");
-          }
-        });
+        resetFields();
+        onClose();
       },
-    });
+    })
   };
-
 
   const validateData = () => {
     setError('');
@@ -137,7 +114,6 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
 export default CreateGroupModal;
 
-
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
@@ -188,5 +164,3 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
-
-export default CreateGroupModal;

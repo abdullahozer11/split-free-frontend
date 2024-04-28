@@ -38,36 +38,6 @@ export const useGroup = (id: number) => {
   });
 };
 
-export const useInsertGroup = () => {
-  const queryClient = useQueryClient();
-  const {profile} = useAuth();
-
-  return useMutation({
-    async mutationFn(data) {
-      // console.log('Data received for insertion:', data);
-      const {error, data: newGroup} = await supabase
-        .from('groups')
-        .insert({
-          title: data.title,
-          description: data.description,
-          owner: profile.id,
-        })
-        .select()
-        .single();
-      if (error) {
-        console.error('Error during insertion:', error);
-        throw new Error(error.message);
-      }
-      console.log('New group inserted:', newGroup);
-      return newGroup;
-    },
-    async onSuccess() {
-      // console.log('Mutation succeeded. Invalidating "groups" query.');
-      await queryClient.invalidateQueries(['groups']);
-    }
-  });
-};
-
 export const useUpdateGroup = () => {
   const queryClient = useQueryClient();
 
@@ -111,6 +81,33 @@ export const useDeleteGroup = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['groups']);
+    }
+  });
+};
+
+export const useInsertGroupSmart = () => {
+  const queryClient = useQueryClient();
+  const {profile} = useAuth();
+
+  return useMutation({
+    async mutationFn(data) {
+      // console.log('Data received for insertion:', data);
+      const {data: newGroupID, error} = await supabase
+        .rpc('create_group', {
+          member_names_input: data.member_names,
+          profile_id_input: profile.id,
+          title_input: data.title
+        });
+      if (error) {
+        console.error('Error during insertion:', error);
+        throw new Error(error.message);
+      }
+      console.log('New group inserted:', newGroupID);
+      return newGroupID;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['groups']);
+      await queryClient.invalidateQueries(['members']);
     }
   });
 };

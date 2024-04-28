@@ -35,48 +35,6 @@ export const useMember = (id: number) => {
   });
 };
 
-export const useInsertMember = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    async mutationFn(data: any) {
-      const {error, data: newMember} = await supabase
-        .from('members')
-        .insert(data)
-        .single();
-      if (error) {
-        console.error('Error during insertion:', error);
-        throw new Error(error.message);
-      }
-      return newMember;
-    },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['members']);
-    }
-  });
-};
-
-export const useBulkInsertMembers = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    async mutationFn(data: any) {
-      const {error, data: newMembers} = await supabase
-        .from('members')
-        .insert(data);
-      if (error) {
-        console.error('Error during insertion:', error);
-        throw new Error(error.message);
-      }
-      console.log("Insert members successfully")
-      return true;
-    },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['members']);
-    }
-  });
-};
-
 export const useUpdateMember = () => {
   const queryClient = useQueryClient();
 

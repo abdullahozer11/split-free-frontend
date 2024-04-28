@@ -32,8 +32,6 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarStyle: {
-          height: 60,
-          paddingTop: 5,
           display: route.name === 'account' ? 'none' : 'flex',
         },
         // headerTitleAlign: 'center',
