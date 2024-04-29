@@ -3,7 +3,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {Redirect, Tabs} from 'expo-router';
 import Colors from '@/src/constants/Colors';
 import {useColorScheme} from '@/src/components/useColorScheme';
-import {useClientOnlyValue} from '@/src/components/useClientOnlyValue';
 import {useAuth} from "@/src/providers/AuthProvider";
 import {Feather} from "@expo/vector-icons";
 
@@ -48,13 +47,6 @@ export default function TabLayout() {
         options={{
           title: 'Group',
           tabBarIcon: ({color}) => <TabBarIcon name="users" color={color}/>,
-        }}
-      />
-      <Tabs.Screen
-        name="expense"
-        options={{
-          title: 'Expense',
-          tabBarIcon: ({color}) => <TabBarIcon name="plus-circle" color={color}/>,
         }}
       />
       <Tabs.Screen

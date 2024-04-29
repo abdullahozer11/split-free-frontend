@@ -48,14 +48,13 @@ export const useDeleteGroup = () => {
         .delete()
         .eq('id', id);
       if (error) {
-        console.error('Error during delete:', error);
+        // console.error('Error during delete:', error);
         throw new Error(error.message);
       }
-      console.log("group is deleted");
+      // console.log("group is deleted");
       return true;
     },
     async onSuccess() {
-      await queryClient.invalidateQueries(['groups']);
     }
   });
 };

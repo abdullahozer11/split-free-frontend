@@ -1,15 +1,12 @@
 import React, {useState} from "react";
 import {useNavigation} from "expo-router";
-import {useGroupList} from "@/src/api/groups";
 import {useMemberList} from "@/src/api/members";
 import {
-  useBulkInsertParticipants,
-  useBulkInsertPayers, useDeleteParticipant, useDeletePayer,
   useInsertExpense,
   useUpdateExpense
 } from "@/src/api/expenses";
 import {Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
-import {findArrayDiff, getFormattedDate, uploadImage} from "@/src/utils/helpers";
+import {getFormattedDate, uploadImage} from "@/src/utils/helpers";
 import {ActivityIndicator, Avatar, Text, TextInput} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import {Dropdown} from "react-native-element-dropdown";
@@ -19,7 +16,16 @@ import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
 import {Feather} from "@expo/vector-icons";
 
-export default function ExpenseForm({title: headerTitle, updatingExpense}) {
+
+function formatDateForPostgreSQL(dateObj) {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(dateObj.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+export default function ExpenseForm({title: headerTitle, groupId, updatingExpense}) {
   const navigation = useNavigation();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [formState, setFormState] = useState(updatingExpense ? {
@@ -33,31 +39,26 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
     image: null,
     currency: 'EUR',
     amount: '0',
-    group: null,
+    group_id: groupId,
     inputDate: new Date(),
   });
-  const [modifiedFields, setModifiedFields] = useState({});
 
   const isUpdating = !!updatingExpense;
 
   const {mutate: insertExpense} = useInsertExpense();
   const {mutate: updateExpense} = useUpdateExpense();
-  const {mutate: bulkInsertPayers} = useBulkInsertPayers();
-  const {mutate: deletePayer} = useDeletePayer();
-  const {mutate: deleteParticipant} = useDeleteParticipant();
-  const {mutate: bulkInsertParticipants} = useBulkInsertParticipants();
-  const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
-  const {data: members, error: membersError, isLoading: membersLoading} = useMemberList();
+  const {data: members, error: membersError, isLoading: membersLoading} = useMemberList(groupId);
 
-  if (groupsLoading || membersLoading) {
+  if (membersLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (groupsError || membersError) {
+  if (membersError) {
+    console.log(membersError);
     return <Text>Failed to fetch data</Text>;
   }
 
-  const {title, description, payers, participants, image, currency, amount, group, inputDate} = formState;
+  const {title, description, payers, participants, image, currency, amount, group_id, inputDate} = formState;
 
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
@@ -73,12 +74,6 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
     if (!title) {
       console.log('Title is empty');
       Alert.alert('Title is empty');
-      return false;
-    }
-
-    if (!group) {
-      console.log('Pick a group for this expense');
-      Alert.alert('Pick a group for this expense');
       return false;
     }
 
@@ -117,110 +112,43 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
   };
 
   const onUpdate = async () => {
-    const modifiedKeys = Object.keys(modifiedFields);
-    let hasAnyFieldModified = modifiedKeys.some(key => ['title', 'description', 'image', 'currency', 'amount', 'group', 'inputDate'].includes(key));
-    if (hasAnyFieldModified) {
-      updateExpense({
-        id: updatingExpense.id,
-        title: title,
-        description: description,
-        image: image,
-        currency: currency,
-        amount: amount,
-        group: group,
-        inputDate: inputDate,
-      }, {
-        onSuccess: () => {
-          console.log('Expense updated');
-        }
-      });
-    }
-
-    const diff = findArrayDiff(payers, updatingExpense.payers);
-    const payers_to_add = diff.subtracted.map(payer => (
-      {
-        member: payer,
-        expense: updatingExpense.id,
-      }
-    ));
-    bulkInsertPayers(payers_to_add, {
+    // const imagePath = await uploadImage(image);
+    updateExpense({
+      id: updatingExpense.id,
+      group_id: groupId,
+      title: title,
+      description: description,
+      currency: currency,
+      amount: amount,
+      date: formatDateForPostgreSQL(inputDate),
+      proof: null,
+      payers: payers,
+    }, {
       onSuccess: () => {
-        console.log("Successfully inserted new payers");
+        console.log('Successfully updated expense');
+        navigation.goBack();
       }
     });
-    const payers_to_delete = diff.added.map(payer => (
-      {
-        member: payer,
-        expense: updatingExpense.id,
-      }
-    ));
-    console.log("payers_to_delete", payers_to_delete);
-    payers_to_delete.forEach(payer => {
-      deletePayer(payer);
-    });
-
-    const diff2 = findArrayDiff(participants, updatingExpense.participants);
-    const participants_to_add = diff2.subtracted.map(par => (
-      {
-        member: par,
-        expense: updatingExpense.id,
-      }
-    ));
-    bulkInsertParticipants(participants_to_add, {
-      onSuccess: () => {
-        console.log("Successfully inserted new participants");
-      }
-    });
-    const participants_to_delete = diff2.added.map(par => (
-      {
-        member: par,
-        expense: updatingExpense.id,
-      }
-    ));
-    participants_to_delete.forEach(par => {
-      deleteParticipant(par);
-    });
-
-    navigation.goBack();
   };
 
   const onCreate = async () => {
-    const imagePath = await uploadImage(image);
-
+    console.log("Creating expense")
+    console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
+    // const imagePath = await uploadImage(image);
     insertExpense({
+      group_id: groupId,
       title: title,
-      description: description,
-      date: inputDate,
-      amount: amount,
+      description: description ? description : null,
       currency: currency,
-      group: group.id,
-      proof: imagePath,
+      amount: amount,
+      date: formatDateForPostgreSQL(inputDate),
+      proof: null,
+      payers: payers,
+      participants: participants
     }, {
-      onSuccess: (data) => {
-        // console.log("Successfully inserted expense");
-        // Formulate payers list
-        const _payers = payers?.map(_payer => ({
-          member: _payer,
-          expense: data.id,
-        }));
-        console.log("payers are ", _payers);
-        bulkInsertPayers(_payers, {
-          onSuccess: () => {
-            // console.log("Successfully inserted payers");
-            // Formulate participants list
-            const _participants = participants?.map(_participant => ({
-              member: _participant,
-              expense: data.id,
-            }));
-            // console.log("participants are ", _participants);
-            bulkInsertParticipants(_participants, {
-              onSuccess: () => {
-                console.log("Successfully inserted participants");
-                navigation.goBack();
-              }
-            });
-          }
-        });
+      onSuccess: () => {
+        console.log("Successfully inserted expense");
+        navigation.goBack();
       }
     });
   };
@@ -240,10 +168,6 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
   };
 
   const handleInputChange = (fieldName, value) => {
-    setModifiedFields(prevModifiedFields => ({
-      ...prevModifiedFields,
-      [fieldName]: value !== formState[fieldName],
-    }));
     setFormState(prevFormState => ({
       ...prevFormState,
       [fieldName]: value,
@@ -279,7 +203,7 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
         </View>
         <View>
           <TextInput
-            label="Enter expense description"
+            label="Enter expense description (optional)"
             placeholder="Give additional information"
             value={description}
             onChangeText={(text) => {
@@ -289,14 +213,6 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
             style={{backgroundColor: 'white'}}
           />
         </View>
-        <Dropdown
-          placeholder={'Select group'}
-          style={styles.groupDropdown}
-          data={groups}
-          labelField={'title'}
-          valueField={'id'}
-          value={'selected'}
-          onChange={(gr) => handleInputChange('group', gr)}/>
         <View style={{flexDirection: "row", gap: 5}}>
           <TextInput
             label="Enter amount"
@@ -335,9 +251,16 @@ export default function ExpenseForm({title: headerTitle, updatingExpense}) {
         <View style={{gap: 20}}>
           <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
             <Avatar.Image size={48} source={require('@/assets/images/blank-profile.png')}/>
-            <MyDropdown selected={payers[0]} data={members} onChange={(payer) => {
-              handleInputChange('payers', [payer]);
-            }} label={"Who paid"}/>
+            <MyDropdown
+              labelField="name"
+              valueField="id"
+              data={members}
+              onChange={(payer) => {
+                handleInputChange('payers', [payer]);
+              }}
+              label={"Who paid"}
+              selected={payers[0]}
+            />
           </View>
           <MyMultiSelect selected={participants} members={members}
                          onChange={(participants) => handleInputChange('participants', participants)}/>

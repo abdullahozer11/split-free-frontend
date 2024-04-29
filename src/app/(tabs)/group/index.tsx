@@ -1,4 +1,4 @@
-import {View, StyleSheet, SectionList} from 'react-native';
+import {View, StyleSheet, SectionList, ScrollView} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useState} from "react";
 import {Text} from "@/src/components/Themed";
@@ -11,7 +11,7 @@ const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
 
-  const { data: groups, error, isLoading } = useGroupList();
+  const {data: groups, error, isLoading} = useGroupList();
 
   if (isLoading) {
     return <ActivityIndicator/>;
@@ -58,7 +58,7 @@ const GroupScreen = ({}) => {
           )}
           keyExtractor={(item) => item.id.toString()}
         />
-        <CreateGroupModal isVisible={isModalVisible} onClose={closeModal} />
+        <CreateGroupModal isVisible={isModalVisible} onClose={closeModal}/>
       </View>
     </View>
   );

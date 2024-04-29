@@ -1,8 +1,8 @@
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Pressable} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {useDeleteGroup, useGroup} from "@/src/api/groups";
-import {useLocalSearchParams, useNavigation} from "expo-router";
+import {Link, useLocalSearchParams, useNavigation} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
@@ -46,6 +46,7 @@ const GroupDetailsScreen = () => {
   };
 
   const handleDelete = () => {
+    console.log("deleting group");
     deleteGroup(group.id, {
       onSuccess: () => {
         console.log("Successfully deleted group with id ", group.id);
@@ -55,7 +56,7 @@ const GroupDetailsScreen = () => {
   };
 
   const promptInvite = () => {
-      console.log('invite');
+    console.log('invite');
   };
 
   return (
@@ -155,6 +156,12 @@ const GroupDetailsScreen = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+      <Link href={`/(tabs)/group/${id}/expense`} asChild>
+        <Pressable style={styles.newExpenseBtn}>
+          <Feather name={"plus"} size={36}/>
+          <Text variant={'titleMedium'}>Expense</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 };
@@ -203,6 +210,19 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 10,
     gap: 10
+  },
+  newExpenseBtn: {
+    position: "absolute",
+    bottom: 20,
+    right: 15,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "orange",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 0.5,
+    borderStyle: "dashed",
   },
 });
 

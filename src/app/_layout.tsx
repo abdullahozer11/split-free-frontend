@@ -8,7 +8,6 @@ import {useEffect} from 'react';
 import {useColorScheme} from '@/src/components/useColorScheme';
 import AuthProvider from "@/src/providers/AuthProvider";
 import QueryProvider from "@/src/providers/QueryProvider";
-import NotificationProvider from "@/src/providers/NotificationProvider";
 import {PaperProvider} from "react-native-paper";
 
 export {

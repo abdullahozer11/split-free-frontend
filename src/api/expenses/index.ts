@@ -46,71 +46,29 @@ export const useInsertExpense = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    async mutationFn(data: any) {
-      const {error, data: newExpense} = await supabase
-        .from('expenses')
-        .insert({
-          amount: data.amount,
-          currency: data.currency,
-          date: data.date,
-          description: data.description,
-          group: data.group,
-          title: data.title,
-          proof: data.proof,
-        })
-        .select()
-        .single();
+    async mutationFn(data) {
+      console.log("data is ", data)
+      const {data: newExpenseID, error} = await supabase
+        .rpc('create_expense', {
+          amount_input: data.amount,
+          currency_input: data.currency,
+          date_input: data.date,
+          description_input: data.description,
+          group_id_input: data.group_id,
+          participants_input: data.participants,
+          payers_input: data.payers,
+          proof_input: data.proof,
+          title_input: data.title,
+        });
       if (error) {
         console.error('Error during insertion:', error);
         throw new Error(error.message);
       }
-      console.log('New expense inserted:', newExpense);
-      return newExpense;
+      console.log('New expense inserted:', newExpenseID);
+      return newExpenseID;
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['expenses']);
-    }
-  });
-};
-
-export const useBulkInsertPayers = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    async mutationFn(data: any) {
-      const {error, data: newPayers} = await supabase
-        .from('expense_payers')
-        .insert(data);
-      if (error) {
-        console.error('Error during insertion:', error);
-        throw new Error(error.message);
-      }
-      // console.log("new payers are ", newPayers);
-      return newPayers;
-    },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['expense_payers']);
-    }
-  });
-};
-
-export const useBulkInsertParticipants = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    async mutationFn(data: any) {
-      const {error, data: newParticipants} = await supabase
-        .from('expense_participants')
-        .insert(data);
-      if (error) {
-        console.error('Error during insertion:', error);
-        throw new Error(error.message);
-      }
-      // console.log(newParticipants);
-      return newParticipants;
-    },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['expense_participants']);
     }
   });
 };
@@ -122,7 +80,18 @@ export const useUpdateExpense = () => {
     async mutationFn(data: any) {
       const {error, data: updatedExpense} = await supabase
         .from('expenses')
-        .update(data)
+        .update({
+          id: data.id,
+          amount_input: data.amount,
+          currency_input: data.currency,
+          date_input: data.date,
+          description_input: data.description,
+          group_id_input: data.group_id,
+          participants_input: data.participants,
+          payers_input: data.payers,
+          proof_input: data.proof,
+          title_input: data.title,
+        })
         .eq('id', data.id)
         .select()
         .single();
@@ -160,7 +129,7 @@ export const useDeletePayer = () => {
       const {error} = await supabase.from('expense_payers')
         .delete()
         .eq('member', payer.member)
-       .eq('expense', payer.expense);
+        .eq('expense', payer.expense);
     },
     async onSuccess(_, {id}) {
       await queryClient.invalidateQueries(['expense_payers']);

@@ -25,7 +25,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   const [members, setMembers] = useState([]);
 
   useEffect(() => {
-    setMembers([profile.full_name])
+    setMembers([profile?.full_name])
   }, [profile]);
 
   const handleParticipantsSubmit = (members) => {

@@ -217,9 +217,9 @@ export type Database = {
           description: string | null
           group_id: number | null
           id: number
+          last_modified: string | null
           proof: string | null
           title: string
-          updated_at: string | null
         }
         Insert: {
           amount?: number
@@ -229,9 +229,9 @@ export type Database = {
           description?: string | null
           group_id?: number | null
           id?: number
+          last_modified?: string | null
           proof?: string | null
           title: string
-          updated_at?: string | null
         }
         Update: {
           amount?: number
@@ -241,9 +241,9 @@ export type Database = {
           description?: string | null
           group_id?: number | null
           id?: number
+          last_modified?: string | null
           proof?: string | null
           title?: string
-          updated_at?: string | null
         }
         Relationships: [
           {
@@ -414,6 +414,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_expense: {
+        Args: {
+          group_id_input: number
+          title_input: string
+          description_input: string
+          amount_input: number
+          currency_input: string
+          date_input: string
+          proof_input: string
+          payers_input: number[]
+          participants_input: number[]
+        }
+        Returns: number
+      }
       create_group: {
         Args: {
           profile_id_input: string
@@ -421,6 +435,36 @@ export type Database = {
           member_names_input: string[]
         }
         Returns: number
+      }
+      is_comember_of: {
+        Args: {
+          _person_id: string
+          _group_id: number
+        }
+        Returns: boolean
+      }
+      update_expense: {
+        Args: {
+          expense_id: number
+          title_input: string
+          description_input: string
+          amount_input: number
+          currency_input: string
+          date_input: string
+          proof_input: string
+          payers_input: number[]
+          participants_input: number[]
+        }
+        Returns: undefined
+      }
+      update_group: {
+        Args: {
+          group_id_input: number
+          title_input: string
+          description_input: string
+          member_names_input: string[]
+        }
+        Returns: undefined
       }
     }
     Enums: {
