@@ -1,3 +1,6 @@
 how to invite members
 remove hard coded quantities
 calculate stuff and display
+
+use rpc s for actions so data integrity is there
+test with shell file eact time you create a new function

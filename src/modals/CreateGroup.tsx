@@ -11,14 +11,14 @@ import {
 import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useInsertGroupSmart} from "@/src/api/groups";
+import {useInsertGroup} from "@/src/api/groups";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
   const [error, setError] = useState('');
 
-  const {mutate: insertGroup} = useInsertGroupSmart();
+  const {mutate: insertGroup} = useInsertGroup();
 
   const {profile} = useAuth();
 
