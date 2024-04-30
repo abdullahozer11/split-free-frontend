@@ -5,7 +5,7 @@ import {Link} from "expo-router";
 
 const ExpenseItem = ({expense}) => {
   return (
-    <Link href={`/(tabs)/expense/${expense.id}`} asChild>
+    <Link href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}`} asChild>
       <Pressable style={styles.expenseItem}>
         <View style={styles.expenseCatIcon}>
           <Feather name={'shopping-cart'} source={require('@/assets/images/logo.png')} style={styles.icon}/>

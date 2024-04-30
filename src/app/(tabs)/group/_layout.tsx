@@ -6,7 +6,6 @@ export default function GroupStack() {
     <Stack>
       <Stack.Screen name="index" options={{headerShown: false, title: 'Group'}}/>
       <Stack.Screen name="[id]" options={{headerShown: false, title: 'Group Details'}}/>
-      <Stack.Screen name="expense" options={{headerShown: false,title: 'Expense'}}/>
     </Stack>
   );
 }
