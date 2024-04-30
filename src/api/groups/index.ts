@@ -55,6 +55,7 @@ export const useDeleteGroup = () => {
       return true;
     },
     async onSuccess() {
+      await queryClient.invalidateQueries(['groups']);
     }
   });
 };

@@ -50,9 +50,9 @@ const GroupDetailsScreen = () => {
     deleteGroup(group.id, {
       onSuccess: () => {
         console.log("Successfully deleted group with id ", group.id);
-        navigation.goBack();
       }
     });
+    navigation.goBack();
   };
 
   const promptInvite = () => {
