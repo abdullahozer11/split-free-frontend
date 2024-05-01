@@ -1,4 +1,4 @@
-import {View, StyleSheet, SectionList, ScrollView} from 'react-native';
+import {View, StyleSheet, SectionList} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useState} from "react";
 import {Text} from "@/src/components/Themed";
@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
   body: {
     paddingHorizontal: 16,
     paddingTop: 16,
+    flex: 1,
   },
 });
 

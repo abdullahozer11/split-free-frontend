@@ -133,7 +133,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
 
   const onCreate = async () => {
     console.log("Creating expense")
-    console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
+    // console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
     // const imagePath = await uploadImage(image);
     insertExpense({
       group_id: groupId,

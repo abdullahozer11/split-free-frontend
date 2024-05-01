@@ -7,7 +7,8 @@ import {useExpense} from "@/src/api/expenses";
 import {ActivityIndicator} from "react-native-paper";
 
 export default function UpdateExpense() {
-  const { id } = useLocalSearchParams();
+  const {group_id, id} = useLocalSearchParams();
+  console.log("local_search_params", group_id, id);
 
   const {data: expense, error: expenseError, isLoading: expenseLoading} = useExpense(id);
 

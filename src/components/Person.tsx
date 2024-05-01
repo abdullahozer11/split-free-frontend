@@ -22,7 +22,7 @@ export const Payer = ({payer, amount}) => {
         <Avatar.Image size={36} source={payer.member.profile?.avatar_url ? {uri: payer.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
         <Text variant={"bodyLarge"}>{payer.member.name}</Text>
       </View>
-      <Text variant={"bodyLarge"} style={{color: "green"}}>${amount}</Text>
+      <Text variant={"bodyLarge"} style={{color: "green"}}>€{amount}</Text>
     </View>
   );
 };
@@ -34,7 +34,7 @@ export const Participant = ({participant, amount}) => {
         <Avatar.Image size={36} source={participant.member.profile?.avatar_url ? {uri: participant.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
         <Text variant={"bodyLarge"}>{participant.member.name}</Text>
       </View>
-      <Text variant={"bodyLarge"} style={{color: "red"}}>${amount}</Text>
+      <Text variant={"bodyLarge"} style={{color: "red"}}>€{amount}</Text>
     </View>
   );
 };

@@ -68,7 +68,7 @@ const GroupDetailsScreen = () => {
             <View style={{flexDirection: "row", marginHorizontal: 15, paddingBottom: 30}}>
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Group spent:</Text>
-                <Text style={{fontSize: 24, fontWeight: "bold"}}>$934.00</Text>
+                <Text style={{fontSize: 24, fontWeight: "bold"}}>€{group?.expense_total || 0}</Text>
               </View>
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Total Receivable:</Text>
@@ -156,7 +156,7 @@ const GroupDetailsScreen = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <Link href={`/(tabs)/group/${id}/expense`} asChild>
+      <Link href={`/(tabs)/group/${id}/expense/create`} asChild>
         <Pressable style={styles.newExpenseBtn}>
           <Feather name={"plus"} size={36}/>
           <Text variant={'titleMedium'}>Expense</Text>

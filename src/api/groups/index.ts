@@ -23,20 +23,34 @@ export const useGroup = (id: number) => {
   return useQuery({
     queryKey: ['groups', id],
     queryFn: async () => {
-      const {data, error} = await supabase
+      const {data: _Group, error} = await supabase
         .from('groups')
         .select('id, title, members(name, role, profile(avatar_url))')
         .eq('id', id)
         .single();
+
       if (error) {
         console.log(error.message);
         throw new Error(error.message);
       }
-      // console.log("data received is ", data);
-      return data;
+
+      // console.log("Group received is ", _Group);
+
+      const {data: expense_total, error: expenseError} = await supabase
+        .rpc('get_expense_total', {
+          "group_id_input": id
+        });
+
+      if (expenseError) {
+        console.log(expenseError.message);
+        throw new Error(expenseError.message);
+      }
+
+      return {..._Group, expense_total};
     }
   });
 };
+
 
 export const useDeleteGroup = () => {
   const queryClient = useQueryClient();
@@ -98,7 +112,7 @@ export const useUpdateGroup = () => {
           group_id_input: data.group_id,
           title_input: data.title,
           description_input: data.description
-        })
+        });
       if (error) {
         console.error('Error during update:', error);
         throw new Error(error.message);

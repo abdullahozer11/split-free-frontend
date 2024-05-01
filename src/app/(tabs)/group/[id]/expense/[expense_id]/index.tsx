@@ -1,6 +1,6 @@
 import {StyleSheet, View, SafeAreaView, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
-import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
+import {useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {useDeleteExpense, useExpense} from "@/src/api/expenses";
 import {Text, ActivityIndicator, Menu, Portal, Dialog, Button} from 'react-native-paper';
@@ -11,15 +11,16 @@ import {Participant, Payer} from "@/src/components/Person";
 const Description = ({text}) => {
   return (
     <View style={{backgroundColor: 'white', padding: 10, borderRadius: 10, marginVertical: 10}}>
-      <Text variant={'labelMedium'} style={{textDecorationLine: 'underline'}}>Description</Text>
-      <Text variant={'bodyMedium'}>{text}</Text>
+      <Text variant={'labelLarge'} style={{textDecorationLine: 'underline'}}>Description</Text>
+      <Text variant={'bodyLarge'}>{text}</Text>
     </View>
   );
 };
 
 const ExpenseDetailsScreen = () => {
-  const {id: idString} = useLocalSearchParams();
-  const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
+  const {id: groupIdString, expense_id: expenseIdString} = useLocalSearchParams();
+  const id = parseFloat(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
+  const group_id = parseFloat(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -82,13 +83,12 @@ const ExpenseDetailsScreen = () => {
         </View>
       } headerContent={
         <View style={styles.header}>
-          <View style={styles.row}>
+          <View style={styles.headerBar}>
             <TouchableOpacity onPress={() => {
               navigation.goBack();
             }}>
               <Feather name="arrow-left" size={36} color="white"/>
             </TouchableOpacity>
-            <Text variant={'displaySmall'} style={styles.headerTitle}>{expense?.title}</Text>
             <Menu
               visible={visible}
               onDismiss={closeMenu}
@@ -100,7 +100,7 @@ const ExpenseDetailsScreen = () => {
               }>
               <Menu.Item onPress={() => {
                 closeMenu();
-                router.push({pathname: "/expense/update", params: {id}});
+                router.push({pathname: "/update", params: {id: group_id, expense_id: id}});
               }} title="Edit expense"/>
               <Menu.Item onPress={() => {
                 promptDelete();
@@ -110,7 +110,10 @@ const ExpenseDetailsScreen = () => {
               />
             </Menu>
           </View>
-          <Text style={styles.syncInfo}>Last modified on January 21, 2024</Text>
+          <View style={styles.headerContent}>
+            <Text variant={'displaySmall'} style={styles.headerTitle}>{expense?.title}</Text>
+            <Text style={styles.syncInfo}>Last modified on January 21, 2024</Text>
+          </View>
         </View>
       }/>
       <Portal>
@@ -166,5 +169,21 @@ const styles = StyleSheet.create({
   members: {
     marginVertical: 10,
     gap: 10,
-  }
+  },
+  headerBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    height: 50,
+    paddingHorizontal: 20,
+    position: "absolute",
+    top: 20,
+    left: 0,
+    backgroundColor: "transparent",
+  },
+  headerContent: {
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 });
