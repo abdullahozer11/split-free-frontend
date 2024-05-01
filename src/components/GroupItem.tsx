@@ -13,7 +13,7 @@ const GroupItem = ({group, onAnchor}) => {
   };
 
   return (
-    <Link href={`/group/${group.id}`} asChild>
+    <Link href={`/group/${group.id}/details`} asChild>
       <Pressable style={styles.container}>
         <View style={[styles.row, styles.firstRow]}>
           <Text style={styles.title}>{group.title}</Text>
