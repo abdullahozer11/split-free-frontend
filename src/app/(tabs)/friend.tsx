@@ -22,7 +22,7 @@ export default function FriendScreen() {
           <View style={{flexDirection: "row", marginHorizontal: 15}}>
             <View style={{flex: 1}}>
               <Text style={{fontSize: 18}}>Total Receivable:</Text>
-              <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ $324.00</Text>
+              <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ €324.00</Text>
             </View>
             <View style={{flex: 1}}>
               <Text style={{fontSize: 18}}>Total Payable:</Text>

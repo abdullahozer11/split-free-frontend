@@ -21,9 +21,6 @@ export const useExpenseList = (group_id: number) => {
 };
 
 export const useExpense = (id: number) => {
-  if (!id) {
-    return null;
-  }
   return useQuery({
     queryKey: ['expenses', id],
     queryFn: async () => {
@@ -33,10 +30,10 @@ export const useExpense = (id: number) => {
         .eq('id', id)
         .single();
       if (error) {
-        // console.log(error.message);
+        console.log("error message is ", error.message);
         throw new Error(error.message);
       }
-      // console.log(data);
+      // console.log("data is ", data);
       return data;
     }
   });
@@ -47,7 +44,6 @@ export const useInsertExpense = () => {
 
   return useMutation({
     async mutationFn(data) {
-      console.log("data is ", data)
       const {data: newExpenseID, error} = await supabase
         .rpc('create_expense', {
           amount_input: data.amount,
@@ -61,7 +57,7 @@ export const useInsertExpense = () => {
           title_input: data.title,
         });
       if (error) {
-        console.error('Error during insertion:', error);
+        console.error('Error during insertion:', error.message);
         throw new Error(error.message);
       }
       console.log('New expense inserted:', newExpenseID);
@@ -75,36 +71,30 @@ export const useInsertExpense = () => {
 
 export const useUpdateExpense = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    async mutationFn(data: any) {
-      const {error, data: updatedExpense} = await supabase
-        .from('expenses')
-        .update({
-          id: data.id,
+    async mutationFn(data) {
+      const {data: newExpense, error} = await supabase
+        .rpc('update_expense', {
+          expense_id: data.id,
           amount_input: data.amount,
           currency_input: data.currency,
           date_input: data.date,
           description_input: data.description,
-          group_id_input: data.group_id,
           participants_input: data.participants,
           payers_input: data.payers,
           proof_input: data.proof,
-          title_input: data.title,
-        })
-        .eq('id', data.id)
-        .select()
-        .single();
+          title_input: data.title
+        });
       if (error) {
-        console.log(error.message);
+        console.error('Error during update:', error.message);
         throw new Error(error.message);
       }
-      console.log(updatedExpense);
-      return updatedExpense;
+      console.log('Expense is updated:', newExpense);
+      return newExpense;
     },
-    async onSuccess(_, {id}) {
+    async onSuccess(data) {
       await queryClient.invalidateQueries(['expenses']);
-      await queryClient.invalidateQueries(['expenses', id]);
+      await queryClient.invalidateQueries(['expenses', data.id]);
     }
   });
 };

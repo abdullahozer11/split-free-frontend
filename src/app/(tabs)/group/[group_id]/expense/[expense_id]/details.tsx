@@ -18,7 +18,7 @@ const Description = ({text}) => {
 };
 
 const ExpenseDetailsScreen = () => {
-  const {id: groupIdString, expense_id: expenseIdString} = useLocalSearchParams();
+  const {group_id: groupIdString, expense_id: expenseIdString} = useLocalSearchParams();
   const id = parseFloat(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
   const group_id = parseFloat(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
   const navigation = useNavigation();
@@ -100,7 +100,7 @@ const ExpenseDetailsScreen = () => {
               }>
               <Menu.Item onPress={() => {
                 closeMenu();
-                router.push({pathname: "/update", params: {id: group_id, expense_id: id}});
+                router.push({pathname: "/(tabs)/group/[group_id]/expense/[expense_id]/update", params: {group_id: group_id, expense_id: id}});
               }} title="Edit expense"/>
               <Menu.Item onPress={() => {
                 promptDelete();

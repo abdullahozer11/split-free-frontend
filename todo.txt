@@ -1,7 +1,6 @@
 how to invite members
 remove hard coded quantities
 calculate stuff and display
-updateExpense
 RPC functions for Balance and Dept
 Policies for safe access to date
 Calculate Balance for each member

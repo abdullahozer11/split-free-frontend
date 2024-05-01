@@ -12,7 +12,7 @@ import {Member} from "@/src/components/Person";
 
 
 const GroupDetailsScreen = () => {
-  const {id: idString} = useLocalSearchParams();
+  const {group_id: idString} = useLocalSearchParams();
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
 

@@ -5,7 +5,7 @@ import ExpenseForm from "@/src/components/ExpenseForm";
 import {useLocalSearchParams} from "expo-router";
 
 export default function NewExpense() {
-  const {id: idString} = useLocalSearchParams();
+  const {group_id: idString} = useLocalSearchParams();
   const groupId = parseFloat(typeof idString === 'string' ? idString : idString[0]);
 
   return (

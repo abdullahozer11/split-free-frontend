@@ -19,9 +19,8 @@ import {Feather} from "@expo/vector-icons";
 
 function formatDateForPostgreSQL(dateObj) {
     const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const day = String(dateObj.getDate()).padStart(2, '0');
-
     return `${year}-${month}-${day}`;
 }
 
@@ -30,7 +29,9 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [formState, setFormState] = useState(updatingExpense ? {
     ...updatingExpense,
-    amount: updatingExpense.amount.toString()
+    amount: updatingExpense.amount.toString(),
+    inputDate: new Date(updatingExpense.date)
+
   } : {
     title: '',
     description: '',
@@ -112,23 +113,25 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   };
 
   const onUpdate = async () => {
+    console.log("Updating expense")
+    console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
     // const imagePath = await uploadImage(image);
     updateExpense({
       id: updatingExpense.id,
-      group_id: groupId,
-      title: title,
-      description: description,
-      currency: currency,
       amount: amount,
+      currency: currency,
       date: formatDateForPostgreSQL(inputDate),
-      proof: null,
+      description: description,
+      participants: participants,
       payers: payers,
+      proof: null,
+      title: title
     }, {
       onSuccess: () => {
         console.log('Successfully updated expense');
-        navigation.goBack();
       }
     });
+    navigation.goBack();
   };
 
   const onCreate = async () => {
@@ -148,9 +151,9 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     }, {
       onSuccess: () => {
         console.log("Successfully inserted expense");
-        navigation.goBack();
       }
     });
+    navigation.goBack();
   };
 
   const pickImage = async () => {
