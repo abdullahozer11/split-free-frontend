@@ -59,6 +59,8 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     return <Text>Failed to fetch data</Text>;
   }
 
+  console.log("rendering form");
+
   const {title, description, payers, participants, image, currency, amount, group_id, inputDate} = formState;
 
   const onDateChange = (event, selectedDate) => {
@@ -198,7 +200,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             label="Enter expense title"
             placeholder="Describe your expense"
             value={title}
-            onChangeText={(text) => {
+            onEndEditing={(text) => {
               handleInputChange('title', text);
             }}
             style={{backgroundColor: 'white'}}
@@ -209,7 +211,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             label="Enter expense description (optional)"
             placeholder="Give additional information"
             value={description}
-            onChangeText={(text) => {
+            onEndEditing={(text) => {
               handleInputChange('description', text);
             }}
             multiline={true}
@@ -221,7 +223,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             label="Enter amount"
             placeholder="Enter amount"
             value={amount}
-            onChangeText={(text) => handleInputChange('amount', text)}
+            onEndEditing={(text) => handleInputChange('amount', text)}
             keyboardType="numeric"
             style={{flex: 1, backgroundColor: 'white'}}
           />

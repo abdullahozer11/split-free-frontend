@@ -2,7 +2,7 @@ import {StyleSheet, View, TouchableOpacity, Pressable} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {useDeleteGroup, useGroup} from "@/src/api/groups";
-import {Link, useLocalSearchParams, useNavigation} from "expo-router";
+import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
@@ -13,9 +13,9 @@ import {Member} from "@/src/components/Person";
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
-  console.log("group_id is ", idString);
   const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
+  const router = useRouter();
 
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(id);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(id);
@@ -119,8 +119,8 @@ const GroupDetailsScreen = () => {
                   </TouchableOpacity>
                 }>
                 <Menu.Item onPress={() => {
-                  console.log("Edit Group");
                   closeMenu();
+                  router.push({pathname: "/(tabs)/group/[group_id]/update", params: {group_id: id}});
                 }} title="Edit Group"/>
                 <Menu.Item onPress={() => {
                   promptDelete();

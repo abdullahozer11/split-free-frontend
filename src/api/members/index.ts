@@ -66,8 +66,13 @@ export const useDeleteMember = () => {
   return useMutation({
     async mutationFn(id: number) {
       const {error} = await supabase.from('members').delete().eq('id', id);
+      if (error) {
+        console.log("error is ", error.message);
+        throw new Error(error.message);
+      }
     },
     async onSuccess(_, {id}) {
+      console.log("successfully deleted member")
       await queryClient.invalidateQueries(['members']);
     }
   });

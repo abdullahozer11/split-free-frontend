@@ -1,13 +1,14 @@
-import {StyleSheet, View, Image} from 'react-native';
+import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {Avatar, Text} from 'react-native-paper';
-import React from "react";
+import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 
 export const Person = ({profile}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Avatar.Image size={36}
+                      source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={'labelMedium'}>{profile?.full_name || 'John Doe'}</Text>
       </View>
       <Text variant={"bodyLarge"} style={{color: "white"}}>+ €36.62</Text>
@@ -19,7 +20,8 @@ export const Payer = ({payer, amount}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Avatar.Image size={36} source={payer.member.profile?.avatar_url ? {uri: payer.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Avatar.Image size={36}
+                      source={payer.member.profile?.avatar_url ? {uri: payer.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{payer.member.name}</Text>
       </View>
       <Text variant={"bodyLarge"} style={{color: "green"}}>€{amount}</Text>
@@ -31,7 +33,8 @@ export const Participant = ({participant, amount}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Avatar.Image size={36} source={participant.member.profile?.avatar_url ? {uri: participant.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Avatar.Image size={36}
+                      source={participant.member.profile?.avatar_url ? {uri: participant.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{participant.member.name}</Text>
       </View>
       <Text variant={"bodyLarge"} style={{color: "red"}}>€{amount}</Text>
@@ -43,10 +46,26 @@ export const Member = ({member}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Avatar.Image size={36} source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')} />
+        <Avatar.Image size={36}
+                      source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{member.name}</Text>
         {member.role === 'owner' ? <Feather style={styles.badge} name={'award'} size={24} color={'silver'}/> : null}
       </View>
+    </View>
+  );
+};
+
+export const Member2 = ({member, onDelete}) => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.subContainer}>
+        <Avatar.Image size={36}
+                      source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{member.name}</Text>
+      </View>
+      {member.role === 'owner' ? null : <TouchableOpacity onPress={onDelete}>
+        <Feather name={"x"} color={'red'} size={24}/>
+      </TouchableOpacity>}
     </View>
   );
 };

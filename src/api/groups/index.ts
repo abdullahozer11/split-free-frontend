@@ -23,30 +23,16 @@ export const useGroup = (id: number) => {
   return useQuery({
     queryKey: ['groups', id],
     queryFn: async () => {
-      const {data: _Group, error} = await supabase
-        .from('groups')
-        .select('id, title, members(name, role, profile(avatar_url))')
-        .eq('id', id)
-        .single();
-
+      const {data, error} = await supabase
+        .rpc('get_group_info', {
+          group_id_input: id
+        });
       if (error) {
         console.log(error.message);
         throw new Error(error.message);
       }
-
-      // console.log("Group received is ", _Group);
-
-      const {data: expense_total, error: expenseError} = await supabase
-        .rpc('get_expense_total', {
-          "group_id_input": id
-        });
-
-      if (expenseError) {
-        console.log(expenseError.message);
-        throw new Error(expenseError.message);
-      }
-
-      return {..._Group, expense_total};
+      console.log("Group received is ", data);
+      return data;
     }
   });
 };
@@ -110,8 +96,8 @@ export const useUpdateGroup = () => {
         .rpc('update_group', {
           member_names_input: data.member_names,
           group_id_input: data.group_id,
+          description_input: data.description,
           title_input: data.title,
-          description_input: data.description
         });
       if (error) {
         console.error('Error during update:', error);
