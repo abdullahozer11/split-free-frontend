@@ -1,16 +1,19 @@
 import {StyleSheet, View, Text, Pressable} from 'react-native';
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {Link} from "expo-router";
 import {useAuth} from "@/src/providers/AuthProvider";
 
 const ExpenseItem = ({expense}) => {
   const {profile} = useAuth();
+  const [impact, setImpact] = useState(0);
+
   const memberId = profile?.members?.find(mb => mb.group_id == expense.group_id).id | null;
-  const impact = 0;
-  if (memberId) {
-    const impact = expense.balances?.find(bl => bl.owner == memberId)?.amount | 0;
-  }
+
+  useEffect(() => {
+    setImpact(expense.balances?.find(bl => bl.owner == memberId)?.amount | 0);
+  }, [memberId]);
+
   return (
     <Link href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`} asChild>
       <Pressable style={styles.expenseItem}>
