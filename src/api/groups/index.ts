@@ -23,16 +23,16 @@ export const useGroup = (id: number) => {
   return useQuery({
     queryKey: ['groups', id],
     queryFn: async () => {
-      const {data, error} = await supabase
-        .rpc('get_group_info', {
-          group_id_input: id
-        });
+      const {data: _Group, error} = await supabase
+        .from('groups')
+        .select('id, title, expense_total, members(name, role, profile(avatar_url))')
+        .eq('id', id)
+        .single();
       if (error) {
         console.log(error.message);
         throw new Error(error.message);
       }
-      console.log("Group received is ", data);
-      return data;
+      return _Group;
     }
   });
 };

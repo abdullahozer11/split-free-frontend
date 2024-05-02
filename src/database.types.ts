@@ -53,6 +53,7 @@ export type Database = {
           amount: number | null
           created_at: string
           currency: string | null
+          expense: number | null
           group_id: number | null
           id: number
           owner: number | null
@@ -61,6 +62,7 @@ export type Database = {
           amount?: number | null
           created_at?: string
           currency?: string | null
+          expense?: number | null
           group_id?: number | null
           id?: number
           owner?: number | null
@@ -69,11 +71,19 @@ export type Database = {
           amount?: number | null
           created_at?: string
           currency?: string | null
+          expense?: number | null
           group_id?: number | null
           id?: number
           owner?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "balances_expense_fkey"
+            columns: ["expense"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "balances_group_id_fkey"
             columns: ["group_id"]
@@ -96,6 +106,7 @@ export type Database = {
           borrower: number
           created_at: string
           currency: string
+          expense: number
           group_id: number | null
           id: number
           lender: number
@@ -105,6 +116,7 @@ export type Database = {
           borrower: number
           created_at?: string
           currency?: string
+          expense: number
           group_id?: number | null
           id?: number
           lender: number
@@ -114,11 +126,19 @@ export type Database = {
           borrower?: number
           created_at?: string
           currency?: string
+          expense?: number
           group_id?: number | null
           id?: number
           lender?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "debts_expense_fkey"
+            columns: ["expense"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "debts_group_id_fkey"
             columns: ["group_id"]
@@ -295,6 +315,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          expense_total: number
           id: number
           owner: string | null
           status: string
@@ -303,6 +324,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          expense_total?: number
           id?: number
           owner?: string | null
           status?: string
@@ -311,6 +333,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          expense_total?: number
           id?: number
           owner?: string | null
           status?: string
@@ -334,6 +357,7 @@ export type Database = {
           name: string
           profile: string | null
           role: string
+          total_balance: number
         }
         Insert: {
           created_at?: string
@@ -342,6 +366,7 @@ export type Database = {
           name: string
           profile?: string | null
           role?: string
+          total_balance?: number
         }
         Update: {
           created_at?: string
@@ -350,6 +375,7 @@ export type Database = {
           name?: string
           profile?: string | null
           role?: string
+          total_balance?: number
         }
         Relationships: [
           {

@@ -8,7 +8,7 @@ export const useExpenseList = (group_id: number) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('expenses')
-        .select('id, title, amount, created_at, group_id')
+        .select('id, title, amount, created_at, group_id, balances(amount, owner)')
         .eq('group_id', group_id);
       if (error) {
         console.log(error.message);

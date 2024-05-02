@@ -113,8 +113,8 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   };
 
   const onUpdate = async () => {
-    console.log("Updating expense")
-    console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
+    // console.log("Updating expense")
+    // console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
     // const imagePath = await uploadImage(image);
     updateExpense({
       id: updatingExpense.id,

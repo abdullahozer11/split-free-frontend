@@ -9,16 +9,17 @@ import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, Text, ActivityIndicator, Dialog, Button, Portal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Member} from "@/src/components/Person";
+import {useAuth} from "@/src/providers/AuthProvider";
 
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
-  const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
+  const groupId = parseFloat(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
   const router = useRouter();
-
-  const {data: group, error: groupError, isLoading: groupLoading} = useGroup(id);
-  const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(id);
+  const {profile} = useAuth();
+  const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
+  const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
 
   const {mutate: deleteGroup} = useDeleteGroup();
 
@@ -73,7 +74,10 @@ const GroupDetailsScreen = () => {
               </View>
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Total Receivable:</Text>
-                <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ $324.00</Text>
+                <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>
+                    {profile?.members?.find(mb => mb.group_id == groupId)?.total_balance >= 0 ? '+' : '-'} €
+                    {Math.abs(profile?.members?.find(mb => mb.group_id == groupId)?.total_balance || 0)}
+                </Text>
               </View>
             </View>
             <View style={styles.section}>
@@ -120,7 +124,7 @@ const GroupDetailsScreen = () => {
                 }>
                 <Menu.Item onPress={() => {
                   closeMenu();
-                  router.push({pathname: "/(tabs)/group/[group_id]/update", params: {group_id: id}});
+                  router.push({pathname: "/(tabs)/group/[group_id]/update", params: {group_id: groupId}});
                 }} title="Edit Group"/>
                 <Menu.Item onPress={() => {
                   promptDelete();
@@ -157,7 +161,7 @@ const GroupDetailsScreen = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <Link href={`/(tabs)/group/${id}/expense/create`} asChild>
+      <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
         <Pressable style={styles.newExpenseBtn}>
           <Feather name={"plus"} size={36}/>
           <Text variant={'titleMedium'}>Expense</Text>

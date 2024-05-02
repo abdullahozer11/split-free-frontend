@@ -2,8 +2,15 @@ import {StyleSheet, View, Text, Pressable} from 'react-native';
 import React from "react";
 import {Feather} from "@expo/vector-icons";
 import {Link} from "expo-router";
+import {useAuth} from "@/src/providers/AuthProvider";
 
 const ExpenseItem = ({expense}) => {
+  const {profile} = useAuth();
+  const memberId = profile?.members?.find(mb => mb.group_id == expense.group_id).id | null;
+  const impact = 0;
+  if (memberId) {
+    const impact = expense.balances?.find(bl => bl.owner == memberId)?.amount | 0;
+  }
   return (
     <Link href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`} asChild>
       <Pressable style={styles.expenseItem}>
@@ -14,7 +21,9 @@ const ExpenseItem = ({expense}) => {
           <Text style={{fontSize: 18, fontWeight: '600'}}>{expense.title}</Text>
           <Text style={{fontSize: 14, fontWeight: '300'}}>Total €{expense.amount}</Text>
         </View>
-        <Text style={styles.balanceEffect}>+ €46.00</Text>
+        <Text style={styles.balanceEffect}>
+          + €{impact}
+        </Text>
       </Pressable>
     </Link>
   );
