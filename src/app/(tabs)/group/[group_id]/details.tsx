@@ -1,5 +1,5 @@
 import {StyleSheet, View, TouchableOpacity, Pressable} from 'react-native';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {useDeleteGroup, useGroup} from "@/src/api/groups";
 import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
@@ -20,6 +20,12 @@ const GroupDetailsScreen = () => {
   const {profile} = useAuth();
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
+  const [totalBalance, setTotalBalance] = useState(0);
+
+  useEffect(() => {
+    const _balance = profile?.members?.find(mb => mb.group_id == groupId)?.total_balance;
+    setTotalBalance(_balance ? _balance : 0);
+  }, [groupId]);
 
   const {mutate: deleteGroup} = useDeleteGroup();
 
@@ -75,8 +81,7 @@ const GroupDetailsScreen = () => {
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Total Receivable:</Text>
                 <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>
-                    {profile?.members?.find(mb => mb.group_id == groupId)?.total_balance >= 0 ? '+' : '-'} €
-                    {Math.abs(profile?.members?.find(mb => mb.group_id == groupId)?.total_balance || 0)}
+                    {totalBalance > 0 ? '+ ' + totalBalance : totalBalance} €
                 </Text>
               </View>
             </View>
