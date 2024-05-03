@@ -27,7 +27,7 @@ export default function AuthProvider({children}: PropsWithChildren) {
       if (session) {
         const {data} = await supabase
           .from('profiles')
-          .select('*, members(*)')
+          .select('*, members(id, group_id, role, total_balance)')
           .eq('id', session.user.id)
           .single();
         setProfile(data || null);

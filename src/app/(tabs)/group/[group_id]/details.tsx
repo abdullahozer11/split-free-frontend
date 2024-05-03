@@ -25,7 +25,7 @@ const GroupDetailsScreen = () => {
   useEffect(() => {
     const _balance = profile?.members?.find(mb => mb.group_id == groupId)?.total_balance;
     // subscription needed in the future
-    setTotalBalance(_balance ? _balance : 0);
+    setTotalBalance(_balance);
   }, [groupId]);
 
   const {mutate: deleteGroup} = useDeleteGroup();
@@ -82,7 +82,7 @@ const GroupDetailsScreen = () => {
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Total Receivable:</Text>
                 <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>
-                    {totalBalance > 0 ? '+ ' + totalBalance : totalBalance} €
+                    {totalBalance > 0 ? '+' + totalBalance : totalBalance} €
                 </Text>
               </View>
             </View>
