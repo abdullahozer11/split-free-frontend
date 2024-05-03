@@ -89,7 +89,7 @@ export const useUpdateExpense = () => {
         console.error('Error during update:', error.message);
         throw new Error(error.message);
       }
-      console.log('Expense is updated:', newExpense);
+      // console.log('Expense is updated:', newExpense);
       return newExpense;
     },
     async onSuccess(data) {

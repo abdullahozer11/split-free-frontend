@@ -24,6 +24,7 @@ const GroupDetailsScreen = () => {
 
   useEffect(() => {
     const _balance = profile?.members?.find(mb => mb.group_id == groupId)?.total_balance;
+    // subscription needed in the future
     setTotalBalance(_balance ? _balance : 0);
   }, [groupId]);
 

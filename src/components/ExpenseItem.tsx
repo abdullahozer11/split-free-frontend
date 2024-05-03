@@ -25,7 +25,7 @@ const ExpenseItem = ({expense}) => {
           <Text style={{fontSize: 14, fontWeight: '300'}}>Total €{expense.amount}</Text>
         </View>
         <Text style={styles.balanceEffect}>
-          + €{impact}
+          {impact > 0 ? '+' + impact : impact} €
         </Text>
       </Pressable>
     </Link>
