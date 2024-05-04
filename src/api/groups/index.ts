@@ -82,7 +82,6 @@ export const useInsertGroup = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['groups']);
-      await queryClient.invalidateQueries(['members']);
     }
   });
 };
@@ -108,7 +107,7 @@ export const useUpdateGroup = () => {
     async onSuccess(groupID) {
       await queryClient.invalidateQueries(['groups']);
       await queryClient.invalidateQueries(['groups', groupID]);
-      await queryClient.invalidateQueries(['members']);
+      await queryClient.invalidateQueries(['members', groupID]);
     }
   });
 };

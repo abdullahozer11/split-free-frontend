@@ -106,7 +106,6 @@ export type Database = {
           borrower: number
           created_at: string
           currency: string
-          expense: number
           group_id: number | null
           id: number
           lender: number
@@ -116,7 +115,6 @@ export type Database = {
           borrower: number
           created_at?: string
           currency?: string
-          expense: number
           group_id?: number | null
           id?: number
           lender: number
@@ -126,19 +124,11 @@ export type Database = {
           borrower?: number
           created_at?: string
           currency?: string
-          expense?: number
           group_id?: number | null
           id?: number
           lender?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "debts_expense_fkey"
-            columns: ["expense"]
-            isOneToOne: false
-            referencedRelation: "expenses"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "debts_group_id_fkey"
             columns: ["group_id"]
@@ -161,6 +151,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      expense_categories: {
+        Row: {
+          embedding: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          embedding?: string | null
+          id?: number
+          name: string
+        }
+        Update: {
+          embedding?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
       }
       expense_participants: {
         Row: {
@@ -440,6 +448,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_new_debts: {
+        Args: {
+          group_id_input: number
+        }
+        Returns: undefined
+      }
       create_expense: {
         Args: {
           group_id_input: number
@@ -462,12 +476,52 @@ export type Database = {
         }
         Returns: number
       }
+      get_debts_from: {
+        Args: {
+          group_id_input: number
+          selection: Database["public"]["CompositeTypes"]["balance_info"][]
+        }
+        Returns: undefined
+      }
+      get_selection_with_sum: {
+        Args: {
+          target_sum: number
+          selection_length: number
+          balances: Database["public"]["CompositeTypes"]["balance_info"][]
+        }
+        Returns: Database["public"]["CompositeTypes"]["balance_info"][]
+      }
       is_comember_of: {
         Args: {
           _person_id: string
           _group_id: number
         }
         Returns: boolean
+      }
+      post_expense: {
+        Args: {
+          group_id_input: number
+        }
+        Returns: undefined
+      }
+      recalculate_total_balance: {
+        Args: {
+          group_id_input: number
+        }
+        Returns: undefined
+      }
+      recalculate_total_expense: {
+        Args: {
+          group_id_input: number
+        }
+        Returns: undefined
+      }
+      remove_selection_from_balances: {
+        Args: {
+          _balances: Database["public"]["CompositeTypes"]["balance_info"][]
+          _selection: Database["public"]["CompositeTypes"]["balance_info"][]
+        }
+        Returns: Database["public"]["CompositeTypes"]["balance_info"][]
       }
       update_expense: {
         Args: {
@@ -492,12 +546,31 @@ export type Database = {
         }
         Returns: undefined
       }
+      use_expense: {
+        Args: {
+          expense_id_input: number
+        }
+        Returns: {
+          amount: number
+          expense_id: number
+          title: string
+          description: string
+          date: string
+          last_modified: string
+          group_id: number
+          payers: Json
+          participants: Json
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      balance_info: {
+        id: number | null
+        balance: number | null
+      }
     }
   }
 }

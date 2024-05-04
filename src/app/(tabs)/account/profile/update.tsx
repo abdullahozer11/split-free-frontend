@@ -2,34 +2,38 @@ import {Image, ScrollView, StyleSheet, TextInput, TouchableOpacity} from 'react-
 import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
-import {useAuth} from "@/src/providers/AuthProvider";
 import {useEffect, useState} from "react";
 import {useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
-import {useUpdateProfile} from "@/src/api/profiles";
+import {useProfile, useUpdateProfile} from "@/src/api/profiles";
+import {useAuth} from "@/src/providers/AuthProvider";
+import {ActivityIndicator} from "react-native-paper";
 
 export default function UpdateProfile() {
-  const {session, profile, loading} = useAuth();
   const navigation = useNavigation();
   const [image, setImage] = useState('');
   const [fullName, setFullName] = useState('');
   const [website, setWebsite] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-
   const {mutate: updateProfile} = useUpdateProfile();
 
-  useEffect(() => {
-    setFullName(profile.full_name);
-    setWebsite(profile.website);
-    setPhoneNumber(profile.phone_number);
-    setImage(profile.avatar_url);
-  }, [profile]);
+  const {profile: _profile} = useAuth();
+  const {data: profile, isLoading, isError} = useProfile(_profile.id)
 
-  const resetFields = () => {
-    setFullName('');
-    setWebsite('');
-    setPhoneNumber('');
-  };
+  if (isLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (isError) {
+    return <Text>Failed to fetch data</Text>;
+  }
+
+  useEffect(() => {
+    setFullName(profile?.full_name);
+    setWebsite(profile?.website);
+    setPhoneNumber(profile?.phone_number);
+    setImage(profile?.avatar_url);
+  }, [profile]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -49,7 +53,7 @@ export default function UpdateProfile() {
 
   const handleSubmit = () => {
     updateProfile({
-      id: profile.id,
+      id: profile?.id,
       full_name: fullName,
       website: website,
       phone_number: phoneNumber,
@@ -57,6 +61,7 @@ export default function UpdateProfile() {
     }, {
       onSuccess: () => {
         // console.log("Successfully updated profile");
+        navigation.goBack();
       }
     });
   };
@@ -79,7 +84,7 @@ export default function UpdateProfile() {
         <Text style={styles.title}>Update Profile</Text>
         <View style={styles.avatarContainer}>
           <Image
-            source={profile.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
+            source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
             style={styles.avatar}/>
         </View>
         <Text onPress={pickImage} style={styles.pickImageButton}> Select Image </Text>

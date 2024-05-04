@@ -21,17 +21,9 @@ export default function UpdateExpense() {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const new_expense = {
-    ...expense,
-    payers: expense?.expense_payers?.map(payer => (payer.member)),
-    participants: expense?.expense_participants?.map(participant => (participant.member)),
-  }
-  delete new_expense.expense_payers;
-  delete new_expense.expense_participants;
-
   return (
     <SafeAreaView style={styles.container}>
-      <ExpenseForm title={"Update Expense"} groupId={group_id} updatingExpense={new_expense}/>
+      <ExpenseForm title={"Update Expense"} groupId={group_id} updatingExpense={expense}/>
     </SafeAreaView>
   );
 }

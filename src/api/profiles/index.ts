@@ -1,5 +1,5 @@
 import {supabase} from "@/src/lib/supabase";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
@@ -18,14 +18,33 @@ export const useUpdateProfile = () => {
         .select()
         .single();
       if (error) {
+        console.log("error is ", error);
         throw new Error(error.message);
       }
-      // console.log("updatedProfile: ", updatedProfile);
+      console.log("updatedProfile: ", updatedProfile);
       return updatedProfile;
     },
     async onSuccess(_, {id}) {
-      await queryClient.invalidateQueries(['profiles']);
-      await queryClient.invalidateQueries(['profiles', id]);
+      await queryClient.invalidateQueries(['profile']);
+    }
+  });
+};
+
+export const useProfile = (uid) => {
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const {data: profile , error} = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', uid)
+        .single();
+      if (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+      }
+      console.log("Fetched profile is :", profile);
+      return profile;
     }
   });
 };

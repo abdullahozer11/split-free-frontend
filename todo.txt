@@ -1,3 +1,5 @@
 how to invite members
 Policies for safe access to data
 invalidate right data for refresh
+
+check mymultiselect for bugs on selected participants

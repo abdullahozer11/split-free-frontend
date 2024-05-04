@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link, router, Stack} from 'expo-router';
+import {Stack} from 'expo-router';
 
 export default function AccountStack() {
   return (

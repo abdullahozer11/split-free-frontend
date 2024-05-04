@@ -22,9 +22,11 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [formState, setFormState] = useState(updatingExpense ? {
     ...updatingExpense,
+    id: updatingExpense.expense_id,
     amount: updatingExpense.amount.toString(),
+    payers: updatingExpense.payer_ids,
+    participants: updatingExpense.participant_ids,
     inputDate: new Date(updatingExpense.date)
-
   } : {
     title: '',
     description: '',
@@ -110,7 +112,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     // console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
     // const imagePath = await uploadImage(image);
     updateExpense({
-      id: updatingExpense.id,
+      id: updatingExpense.expense_id,
       amount: amount,
       currency: currency,
       date: formatDate(inputDate),
@@ -258,8 +260,11 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
               selected={payers[0]}
             />
           </View>
-          <MyMultiSelect selected={participants} members={members}
-                         onChange={(participants) => handleInputChange('participants', participants)}/>
+          <MyMultiSelect
+            selected={participants}
+            members={members}
+            onChange={(participants) => handleInputChange('participants', participants)}
+          />
           <View style={{
             flexDirection: "row",
             gap: 15,
