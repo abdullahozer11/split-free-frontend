@@ -1,4 +1,8 @@
 how to invite members
 Policies for safe access to data
-invalidate right data for refresh
-check mymultiselect for bugs on selected participants
+Connect to your database from pycharm
+Be able to run queries from pycharm
+Be able to run migrations from pycharm
+Save the entire function fleet in version control
+Invite members
+Setup emails
