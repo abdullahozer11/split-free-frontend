@@ -6,7 +6,7 @@ import {useLocalSearchParams} from "expo-router";
 
 export default function NewExpense() {
   const {group_id: idString} = useLocalSearchParams();
-  const groupId = parseFloat(typeof idString === 'string' ? idString : idString[0]);
+  const groupId = parseInt(typeof idString === 'string' ? idString : idString[0]);
 
   return (
     <SafeAreaView style={styles.container}>

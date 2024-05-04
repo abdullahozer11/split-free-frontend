@@ -8,8 +8,8 @@ import {Text, ActivityIndicator} from "react-native-paper";
 
 export default function UpdateExpense() {
   const {group_id: groupIdString, expense_id: expenseIdString} = useLocalSearchParams();
-  const expenseId = parseFloat(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
-  const group_id = parseFloat(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
+  const expenseId = parseInt(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
+  const group_id = parseInt(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
 
   const {data: expense, error: expenseError, isLoading: expenseLoading} = useExpense(expenseId);
 

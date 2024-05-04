@@ -18,8 +18,8 @@ const Description = ({text}) => {
 
 const ExpenseDetailsScreen = () => {
   const {group_id: groupIdString, expense_id: expenseIdString} = useLocalSearchParams();
-  const id = parseFloat(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
-  const group_id = parseFloat(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
+  const id = parseInt(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
+  const group_id = parseInt(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
   const navigation = useNavigation();
   const router = useRouter();
 

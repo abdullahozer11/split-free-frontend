@@ -14,7 +14,7 @@ import {useAuth} from "@/src/providers/AuthProvider";
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
-  const groupId = parseFloat(typeof idString === 'string' ? idString : idString[0]);
+  const groupId = parseInt(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
   const router = useRouter();
   const {profile} = useAuth();

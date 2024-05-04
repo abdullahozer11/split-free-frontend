@@ -9,7 +9,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 
 const UpdateGroup = () => {
   const {group_id: idString} = useLocalSearchParams();
-  const groupId = parseFloat(typeof idString === "string" ? idString : idString[0]);
+  const groupId = parseInt(typeof idString === "string" ? idString : idString[0]);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState(null);
   const [removingMemberName, setRemovingMemberName] = useState(null);

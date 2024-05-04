@@ -24,7 +24,7 @@ export const useExpense = (id: number) => {
   return useQuery({
     queryKey: ['expense', id],
     queryFn: async () => {
-      const {data, error} = await supabase
+      const {data: [expense], error} = await supabase
         .rpc('use_expense', {
           expense_id_input: id
         });
@@ -32,8 +32,8 @@ export const useExpense = (id: number) => {
         console.log("error is ", error.message);
         throw new Error(error.message);
       }
-      // console.log("data is ", data);
-      return data[0];
+      console.log("expense is ", expense);
+      return expense;
     }
   });
 };
@@ -65,6 +65,7 @@ export const useInsertExpense = (group_id: number) => {
     async onSuccess() {
       await queryClient.invalidateQueries(['group', group_id]);
       await queryClient.invalidateQueries(['expenses', group_id]);
+      await queryClient.invalidateQueries(['groups']);
     }
   });
 };
@@ -95,6 +96,7 @@ export const useUpdateExpense = () => {
     async onSuccess(_, {id, group_id}) {
       await queryClient.invalidateQueries(['group', group_id]);
       await queryClient.invalidateQueries(['expense', id]);
+      await queryClient.invalidateQueries(['expenses', group_id]);
     }
   });
 };
@@ -118,6 +120,7 @@ export const useDeleteExpense = (group_id: bigint) => {
       await queryClient.invalidateQueries(['group', group_id]);
       await queryClient.invalidateQueries(['expenses', group_id]);
       await queryClient.invalidateQueries(['expense', id]);
+      await queryClient.invalidateQueries(['groups']);
     }
   });
 };
