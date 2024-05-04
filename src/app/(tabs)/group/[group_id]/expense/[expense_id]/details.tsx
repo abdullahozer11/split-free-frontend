@@ -31,7 +31,7 @@ const ExpenseDetailsScreen = () => {
 
   const {data: expense, expenseError, expenseLoading} = useExpense(id);
 
-  const {mutate: deleteExpense} = useDeleteExpense();
+  const {mutate: deleteExpense} = useDeleteExpense(group_id);
 
   if (expenseLoading) {
     return <ActivityIndicator/>;

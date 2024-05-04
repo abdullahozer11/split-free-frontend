@@ -99,25 +99,22 @@ export const useUpdateExpense = () => {
   });
 };
 
-export const useDeleteExpense = () => {
+export const useDeleteExpense = (group_id: bigint) => {
   const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(id: bigint) {
       const {error} = await supabase
         .from('expenses')
         .delete()
-        .eq('id', id)
-        .single();
+        .eq('id', id);
       if (error) {
         console.error('Error during deletion:', error.message);
         throw new Error(error.message);
       }
-      console.log('Expense is deleted:', id);
-      return true;
+      // console.log('Expense is deleted');
+      return id;
     },
-    async onSuccess(_, {id, group_id}) {
-      console.log("id is ", id);
-      console.log("group_id is ", group_id);
+    async onSuccess(id) {
       await queryClient.invalidateQueries(['group', group_id]);
       await queryClient.invalidateQueries(['expenses', group_id]);
       await queryClient.invalidateQueries(['expense', id]);
