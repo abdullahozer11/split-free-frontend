@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {StyleSheet, View, ScrollView, TouchableOpacity, Alert} from "react-native";
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import {ActivityIndicator, Button, TextInput, Text, Dialog, Portal} from "react-native-paper";
-import {Member2} from "@/src/components/Person";
+import {DeletableMember} from "@/src/components/Person";
 import {useGroup, useUpdateGroup} from "@/src/api/groups";
 import {Feather} from "@expo/vector-icons";
 import {SafeAreaView} from "react-native-safe-area-context";
@@ -148,7 +148,7 @@ const UpdateGroup = () => {
         <ScrollView style={styles.memberList}>
           {existingMembers.map((member) => (
             <View key={member.name} style={styles.memberContainer}>
-              <Member2 member={member} onDelete={() => onMemberDelete(member.id, member.name)}/>
+              <DeletableMember member={member} onDelete={() => onMemberDelete(member.id, member.name)}/>
             </View>
           ))}
         </ScrollView>

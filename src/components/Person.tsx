@@ -1,7 +1,8 @@
 import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {Avatar, Text} from 'react-native-paper';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
+import {useMember} from "@/src/api/members";
 
 export const Person = ({profile}) => {
   return (
@@ -55,7 +56,7 @@ export const Member = ({member}) => {
   );
 };
 
-export const Member2 = ({member, onDelete}) => {
+export const DeletableMember = ({member, onDelete}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
@@ -66,6 +67,31 @@ export const Member2 = ({member, onDelete}) => {
       {member.role === 'owner' ? null : <TouchableOpacity onPress={onDelete}>
         <Feather name={"x"} color={'red'} size={24}/>
       </TouchableOpacity>}
+    </View>
+  );
+};
+
+export const Debt = ({debt, members}) => {
+  const [lender, setLender] = useState(null);
+  const [borrower, setBorrower] = useState(null);
+
+  useEffect(() => {
+    setLender(members?.find(member => member.id == debt?.lender));
+    setBorrower(members?.find(member => member.id == debt?.borrower));
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.subContainer, {justifyContent: "space-between"}]}>
+        <Avatar.Image size={36}
+                      source={borrower?.profile?.avatar_url ? {uri: borrower.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{borrower?.name}</Text>
+        <Feather name={'arrow-right'} size={36}/>
+        <Text variant={"bodyLarge"}>{lender?.name}</Text>
+        <Avatar.Image size={36}
+                      source={lender?.profile?.avatar_url ? {uri: lender.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={'labelLarge'}>€ {debt?.amount} </Text>
+      </View>
     </View>
   );
 };

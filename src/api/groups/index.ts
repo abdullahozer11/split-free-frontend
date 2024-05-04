@@ -25,7 +25,7 @@ export const useGroup = (id: number) => {
     queryFn: async () => {
       const {data: _Group, error} = await supabase
         .from('groups')
-        .select('id, title, expense_total, members(name, role, profile(avatar_url))')
+        .select('id, title, expense_total, members(id, name, role, profile(avatar_url)), debts(id, amount, borrower, lender)')
         .eq('id', id)
         .single();
       if (error) {

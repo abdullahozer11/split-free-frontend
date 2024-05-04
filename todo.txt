@@ -1,6 +1,5 @@
 how to invite members
-remove hard coded quantities
-calculate stuff and display
-RPC functions for Balance and Dept
 Policies for safe access to data
-Calculate Balance for each member
+invalidate right data for refresh
+
+

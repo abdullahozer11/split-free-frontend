@@ -8,7 +8,7 @@ import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, Text, ActivityIndicator, Dialog, Button, Portal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
-import {Member} from "@/src/components/Person";
+import {Debt, Member} from "@/src/components/Person";
 import {useAuth} from "@/src/providers/AuthProvider";
 
 
@@ -102,6 +102,13 @@ const GroupDetailsScreen = () => {
               <Text variant={'titleMedium'}>Members</Text>
               {group?.members && group?.members?.map(member => (
                   <Member key={member.name} member={member}/>
+                )
+              )}
+            </View>
+            <View style={[styles.section, {paddingBottom: 120}]}>
+              <Text variant={'titleMedium'}>Debts</Text>
+              {group?.debts && group?.debts?.map(debt => (
+                  <Debt key={debt.id} debt={debt} members={group?.members}/>
                 )
               )}
             </View>
