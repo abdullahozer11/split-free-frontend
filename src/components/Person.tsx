@@ -2,7 +2,6 @@ import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {Avatar, Text} from 'react-native-paper';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
-import {useMember} from "@/src/api/members";
 
 export const Person = ({profile}) => {
   return (
@@ -22,8 +21,8 @@ export const Payer = ({payer, amount}) => {
     <View style={styles.container}>
       <View style={styles.subContainer}>
         <Avatar.Image size={36}
-                      source={payer.member.profile?.avatar_url ? {uri: payer.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
-        <Text variant={"bodyLarge"}>{payer.member.name}</Text>
+                      source={payer.avatar_url ? {uri: payer.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{payer.name}</Text>
       </View>
       <Text variant={"bodyLarge"} style={{color: "green"}}>€{amount}</Text>
     </View>
@@ -35,8 +34,8 @@ export const Participant = ({participant, amount}) => {
     <View style={styles.container}>
       <View style={styles.subContainer}>
         <Avatar.Image size={36}
-                      source={participant.member.profile?.avatar_url ? {uri: participant.member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
-        <Text variant={"bodyLarge"}>{participant.member.name}</Text>
+                      source={participant.avatar_url ? {uri: participant.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{participant.name}</Text>
       </View>
       <Text variant={"bodyLarge"} style={{color: "red"}}>€{amount}</Text>
     </View>

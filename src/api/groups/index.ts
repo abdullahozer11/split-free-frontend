@@ -106,8 +106,9 @@ export const useUpdateGroup = () => {
       return data.group_id;
     },
     async onSuccess(groupID) {
-      await queryClient.invalidateQueries(['members']);
+      await queryClient.invalidateQueries(['groups']);
       await queryClient.invalidateQueries(['groups', groupID]);
+      await queryClient.invalidateQueries(['members']);
     }
   });
 };

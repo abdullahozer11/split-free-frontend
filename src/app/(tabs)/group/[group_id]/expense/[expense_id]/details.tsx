@@ -5,7 +5,6 @@ import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {useDeleteExpense, useExpense} from "@/src/api/expenses";
 import {Text, ActivityIndicator, Menu, Portal, Dialog, Button} from 'react-native-paper';
 import {Feather} from "@expo/vector-icons";
-import {useParticipantList, usePayerList} from "@/src/api/members";
 import {Participant, Payer} from "@/src/components/Person";
 
 const Description = ({text}) => {
@@ -31,16 +30,14 @@ const ExpenseDetailsScreen = () => {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
 
   const {data: expense, expenseError, expenseLoading} = useExpense(id);
-  const {data: payers, payersError, payersLoading} = usePayerList(id);
-  const {data: participants, participantsError, participantsLoading} = useParticipantList(id);
 
-  const {mutate: deleteExpense} = useDeleteExpense();
+  const {mutate: deleteExpense} = useDeleteExpense(group_id);
 
-  if (expenseLoading || payersLoading || participantsLoading) {
+  if (expenseLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (expenseError || payersError || participantsError) {
+  if (expenseError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
@@ -68,15 +65,15 @@ const ExpenseDetailsScreen = () => {
 
           <Text variant={'titleSmall'}>Who paid?</Text>
           <View style={styles.members}>
-            {payers?.map(payer => (
+            {expense?.payers?.map(payer => (
               <Payer key={payer.id} payer={payer} amount={expense?.amount}/>)
             )}
           </View>
           <Text variant={'titleSmall'}>Who shared?</Text>
           <View style={styles.members}>
-            {participants?.map(participant => (
+            {expense?.participants?.map(participant => (
                 <Participant key={participant.id} participant={participant}
-                             amount={expense?.amount / participants.length}/>
+                             amount={expense?.amount / expense?.participants?.length | 0}/>
               )
             )}
           </View>

@@ -6,7 +6,7 @@ import {
   useUpdateExpense
 } from "@/src/api/expenses";
 import {Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
-import {getFormattedDate, uploadImage} from "@/src/utils/helpers";
+import {getFormattedDate, uploadImage, formatDate} from "@/src/utils/helpers";
 import {ActivityIndicator, Avatar, Text, TextInput} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import {Dropdown} from "react-native-element-dropdown";
@@ -16,13 +16,6 @@ import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
 import {Feather} from "@expo/vector-icons";
 
-
-function formatDateForPostgreSQL(dateObj) {
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
 
 export default function ExpenseForm({title: headerTitle, groupId, updatingExpense}) {
   const navigation = useNavigation();
@@ -46,8 +39,8 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
 
   const isUpdating = !!updatingExpense;
 
-  const {mutate: insertExpense} = useInsertExpense();
-  const {mutate: updateExpense} = useUpdateExpense();
+  const {mutate: insertExpense} = useInsertExpense(groupId);
+  const {mutate: updateExpense} = useUpdateExpense(groupId);
   const {data: members, error: membersError, isLoading: membersLoading} = useMemberList(groupId);
 
   if (membersLoading) {
@@ -120,7 +113,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       id: updatingExpense.id,
       amount: amount,
       currency: currency,
-      date: formatDateForPostgreSQL(inputDate),
+      date: formatDate(inputDate),
       description: description,
       participants: participants,
       payers: payers,
@@ -144,7 +137,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       description: description ? description : null,
       currency: currency,
       amount: amount,
-      date: formatDateForPostgreSQL(inputDate),
+      date: formatDate(inputDate),
       proof: null,
       payers: payers,
       participants: participants
