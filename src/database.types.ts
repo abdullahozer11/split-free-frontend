@@ -525,7 +525,7 @@ export type Database = {
       }
       update_expense: {
         Args: {
-          expense_id: number
+          id: number
           title_input: string
           description_input: string
           amount_input: number
@@ -552,7 +552,7 @@ export type Database = {
         }
         Returns: {
           amount: number
-          expense_id: number
+          id: number
           title: string
           description: string
           date: string

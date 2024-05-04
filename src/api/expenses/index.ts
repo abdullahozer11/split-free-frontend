@@ -63,19 +63,19 @@ export const useInsertExpense = (group_id: number) => {
       return newExpenseID;
     },
     async onSuccess() {
-      await queryClient.invalidateQueries(['groups', group_id]);
+      await queryClient.invalidateQueries(['group', group_id]);
       await queryClient.invalidateQueries(['expenses', group_id]);
     }
   });
 };
 
-export const useUpdateExpense = (group_id: number) => {
+export const useUpdateExpense = () => {
   const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(data) {
       const {data: newExpense, error} = await supabase
         .rpc('update_expense', {
-          expense_id: data.id,
+          id: data.id,
           amount_input: data.amount,
           currency_input: data.currency,
           date_input: data.date,
@@ -92,23 +92,35 @@ export const useUpdateExpense = (group_id: number) => {
       // console.log('Expense is updated:', newExpense);
       return newExpense;
     },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['groups', group_id]);
-      await queryClient.invalidateQueries(['expenses', group_id]);
+    async onSuccess(_, {id, group_id}) {
+      await queryClient.invalidateQueries(['group', group_id]);
+      await queryClient.invalidateQueries(['expense', id]);
     }
   });
 };
 
-export const useDeleteExpense = (groupId: number) => {
+export const useDeleteExpense = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    async mutationFn(id: number) {
-      const {error} = await supabase.from('expenses').delete().eq('id', id);
+    async mutationFn(id: bigint) {
+      const {error} = await supabase
+        .from('expenses')
+        .delete()
+        .eq('id', id)
+        .single();
+      if (error) {
+        console.error('Error during deletion:', error.message);
+        throw new Error(error.message);
+      }
+      console.log('Expense is deleted:', id);
+      return true;
     },
-    async onSuccess(_, {id}) {
-      await queryClient.invalidateQueries(['groups', groupId]);
-      await queryClient.invalidateQueries(['expenses', groupId]);
-      await queryClient.invalidateQueries(['expenses', groupId, id]);
+    async onSuccess(_, {id, group_id}) {
+      console.log("id is ", id);
+      console.log("group_id is ", group_id);
+      await queryClient.invalidateQueries(['group', group_id]);
+      await queryClient.invalidateQueries(['expenses', group_id]);
+      await queryClient.invalidateQueries(['expense', id]);
     }
   });
 };

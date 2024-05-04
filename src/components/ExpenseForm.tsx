@@ -22,7 +22,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [formState, setFormState] = useState(updatingExpense ? {
     ...updatingExpense,
-    id: updatingExpense.expense_id,
+    id: updatingExpense.id,
     amount: updatingExpense.amount.toString(),
     payers: updatingExpense.payer_ids,
     participants: updatingExpense.participant_ids,
@@ -42,7 +42,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   const isUpdating = !!updatingExpense;
 
   const {mutate: insertExpense} = useInsertExpense(groupId);
-  const {mutate: updateExpense} = useUpdateExpense(groupId);
+  const {mutate: updateExpense} = useUpdateExpense();
   const {data: members, error: membersError, isLoading: membersLoading} = useMemberList(groupId);
 
   if (membersLoading) {
@@ -112,7 +112,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     // console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
     // const imagePath = await uploadImage(image);
     updateExpense({
-      id: updatingExpense.expense_id,
+      id: updatingExpense.id,
       amount: amount,
       currency: currency,
       date: formatDate(inputDate),

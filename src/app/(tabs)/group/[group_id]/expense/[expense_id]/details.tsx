@@ -31,7 +31,7 @@ const ExpenseDetailsScreen = () => {
 
   const {data: expense, expenseError, expenseLoading} = useExpense(id);
 
-  const {mutate: deleteExpense} = useDeleteExpense(group_id);
+  const {mutate: deleteExpense} = useDeleteExpense();
 
   if (expenseLoading) {
     return <ActivityIndicator/>;
@@ -47,7 +47,7 @@ const ExpenseDetailsScreen = () => {
 
   const handleDelete = () => {
     console.log("deleting expense");
-    deleteExpense(expense.id, {
+    deleteExpense(expense?.id, {
       onSuccess: () => {
         console.log("Successfully deleted expense");
       }

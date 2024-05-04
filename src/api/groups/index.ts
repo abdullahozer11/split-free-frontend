@@ -21,7 +21,7 @@ export const useGroupList = () => {
 
 export const useGroup = (id: number) => {
   return useQuery({
-    queryKey: ['groups', id],
+    queryKey: ['group', id],
     queryFn: async () => {
       const {data: _Group, error} = await supabase
         .from('groups')
@@ -106,7 +106,7 @@ export const useUpdateGroup = () => {
     },
     async onSuccess(groupID) {
       await queryClient.invalidateQueries(['groups']);
-      await queryClient.invalidateQueries(['groups', groupID]);
+      await queryClient.invalidateQueries(['group', groupID]);
       await queryClient.invalidateQueries(['members', groupID]);
     }
   });
