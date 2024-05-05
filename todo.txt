@@ -1,8 +1,17 @@
-how to invite members
+Priority
+========
+Add friends
+Invite members
 Policies for safe access to data
+
+
+Bonus
+=====
 Connect to your database from pycharm
 Be able to run queries from pycharm
 Be able to run migrations from pycharm
 Save the entire function fleet in version control
-Invite members
+
+Later
+=====
 Setup emails

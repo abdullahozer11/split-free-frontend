@@ -3,11 +3,20 @@ import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {Link} from "expo-router";
 import {useMemberList} from "@/src/api/members";
+import {ActivityIndicator} from "react-native-paper";
 
 const ExpenseItem = ({expense}) => {
   const [impact, setImpact] = useState(0);
-  const members = useMemberList(expense.group_id);
+  const {data: members, isLoading, isError} = useMemberList(expense.group_id);
   const memberId = members?.find(mb => mb.group_id == expense.group_id).id | null;
+
+  if (isLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (isError) {
+    return <Text>Failed to fetch data</Text>;
+  }
 
   useEffect(() => {
     setImpact(expense.balances?.find(bl => bl.owner == memberId)?.amount | 0);

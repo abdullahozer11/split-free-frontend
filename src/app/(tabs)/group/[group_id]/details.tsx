@@ -6,10 +6,9 @@ import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router"
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
-import {Menu, Text, ActivityIndicator, Dialog, Button, Portal} from 'react-native-paper';
+import {Menu, Text, Dialog, Button, Portal, ActivityIndicator} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Member} from "@/src/components/Person";
-import {useMemberList} from "@/src/api/members";
 
 
 const GroupDetailsScreen = () => {
@@ -17,13 +16,21 @@ const GroupDetailsScreen = () => {
   const groupId = parseInt(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
   const router = useRouter();
-  const members = useMemberList(groupId);
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
   const [totalBalance, setTotalBalance] = useState(0);
 
+  if (groupLoading || expenseLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (groupError || expenseError) {
+    return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
+  }
+
   useEffect(() => {
-    const _balance = members?.find(mb => mb.group_id == groupId)?.total_balance;
+    console.log("group members are ", group?.members);
+    const _balance = group?.members?.find(mb => mb.group_id == groupId)?.total_balance;
     // subscription needed in the future
     setTotalBalance(_balance);
   }, [groupId]);
@@ -35,14 +42,6 @@ const GroupDetailsScreen = () => {
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-
-  if (groupLoading || expenseLoading) {
-    return <ActivityIndicator/>;
-  }
-
-  if (groupError || expenseError) {
-    return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
-  }
 
   const groupedExpenses = groupElementsByDay(expenses);
 

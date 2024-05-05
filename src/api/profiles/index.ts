@@ -43,7 +43,7 @@ export const useProfile = (uid) => {
         console.log(error.message);
         throw new Error(error.message);
       }
-      console.log("Fetched profile is :", profile);
+      // console.log("Fetched profile is :", profile);
       return profile;
     }
   });
