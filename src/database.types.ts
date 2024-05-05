@@ -173,16 +173,19 @@ export type Database = {
       expense_participants: {
         Row: {
           expense: number | null
+          group_id: number | null
           id: number
           member: number | null
         }
         Insert: {
           expense?: number | null
+          group_id?: number | null
           id?: number
           member?: number | null
         }
         Update: {
           expense?: number | null
+          group_id?: number | null
           id?: number
           member?: number | null
         }
@@ -192,6 +195,13 @@ export type Database = {
             columns: ["expense"]
             isOneToOne: false
             referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_participants_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
             referencedColumns: ["id"]
           },
           {
@@ -206,16 +216,19 @@ export type Database = {
       expense_payers: {
         Row: {
           expense: number | null
+          group_id: number | null
           id: number
           member: number | null
         }
         Insert: {
           expense?: number | null
+          group_id?: number | null
           id?: number
           member?: number | null
         }
         Update: {
           expense?: number | null
+          group_id?: number | null
           id?: number
           member?: number | null
         }
@@ -225,6 +238,13 @@ export type Database = {
             columns: ["expense"]
             isOneToOne: false
             referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_payers_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
             referencedColumns: ["id"]
           },
           {
@@ -292,9 +312,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          friend: string
+          friend?: string
           id?: number
-          profile: string
+          profile?: string
         }
         Update: {
           created_at?: string
@@ -410,7 +430,6 @@ export type Database = {
           id: string
           phone_number: string | null
           updated_at: string | null
-          username: string | null
           website: string | null
         }
         Insert: {
@@ -420,7 +439,6 @@ export type Database = {
           id: string
           phone_number?: string | null
           updated_at?: string | null
-          username?: string | null
           website?: string | null
         }
         Update: {
@@ -430,7 +448,6 @@ export type Database = {
           id?: string
           phone_number?: string | null
           updated_at?: string | null
-          username?: string | null
           website?: string | null
         }
         Relationships: [
@@ -491,7 +508,7 @@ export type Database = {
         }
         Returns: Database["public"]["CompositeTypes"]["balance_info"][]
       }
-      is_comember_of: {
+      is_member_of: {
         Args: {
           _person_id: string
           _group_id: number
@@ -525,7 +542,7 @@ export type Database = {
       }
       update_expense: {
         Args: {
-          id: number
+          expense_id: number
           title_input: string
           description_input: string
           amount_input: number
@@ -554,12 +571,15 @@ export type Database = {
           amount: number
           id: number
           title: string
+          currency: string
           description: string
           date: string
           last_modified: string
           group_id: number
           payers: Json
           participants: Json
+          payer_ids: Json
+          participant_ids: Json
         }[]
       }
     }

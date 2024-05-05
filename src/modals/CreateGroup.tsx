@@ -24,6 +24,11 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
   const {session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id);
+  const [members, setMembers] = useState([]);
+
+  useEffect(() => {
+    setMembers([profile?.full_name])
+  }, [profile]);
 
   if (isLoading) {
     return <ActivityIndicator/>;
@@ -32,12 +37,6 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   if (isError) {
     return <Text>Failed to fetch data</Text>;
   }
-
-  const [members, setMembers] = useState([]);
-
-  useEffect(() => {
-    setMembers([profile?.full_name])
-  }, [profile]);
 
   const handleParticipantsSubmit = (members) => {
     setShowParticipantsModal(false);

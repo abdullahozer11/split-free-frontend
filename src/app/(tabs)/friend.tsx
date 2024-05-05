@@ -21,18 +21,18 @@ export default function FriendScreen() {
       </SafeAreaView>
       <View style={styles.body}>
         <View style={styles.searchSection}>
-          <Dropdown
-            search={true}
-            searchField={'username'}
-            labelField={'username'}
-            valueField={'username'}
-            placeholder={"Search for new friends..."}
-            searchPlaceholder={"Search for friends..."}
-            data={searchResults}
-            onChange={pe => setSelected(pe)}
-            value={null}
-            style={styles.searchBox}
-          />
+          {/*<Dropdown*/}
+          {/*  search={true}*/}
+          {/*  searchField={'email'}*/}
+          {/*  labelField={'email'}*/}
+          {/*  valueField={'email'}*/}
+          {/*  placeholder={"Search for new friends..."}*/}
+          {/*  searchPlaceholder={"Search for friends..."}*/}
+          {/*  data={searchResults}*/}
+          {/*  onChange={pe => setSelected(pe)}*/}
+          {/*  value={null}*/}
+          {/*  style={styles.searchBox}*/}
+          {/*/>*/}
           {isLoading && <ActivityIndicator/>}
           {isError && <Text>Failed to fetch search results</Text>}
         </View>

@@ -4,7 +4,6 @@ Add friends
 Invite members
 Policies for safe access to data
 
-
 Bonus
 =====
 Connect to your database from pycharm
