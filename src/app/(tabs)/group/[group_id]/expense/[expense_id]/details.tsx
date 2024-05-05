@@ -55,6 +55,8 @@ const ExpenseDetailsScreen = () => {
     navigation.goBack();
   };
 
+  console.log("participants are ", expense?.participants);
+
   return (
     <SafeAreaView style={styles.container}>
       <CollapsableHeader H_MAX_HEIGHT={200} H_MIN_HEIGHT={52} content={
