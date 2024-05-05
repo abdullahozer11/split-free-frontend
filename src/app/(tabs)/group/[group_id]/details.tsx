@@ -19,6 +19,18 @@ const GroupDetailsScreen = () => {
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
   const [totalBalance, setTotalBalance] = useState(0);
+  const {mutate: deleteGroup} = useDeleteGroup();
+  // menu related
+  const [visible, setVisible] = React.useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
+
+  useEffect(() => {
+    const _balance = group?.members?.find(mb => mb.group_id == groupId)?.total_balance;
+    setTotalBalance(_balance);
+  }, [groupId]);
 
   if (groupLoading || expenseLoading) {
     return <ActivityIndicator/>;
@@ -27,23 +39,6 @@ const GroupDetailsScreen = () => {
   if (groupError || expenseError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
-
-  useEffect(() => {
-    console.log("group members are ", group?.members);
-    const _balance = group?.members?.find(mb => mb.group_id == groupId)?.total_balance;
-    // subscription needed in the future
-    setTotalBalance(_balance);
-  }, [groupId]);
-
-  const {mutate: deleteGroup} = useDeleteGroup();
-
-  // menu related
-  const [visible, setVisible] = React.useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
-
-  const groupedExpenses = groupElementsByDay(expenses);
 
   const handleStats = () => {
     console.log('stats');

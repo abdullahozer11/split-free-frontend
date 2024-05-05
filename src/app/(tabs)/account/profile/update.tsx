@@ -20,6 +20,13 @@ export default function UpdateProfile() {
   const {session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id);
 
+  useEffect(() => {
+    setFullName(profile?.full_name);
+    setWebsite(profile?.website);
+    setPhoneNumber(profile?.phone_number);
+    setImage(profile?.avatar_url);
+  }, [profile]);
+
   if (isLoading) {
     return <ActivityIndicator/>;
   }
@@ -27,13 +34,6 @@ export default function UpdateProfile() {
   if (isError) {
     return <Text>Failed to fetch data</Text>;
   }
-
-  useEffect(() => {
-    setFullName(profile?.full_name);
-    setWebsite(profile?.website);
-    setPhoneNumber(profile?.phone_number);
-    setImage(profile?.avatar_url);
-  }, [profile]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

@@ -12,7 +12,10 @@ import {Dropdown} from "react-native-element-dropdown";
 export default function FriendScreen() {
   const [selected, setSelected] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const {data: searchResults, isLoading, isError} = useSearchQuery(searchQuery);
+
+  const {data: searchResults, isLoading, isError} = searchQuery ? useSearchQuery(searchQuery): {data: null, isLoading: null, isError: null};
+
+  console.log("search results are ", searchResults);
 
   return (
     <>

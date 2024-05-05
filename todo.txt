@@ -19,3 +19,5 @@ Current bug
 ===========
 New login or signup (new user) should invalidate all queries (if not)
 Policies causing cross data access
+
+functions will be definers and will check manually inside

@@ -10,6 +10,10 @@ const ExpenseItem = ({expense}) => {
   const {data: members, isLoading, isError} = useMemberList(expense.group_id);
   const memberId = members?.find(mb => mb.group_id == expense.group_id).id | null;
 
+  useEffect(() => {
+    setImpact(expense.balances?.find(bl => bl.owner == memberId)?.amount | 0);
+  }, [memberId]);
+
   if (isLoading) {
     return <ActivityIndicator/>;
   }
@@ -17,10 +21,6 @@ const ExpenseItem = ({expense}) => {
   if (isError) {
     return <Text>Failed to fetch data</Text>;
   }
-
-  useEffect(() => {
-    setImpact(expense.balances?.find(bl => bl.owner == memberId)?.amount | 0);
-  }, [memberId]);
 
   return (
     <Link href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`} asChild>
