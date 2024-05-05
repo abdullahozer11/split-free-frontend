@@ -15,3 +15,8 @@ Save the entire function fleet in version control
 Later
 =====
 Setup emails
+
+Current bug
+===========
+New login or signup (new user) should invalidate all queries (if not)
+Policies causing cross data access
