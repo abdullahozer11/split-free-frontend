@@ -4,6 +4,7 @@ import {useAuth} from "@/src/providers/AuthProvider";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {Link, useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
+import {useProfile} from "@/src/api/profiles";
 
 const Card = ({iconName, title, page}) => {
   return (
@@ -18,7 +19,9 @@ const Card = ({iconName, title, page}) => {
 };
 
 const AccountScreen = () => {
-  const {profile, session} = useAuth();
+  const {session} = useAuth();
+  const {data: profile, isLoading, isError} = useProfile(session?.user.id)
+
   const [scrollY] = useState(new Animated.Value(0));
   const headerHeight = 80;
 

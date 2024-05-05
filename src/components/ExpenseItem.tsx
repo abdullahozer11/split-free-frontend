@@ -2,13 +2,12 @@ import {StyleSheet, View, Text, Pressable} from 'react-native';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {Link} from "expo-router";
-import {useAuth} from "@/src/providers/AuthProvider";
+import {useMemberList} from "@/src/api/members";
 
 const ExpenseItem = ({expense}) => {
-  const {profile} = useAuth();
   const [impact, setImpact] = useState(0);
-
-  const memberId = profile?.members?.find(mb => mb.group_id == expense.group_id).id | null;
+  const members = useMemberList(expense.group_id);
+  const memberId = members?.find(mb => mb.group_id == expense.group_id).id | null;
 
   useEffect(() => {
     setImpact(expense.balances?.find(bl => bl.owner == memberId)?.amount | 0);

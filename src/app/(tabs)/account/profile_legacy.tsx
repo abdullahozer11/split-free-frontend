@@ -7,11 +7,22 @@ import {useAuth} from "@/src/providers/AuthProvider";
 import {useState} from "react";
 import CurrencyCard from "@/src/components/CurrencyItem";
 import {useNavigation} from "expo-router";
+import {useProfile} from "@/src/api/profiles";
+import {ActivityIndicator} from "react-native-paper";
 
 export default function ProfileScreen() {
   const [selectedCurrency, setSelectedCurrency] = useState('USD'); // should be dynamic
-  const {session, profile, loading} = useAuth();
   const [image, setImage] = useState('');
+  const {session} = useAuth();
+  const {data: profile, isLoading, isError} = useProfile(session?.user.id);
+
+  if (isLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (isError) {
+    return <Text>Failed to fetch data</Text>;
+  }
 
   const currencies = {
     'USD': '$',

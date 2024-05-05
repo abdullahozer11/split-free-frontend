@@ -9,7 +9,7 @@ import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, Text, ActivityIndicator, Dialog, Button, Portal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Member} from "@/src/components/Person";
-import {useAuth} from "@/src/providers/AuthProvider";
+import {useMemberList} from "@/src/api/members";
 
 
 const GroupDetailsScreen = () => {
@@ -17,13 +17,13 @@ const GroupDetailsScreen = () => {
   const groupId = parseInt(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
   const router = useRouter();
-  const {profile} = useAuth();
+  const members = useMemberList(groupId);
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
   const [totalBalance, setTotalBalance] = useState(0);
 
   useEffect(() => {
-    const _balance = profile?.members?.find(mb => mb.group_id == groupId)?.total_balance;
+    const _balance = members?.find(mb => mb.group_id == groupId)?.total_balance;
     // subscription needed in the future
     setTotalBalance(_balance);
   }, [groupId]);

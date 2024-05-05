@@ -10,7 +10,7 @@ const NotificationProvider = ({ children }: PropsWithChildren) => {
     ExpoPushToken | undefined
   >();
 
-  const {profile} = useAuth();
+  const {session} = useAuth();
   const [notification, setNotification] =
     useState<Notifications.Notification>();
   const notificationListener = useRef<Notifications.Subscription>();
@@ -23,7 +23,7 @@ const NotificationProvider = ({ children }: PropsWithChildren) => {
     }
 
     // update the token in the database
-    await supabase.from('profiles').update({expo_push_token: newToken}).eq('id', profile.id);
+    await supabase.from('profiles').update({expo_push_token: newToken}).eq('id', session?.user.id);
   };
 
   useEffect(() => {

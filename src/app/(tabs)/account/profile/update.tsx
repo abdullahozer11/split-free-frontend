@@ -17,8 +17,8 @@ export default function UpdateProfile() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const {mutate: updateProfile} = useUpdateProfile();
 
-  const {profile: _profile} = useAuth();
-  const {data: profile, isLoading, isError} = useProfile(_profile.id)
+  const {session} = useAuth();
+  const {data: profile, isLoading, isError} = useProfile(session?.user.id);
 
   if (isLoading) {
     return <ActivityIndicator/>;

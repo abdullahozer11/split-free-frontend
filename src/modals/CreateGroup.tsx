@@ -12,6 +12,8 @@ import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertGroup} from "@/src/api/groups";
+import {useProfile} from "@/src/api/profiles";
+import {ActivityIndicator} from "react-native-paper";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
   const [title, setTitle] = useState("");
@@ -20,7 +22,16 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
   const {mutate: insertGroup} = useInsertGroup();
 
-  const {profile} = useAuth();
+  const {session} = useAuth();
+  const {data: profile, isLoading, isError} = useProfile(session?.user.id);
+
+  if (isLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (isError) {
+    return <Text>Failed to fetch data</Text>;
+  }
 
   const [members, setMembers] = useState([]);
 

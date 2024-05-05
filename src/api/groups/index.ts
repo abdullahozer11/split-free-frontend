@@ -62,7 +62,7 @@ export const useDeleteGroup = () => {
 
 export const useInsertGroup = () => {
   const queryClient = useQueryClient();
-  const {profile} = useAuth();
+  const {session} = useAuth();
 
   return useMutation({
     async mutationFn(data) {
@@ -70,7 +70,7 @@ export const useInsertGroup = () => {
       const {data: newGroupID, error} = await supabase
         .rpc('create_group', {
           member_names_input: data.member_names,
-          profile_id_input: profile.id,
+          profile_id_input: session?.user.id,
           title_input: data.title
         });
       if (error) {
