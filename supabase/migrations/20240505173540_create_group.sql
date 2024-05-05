@@ -10,7 +10,7 @@ DECLARE
 BEGIN
     -- Insert row into groups table
     INSERT INTO groups(title, owner)
-    VALUES (title_input, profile_id_input)
+    VALUES (title_input, auth.uid())
     RETURNING id INTO group_id;
 
     -- Insert members one by one and link to the group created
