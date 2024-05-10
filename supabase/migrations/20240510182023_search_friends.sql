@@ -15,7 +15,7 @@ BEGIN
                ELSE 'AVAILABLE'
            END AS friend_status
     FROM profiles p
-    LEFT JOIN friends f ON f.friend = p.id
+    LEFT JOIN friends f ON f.profile = p.id
     WHERE p.email ILIKE keyword_input || '%'
     LIMIT limit_input
     OFFSET offset_input;

@@ -43,6 +43,7 @@ export default function FriendScreen() {
       return;
     }
     setSearchResults(data);
+    console.log("results are ", data);
     setSearchLoading(false);
   };
 
