@@ -9,6 +9,8 @@ import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, Text, Dialog, Button, Portal, ActivityIndicator} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Member} from "@/src/components/Person";
+import {useProfile} from "@/src/api/profiles";
+import {useAuth} from "@/src/providers/AuthProvider";
 
 
 const GroupDetailsScreen = () => {
@@ -18,6 +20,8 @@ const GroupDetailsScreen = () => {
   const router = useRouter();
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
+  const {session} = useAuth();
+  const {data: profile, isProfileLoading, isProfileError} = useProfile(session?.user.id)
   const [totalBalance, setTotalBalance] = useState(0);
   const {mutate: deleteGroup} = useDeleteGroup();
   // menu related
@@ -28,15 +32,15 @@ const GroupDetailsScreen = () => {
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
 
   useEffect(() => {
-    const _balance = group?.members?.find(mb => mb.group_id == groupId)?.total_balance || 0;
+    const _balance = group?.members.find(mb => mb.profile.id == profile?.id).total_balance || null;
     setTotalBalance(_balance);
-  }, [groupId]);
+  }, [group]);
 
-  if (groupLoading || expenseLoading) {
+  if (groupLoading || expenseLoading || isProfileLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (groupError || expenseError) {
+  if (groupError || expenseError || isProfileError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
