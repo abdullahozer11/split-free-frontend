@@ -9,6 +9,7 @@ BEGIN
     RETURN QUERY
     SELECT p.id,
            p.email,
+           p.avatar_url,
            CASE
                WHEN f.friend = profile_id_input THEN 'FRIEND'
                WHEN p.id = profile_id_input THEN 'SELF'

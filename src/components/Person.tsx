@@ -101,6 +101,7 @@ export const SearchProfile = ({profile, onAdd}) => {
       <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
         <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{profile.email}</Text>
+        <Text variant={"bodyLarge"}>{profile.friend_status}</Text>
         <TouchableOpacity onPress={onAdd}>
           <Feather name={'user-plus'} size={24}/>
         </TouchableOpacity>
