@@ -6,14 +6,10 @@ import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import {useGroupList} from "@/src/api/groups";
 import {ActivityIndicator} from "react-native-paper";
-import {useAuth} from "@/src/providers/AuthProvider";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
-
-  const {session} = useAuth();
-  console.log("access token is ", session?.access_token);
 
   const {data: groups, error, isLoading} = useGroupList();
 

@@ -32,7 +32,7 @@ export const useExpense = (id: number) => {
         console.log("error is ", error.message);
         throw new Error(error.message);
       }
-      console.log("expense is ", expense);
+      // console.log("expense is ", expense);
       return expense;
     }
   });

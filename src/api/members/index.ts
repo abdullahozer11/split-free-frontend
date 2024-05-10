@@ -8,7 +8,7 @@ export const useMemberList = (groupId: number) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('members')
-        .select('id, name')
+        .select('id, name, profile')
         .eq('group_id', groupId);
       if (error) {
         // console.log(error.message);

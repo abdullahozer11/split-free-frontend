@@ -28,7 +28,7 @@ const GroupDetailsScreen = () => {
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
 
   useEffect(() => {
-    const _balance = group?.members?.find(mb => mb.group_id == groupId)?.total_balance;
+    const _balance = group?.members?.find(mb => mb.group_id == groupId)?.total_balance || 0;
     setTotalBalance(_balance);
   }, [groupId]);
 
@@ -71,12 +71,12 @@ const GroupDetailsScreen = () => {
             <View style={{flexDirection: "row", marginHorizontal: 15, paddingBottom: 30}}>
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Group spent:</Text>
-                <Text style={{fontSize: 24, fontWeight: "bold"}}>€{group?.expense_total || 0}</Text>
+                <Text style={{fontSize: 24, fontWeight: "bold"}}>{group?.expense_total || 0}€</Text>
               </View>
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Total Receivable:</Text>
                 <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>
-                    {totalBalance > 0 ? '+' + totalBalance : totalBalance} €
+                    {totalBalance > 0 ? '+' + totalBalance : totalBalance}€
                 </Text>
               </View>
             </View>

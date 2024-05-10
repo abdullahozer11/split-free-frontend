@@ -4,21 +4,25 @@ import {Feather} from "@expo/vector-icons";
 import {Link} from "expo-router";
 import {useMemberList} from "@/src/api/members";
 import {ActivityIndicator} from "react-native-paper";
+import {useAuth} from "@/src/providers/AuthProvider";
+import {useProfile} from "@/src/api/profiles";
 
 const ExpenseItem = ({expense}) => {
+  const {session} = useAuth();
+  const {data: profile, isProfileLoading, isProfileError} = useProfile(session?.user.id)
+  const {data: members, isMembersLoading, isMembersError} = useMemberList(expense.group_id);
   const [impact, setImpact] = useState(0);
-  const {data: members, isLoading, isError} = useMemberList(expense.group_id);
-  const memberId = members?.find(mb => mb.group_id == expense.group_id).id | null;
 
   useEffect(() => {
-    setImpact(expense.balances?.find(bl => bl.owner == memberId)?.amount | 0);
-  }, [memberId]);
+    const profileMember = members?.find(member => member.profile === profile?.id);
+    setImpact(expense.balances?.find(bl => bl.owner == profileMember?.id)?.amount || 0);
+  }, [profile, members]);
 
-  if (isLoading) {
+  if (isProfileLoading || isMembersLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (isError) {
+  if (isProfileError || isMembersError) {
     return <Text>Failed to fetch data</Text>;
   }
 
