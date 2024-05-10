@@ -95,6 +95,20 @@ export const Debt = ({debt, members}) => {
   );
 };
 
+export const SearchProfile = ({profile, onAdd}) => {
+  return (
+    <View style={styles.container}>
+      <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
+        <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{profile.email}</Text>
+        <TouchableOpacity onPress={onAdd}>
+          <Feather name={'plus'} size={24} color={'green'}/>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',

@@ -1,21 +1,36 @@
-import {StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {Text} from '@/src/components/Themed';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
-import {Person} from "@/src/components/Person";
-import {ActivityIndicator, ProgressBar} from "react-native-paper";
+import {Person, SearchProfile} from "@/src/components/Person";
+import {ProgressBar, Searchbar} from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {useSearchQuery} from "@/src/api/friends";
-import {Dropdown} from "react-native-element-dropdown";
+import {supabase} from "@/src/lib/supabase";
+import { Menu } from 'react-native-paper';
+
 
 export default function FriendScreen() {
   const [selected, setSelected] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
-  const {data: searchResults, isLoading, isError} = searchQuery ? useSearchQuery(searchQuery): {data: null, isLoading: null, isError: null};
-
-  console.log("search results are ", searchResults);
+  const handleSearch = async () => {
+    setSearchLoading(true);
+    const {data, error} = await supabase
+      .from('profiles')
+      .select('id, email')
+      .ilike('email', `${searchQuery}%`)
+      .limit(10);
+    if (error) {
+      console.log("error is ", error.message);
+      setSearchLoading(false);
+      return;
+    }
+    setSearchResults(data);
+    setSearchLoading(false);
+  };
 
   return (
     <>
@@ -24,20 +39,23 @@ export default function FriendScreen() {
       </SafeAreaView>
       <View style={styles.body}>
         <View style={styles.searchSection}>
-          {/*<Dropdown*/}
-          {/*  search={true}*/}
-          {/*  searchField={'email'}*/}
-          {/*  labelField={'email'}*/}
-          {/*  valueField={'email'}*/}
-          {/*  placeholder={"Search for new friends..."}*/}
-          {/*  searchPlaceholder={"Search for friends..."}*/}
-          {/*  data={searchResults}*/}
-          {/*  onChange={pe => setSelected(pe)}*/}
-          {/*  value={null}*/}
-          {/*  style={styles.searchBox}*/}
-          {/*/>*/}
-          {isLoading && <ActivityIndicator/>}
-          {isError && <Text>Failed to fetch search results</Text>}
+          <Searchbar
+            placeholder="Search"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            mode={'view'}
+            style={{backgroundColor: 'white'}}
+            onClearIconPress={() => {setSearchQuery(null)}}
+            onIconPress={handleSearch}
+            loading={searchLoading}
+          />
+          <ScrollView style={{backgroundColor: 'white'}}>
+            {searchResults?.map((profile) => (
+              <View key={profile.id}>
+                <SearchProfile onAdd={() => {console.log("searching profile")}} profile={profile} />
+              </View>
+            ))}
+          </ScrollView>
         </View>
         <View style={styles.balanceSection}>
           <View style={{flexDirection: "row", marginHorizontal: 15}}>
