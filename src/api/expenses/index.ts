@@ -76,7 +76,7 @@ export const useUpdateExpense = () => {
     async mutationFn(data) {
       const {data: newExpense, error} = await supabase
         .rpc('update_expense', {
-          id: data.id,
+          expense_id: data.id,
           amount_input: data.amount,
           currency_input: data.currency,
           date_input: data.date,
