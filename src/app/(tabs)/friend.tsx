@@ -31,10 +31,12 @@ export default function FriendScreen() {
   const handleSearch = async () => {
     setSearchLoading(true);
     const {data, error} = await supabase
-      .from('profiles')
-      .select('id, email')
-      .ilike('email', `${searchQuery}%`)
-      .range(0, 9); // eventually we ll offset as we go through the results
+      .rpc('search_friends', {
+        keyword_input: searchQuery,
+        profile_id_input: session?.user.id,
+        limit_input: 10,
+        offset_input: 0,
+      });
     if (error) {
       console.log("error is ", error.message);
       setSearchLoading(false);

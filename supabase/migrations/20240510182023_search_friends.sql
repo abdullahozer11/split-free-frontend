@@ -11,11 +11,11 @@ BEGIN
            p.email,
            CASE
                WHEN f.friend = profile_id_input THEN 'FRIEND'
-               WHEN p.profile_id = profile_id_input THEN 'SELF'
+               WHEN p.id = profile_id_input THEN 'SELF'
                ELSE 'AVAILABLE'
            END AS friend_status
     FROM profiles p
-    LEFT JOIN friends f ON f.friend = p.profile_id
+    LEFT JOIN friends f ON f.friend = p.id
     WHERE p.email ILIKE keyword_input || '%'
     LIMIT limit_input
     OFFSET offset_input;
