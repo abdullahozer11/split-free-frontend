@@ -54,15 +54,38 @@ export const getFriends = (uid) => {
     queryKey: ['friends'],
     queryFn: async () => {
       const {data, error} = await supabase
-        .from('friends')
-        .select('friend')
-        .eq('profile', uid);
+        .rpc('get_friends', {
+          profile_id_input: uid,
+        });
       if (error) {
         console.log("error is ", error.message);
         throw new Error(error.message);
       }
-      console.log("Friends are ", data);
+      // console.log("Friends are ", data);
       return data;
     }
   })
 }
+
+export const useInsertFriendRequest = () => {
+  return useMutation({
+    async mutationFn(data) {
+      const {data: status, error} = await supabase
+        .from('friend_requests')
+        .insert({
+          sender_id: data?.sender_id,
+          receiver_id: data?.receiver_id,
+          status: data?.status,
+          message: data?.message
+        });
+      if (error) {
+        console.error('Error during insertion:', error.message);
+        throw new Error(error.message);
+      }
+      console.log('New friend request is inserted', status);
+      return data;
+    },
+    async onSuccess() {
+    }
+  });
+};

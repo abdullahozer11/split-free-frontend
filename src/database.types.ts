@@ -303,6 +303,42 @@ export type Database = {
           },
         ]
       }
+      friend_requests: {
+        Row: {
+          created_at: string
+          id: number
+          receiver: string
+          sender: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          receiver: string
+          sender: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          receiver?: string
+          sender?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_requests_receiver_fkey"
+            columns: ["receiver"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friend_requests_sender_fkey"
+            columns: ["sender"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       friends: {
         Row: {
           created_at: string
@@ -345,6 +381,7 @@ export type Database = {
           description: string | null
           expense_total: number
           id: number
+          newly_created: boolean
           owner: string | null
           status: string
           title: string | null
@@ -354,6 +391,7 @@ export type Database = {
           description?: string | null
           expense_total?: number
           id?: number
+          newly_created?: boolean
           owner?: string | null
           status?: string
           title?: string | null
@@ -363,6 +401,7 @@ export type Database = {
           description?: string | null
           expense_total?: number
           id?: number
+          newly_created?: boolean
           owner?: string | null
           status?: string
           title?: string | null
@@ -426,6 +465,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           balance: number
+          email: string | null
           full_name: string | null
           id: string
           phone_number: string | null
@@ -435,6 +475,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           balance?: number
+          email?: string | null
           full_name?: string | null
           id: string
           phone_number?: string | null
@@ -444,6 +485,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           balance?: number
+          email?: string | null
           full_name?: string | null
           id?: string
           phone_number?: string | null
@@ -487,7 +529,6 @@ export type Database = {
       }
       create_group: {
         Args: {
-          profile_id_input: string
           title_input: string
           member_names_input: string[]
         }
@@ -500,6 +541,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_friends: {
+        Args: {
+          profile_id_input: string
+        }
+        Returns: {
+          id: string
+          full_name: string
+          avatar_url: string
+          balance: number
+          email: string
+        }[]
+      }
       get_selection_with_sum: {
         Args: {
           target_sum: number
@@ -507,6 +560,13 @@ export type Database = {
           balances: Database["public"]["CompositeTypes"]["balance_info"][]
         }
         Returns: Database["public"]["CompositeTypes"]["balance_info"][]
+      }
+      is_group_owner: {
+        Args: {
+          _person_id: string
+          _group_id: number
+        }
+        Returns: boolean
       }
       is_member_of: {
         Args: {
@@ -546,8 +606,8 @@ export type Database = {
           title_input: string
           description_input: string
           amount_input: number
-          currency_input: string
           date_input: string
+          currency_input: string
           proof_input: string
           payers_input: number[]
           participants_input: number[]

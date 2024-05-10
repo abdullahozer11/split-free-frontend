@@ -2,28 +2,29 @@ import {View, ScrollView, StyleSheet} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
-import {Person, SearchProfile} from "@/src/components/Person";
+import {Friend, SearchProfile} from "@/src/components/Person";
 import {Text, ActivityIndicator, ProgressBar, Searchbar} from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {supabase} from "@/src/lib/supabase";
-import {getFriends} from "@/src/api/profiles";
+import {getFriends, useInsertFriendRequest, useProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 
 
 export default function FriendScreen() {
-  const [selected, setSelected] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
   const {session} = useAuth();
+  const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id)
   const {data: friends, error, isLoading} = getFriends(session?.user.id);
+  const {mutate: insertFriendRequest} = useInsertFriendRequest();
 
-  if (isLoading) {
+  if (isLoading || profileLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (error) {
+  if (error || profileError) {
     return <Text>Failed to fetch data</Text>;
   }
 
@@ -33,7 +34,7 @@ export default function FriendScreen() {
       .from('profiles')
       .select('id, email')
       .ilike('email', `${searchQuery}%`)
-      .limit(10);
+      .range(0, 9); // eventually we ll offset as we go through the results
     if (error) {
       console.log("error is ", error.message);
       setSearchLoading(false);
@@ -41,6 +42,20 @@ export default function FriendScreen() {
     }
     setSearchResults(data);
     setSearchLoading(false);
+  };
+
+  const handleAddFriend = () => {
+    console.log("Creating friend request");
+    insertFriendRequest({
+      sender_id: null,
+      receiver_id: null,
+      status: 'pending',
+      message: null,
+    })
+  };
+
+  const handleRemoveFriend = (friend_id_input) => {
+    console.log("Removing friend: ", friend_id_input);
   };
 
   return (
@@ -65,9 +80,7 @@ export default function FriendScreen() {
           <ScrollView style={{backgroundColor: 'white'}}>
             {searchResults?.map((profile) => (
               <View key={profile.id}>
-                <SearchProfile onAdd={() => {
-                  console.log("searching profile");
-                }} profile={profile}/>
+                <SearchProfile onAdd={handleAddFriend} profile={profile}/>
               </View>
             ))}
           </ScrollView>
@@ -92,7 +105,7 @@ export default function FriendScreen() {
           </View>
           <View style={styles.personContainer}>
             {friends?.map((friend) => (
-              <Person key={friend.id}/>
+              <Friend key={friend.id} profile={friend} onRemove={() => {handleRemoveFriend(friend.id)}}/>
             ))}
           </View>
         </View>

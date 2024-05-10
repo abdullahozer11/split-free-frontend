@@ -102,7 +102,21 @@ export const SearchProfile = ({profile, onAdd}) => {
         <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{profile.email}</Text>
         <TouchableOpacity onPress={onAdd}>
-          <Feather name={'plus'} size={24} color={'green'}/>
+          <Feather name={'user-plus'} size={24}/>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+export const Friend = ({profile, onRemove}) => {
+  return (
+    <View style={styles.container}>
+      <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
+        <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{profile.email}</Text>
+        <TouchableOpacity onPress={onRemove}>
+          <Feather name={'user-x'} size={24}/>
         </TouchableOpacity>
       </View>
     </View>
