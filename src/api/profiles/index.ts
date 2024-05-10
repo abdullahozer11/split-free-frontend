@@ -68,6 +68,8 @@ export const getFriends = (uid) => {
 }
 
 export const useInsertFriendRequest = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     async mutationFn(data) {
       const {data: status, error} = await supabase
@@ -75,8 +77,6 @@ export const useInsertFriendRequest = () => {
         .insert({
           sender: data?.sender_id,
           receiver: data?.receiver_id,
-          status: data?.status,
-          message: data?.message
         });
       if (error) {
         console.error('Error during insertion:', error.message);
@@ -86,6 +86,7 @@ export const useInsertFriendRequest = () => {
       return data;
     },
     async onSuccess() {
+      await queryClient.invalidateQueries(['friends']);
     }
   });
 };

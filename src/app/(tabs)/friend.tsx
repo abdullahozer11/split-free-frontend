@@ -51,8 +51,6 @@ export default function FriendScreen() {
     insertFriendRequest({
       sender_id: session?.user.id,
       receiver_id: friend_id_input,
-      status: 'pending',
-      message: null,
     });
   };
 

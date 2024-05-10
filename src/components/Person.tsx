@@ -101,9 +101,12 @@ export const SearchProfile = ({profile, onAdd}) => {
       <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
         <Avatar.Image size={36} source={profile.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{profile.email}</Text>
-        {profile.friend_status === 'AVAILABLE' ? <TouchableOpacity onPress={() => onAdd(profile.id)}>
+        {profile.friend_status === 'AVAILABLE' && <TouchableOpacity onPress={() => onAdd(profile.id)}>
           <Feather name={'user-plus'} size={24}/>
-        </TouchableOpacity> : <Feather name={'user-check'} size={24} color={'green'}/>}
+        </TouchableOpacity>}
+        {profile.friend_status === 'FRIEND' && <Feather name={'user-check'} size={24} color={'green'}/>}
+        {profile.friend_status === 'SENT' && <Feather name={'corner-down-right'} size={24} color={'blue'}/>}
+        {profile.friend_status === 'RECEIVED' && <Feather name={'corner-down-left'} size={24} color={'blue'}/>}
       </View>
     </View>
   );
