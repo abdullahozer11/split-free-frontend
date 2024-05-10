@@ -58,6 +58,8 @@ export default function FriendScreen() {
     console.log("Removing friend: ", friend_id_input);
   };
 
+  console.log("search results are ", searchResults);
+
   return (
     <>
       <SafeAreaView style={styles.header}>
