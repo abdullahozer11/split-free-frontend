@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION search_friends(keyword_input TEXT, profile_id_input UUID, limit_input INT DEFAULT 10, offset_input INT)
+CREATE OR REPLACE FUNCTION search_friends(keyword_input TEXT, profile_id_input UUID, limit_input INT DEFAULT 10, offset_input INT DEFAULT 0)
 RETURNS TABLE (
     id UUID,
     email TEXT,
