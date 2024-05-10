@@ -81,7 +81,7 @@ export default function FriendScreen() {
           />
           <ScrollView style={{backgroundColor: 'white'}}>
             {searchResults?.map((profile) => (
-              profile.friend_status !== 'SELF' && (
+              profile.id !== session?.user.id && (
                 <View key={profile.id}>
                   <SearchProfile onAdd={handleAddFriend} profile={profile}/>
                 </View>

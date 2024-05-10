@@ -12,7 +12,6 @@ BEGIN
            p.avatar_url,
            CASE
                WHEN f.friend = profile_id_input THEN 'FRIEND'
-               WHEN p.id = profile_id_input THEN 'SELF'
                ELSE 'AVAILABLE'
            END AS friend_status
     FROM profiles p
