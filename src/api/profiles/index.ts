@@ -73,8 +73,8 @@ export const useInsertFriendRequest = () => {
       const {data: status, error} = await supabase
         .from('friend_requests')
         .insert({
-          sender_id: data?.sender_id,
-          receiver_id: data?.receiver_id,
+          sender: data?.sender_id,
+          receiver: data?.receiver_id,
           status: data?.status,
           message: data?.message
         });

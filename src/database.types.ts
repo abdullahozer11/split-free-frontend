@@ -307,20 +307,26 @@ export type Database = {
         Row: {
           created_at: string
           id: number
+          message: string | null
           receiver: string
           sender: string
+          status: string
         }
         Insert: {
           created_at?: string
           id?: number
+          message?: string | null
           receiver: string
           sender: string
+          status?: string
         }
         Update: {
           created_at?: string
           id?: number
+          message?: string | null
           receiver?: string
           sender?: string
+          status?: string
         }
         Relationships: [
           {
@@ -600,6 +606,31 @@ export type Database = {
         }
         Returns: Database["public"]["CompositeTypes"]["balance_info"][]
       }
+      search_friends:
+        | {
+            Args: {
+              keyword_input: string
+              profile_id_input: string
+            }
+            Returns: {
+              id: string
+              email: string
+              friend_status: string
+            }[]
+          }
+        | {
+            Args: {
+              keyword_input: string
+              profile_id_input: string
+              limit_input?: number
+              offset_input?: number
+            }
+            Returns: {
+              id: string
+              email: string
+              friend_status: string
+            }[]
+          }
       update_expense: {
         Args: {
           expense_id: number

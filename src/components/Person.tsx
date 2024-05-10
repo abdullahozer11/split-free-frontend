@@ -99,12 +99,11 @@ export const SearchProfile = ({profile, onAdd}) => {
   return (
     <View style={styles.container}>
       <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
-        <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Avatar.Image size={36} source={profile.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{profile.email}</Text>
-        <Text variant={"bodyLarge"}>{profile.friend_status}</Text>
-        <TouchableOpacity onPress={onAdd}>
+        {profile.friend_status === 'AVAILABLE' ? <TouchableOpacity onPress={() => onAdd(profile.id)}>
           <Feather name={'user-plus'} size={24}/>
-        </TouchableOpacity>
+        </TouchableOpacity> : <Feather name={'user-check'} size={24} color={'green'}/>}
       </View>
     </View>
   );

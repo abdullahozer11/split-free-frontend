@@ -16,7 +16,7 @@ export default function FriendScreen() {
   const [searchLoading, setSearchLoading] = useState(false);
 
   const {session} = useAuth();
-  const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id)
+  const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id);
   const {data: friends, error, isLoading} = getFriends(session?.user.id);
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
 
@@ -43,18 +43,17 @@ export default function FriendScreen() {
       return;
     }
     setSearchResults(data);
-    console.log("results are ", data);
     setSearchLoading(false);
   };
 
-  const handleAddFriend = () => {
+  const handleAddFriend = (friend_id_input) => {
     console.log("Creating friend request");
     insertFriendRequest({
-      sender_id: null,
-      receiver_id: null,
+      sender_id: session?.user.id,
+      receiver_id: friend_id_input,
       status: 'pending',
       message: null,
-    })
+    });
   };
 
   const handleRemoveFriend = (friend_id_input) => {
@@ -82,9 +81,11 @@ export default function FriendScreen() {
           />
           <ScrollView style={{backgroundColor: 'white'}}>
             {searchResults?.map((profile) => (
-              <View key={profile.id}>
-                <SearchProfile onAdd={handleAddFriend} profile={profile}/>
-              </View>
+              profile.friend_status !== 'SELF' && (
+                <View key={profile.id}>
+                  <SearchProfile onAdd={handleAddFriend} profile={profile}/>
+                </View>
+              )
             ))}
           </ScrollView>
         </View>
@@ -108,7 +109,9 @@ export default function FriendScreen() {
           </View>
           <View style={styles.personContainer}>
             {friends?.map((friend) => (
-              <Friend key={friend.id} profile={friend} onRemove={() => {handleRemoveFriend(friend.id)}}/>
+              <Friend key={friend.id} profile={friend} onRemove={() => {
+                handleRemoveFriend(friend.id);
+              }}/>
             ))}
           </View>
         </View>
