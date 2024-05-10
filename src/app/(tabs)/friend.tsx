@@ -1,13 +1,13 @@
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {Text} from '@/src/components/Themed';
+import {View, ScrollView, StyleSheet} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
 import {Person, SearchProfile} from "@/src/components/Person";
-import {ProgressBar, Searchbar} from "react-native-paper";
+import {Text, ActivityIndicator, ProgressBar, Searchbar} from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {supabase} from "@/src/lib/supabase";
-import { Menu } from 'react-native-paper';
+import {getFriends} from "@/src/api/profiles";
+import {useAuth} from "@/src/providers/AuthProvider";
 
 
 export default function FriendScreen() {
@@ -15,6 +15,17 @@ export default function FriendScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+
+  const {session} = useAuth();
+  const {data: friends, error, isLoading} = getFriends(session?.user.id);
+
+  if (isLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (error) {
+    return <Text>Failed to fetch data</Text>;
+  }
 
   const handleSearch = async () => {
     setSearchLoading(true);
@@ -45,14 +56,18 @@ export default function FriendScreen() {
             value={searchQuery}
             mode={'view'}
             style={{backgroundColor: 'white'}}
-            onClearIconPress={() => {setSearchQuery(null)}}
+            onClearIconPress={() => {
+              setSearchQuery(null);
+            }}
             onIconPress={handleSearch}
             loading={searchLoading}
           />
           <ScrollView style={{backgroundColor: 'white'}}>
             {searchResults?.map((profile) => (
               <View key={profile.id}>
-                <SearchProfile onAdd={() => {console.log("searching profile")}} profile={profile} />
+                <SearchProfile onAdd={() => {
+                  console.log("searching profile");
+                }} profile={profile}/>
               </View>
             ))}
           </ScrollView>
@@ -76,8 +91,9 @@ export default function FriendScreen() {
             <Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20}/>
           </View>
           <View style={styles.personContainer}>
-            <Person/>
-            <Person/>
+            {friends?.map((friend) => (
+              <Person key={friend.id}/>
+            ))}
           </View>
         </View>
       </View>

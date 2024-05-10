@@ -48,3 +48,21 @@ export const useProfile = (uid) => {
     }
   });
 };
+
+export const getFriends = (uid) => {
+  return useQuery({
+    queryKey: ['friends'],
+    queryFn: async () => {
+      const {data, error} = await supabase
+        .from('friends')
+        .select('friend')
+        .eq('profile', uid);
+      if (error) {
+        console.log("error is ", error.message);
+        throw new Error(error.message);
+      }
+      console.log("Friends are ", data);
+      return data;
+    }
+  })
+}
