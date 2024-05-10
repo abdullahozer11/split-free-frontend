@@ -17,9 +17,11 @@ DECLARE
     amount_dif_payer DECIMAL;
     amount_dif_participant DECIMAL;
 BEGIN
+    _group_id := NULL; -- Initialize _group_id
+
     -- pre-update clean up on balances
-    delete from balances
-    where expense = expense_id;
+    DELETE FROM balances
+    WHERE expense = expense_id;
 
     -- Get the lengths of the input arrays
     payers_length := array_length(payers_input, 1);
@@ -29,18 +31,18 @@ BEGIN
     amount_dif_payer := (amount_input / payers_length)::DECIMAL;
     amount_dif_participant := (amount_input / participants_length)::DECIMAL;
 
-    select group_id into _group_id from expenses
-    where id = expense_id;
+    SELECT group_id INTO _group_id FROM expenses
+    WHERE id = expense_id;
 
     -- Update row in expenses table
-    update expenses
-        set title = title_input,
-            description = description_input,
-            amount = amount_input,
-            currency = currency_input,
-            date = date_input,
-            proof = proof_input
-        where id = expense_id;
+    UPDATE expenses
+    SET title = title_input,
+        description = description_input,
+        amount = amount_input,
+        currency = currency_input,
+        date = date_input,
+        proof = proof_input
+    WHERE id = expense_id;
 
     -- remove deleted payers
     DELETE FROM expense_payers
@@ -70,13 +72,13 @@ BEGIN
             VALUES (expense_id, participants_input[i]);
         END IF;
         -- Insert or update balance for participant
-        begin
+        BEGIN
             INSERT INTO balances (amount, owner, group_id, expense)
             VALUES (-amount_dif_participant, participants_input[i], _group_id, expense_id);
         EXCEPTION WHEN unique_violation THEN
             UPDATE balances SET amount = amount_dif_payer - amount_dif_participant
             WHERE owner = participants_input[i] AND group_id = _group_id AND expense = expense_id;
-        end;
+        END;
     END LOOP;
 
     -- post expense actions are grouped up

@@ -124,9 +124,9 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     }, {
       onSuccess: () => {
         console.log('Successfully updated expense');
+        navigation.goBack();
       }
     });
-    navigation.goBack();
   };
 
   const onCreate = async () => {
@@ -146,9 +146,9 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     }, {
       onSuccess: () => {
         console.log("Successfully inserted expense");
+        navigation.goBack();
       }
     });
-    navigation.goBack();
   };
 
   const pickImage = async () => {
