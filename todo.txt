@@ -1,15 +1,12 @@
 Priority
 ========
-Add friends
-Invite members
-Policies for safe access to data
+Accept friend requests
+Add friends to groups
 
 Bonus
 =====
 Connect to your database from pycharm
-Be able to run queries from pycharm
 Be able to run migrations from pycharm
-Save the entire function fleet in version control
 
 Later
 =====
@@ -18,6 +15,3 @@ Setup emails
 Current bug
 ===========
 New login or signup (new user) should invalidate all queries (if not)
-Policies causing cross data access
-
-functions will be definers and will check manually inside
