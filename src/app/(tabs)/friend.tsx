@@ -6,7 +6,7 @@ import {Friend, SearchProfile} from "@/src/components/Person";
 import {Text, ActivityIndicator, ProgressBar, Searchbar} from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {supabase} from "@/src/lib/supabase";
-import {getFriends, useInsertFriendRequest, useProfile} from "@/src/api/profiles";
+import {getFriends, useInsertFriendRequest} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 
 
@@ -16,15 +16,14 @@ export default function FriendScreen() {
   const [searchLoading, setSearchLoading] = useState(false);
 
   const {session} = useAuth();
-  const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id);
   const {data: friends, error, isLoading} = getFriends(session?.user.id);
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
 
-  if (isLoading || profileLoading) {
+  if (isLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (error || profileError) {
+  if (error) {
     return <Text>Failed to fetch data</Text>;
   }
 
@@ -57,8 +56,6 @@ export default function FriendScreen() {
   const handleRemoveFriend = (friend_id_input) => {
     console.log("Removing friend: ", friend_id_input);
   };
-
-  console.log("search results are ", searchResults);
 
   return (
     <>

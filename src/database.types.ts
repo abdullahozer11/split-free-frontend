@@ -307,26 +307,20 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          message: string | null
           receiver: string
           sender: string
-          status: string
         }
         Insert: {
           created_at?: string
           id?: number
-          message?: string | null
           receiver: string
           sender: string
-          status?: string
         }
         Update: {
           created_at?: string
           id?: number
-          message?: string | null
           receiver?: string
           sender?: string
-          status?: string
         }
         Relationships: [
           {
@@ -628,6 +622,7 @@ export type Database = {
             Returns: {
               id: string
               email: string
+              avatar_url: string
               friend_status: string
             }[]
           }
