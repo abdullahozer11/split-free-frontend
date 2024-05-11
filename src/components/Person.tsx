@@ -1,5 +1,5 @@
-import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
-import {Avatar, Text} from 'react-native-paper';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {Avatar, Button, Text} from 'react-native-paper';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 
@@ -105,8 +105,8 @@ export const SearchProfile = ({profile, onAdd}) => {
           <Feather name={'user-plus'} size={24}/>
         </TouchableOpacity>}
         {profile.friend_status === 'FRIEND' && <Feather name={'user-check'} size={24} color={'green'}/>}
-        {profile.friend_status === 'SENT' && <Feather name={'corner-down-right'} size={24} color={'blue'}/>}
-        {profile.friend_status === 'RECEIVED' && <Feather name={'corner-down-left'} size={24} color={'blue'}/>}
+        {profile.friend_status === 'SENT' && <Button onPress={() => {console.log('pressed')}}>Pending</Button>}
+        {profile.friend_status === 'RECEIVED' && <Button onPress={() => {console.log('pressed')}}>Accept</Button>}
       </View>
     </View>
   );

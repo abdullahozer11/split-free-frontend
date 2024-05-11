@@ -1,5 +1,6 @@
 import {supabase} from "@/src/lib/supabase";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {uuid} from "expo-modules-core";
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
@@ -18,7 +19,7 @@ export const useUpdateProfile = () => {
         .select()
         .single();
       if (error) {
-        console.log("error is ", error);
+        console.log("errorr is ", error);
         throw new Error(error.message);
       }
       console.log("updatedProfile: ", updatedProfile);
@@ -58,7 +59,7 @@ export const getFriends = (uid) => {
           profile_id_input: uid,
         });
       if (error) {
-        console.log("error is ", error.message);
+        console.log("eerror is ", error.message);
         throw new Error(error.message);
       }
       // console.log("Friends are ", data);
@@ -84,6 +85,27 @@ export const useInsertFriendRequest = () => {
       }
       console.log('New friend request is inserted', status);
       return data;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['friends']);
+    }
+  });
+};
+
+export const useUnfriend = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(friend_id: uuid) {
+      const {error} = await supabase
+        .from('friends')
+        .delete()
+        .or(`profile.eq.${friend_id},friend.eq.${friend_id}`);
+      if (error) {
+        console.error('Error during unfriending:', error.message);
+        throw new Error(error.message);
+      }
+      console.log('Unfriend is successful');
+      return;
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['friends']);

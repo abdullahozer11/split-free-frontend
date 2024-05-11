@@ -29,7 +29,7 @@ export const useExpense = (id: number) => {
           expense_id_input: id
         });
       if (error) {
-        console.log("error is ", error.message);
+        console.log("error iss ", error.message);
         throw new Error(error.message);
       }
       // console.log("expense is ", expense);

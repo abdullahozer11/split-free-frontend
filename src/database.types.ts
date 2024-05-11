@@ -464,31 +464,37 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
-          balance: number
           email: string | null
           full_name: string | null
           id: string
           phone_number: string | null
+          total_balance: number
+          total_payable: number
+          total_receivable: number
           updated_at: string | null
           website: string | null
         }
         Insert: {
           avatar_url?: string | null
-          balance?: number
           email?: string | null
           full_name?: string | null
           id: string
           phone_number?: string | null
+          total_balance?: number
+          total_payable?: number
+          total_receivable?: number
           updated_at?: string | null
           website?: string | null
         }
         Update: {
           avatar_url?: string | null
-          balance?: number
           email?: string | null
           full_name?: string | null
           id?: string
           phone_number?: string | null
+          total_balance?: number
+          total_payable?: number
+          total_receivable?: number
           updated_at?: string | null
           website?: string | null
         }
@@ -533,6 +539,20 @@ export type Database = {
           member_names_input: string[]
         }
         Returns: number
+      }
+      debug_query: {
+        Args: {
+          profile_id_input: string
+          keyword_input: string
+          limit_input: number
+          offset_input: number
+        }
+        Returns: {
+          id: string
+          email: string
+          avatar_url: string
+          friend_status: string
+        }[]
       }
       get_debts_from: {
         Args: {
@@ -600,32 +620,20 @@ export type Database = {
         }
         Returns: Database["public"]["CompositeTypes"]["balance_info"][]
       }
-      search_friends:
-        | {
-            Args: {
-              keyword_input: string
-              profile_id_input: string
-            }
-            Returns: {
-              id: string
-              email: string
-              friend_status: string
-            }[]
-          }
-        | {
-            Args: {
-              keyword_input: string
-              profile_id_input: string
-              limit_input?: number
-              offset_input?: number
-            }
-            Returns: {
-              id: string
-              email: string
-              avatar_url: string
-              friend_status: string
-            }[]
-          }
+      search_friends: {
+        Args: {
+          keyword_input: string
+          profile_id_input: string
+          limit_input?: number
+          offset_input?: number
+        }
+        Returns: {
+          id: string
+          email: string
+          avatar_url: string
+          friend_status: string
+        }[]
+      }
       update_expense: {
         Args: {
           expense_id: number
@@ -646,6 +654,12 @@ export type Database = {
           title_input: string
           description_input: string
           member_names_input: string[]
+        }
+        Returns: undefined
+      }
+      update_profile_balance: {
+        Args: {
+          group_id_input: number
         }
         Returns: undefined
       }

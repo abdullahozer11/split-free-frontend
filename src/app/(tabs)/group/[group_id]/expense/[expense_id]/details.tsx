@@ -50,9 +50,9 @@ const ExpenseDetailsScreen = () => {
     deleteExpense(expense?.id, {
       onSuccess: () => {
         console.log("Successfully deleted expense");
+        navigation.goBack();
       }
     });
-    navigation.goBack();
   };
 
   return (

@@ -1,12 +1,12 @@
-import {View, ScrollView, StyleSheet} from 'react-native';
+import {View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
 import {Friend, SearchProfile} from "@/src/components/Person";
-import {Text, ActivityIndicator, ProgressBar, Searchbar} from "react-native-paper";
+import {Text, ActivityIndicator, ProgressBar, Searchbar, Dialog, Button, Portal} from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {supabase} from "@/src/lib/supabase";
-import {getFriends, useInsertFriendRequest} from "@/src/api/profiles";
+import {getFriends, useInsertFriendRequest, useProfile, useUnfriend} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 
 
@@ -14,16 +14,20 @@ export default function FriendScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [removingFriend, setRemovingFriend] = useState({});
 
   const {session} = useAuth();
+  const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id)
   const {data: friends, error, isLoading} = getFriends(session?.user.id);
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
+  const {mutate: unfriend} = useUnfriend();
 
-  if (isLoading) {
+  if (isLoading || profileLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (error) {
+  if (error || profileError) {
     return <Text>Failed to fetch data</Text>;
   }
 
@@ -37,7 +41,7 @@ export default function FriendScreen() {
         offset_input: 0,
       });
     if (error) {
-      console.log("error is ", error.message);
+      console.log("error iss ", error.message);
       setSearchLoading(false);
       return;
     }
@@ -53,14 +57,25 @@ export default function FriendScreen() {
     });
   };
 
-  const handleRemoveFriend = (friend_id_input) => {
-    console.log("Removing friend: ", friend_id_input);
+  const handleRemove = (friend_id) => {
+    console.log("Removing friend", friend_id);
+    unfriend(friend_id, {
+      onSuccess: () => {
+        console.log("Successfully unfriended", friend_id);
+        setIsDialogVisible(false);
+      }
+    })
   };
 
   return (
     <>
       <SafeAreaView style={styles.header}>
         <Text style={styles.title}>Friends</Text>
+        <TouchableOpacity onPress={() => {
+          console.log("notifications")
+        }} asChild>
+          <Feather style={styles.notifIcon} name={"bell"} size={36}/>
+        </TouchableOpacity>
       </SafeAreaView>
       <View style={styles.body}>
         <View style={styles.searchSection}>
@@ -90,11 +105,11 @@ export default function FriendScreen() {
           <View style={{flexDirection: "row", marginHorizontal: 15}}>
             <View style={{flex: 1}}>
               <Text style={{fontSize: 18}}>Total Receivable:</Text>
-              <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ €324.00</Text>
+              <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ €{profile?.total_receivable}</Text>
             </View>
             <View style={{flex: 1}}>
               <Text style={{fontSize: 18}}>Total Payable:</Text>
-              <Text style={{fontSize: 24, fontWeight: "bold"}}>- $254.84</Text>
+              <Text style={{fontSize: 24, fontWeight: "bold"}}>- €{profile?.total_payable}</Text>
             </View>
           </View>
           <ProgressBar animatedValue={0.7} theme={{colors: {primary: 'green'}}} style={{height: 18, borderRadius: 10}}/>
@@ -107,11 +122,30 @@ export default function FriendScreen() {
           <View style={styles.personContainer}>
             {friends?.map((friend) => (
               <Friend key={friend.id} profile={friend} onRemove={() => {
-                handleRemoveFriend(friend.id);
+                setRemovingFriend({
+                  id: friend.id,
+                  email: friend.email,
+                });
+                setIsDialogVisible(true);
               }}/>
             ))}
           </View>
         </View>
+        <Portal>
+        <Dialog visible={isDialogVisible} onDismiss={() => {
+          setIsDialogVisible(false);
+        }}>
+          <Dialog.Icon icon="alert"/>
+          <Dialog.Title>Are you sure to unfriend {removingFriend?.email}?</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">This action cannot be taken back</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+            <Button onPress={() => handleRemove(removingFriend?.id)}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
       </View>
     </>
   );
@@ -169,4 +203,7 @@ const styles = StyleSheet.create({
   searchSection: {
     marginBottom: 20,
   },
+  notifIcon: {
+    marginRight: 10,
+  }
 });
