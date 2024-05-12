@@ -68,6 +68,24 @@ export const getFriends = (uid) => {
   })
 }
 
+export const getFriendRequests = (uid) => {
+  return useQuery({
+    queryKey: ['friend_requests'],
+    queryFn: async () => {
+      const {data, error} = await supabase
+        .from('friend_requests')
+        .select()
+        .eq('receiver', uid);
+      if (error) {
+        console.log("Eerror is ", error.message);
+        throw new Error(error.message);
+      }
+      console.log("Friend requests are ", data);
+      return data;
+    }
+  })
+}
+
 export const useInsertFriendRequest = () => {
   const queryClient = useQueryClient();
 

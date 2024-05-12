@@ -2,11 +2,19 @@ import {View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
-import {Friend, SearchProfile} from "@/src/components/Person";
-import {Text, ActivityIndicator, ProgressBar, Searchbar, Dialog, Button, Portal} from "react-native-paper";
+import {Friend, NotifLine, SearchProfile} from "@/src/components/Person";
+import {
+  Text,
+  ActivityIndicator,
+  ProgressBar,
+  Searchbar,
+  Dialog,
+  Button,
+  Portal,
+} from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {supabase} from "@/src/lib/supabase";
-import {getFriends, useInsertFriendRequest, useProfile, useUnfriend} from "@/src/api/profiles";
+import {getFriendRequests, getFriends, useInsertFriendRequest, useProfile, useUnfriend} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 
 
@@ -15,19 +23,21 @@ export default function FriendScreen() {
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [removingFriend, setRemovingFriend] = useState({});
+  const [isNotifMenuVisible, setIsNotifMenuVisible] = useState(false);
+  const [removingFriend, setRemovingFriend] = useState({email: null, id: null});
 
   const {session} = useAuth();
-  const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id)
+  const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id);
   const {data: friends, error, isLoading} = getFriends(session?.user.id);
+  const {data: freqs, error: freqError, isLoading: freqIsLoading} = getFriendRequests(session?.user.id);
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
   const {mutate: unfriend} = useUnfriend();
 
-  if (isLoading || profileLoading) {
+  if (isLoading || profileLoading || freqIsLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (error || profileError) {
+  if (error || profileError || freqError) {
     return <Text>Failed to fetch data</Text>;
   }
 
@@ -64,7 +74,15 @@ export default function FriendScreen() {
         console.log("Successfully unfriended", friend_id);
         setIsDialogVisible(false);
       }
-    })
+    });
+  };
+
+  const handleAccept = () => {
+
+  };
+
+  const handleIgnore = () => {
+
   };
 
   return (
@@ -72,12 +90,17 @@ export default function FriendScreen() {
       <SafeAreaView style={styles.header}>
         <Text style={styles.title}>Friends</Text>
         <TouchableOpacity onPress={() => {
-          console.log("notifications")
+          setIsNotifMenuVisible(!isNotifMenuVisible);
         }} asChild>
           <Feather style={styles.notifIcon} name={"bell"} size={36}/>
         </TouchableOpacity>
       </SafeAreaView>
       <View style={styles.body}>
+        {isNotifMenuVisible && <View style={styles.notifications}>
+          {freqs.map((freq) => (
+            <NotifLine text={'Friend request from John'} onAccept={handleAccept} onIgnore={handleIgnore}/>
+          ))}
+        </View>}
         <View style={styles.searchSection}>
           <Searchbar
             placeholder="Search"
@@ -132,20 +155,20 @@ export default function FriendScreen() {
           </View>
         </View>
         <Portal>
-        <Dialog visible={isDialogVisible} onDismiss={() => {
-          setIsDialogVisible(false);
-        }}>
-          <Dialog.Icon icon="alert"/>
-          <Dialog.Title>Are you sure to unfriend {removingFriend?.email}?</Dialog.Title>
-          <Dialog.Content>
-            <Text variant="bodyMedium">This action cannot be taken back</Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
-            <Button onPress={() => handleRemove(removingFriend?.id)}>Ok</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+          <Dialog visible={isDialogVisible} onDismiss={() => {
+            setIsDialogVisible(false);
+          }}>
+            <Dialog.Icon icon="alert"/>
+            <Dialog.Title>Are you sure to unfriend {removingFriend.email}?</Dialog.Title>
+            <Dialog.Content>
+              <Text variant="bodyMedium">This action cannot be taken back</Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+              <Button onPress={() => handleRemove(removingFriend.id)}>Ok</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
       </View>
     </>
   );
@@ -205,5 +228,16 @@ const styles = StyleSheet.create({
   },
   notifIcon: {
     marginRight: 10,
-  }
+  },
+  notifications: {
+    backgroundColor: "white",
+    width: 300,
+    position: "absolute",
+    top: -10,
+    zIndex: 999,
+    right: 30,
+    minHeight: 120,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
 });

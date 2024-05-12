@@ -1,5 +1,5 @@
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {Avatar, Button, Text} from 'react-native-paper';
+import {Avatar, Button, Divider, Text} from 'react-native-paper';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 
@@ -126,6 +126,25 @@ export const Friend = ({profile, onRemove}) => {
   );
 };
 
+export const NotifLine = ({text, onAccept, onIgnore}) => {
+  return (
+    <>
+      <View style={styles.notifLine}>
+        <Text>{text}</Text>
+        <View style={{flexDirection: "row"}}>
+          <TouchableOpacity onPress={onAccept}>
+            <Feather name={"check"} size={24} color={"green"}/>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onIgnore}>
+            <Feather name={"x"} size={24} color={"red"}/>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Divider/>
+    </>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
@@ -144,5 +163,11 @@ const styles = StyleSheet.create({
   badge: {
     position: "absolute",
     right: 10,
+  },
+  notifLine: {
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
