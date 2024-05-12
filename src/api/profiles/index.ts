@@ -55,14 +55,14 @@ export const getFriends = (uid) => {
     queryKey: ['friends'],
     queryFn: async () => {
       const {data, error} = await supabase
-        .rpc('get_friends', {
-          profile_id_input: uid,
-        });
+        .from('friends')
+        .select('profile:friend(id, email, avatar_url)')
+        .eq('profile', uid);
       if (error) {
         console.log("eerror is ", error.message);
         throw new Error(error.message);
       }
-      // console.log("Friends are ", data);
+      console.log("Friends are ", data);
       return data;
     }
   })
@@ -80,7 +80,7 @@ export const getFriendRequests = (uid) => {
         console.log("Eerror is ", error.message);
         throw new Error(error.message);
       }
-      console.log("Friend requests are ", data);
+      // console.log("Friend requests are ", data);
       return data;
     }
   })

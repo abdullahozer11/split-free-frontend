@@ -78,11 +78,11 @@ export default function FriendScreen() {
     });
   };
 
-  const handleAccept = () => {
+  const handleAccept = (sender_uid) => {
 
   };
 
-  const handleIgnore = () => {
+  const handleIgnore = (sender_uid) => {
 
   };
 
@@ -99,7 +99,7 @@ export default function FriendScreen() {
       <View style={styles.body}>
         {isNotifMenuVisible && <View style={styles.notifications}>
           {freqs.map((freq) => (
-            <NotifLine key={freq.id} text={'Invite from ' + freq.sender_profile.email} onAccept={handleAccept} onIgnore={handleIgnore}/>
+            <NotifLine key={freq.id} text={'Invite from ' + freq.sender_profile.email} onAccept={() => handleAccept(freq.sender)} onIgnore={() => handleIgnore(freq.sender)}/>
           ))}
         </View>}
         <DebugTextInput />
@@ -145,11 +145,11 @@ export default function FriendScreen() {
             <Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20}/>
           </View>
           <View style={styles.personContainer}>
-            {friends?.map((friend) => (
-              <Friend key={friend.id} profile={friend} onRemove={() => {
+            {friends?.map(({profile: {id, email}}) => (
+              <Friend key={id} profile={profile} onRemove={() => {
                 setRemovingFriend({
-                  id: friend.id,
-                  email: friend.email,
+                  id,
+                  email,
                 });
                 setIsDialogVisible(true);
               }}/>
