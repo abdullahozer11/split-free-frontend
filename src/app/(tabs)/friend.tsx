@@ -90,6 +90,7 @@ export default function FriendScreen() {
     acceptFriend(sender_uid, {
       onSuccess: () => {
         console.log('Friend request is accepted');
+        setIsNotifMenuVisible(false);
       }
     });
   };
