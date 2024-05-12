@@ -14,7 +14,14 @@ import {
 } from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {supabase} from "@/src/lib/supabase";
-import {getFriendRequests, getFriends, useInsertFriendRequest, useProfile, useUnfriend} from "@/src/api/profiles";
+import {
+  getFriendRequests,
+  getFriends,
+  useAcceptFriend,
+  useInsertFriendRequest,
+  useProfile,
+  useUnfriend
+} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 import DebugTextInput from "@/src/components/Debug";
 
@@ -33,6 +40,7 @@ export default function FriendScreen() {
   const {data: freqs, error: freqError, isLoading: freqIsLoading} = getFriendRequests(session?.user.id);
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
   const {mutate: unfriend} = useUnfriend();
+  const {mutate: acceptFriend} = useAcceptFriend();
 
   if (isLoading || profileLoading || freqIsLoading) {
     return <ActivityIndicator/>;
@@ -78,8 +86,12 @@ export default function FriendScreen() {
     });
   };
 
-  const handleAccept = (sender_uid) => {
-
+  const handleAccept = async (sender_uid) => {
+    acceptFriend(sender_uid, {
+      onSuccess: () => {
+        console.log('Friend request is accepted');
+      }
+    });
   };
 
   const handleIgnore = (sender_uid) => {

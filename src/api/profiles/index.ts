@@ -80,7 +80,7 @@ export const getFriendRequests = (uid) => {
         console.log("Eerror is ", error.message);
         throw new Error(error.message);
       }
-      // console.log("Friend requests are ", data);
+      console.log("Friend requests are ", data);
       return data;
     }
   })
@@ -127,6 +127,29 @@ export const useUnfriend = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['friends']);
+    }
+  });
+};
+
+export const useAcceptFriend = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn(sender_uid) {
+      const {data: status, error} = await supabase
+        .rpc('accept_friend_request', {
+          sender_uid: sender_uid
+        })
+      if (error) {
+        console.error('Error during insertion:', error.message);
+        throw new Error(error.message);
+      }
+      console.log('Friend request is accepted', status);
+      return status;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['friends']);
+      await queryClient.invalidateQueries(['friend_requests']);
     }
   });
 };
