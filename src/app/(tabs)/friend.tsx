@@ -16,6 +16,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {supabase} from "@/src/lib/supabase";
 import {getFriendRequests, getFriends, useInsertFriendRequest, useProfile, useUnfriend} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
+import DebugTextInput from "@/src/components/Debug";
 
 
 export default function FriendScreen() {
@@ -101,6 +102,7 @@ export default function FriendScreen() {
             <NotifLine text={'Friend request from John'} onAccept={handleAccept} onIgnore={handleIgnore}/>
           ))}
         </View>}
+        <DebugTextInput />
         <View style={styles.searchSection}>
           <Searchbar
             placeholder="Search"

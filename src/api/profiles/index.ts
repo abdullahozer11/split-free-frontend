@@ -74,8 +74,8 @@ export const getFriendRequests = (uid) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('friend_requests')
-        .select()
-        .eq('receiver', uid);
+        .select();
+        // .eq('receiver', uid);
       if (error) {
         console.log("Eerror is ", error.message);
         throw new Error(error.message);
