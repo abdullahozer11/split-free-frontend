@@ -6,11 +6,12 @@ import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router"
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
-import {Menu, Text, Dialog, Button, Portal, ActivityIndicator} from 'react-native-paper';
+import {Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
-import {Debt, Member} from "@/src/components/Person";
-import {useProfile} from "@/src/api/profiles";
+import {Debt, Friend2, Member} from "@/src/components/Person";
+import {getFriends, useProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
+import FriendSelector from "@/src/components/FriendSelector";
 
 
 const GroupDetailsScreen = () => {
@@ -21,11 +22,13 @@ const GroupDetailsScreen = () => {
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
   const {session} = useAuth();
+  const {data: friends, error: friendsError, isLoading: friendsLoading} = getFriends(session?.user.id);
   const {data: profile, isProfileLoading, isProfileError} = useProfile(session?.user.id)
   const [totalBalance, setTotalBalance] = useState(0);
   const {mutate: deleteGroup} = useDeleteGroup();
   // menu related
   const [visible, setVisible] = React.useState(false);
+  const [isFriendSelectorVisible, setIsFriendSelectorVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -36,11 +39,11 @@ const GroupDetailsScreen = () => {
     setTotalBalance(_balance);
   }, [group]);
 
-  if (groupLoading || expenseLoading || isProfileLoading) {
+  if (groupLoading || expenseLoading || isProfileLoading || friendsLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (groupError || expenseError || isProfileError) {
+  if (groupError || expenseError || isProfileError || friendsError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
@@ -63,7 +66,7 @@ const GroupDetailsScreen = () => {
   };
 
   const promptInvite = () => {
-    console.log('invite');
+    setIsFriendSelectorVisible(true);
   };
 
   return (
@@ -80,7 +83,7 @@ const GroupDetailsScreen = () => {
               <View style={{flex: 1}}>
                 <Text style={{fontSize: 18}}>Total Receivable:</Text>
                 <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>
-                    {totalBalance > 0 ? '+' + totalBalance : totalBalance}€
+                    {totalBalance || 0}€
                 </Text>
               </View>
             </View>
@@ -104,7 +107,7 @@ const GroupDetailsScreen = () => {
               )}
             </View>
             <View style={[styles.section, {paddingBottom: 120}]}>
-              <Text variant={'titleMedium'}>Debts</Text>
+              {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
                   <Debt key={debt.id} debt={debt} members={group?.members}/>
                 )
@@ -172,6 +175,15 @@ const GroupDetailsScreen = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+      <Hidden>Start Friend Selector for invite</Hidden>
+      <Modal visible={isFriendSelectorVisible} onDismiss={() => {setIsFriendSelectorVisible(false)}} contentContainerStyle={styles.friendSelector}>
+        {friends?.map(({profile: {id, email, avatar_url}}) => (
+          <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => {
+            console.log('inviting ' + email);
+          }}/>
+        ))}
+      </Modal>
+      <Hidden>End Friend Selector for invite</Hidden>
       <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
         <Pressable style={styles.newExpenseBtn}>
           <Feather name={"plus"} size={36}/>
@@ -239,6 +251,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 0.5,
     borderStyle: "dashed",
+  },
+  friendSelector: {
+    width: '100%',
+    paddingHorizontal: 10,
+    alignSelf: "center",
+    borderRadius: 20,
   },
 });
 

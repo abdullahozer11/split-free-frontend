@@ -59,10 +59,10 @@ export const getFriends = (uid) => {
         .select('profile:friend(id, email, avatar_url)')
         .eq('profile', uid);
       if (error) {
-        console.log("eerror is ", error.message);
+        console.log("GetFriends error is ", error.message);
         throw new Error(error.message);
       }
-      console.log("Friends are ", data);
+      // console.log("Friends are ", data);
       return data;
     }
   })
@@ -74,13 +74,13 @@ export const getFriendRequests = (uid) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('friend_requests')
-        .select('sender, sender_profile:sender(email)')
+        .select('id, sender, sender_profile:sender(email)')
         .eq('receiver', uid);
       if (error) {
-        console.log("Eerror is ", error.message);
+        console.log("Get friend requests error is ", error.message);
         throw new Error(error.message);
       }
-      console.log("Friend requests are ", data);
+      // console.log("Friend requests are ", data);
       return data;
     }
   })
@@ -91,7 +91,7 @@ export const useInsertFriendRequest = () => {
 
   return useMutation({
     async mutationFn(data) {
-      const {data: status, error} = await supabase
+      const {data: _, error} = await supabase
         .from('friend_requests')
         .insert({
           sender: data?.sender_id,
@@ -101,8 +101,8 @@ export const useInsertFriendRequest = () => {
         console.error('Error during insertion:', error.message);
         throw new Error(error.message);
       }
-      console.log('New friend request is inserted', status);
-      return data;
+      console.log('New friend request is inserted');
+      return;
     },
     async onSuccess() {
       await queryClient.invalidateQueries(['friends']);

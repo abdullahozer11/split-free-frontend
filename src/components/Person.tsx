@@ -112,14 +112,28 @@ export const SearchProfile = ({profile, onAdd}) => {
   );
 };
 
-export const Friend = ({profile, onRemove}) => {
+export const Friend = ({email, avatar_url, onRemove}) => {
   return (
     <View style={styles.container}>
       <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
-        <Avatar.Image size={36} source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}/>
-        <Text variant={"bodyLarge"}>{profile.email}</Text>
+        <Avatar.Image size={36} source={avatar_url ? {uri: avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{email}</Text>
         <TouchableOpacity onPress={onRemove}>
           <Feather name={'user-x'} size={24}/>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+export const Friend2 = ({email, avatar_url, onInvite}) => {
+  return (
+    <View style={styles.container}>
+      <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
+        <Avatar.Image size={36} source={avatar_url ? {uri: avatar_url} : require('@/assets/images/blank-profile.png')}/>
+        <Text variant={"bodyLarge"}>{email}</Text>
+        <TouchableOpacity onPress={onInvite}>
+          <Feather name={'user-plus'} size={24}/>
         </TouchableOpacity>
       </View>
     </View>

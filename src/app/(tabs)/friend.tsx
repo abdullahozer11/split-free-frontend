@@ -13,7 +13,6 @@ import {
   Portal,
 } from "react-native-paper";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {supabase} from "@/src/lib/supabase";
 import {
   getFriendRequests,
   getFriends,
@@ -23,7 +22,7 @@ import {
   useUnfriend
 } from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
-import DebugTextInput from "@/src/components/Debug";
+import {supabase} from "@/src/lib/supabase";
 
 
 export default function FriendScreen() {
@@ -60,7 +59,7 @@ export default function FriendScreen() {
         offset_input: 0,
       });
     if (error) {
-      console.log("error iss ", error.message);
+      console.log("Handle Search error is ", error.message);
       setSearchLoading(false);
       return;
     }
@@ -69,10 +68,14 @@ export default function FriendScreen() {
   };
 
   const handleAddFriend = (friend_id_input) => {
-    console.log("Creating friend request");
     insertFriendRequest({
       sender_id: session?.user.id,
       receiver_id: friend_id_input,
+    }, {
+      onSuccess: () => {
+        console.log("Friend request is created.")
+        searchResults.find((sr) => sr.id == friend_id_input).friend_status = "SENT";
+      }
     });
   };
 
@@ -115,7 +118,6 @@ export default function FriendScreen() {
             <NotifLine key={freq.id} text={'Invite from ' + freq.sender_profile.email} onAccept={() => handleAccept(freq.sender)} onIgnore={() => handleIgnore(freq.sender)}/>
           ))}
         </View>}
-        <DebugTextInput />
         <View style={styles.searchSection}>
           <Searchbar
             placeholder="Search"
@@ -158,8 +160,8 @@ export default function FriendScreen() {
             <Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20}/>
           </View>
           <View style={styles.personContainer}>
-            {friends?.map(({profile: {id, email}}) => (
-              <Friend key={id} profile={profile} onRemove={() => {
+            {friends?.map(({profile: {id, email, avatar_url}}) => (
+              <Friend key={id} email={email} avatar_url={avatar_url} onRemove={() => {
                 setRemovingFriend({
                   id,
                   email,

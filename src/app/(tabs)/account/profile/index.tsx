@@ -50,7 +50,7 @@ export default function ProfileScreen() {
         </View>
         <View style={styles.transparent}>
           <Text style={styles.label}>Email</Text>
-          <Text style={styles.info}>{session?.user.email}</Text>
+          <Text style={styles.info}>{profile?.email}</Text>
         </View>
         <View style={styles.transparent}>
           <Text style={styles.label}>Phone Number</Text>
