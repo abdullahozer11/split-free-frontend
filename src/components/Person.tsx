@@ -159,6 +159,18 @@ export const NotifLine = ({text, onAccept, onIgnore}) => {
   );
 };
 
+export const GroupInvite = (props) => {
+  return (
+      <View style={styles.container}>
+        <View style={styles.subContainer}>
+          <Text>{props.sender_profile.email} invited you to {props.group.title}</Text>
+          <Feather name={'check'} onPress={() => {console.log('accepting group invite')}}/>
+          <Feather name={'x'} onPress={() => {console.log('rejecting group invite')}}/>
+        </View>
+      </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
