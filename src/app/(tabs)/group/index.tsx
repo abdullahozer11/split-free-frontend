@@ -1,24 +1,28 @@
 import {View, StyleSheet, SectionList} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useState} from "react";
-import {Text} from "@/src/components/Themed";
 import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import {useGroupList} from "@/src/api/groups";
-import {ActivityIndicator} from "react-native-paper";
+import {Text, ActivityIndicator} from "react-native-paper";
+import {Hidden} from "@/src/utils/helpers";
+import {useAuth} from "@/src/providers/AuthProvider";
+import {useGroupInvitations} from "@/src/api/profiles";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
 
   const {data: groups, error, isLoading} = useGroupList();
+  const {session} = useAuth();
+  const {data: groupInvitations, error: error2, isLoading: isLoading2} = useGroupInvitations(session?.user.id);
 
-  if (isLoading) {
+  if (isLoading || isLoading2) {
     return <ActivityIndicator/>;
   }
 
-  if (error) {
-    return <Text>Failed to fetch groups</Text>;
+  if (error || error2) {
+    return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
   function handleSearch() {
@@ -59,6 +63,13 @@ const GroupScreen = ({}) => {
           keyExtractor={(item) => item.id.toString()}
         />
         <CreateGroupModal isVisible={isModalVisible} onClose={closeModal}/>
+        <Hidden>Display pending group invitations</Hidden>
+        <View>
+          <Text variant={'labelLarge'}>Pending Group Invitations</Text>
+          {groupInvitations?.map((gi) => (
+            <Text variant={'bodyLarge'} key={gi.id}>{gi.sender} {gi.receiver}</Text>
+          ))}
+        </View>
       </View>
     </View>
   );

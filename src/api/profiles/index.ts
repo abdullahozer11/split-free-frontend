@@ -172,3 +172,21 @@ export const useInsertGroupInvitation = () => {
     }
   });
 };
+
+export const useGroupInvitations = (uid) => {
+  return useQuery({
+    queryKey: ['group_invites'],
+    queryFn: async () => {
+      const {data, error} = await supabase
+        .from('group_invitations')
+        .select('*') // todo get structured data in order to neatly display the incoming group invitation
+        .eq('receiver', uid);
+      if (error) {
+        console.log("useGroupInvitations error: ", error.message);
+        throw new Error(error.message);
+      }
+      console.log("Group invites are ", data);
+      return data;
+    }
+  })
+}
