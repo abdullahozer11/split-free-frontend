@@ -153,3 +153,22 @@ export const useAcceptFriend = () => {
     }
   });
 };
+
+export const useInsertGroupInvitation = () => {
+  return useMutation({
+    async mutationFn(data) {
+      const {data: _, error} = await supabase
+        .from('group_invitations')
+        .insert(data);
+      if (error) {
+        console.error('useInsertGroupInvitation error: ', error.message);
+        throw new Error(error.message);
+      }
+      // console.log('New group invite is inserted');
+      return;
+    },
+    async onSuccess() {
+      // invalidate something
+    }
+  });
+};

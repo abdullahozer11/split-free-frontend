@@ -9,10 +9,8 @@ import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
-import {getFriends, useProfile} from "@/src/api/profiles";
+import {getFriends, useInsertGroupInvitation, useProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
-import FriendSelector from "@/src/components/FriendSelector";
-
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
@@ -26,6 +24,7 @@ const GroupDetailsScreen = () => {
   const {data: profile, isProfileLoading, isProfileError} = useProfile(session?.user.id)
   const [totalBalance, setTotalBalance] = useState(0);
   const {mutate: deleteGroup} = useDeleteGroup();
+  const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
   // menu related
   const [visible, setVisible] = React.useState(false);
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = React.useState(false);
@@ -67,6 +66,19 @@ const GroupDetailsScreen = () => {
 
   const promptInvite = () => {
     setIsFriendSelectorVisible(true);
+  };
+
+  const handleInvite = (id) => {
+      insertGroupInvitation({
+        sender: session?.user.id,
+        receiver: id,
+        group_id: groupId
+      }, {
+        onSuccess: () => {
+          // console.log('Successfully inserted group invitation');
+          setIsFriendSelectorVisible(false);
+        }
+      })
   };
 
   return (
@@ -178,9 +190,7 @@ const GroupDetailsScreen = () => {
       <Hidden>Start Friend Selector for invite</Hidden>
       <Modal visible={isFriendSelectorVisible} onDismiss={() => {setIsFriendSelectorVisible(false)}} contentContainerStyle={styles.friendSelector}>
         {friends?.map(({profile: {id, email, avatar_url}}) => (
-          <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => {
-            console.log('inviting ' + email);
-          }}/>
+          <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)}/>
         ))}
       </Modal>
       <Hidden>End Friend Selector for invite</Hidden>
