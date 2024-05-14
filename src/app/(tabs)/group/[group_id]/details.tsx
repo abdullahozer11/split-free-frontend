@@ -130,7 +130,11 @@ const GroupDetailsScreen = () => {
             <View style={styles.section}>
               <Text variant={'titleMedium'}>Members</Text>
               {group?.members && group?.members?.map(member => (
-                  member.visible ? <Member key={member.name} member={member} assignable={!profileMember?.visible && !member.profile } onAssign={() => {handleAssign(member.id)}} /> : null
+                  member.visible ? <Member key={member.name}
+                                           member={member}
+                                           myOwnMember={member.id == profileMember.id}
+                                           assignable={!profileMember?.visible && !member.profile }
+                                           onAssign={() => {handleAssign(member.id)}} /> : null
                 )
               )}
             </View>

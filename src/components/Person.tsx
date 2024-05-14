@@ -29,7 +29,7 @@ export const Participant = ({participant, amount}) => {
   );
 };
 
-export const Member = ({member, assignable, onAssign}) => {
+export const Member = ({member, assignable, onAssign, myOwnMember}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
@@ -37,6 +37,7 @@ export const Member = ({member, assignable, onAssign}) => {
                       source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{member.name}</Text>
         {member.role === 'owner' ? <Feather style={styles.badge} name={'award'} size={24} color={'silver'}/> : null}
+        {myOwnMember && <Text variant={"labelMedium"} color={'green'} style={[styles.badge]}>Me</Text>}
         {assignable && <TouchableOpacity style={styles.badge} onPress={onAssign}>
           <Feather name={'plus-circle'} size={24} color={'green'}/>
         </TouchableOpacity>}
