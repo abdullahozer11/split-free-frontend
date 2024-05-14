@@ -33,14 +33,18 @@ export const Member = ({member, assignable, onAssign, myOwnMember}) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Avatar.Image size={36}
-                      source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
-        <Text variant={"bodyLarge"}>{member.name}</Text>
-        {member.role === 'owner' ? <Feather style={styles.badge} name={'award'} size={24} color={'silver'}/> : null}
-        {myOwnMember && <Text variant={"labelMedium"} color={'green'} style={[styles.badge]}>Me</Text>}
-        {assignable && <TouchableOpacity style={styles.badge} onPress={onAssign}>
-          <Feather name={'plus-circle'} size={24} color={'green'}/>
-        </TouchableOpacity>}
+        <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
+          <Avatar.Image size={36}
+                        source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+          <Text variant={"bodyLarge"}>{member.name}</Text>
+        </View>
+        <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
+          {myOwnMember && <Text variant={"labelMedium"} color={'green'}>Me</Text>}
+          {member.role === 'owner' ? <Feather name={'award'} size={24} color={'silver'}/> : null}
+          {assignable && <TouchableOpacity onPress={onAssign}>
+            <Feather name={'plus-circle'} size={24} color={'green'}/>
+          </TouchableOpacity>}
+        </View>
       </View>
     </View>
   );
@@ -182,10 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     gap: 10,
-  },
-  badge: {
-    position: "absolute",
-    right: 10,
+    justifyContent: "space-between",
   },
   notifLine: {
     paddingVertical: 10,
