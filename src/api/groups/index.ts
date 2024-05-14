@@ -1,6 +1,5 @@
 import {supabase} from "@/src/lib/supabase";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
-import {useAuth} from "@/src/providers/AuthProvider";
 
 
 export const useGroupList = () => {
@@ -8,8 +7,7 @@ export const useGroupList = () => {
     queryKey: ['groups'],
     queryFn: async () => {
       const {data, error} = await supabase
-        .from('groups')
-        .select('id, status, title, member_count:members(count), expenses(count)');
+        .rpc('get_groups_summary');
       if (error) {
         // console.log(error.message);
         throw new Error(error.message);

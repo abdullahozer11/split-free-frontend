@@ -12,8 +12,7 @@ const GroupItem = ({group, onAnchor}) => {
     return true;
   };
 
-  console.log('group is ', group);
-  return (<Text>Hello</Text>);
+  // console.log('group is ', group);
 
   return (
     <Link href={`/group/${group.id}/details`} asChild>
@@ -27,13 +26,13 @@ const GroupItem = ({group, onAnchor}) => {
         <View style={styles.row}>
           <View style={{flexDirection: "row"}}>
             <FontAwesome size={22} style={styles.fixWidth} name={'user'}/>
-            <Text style={{color: 'gray'}}>{group['members'][0]['count']} Friends</Text>
+            <Text style={{color: 'gray'}}>{group.member_count} Friends</Text>
           </View>
         </View>
         <View style={styles.row}>
           <View style={{flexDirection: "row"}}>
             <FontAwesome size={22} style={styles.fixWidth} name={'info'}/>
-            <Text style={{color: '#aaa'}}>{group['expenses'][0]['count']} Expenses</Text>
+            <Text style={{color: '#aaa'}}>{group.expense_count} Expenses</Text>
           </View>
           <Text style={{color: group.status === 'settled' ? 'green' : 'red'}}>{group.status}</Text>
         </View>

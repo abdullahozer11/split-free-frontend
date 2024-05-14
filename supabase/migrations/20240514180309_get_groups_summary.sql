@@ -3,8 +3,8 @@ RETURNS TABLE (
     id BIGINT,
     status TEXT,
     title TEXT,
-    expense_count INT,
-    member_count INT
+    expense_count BIGINT,
+    member_count BIGINT
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -17,7 +17,7 @@ BEGIN
     FROM
         groups g
     LEFT JOIN
-        members m ON g.id = m.group_id
+        members m ON g.id = m.group_id AND m.visible
     LEFT JOIN
         expenses e ON g.id = e.group_id
     GROUP BY
