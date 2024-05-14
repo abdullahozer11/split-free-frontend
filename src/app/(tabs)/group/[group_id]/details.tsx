@@ -9,7 +9,7 @@ import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
-import {getFriends, useInsertGroupInvitation, useProfile} from "@/src/api/profiles";
+import {getFriends, useAssignMember, useInsertGroupInvitation, useProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 
 const GroupDetailsScreen = () => {
@@ -23,7 +23,9 @@ const GroupDetailsScreen = () => {
   const {data: friends, error: friendsError, isLoading: friendsLoading} = getFriends(session?.user.id);
   const {data: profile, isProfileLoading, isProfileError} = useProfile(session?.user.id)
   const [totalBalance, setTotalBalance] = useState(0);
+  const [profileMember, setMember] = useState(null);
   const {mutate: deleteGroup} = useDeleteGroup();
+  const {mutate: assignMember} = useAssignMember();
   const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
   // menu related
   const [visible, setVisible] = React.useState(false);
@@ -34,7 +36,9 @@ const GroupDetailsScreen = () => {
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
 
   useEffect(() => {
-    const _balance = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id).total_balance || null;
+    const _member = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id);
+    const _balance = _member.total_balance || null;
+    setMember(_member);
     setTotalBalance(_balance);
   }, [group]);
 
@@ -82,7 +86,16 @@ const GroupDetailsScreen = () => {
       })
   };
 
-  // console.log('group members are ', group?.members);
+  const handleAssign = (memberId) => {
+    assignMember({
+      _profile_id: profile.id,
+      _member_id: memberId
+    }, {
+      onSuccess: () => {
+        console.log('Member assign is dealt with success');
+      }
+    })
+  };
 
   return (
     <View style={styles.container}>
@@ -117,7 +130,7 @@ const GroupDetailsScreen = () => {
             <View style={styles.section}>
               <Text variant={'titleMedium'}>Members</Text>
               {group?.members && group?.members?.map(member => (
-                  member.visible ? <Member key={member.name} member={member}/> : null
+                  member.visible ? <Member key={member.name} member={member} assignable={!profileMember?.visible && !member.profile } onAssign={() => {handleAssign(member.id)}} /> : null
                 )
               )}
             </View>

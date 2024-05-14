@@ -232,3 +232,23 @@ export const useRejectInvite = () => {
     }
   });
 };
+
+export const useAssignMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(data) {
+      console.log('input data is ', data);
+      const {data: _, error} = await supabase
+        .rpc('assign_new_member', data);
+      if (error) {
+        console.error('useAssignMember error: ', error.message);
+        throw new Error(error.message);
+      }
+      console.log('useAssignMember successfull');
+      return data;
+    },
+    async onSuccess({_group_id: groupId}) {
+      await queryClient.invalidateQueries(['members', groupId]);
+    }
+  });
+};
