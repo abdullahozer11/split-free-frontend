@@ -26,7 +26,7 @@ const GroupItem = ({group, onAnchor}) => {
         <View style={styles.row}>
           <View style={{flexDirection: "row"}}>
             <FontAwesome size={22} style={styles.fixWidth} name={'user'}/>
-            <Text style={{color: 'gray'}}>{group.member_count} Friends</Text>
+            <Text style={{color: 'gray'}}>{group.member_count} Members</Text>
           </View>
         </View>
         <View style={styles.row}>
