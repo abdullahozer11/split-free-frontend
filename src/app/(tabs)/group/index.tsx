@@ -8,6 +8,8 @@ import {Text, ActivityIndicator} from "react-native-paper";
 import {Hidden} from "@/src/utils/helpers";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useGroupInvitations} from "@/src/api/profiles";
+import {GroupInvite} from "@/src/components/Person";
+import DebugTextInput from "@/src/components/Debug";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -67,7 +69,7 @@ const GroupScreen = ({}) => {
         <View>
           <Text variant={'labelLarge'}>Pending Group Invitations</Text>
           {groupInvitations?.map((gi) => (
-            <Text variant={'bodyLarge'} key={gi.id}>{gi.sender} {gi.receiver}</Text>
+            <GroupInvite key={gi.id} invite={gi}/>
           ))}
         </View>
       </View>

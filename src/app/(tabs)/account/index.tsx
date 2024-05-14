@@ -5,6 +5,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {Link, useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
 import {useProfile} from "@/src/api/profiles";
+import {ActivityIndicator} from "react-native-paper";
 
 const Card = ({iconName, title, page}) => {
   return (
@@ -21,6 +22,14 @@ const Card = ({iconName, title, page}) => {
 const AccountScreen = () => {
   const {session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id)
+
+  if (isLoading) {
+    return <ActivityIndicator/>;
+  }
+
+  if (isError) {
+    return <Text>Failed to fetch data</Text>;
+  }
 
   const [scrollY] = useState(new Animated.Value(0));
   const headerHeight = 80;
@@ -52,7 +61,7 @@ const AccountScreen = () => {
           style={styles.avatar}/>
         <View>
           <Text style={styles.name}>{profile.full_name}</Text>
-          <Text style={styles.email}>{session?.user.email}</Text>
+          <Text style={styles.email}>{profile.email}</Text>
         </View>
       </Animated.View>
       <View style={styles.body}>

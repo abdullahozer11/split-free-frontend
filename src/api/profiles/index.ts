@@ -179,13 +179,13 @@ export const useGroupInvitations = (uid) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('group_invitations')
-        .select('*') // todo get structured data in order to neatly display the incoming group invitation
+        .select('id, group_name, sender_profile:sender(id, email)')
         .eq('receiver', uid);
       if (error) {
         console.log("useGroupInvitations error: ", error.message);
         throw new Error(error.message);
       }
-      console.log("Group invites are ", data);
+      console.log("Group invites are for uid ", uid, " is ", data);
       return data;
     }
   })

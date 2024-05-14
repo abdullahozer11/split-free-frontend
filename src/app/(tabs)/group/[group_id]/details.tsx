@@ -72,7 +72,8 @@ const GroupDetailsScreen = () => {
       insertGroupInvitation({
         sender: session?.user.id,
         receiver: id,
-        group_id: groupId
+        group_id: groupId,
+        group_name: group.title
       }, {
         onSuccess: () => {
           // console.log('Successfully inserted group invitation');

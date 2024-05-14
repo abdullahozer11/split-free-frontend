@@ -3,19 +3,6 @@ import {Avatar, Button, Divider, Text} from 'react-native-paper';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 
-export const Person = ({profile}) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.subContainer}>
-        <Avatar.Image size={36}
-                      source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
-        <Text variant={'labelMedium'}>{profile?.full_name || 'John Doe'}</Text>
-      </View>
-      <Text variant={"bodyLarge"} style={{color: "white"}}>+ €36.62</Text>
-    </View>
-  );
-};
-
 export const Payer = ({payer, amount}) => {
   return (
     <View style={styles.container}>
@@ -159,13 +146,20 @@ export const NotifLine = ({text, onAccept, onIgnore}) => {
   );
 };
 
-export const GroupInvite = (props) => {
+export const GroupInvite = ({invite}) => {
+  console.log('invite is ', invite);
   return (
       <View style={styles.container}>
         <View style={styles.subContainer}>
-          <Text>{props.sender_profile.email} invited you to {props.group.title}</Text>
-          <Feather name={'check'} onPress={() => {console.log('accepting group invite')}}/>
-          <Feather name={'x'} onPress={() => {console.log('rejecting group invite')}}/>
+          <Text>{invite.sender_profile.email} invited you to group "{invite.group_name}"</Text>
+        </View>
+        <View style={{flexDirection: "row", gap: 10, marginLeft: 10}}>
+          <TouchableOpacity style={{borderWidth: 1, borderRadius: 5, padding: 5, backgroundColor: 'green'}} onPress={() => {console.log('accepting group invite')}}>
+            <Feather name={'check'} size={24}/>
+          </TouchableOpacity>
+          <TouchableOpacity style={{borderWidth: 1, borderRadius: 5, padding: 5, backgroundColor: 'red'}} onPress={() => {console.log('rejecting group invite')}}>
+            <Feather name={'x'} size={24}/>
+          </TouchableOpacity>
         </View>
       </View>
   );

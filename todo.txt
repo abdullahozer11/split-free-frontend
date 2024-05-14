@@ -1,7 +1,7 @@
 Priority
 ========
-Accept friend requests
-Add friends to groups
+Add friends to group
+modify non-existing features such as currencies and shit.
 
 Bonus
 =====
