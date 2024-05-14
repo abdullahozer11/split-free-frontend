@@ -147,7 +147,6 @@ export const NotifLine = ({text, onAccept, onIgnore}) => {
 };
 
 export const GroupInvite = ({invite, onAccept, onReject}) => {
-  console.log('invite is ', invite);
   return (
       <View style={styles.container}>
         <View style={styles.subContainer}>

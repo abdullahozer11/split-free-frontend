@@ -9,6 +9,7 @@ import {Hidden} from "@/src/utils/helpers";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useAcceptInvite, useGroupInvitations, useRejectInvite} from "@/src/api/profiles";
 import {GroupInvite} from "@/src/components/Person";
+import DebugTextInput from "@/src/components/Debug";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -87,6 +88,7 @@ const GroupScreen = ({}) => {
         />
         <CreateGroupModal isVisible={isModalVisible} onClose={closeModal}/>
         <Hidden>Display pending group invitations</Hidden>
+        <DebugTextInput/>
         <View>
           <Text variant={'labelLarge'}>Pending Group Invitations</Text>
           {groupInvitations?.map((gi) => (

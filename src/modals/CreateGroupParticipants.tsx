@@ -1,7 +1,6 @@
 import {StyleSheet, View, Text, TextInput, Modal, Image, TouchableOpacity, Alert} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
-import {useAuth} from "@/src/providers/AuthProvider";
 
 
 const Member = ({name, onRemove, owner}) => {

@@ -179,13 +179,13 @@ export const useGroupInvitations = (uid) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('group_invitations')
-        .select('id, group_name, sender_profile:sender(id, email)')
+        .select('id, group_name, group_id, sender_profile:sender(id, email)')
         .eq('receiver', uid);
       if (error) {
         console.log("useGroupInvitations error: ", error.message);
         throw new Error(error.message);
       }
-      console.log("Group invites for uid ", uid, " is ", data);
+      // console.log("Group invites for uid ", uid, " is ", data);
       return data;
     }
   })
@@ -195,6 +195,7 @@ export const useAcceptInvite = () => {
   const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(data) {
+      // console.log('input data is ', data);
       const {data: _, error} = await supabase
         .rpc('accept_group_invite', data);
       if (error) {

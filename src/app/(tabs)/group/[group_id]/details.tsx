@@ -34,7 +34,7 @@ const GroupDetailsScreen = () => {
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
 
   useEffect(() => {
-    const _balance = group?.members.find(mb => mb.profile.id == profile?.id).total_balance || null;
+    const _balance = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id).total_balance || null;
     setTotalBalance(_balance);
   }, [group]);
 

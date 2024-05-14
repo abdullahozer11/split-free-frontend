@@ -9,7 +9,7 @@ export const useGroupList = () => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('groups')
-        .select('id, status, title, members(count), expenses(count)');
+        .select('id, status, title, member_count:members(count), expenses(count)');
       if (error) {
         // console.log(error.message);
         throw new Error(error.message);
