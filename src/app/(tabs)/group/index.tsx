@@ -87,10 +87,8 @@ const GroupScreen = ({}) => {
           keyExtractor={(item) => item.id.toString()}
         />
         <CreateGroupModal isVisible={isModalVisible} onClose={closeModal}/>
-        <Hidden>Display pending group invitations</Hidden>
-        <DebugTextInput/>
-        <View>
-          <Text variant={'labelLarge'}>Pending Group Invitations</Text>
+        <View style={{flex: 1}}>
+          {groupInvitations.length != 0 && <Text variant={'titleLarge'}>Group Invites</Text>}
           {groupInvitations?.map((gi) => (
             <GroupInvite key={gi.id} invite={gi}
                          onAccept={() => {handleAcceptInvite(gi)}}
