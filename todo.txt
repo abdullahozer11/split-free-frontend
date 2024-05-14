@@ -1,16 +1,6 @@
 Priority
 ========
-modify non-existing features such as currencies and shit.
-
-Bonus
-=====
-Connect to your database from pycharm
-Be able to run migrations from pycharm
-
-Later
-=====
-Setup emails
-
-Current bug
-===========
-New login or signup (new user) should invalidate all queries (if not)
+Member Screen
+to edit member name
+See interactions with other members
+Creating new member if not assigned already
