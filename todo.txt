@@ -1,6 +1,5 @@
 Priority
 ========
-Add friends to group
 modify non-existing features such as currencies and shit.
 
 Bonus
