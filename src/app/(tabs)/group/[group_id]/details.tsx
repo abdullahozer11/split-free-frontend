@@ -82,6 +82,8 @@ const GroupDetailsScreen = () => {
       })
   };
 
+  // console.log('group members are ', group?.members);
+
   return (
     <View style={styles.container}>
       <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
@@ -115,7 +117,7 @@ const GroupDetailsScreen = () => {
             <View style={styles.section}>
               <Text variant={'titleMedium'}>Members</Text>
               {group?.members && group?.members?.map(member => (
-                  <Member key={member.name} member={member}/>
+                  member.visible ? <Member key={member.name} member={member}/> : null
                 )
               )}
             </View>
