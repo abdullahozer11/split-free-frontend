@@ -185,8 +185,49 @@ export const useGroupInvitations = (uid) => {
         console.log("useGroupInvitations error: ", error.message);
         throw new Error(error.message);
       }
-      console.log("Group invites are for uid ", uid, " is ", data);
+      console.log("Group invites for uid ", uid, " is ", data);
       return data;
     }
   })
 }
+
+export const useAcceptInvite = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(data) {
+      const {data: _, error} = await supabase
+        .rpc('accept_group_invite', data);
+      if (error) {
+        console.error('useAcceptInvite error: ', error.message);
+        throw new Error(error.message);
+      }
+      console.log('useAcceptInvite successfull');
+      return;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['groups']);
+      await queryClient.invalidateQueries(['group_invites']);
+    }
+  });
+};
+
+export const useRejectInvite = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(invite_id) {
+      const {data, error} = await supabase
+        .from('group_invitations')
+        .delete()
+        .eq('id', invite_id);
+      if (error) {
+        console.error('useRejectInvite error: ', error.message);
+        throw new Error(error.message);
+      }
+      console.log('useRejectInvite is successfull');
+      return;
+    },
+    async onSuccess() {
+      await queryClient.invalidateQueries(['group_invites']);
+    }
+  });
+};

@@ -7,9 +7,8 @@ import {useGroupList} from "@/src/api/groups";
 import {Text, ActivityIndicator} from "react-native-paper";
 import {Hidden} from "@/src/utils/helpers";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useGroupInvitations} from "@/src/api/profiles";
+import {useAcceptInvite, useGroupInvitations, useRejectInvite} from "@/src/api/profiles";
 import {GroupInvite} from "@/src/components/Person";
-import DebugTextInput from "@/src/components/Debug";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -18,6 +17,9 @@ const GroupScreen = ({}) => {
   const {data: groups, error, isLoading} = useGroupList();
   const {session} = useAuth();
   const {data: groupInvitations, error: error2, isLoading: isLoading2} = useGroupInvitations(session?.user.id);
+
+  const {mutate: acceptInvite} = useAcceptInvite();
+  const {mutate: rejectInvite} = useRejectInvite();
 
   if (isLoading || isLoading2) {
     return <ActivityIndicator/>;
@@ -33,6 +35,25 @@ const GroupScreen = ({}) => {
 
   const closeModal = () => {
     setIsModalVisible(false);
+  };
+
+  const handleAcceptInvite = ({group_id}) => {
+    acceptInvite({
+      _profile_id: session?.user.id,
+      _group_id: group_id
+    }, {
+      onSuccess: () => {
+        console.log('Accept invite command handled successfully')
+      }
+    })
+  };
+
+  const handleRejectInvite = ({id: invite_id}) => {
+    rejectInvite(invite_id, {
+      onSuccess: () => {
+        console.log('Reject invite command handled successfully')
+      }
+    })
   };
 
   const handleAnchor = (group, anchored) => {
@@ -69,7 +90,10 @@ const GroupScreen = ({}) => {
         <View>
           <Text variant={'labelLarge'}>Pending Group Invitations</Text>
           {groupInvitations?.map((gi) => (
-            <GroupInvite key={gi.id} invite={gi}/>
+            <GroupInvite key={gi.id} invite={gi}
+                         onAccept={() => {handleAcceptInvite(gi)}}
+                         onReject={() => {handleRejectInvite(gi)}}
+            />
           ))}
         </View>
       </View>
