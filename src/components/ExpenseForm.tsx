@@ -265,24 +265,24 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             members={members}
             onChange={(participants) => handleInputChange('participants', participants)}
           />
-          <View style={{
-            flexDirection: "row",
-            gap: 15,
-            backgroundColor: 'white',
-            borderRadius: 10,
-            padding: 12,
-            alignItems: "center"
-          }}>
-            <Text>Proof of payment: (optional)</Text>
-            <Text variant={'labelLarge'} style={{
-              borderWidth: 1,
-              borderColor: 'maroon',
-              borderRadius: 5,
-              paddingHorizontal: 5,
-              paddingVertical: 3
-            }} onPress={pickImage}>Select Image </Text>
-            {image && <Avatar.Image source={{uri: image}} size={24}/>}
-          </View>
+          {/*<View style={{*/}
+          {/*  flexDirection: "row",*/}
+          {/*  gap: 15,*/}
+          {/*  backgroundColor: 'white',*/}
+          {/*  borderRadius: 10,*/}
+          {/*  padding: 12,*/}
+          {/*  alignItems: "center"*/}
+          {/*}}>*/}
+          {/*  <Text>Proof of payment: (optional)</Text>*/}
+          {/*  <Text variant={'labelLarge'} style={{*/}
+          {/*    borderWidth: 1,*/}
+          {/*    borderColor: 'maroon',*/}
+          {/*    borderRadius: 5,*/}
+          {/*    paddingHorizontal: 5,*/}
+          {/*    paddingVertical: 3*/}
+          {/*  }} onPress={pickImage}>Select Image </Text>*/}
+          {/*  {image && <Avatar.Image source={{uri: image}} size={24}/>}*/}
+          {/*</View>*/}
         </View>
       </View>
     </ScrollView>
