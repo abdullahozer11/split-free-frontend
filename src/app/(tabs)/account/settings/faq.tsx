@@ -1,11 +1,10 @@
 import {StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
-import {Text} from 'react-native-paper';
 import React from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
+import Markdown from "react-native-markdown-display";
 import {Feather} from "@expo/vector-icons";
-import {Card} from "react-native-paper";
-import {useNavigation} from "expo-router";
 import {faqText} from "@/faq";
+import {useNavigation} from "expo-router";
 
 const FAQ = () => {
   const navigation = useNavigation();
@@ -14,14 +13,14 @@ const FAQ = () => {
         <TouchableOpacity onPress={() => {navigation.goBack()}}>
           <Feather name={"arrow-left"} size={36}/>
         </TouchableOpacity>
-      <ScrollView>
-        <Card style={styles.card}>
-          <Card.Content>
-            <Text style={{alignSelf: "center"}} variant={'headlineLarge'}>FAQ</Text>
-            <Text style={styles.text}>{faqText}</Text>
-          </Card.Content>
-        </Card>
-      </ScrollView>
+      <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{height: '100%'}}
+        >
+          <Markdown>
+            {faqText}
+          </Markdown>
+        </ScrollView>
     </SafeAreaView>
   );
 };

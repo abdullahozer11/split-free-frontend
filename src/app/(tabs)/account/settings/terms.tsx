@@ -1,7 +1,7 @@
 import {ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
-import {Card, Text} from 'react-native-paper';
 import React from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
+import Markdown from "react-native-markdown-display";
 import {Feather} from "@expo/vector-icons";
 import {termsText} from "@/TermsOfUse";
 import {useNavigation} from "expo-router";
@@ -13,14 +13,14 @@ const Terms = () => {
         <TouchableOpacity onPress={() => {navigation.goBack()}}>
           <Feather name={"arrow-left"} size={36}/>
         </TouchableOpacity>
-      <ScrollView>
-        <Card style={styles.card}>
-          <Card.Content>
-            <Text style={{alignSelf: "center"}} variant={'headlineLarge'}>TERM OF USE</Text>
-            <Text style={styles.text}>{termsText}</Text>
-          </Card.Content>
-        </Card>
-      </ScrollView>
+      <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{height: '100%'}}
+        >
+          <Markdown>
+            {termsText}
+          </Markdown>
+        </ScrollView>
     </SafeAreaView>
   );
 };

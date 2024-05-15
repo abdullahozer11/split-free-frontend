@@ -23,6 +23,7 @@
     "@tanstack/react-query": "^5.28.14",
     "base64-arraybuffer": "^1.0.2",
     "dayjs": "^1.11.10",
+    "expo": "~51.0.6",
     "expo-crypto": "~13.0.2",
     "expo-device": "~6.0.2",
     "expo-file-system": "~17.0.1",
@@ -43,6 +44,7 @@
     "react-native-element-dropdown": "^2.10.4",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.16.1",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-pager-view": "6.3.0",
     "react-native-paper": "^5.12.3",
     "react-native-paper-dates": "^0.22.7",
@@ -53,8 +55,7 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.0.3",
-    "react-native-web": "~0.19.6",
-    "expo": "~51.0.6"
+    "react-native-web": "~0.19.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
