@@ -44,7 +44,7 @@ export const useProfileMember = (profileId: string, groupId: number) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('members')
-        .select('id')
+        .select('id, visible')
         .eq('profile', profileId)
         .eq('group_id', groupId)
         .single();

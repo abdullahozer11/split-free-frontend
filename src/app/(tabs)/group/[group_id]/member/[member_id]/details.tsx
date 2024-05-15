@@ -36,6 +36,8 @@ const MemberDetailsScreen = () => {
     return <Text>Failed to fetch data</Text>;
   }
 
+  const isEditable = !member?.profile || member?.id == profileMember?.id;
+
   const handleNameSubmit = () => {
     updateMemberName({
       name,
@@ -83,11 +85,11 @@ const MemberDetailsScreen = () => {
                   <Paragraph>
                     Name: {member.name}
                   </Paragraph>
-                  <TouchableOpacity onPress={() => {
+                  {isEditable && <TouchableOpacity onPress={() => {
                     setIsEditingName(true);
                   }}>
                     <Feather name={'edit'} size={20}/>
-                  </TouchableOpacity>
+                  </TouchableOpacity>}
                 </View>}
                 {isEditingName && <View style={{flexDirection: "row", alignItems: 'center'}}>
                   <TextInput
@@ -113,9 +115,9 @@ const MemberDetailsScreen = () => {
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Feather name="arrow-left" size={36} color="white" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setIsDialogVisible(true)}>
+              {isEditable && <TouchableOpacity onPress={() => setIsDialogVisible(true)}>
                 <Feather name={'trash'} size={24} color={'red'}/>
-              </TouchableOpacity>
+              </TouchableOpacity>}
             </View>
             <View style={styles.headerContent}>
               <Text variant={'displaySmall'} style={styles.headerTitle}>

@@ -153,7 +153,7 @@ const GroupDetailsScreen = () => {
                   member.visible ? <Member key={member.name}
                                            member={member}
                                            myOwnMember={member.id == profileMember?.id}
-                                           assignable={!profileMember?.visible && !member.profile }
+                                           assignable={!profileMember?.visible && !member.profile}
                                            onAssign={() => {handleAssign(member.id)}} /> : null
                 )
               )}
