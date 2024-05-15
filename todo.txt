@@ -1,6 +1,12 @@
 Priority
 ========
-Member Screen
-to edit member name
 See interactions with other members
-Creating new member if not assigned already
+Member details to show interaction with main member
+don't let edit for certain members
+other peoples members etc.
+Spending graphs
+Settings
+Themes
+Emails
+Data subscriptions
+Avatar upload should work
