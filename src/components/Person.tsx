@@ -126,7 +126,7 @@ export const Friend = ({email, avatar_url, onRemove}) => {
 
 export const Friend2 = ({email, avatar_url, onInvite}) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {borderRadius: 0}]}>
       <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
         <Avatar.Image size={36} source={avatar_url ? {uri: avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{email}</Text>

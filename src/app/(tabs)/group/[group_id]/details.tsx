@@ -5,7 +5,7 @@ import {useDeleteGroup, useGroup} from "@/src/api/groups";
 import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {Hidden, groupElementsByDay} from "@/src/utils/helpers";
+import {groupElementsByDay} from "@/src/utils/helpers";
 import {Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
@@ -100,7 +100,7 @@ const GroupDetailsScreen = () => {
     <View style={styles.container}>
       <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
         <View style={styles.content}>
-          <Hidden>First Section</Hidden>
+          {/*First Section*/}
           <View style={{padding: 20, flex: 1}}>
             <View style={{flexDirection: "row", marginHorizontal: 15, paddingBottom: 30}}>
               <View style={{flex: 1}}>
@@ -206,13 +206,16 @@ const GroupDetailsScreen = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      <Hidden>Start Friend Selector for invite</Hidden>
+      {/*Start Friend Selector for invite*/}
       <Modal visible={isFriendSelectorVisible} onDismiss={() => {setIsFriendSelectorVisible(false)}} contentContainerStyle={styles.friendSelector}>
+        <View style={{height: 20, backgroundColor: 'white'}} />
         {friends?.map(({profile: {id, email, avatar_url}}) => (
           <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)}/>
         ))}
+        <TouchableOpacity style={{position: "absolute", top: 2, right: 10}} onPress={() => {setIsFriendSelectorVisible(false)}} >
+          <Feather name={'x'} size={28}/>
+        </TouchableOpacity>
       </Modal>
-      <Hidden>End Friend Selector for invite</Hidden>
       <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
         <Pressable style={styles.newExpenseBtn}>
           <Feather name={"plus"} size={36}/>
