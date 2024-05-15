@@ -1,29 +1,29 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
-import ExpenseForm from "@/src/components/ExpenseForm";
+import MemberForm from "@/src/components/MemberForm";
 import {useLocalSearchParams} from "expo-router";
+import {useMember} from "@/src/api/members";
 import {Text, ActivityIndicator} from "react-native-paper";
-import {useExpense} from "@/src/api/expenses";
 
-export default function UpdateExpense() {
-  const {group_id: groupIdString, expense_id: expenseIdString} = useLocalSearchParams();
-  const expenseId = parseInt(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
+export default function UpdateMember() {
+  const {group_id: groupIdString, member_id: memberIdString} = useLocalSearchParams();
+  const memberId = parseInt(typeof memberIdString === 'string' ? memberIdString : memberIdString[0]);
   const group_id = parseInt(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
 
-  const {data: expense, error: expenseError, isLoading: expenseLoading} = useExpense(expenseId);
+  const {data: member, error: memberError, isLoading: memberLoading} = useMember(memberId);
 
-  if (expenseLoading) {
+  if (memberLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (expenseError) {
+  if (memberError) {
     return <Text>Failed to fetch data</Text>;
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ExpenseForm title={"Update Expense"} groupId={group_id} updatingExpense={expense}/>
+      <MemberForm title={"Update Member"} groupId={group_id} updatingMember={member}/>
     </SafeAreaView>
   );
 }

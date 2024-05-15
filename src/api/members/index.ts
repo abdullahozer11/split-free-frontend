@@ -18,3 +18,42 @@ export const useMemberList = (groupId: number) => {
     },
   });
 };
+
+export const useMember = (memberId: number) => {
+  return useQuery({
+    queryKey: ['member', memberId],
+    queryFn: async () => {
+      const {data, error} = await supabase
+        .from('members')
+        .select('*, group:group_id(title), profile(email, avatar_url)')
+        .eq('id', memberId)
+        .single();
+      if (error) {
+        console.log("useMember error: ", error.message);
+        throw new Error(error.message);
+      }
+      // console.log('useMember success: ', data);
+      return data;
+    },
+  });
+};
+
+export const useProfileMember = (profileId: string, groupId: number) => {
+  return useQuery({
+    queryKey: ['profileMember'],
+    queryFn: async () => {
+      const {data, error} = await supabase
+        .from('members')
+        .select('id')
+        .eq('profile', profileId)
+        .eq('group_id', groupId)
+        .single();
+      if (error) {
+        console.log("useProfileMember error: ", error.message);
+        throw new Error(error.message);
+      }
+      // console.log('useProfileMember success: ', data);
+      return data;
+    },
+  });
+};

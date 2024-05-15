@@ -11,6 +11,7 @@ import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
 import {getFriends, useAssignMember, useInsertGroupInvitation, useProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
+import {useProfileMember} from "@/src/api/members";
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
@@ -21,9 +22,9 @@ const GroupDetailsScreen = () => {
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
   const {session} = useAuth();
   const {data: friends, error: friendsError, isLoading: friendsLoading} = getFriends(session?.user.id);
-  const {data: profile, isProfileLoading, isProfileError} = useProfile(session?.user.id)
+  const {data: profile, error: profileError, isLoading: profileLoading} = useProfile(session?.user.id)
+  const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(profile?.id, groupId);
   const [totalBalance, setTotalBalance] = useState(0);
-  const [profileMember, setMember] = useState(null);
   const {mutate: deleteGroup} = useDeleteGroup();
   const {mutate: assignMember} = useAssignMember();
   const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
@@ -36,17 +37,15 @@ const GroupDetailsScreen = () => {
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
 
   useEffect(() => {
-    const _member = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id);
-    const _balance = _member?.total_balance || null;
-    setMember(_member);
+    const _balance = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id)?.total_balance || null;
     setTotalBalance(_balance);
   }, [group]);
 
-  if (groupLoading || expenseLoading || isProfileLoading || friendsLoading) {
+  if (groupLoading || expenseLoading || profileLoading || friendsLoading || profileMemberLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (groupError || expenseError || isProfileError || friendsError) {
+  if (groupError || expenseError || profileError || friendsError || profileMemberError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 

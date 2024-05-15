@@ -31,10 +31,10 @@ export default function ProfileScreen() {
         <TouchableOpacity onPress={() => {
           navigation.goBack();
         }}>
-          <Feather style={styles.icon} name={"x"} size={24}/>
+          <Feather name={"x"} size={30}/>
         </TouchableOpacity>
         <Link href={`/account/profile/update`}>
-          <Feather style={styles.icon} name={"edit"} size={24}/>
+          <Feather name={"edit"} size={30}/>
         </Link>
       </View>
       <Text style={styles.title}>Profile</Text>
@@ -108,9 +108,6 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  icon: {
-    fontSize: 30,
   },
   transparent: {
     backgroundColor: 'transparent',
