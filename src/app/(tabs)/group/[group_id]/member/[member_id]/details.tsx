@@ -2,9 +2,9 @@ import {Alert, StyleSheet, View, SafeAreaView, TouchableOpacity, Image} from 're
 import React, {useEffect, useState} from 'react';
 import {Link, useLocalSearchParams, useNavigation} from 'expo-router';
 import CollapsableHeader from '@/src/components/CollapsableHeader';
-import {ActivityIndicator, Text, Card, Paragraph, TextInput, Button} from 'react-native-paper';
+import {ActivityIndicator, Text, Card, Paragraph, TextInput, Button, Dialog, Portal} from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
-import {useMember, useProfileMember, useUpdateMemberName} from '@/src/api/members';
+import {useDeleteMember, useMember, useProfileMember, useUpdateMemberName} from '@/src/api/members';
 import {useAuth} from "@/src/providers/AuthProvider";
 
 const MemberDetailsScreen = () => {
@@ -13,6 +13,7 @@ const MemberDetailsScreen = () => {
   const memberId = parseInt(typeof memberIdString === 'string' ? memberIdString : memberIdString[0]);
 
   const [isEditingName, setIsEditingName] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [name, setName] = useState();
 
   const {session} = useAuth();
@@ -21,6 +22,7 @@ const MemberDetailsScreen = () => {
   const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(session?.user.id, member?.group_id);
 
   const {mutate: updateMemberName} = useUpdateMemberName();
+  const {mutate: deleteMember} = useDeleteMember();
 
   useEffect(() => {
     setName(member?.name);
@@ -47,6 +49,19 @@ const MemberDetailsScreen = () => {
         console.log('error is caught');
       }
     })
+  };
+
+  const handleDelete = () => {
+    console.log("deleting member");
+    deleteMember({
+      memberId: member?.id,
+      groupId: member?.group_id
+  }, {
+      onSuccess: () => {
+        console.log("Successfully deleted member");
+        navigation.goBack();
+      }
+    });
   };
 
   return (
@@ -98,9 +113,9 @@ const MemberDetailsScreen = () => {
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Feather name="arrow-left" size={36} color="white" />
               </TouchableOpacity>
-              <Link href={`/(tabs)/group/${member?.group_id}]/member/${member?.id}/update`}>
-                <Feather name={"edit"} style={styles.icon} size={24} color={"white"}/>
-              </Link>
+              <TouchableOpacity onPress={() => setIsDialogVisible(true)}>
+                <Feather name={'trash'} size={24} color={'red'}/>
+              </TouchableOpacity>
             </View>
             <View style={styles.headerContent}>
               <Text variant={'displaySmall'} style={styles.headerTitle}>
@@ -111,6 +126,21 @@ const MemberDetailsScreen = () => {
           </View>
         }
       />
+      <Portal>
+        <Dialog visible={isDialogVisible} onDismiss={() => {
+          setIsDialogVisible(false);
+        }}>
+          <Dialog.Icon icon="alert"/>
+          <Dialog.Title>Are you sure to delete this member?</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">This action cannot be taken back</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+            <Button onPress={handleDelete}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </SafeAreaView>
   );
 };

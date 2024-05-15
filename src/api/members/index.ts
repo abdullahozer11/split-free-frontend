@@ -107,3 +107,25 @@ export const useInsertMember = () => {
     }
   })
 }
+
+export const useDeleteMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn({memberId, groupId}) {
+      const {error} = await supabase
+        .from('members')
+        .delete()
+        .eq('id', memberId);
+      if (error) {
+        console.log('useDeleteMember error: ', error);
+        throw new Error(error.message);
+      }
+      console.log("useDeleteMember success");
+      return groupId;
+    },
+    async onSuccess(groupId) {
+      await queryClient.invalidateQueries(['members', groupId]);
+    }
+  })
+}
