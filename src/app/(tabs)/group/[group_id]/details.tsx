@@ -33,6 +33,7 @@ const GroupDetailsScreen = () => {
   const [visible, setVisible] = useState(false);
   const [isAddingNewName, setIsAddingNewName] = useState(false);
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
+  const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState('');
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -108,6 +109,7 @@ const GroupDetailsScreen = () => {
         console.log('New member addition is dealt with success');
         setNewMemberName('');
         setIsAddingNewName(false);
+        setBigPlusVisible(true);
       }
     })
   };
@@ -145,7 +147,7 @@ const GroupDetailsScreen = () => {
             <View style={styles.section}>
               <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
                 <Text variant={'titleMedium'}>Members</Text>
-                <TouchableOpacity onPress={() => {setIsAddingNewName(true)}}>
+                <TouchableOpacity onPress={() => {setIsAddingNewName(true); setBigPlusVisible(false)}}>
                   <Feather name={'plus-circle'} size={18} color={'green'}/>
                 </TouchableOpacity>
               </View>
@@ -169,23 +171,21 @@ const GroupDetailsScreen = () => {
                   <Pressable style={{marginLeft: 10}} onPress={handleNewMember}>
                     <Feather name={'check'} color={'green'} size={24}/>
                   </Pressable>
+                  <Pressable style={{marginLeft: 10}} onPress={() => {
+                    setIsAddingNewName(false);
+                    setBigPlusVisible(true);
+                  }}>
+                    <Feather name={'x'} size={24}/>
+                  </Pressable>
                 </View>
               }
             </View>
-            <View style={[styles.section, {flex: 1}]}>
+            <View style={[styles.section, {paddingBottom: 120}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
                   <Debt key={debt.id} debt={debt} members={group?.members}/>
                 )
               )}
-            </View>
-            <View style={styles.section}>
-              <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
-                <Pressable style={styles.newExpenseBtn}>
-                  <Feather name={"plus"} size={36}/>
-                  <Text variant={'titleMedium'}>Expense</Text>
-                </Pressable>
-              </Link>
             </View>
           </View>
         </View>
@@ -259,6 +259,12 @@ const GroupDetailsScreen = () => {
           <Feather name={'x'} size={28}/>
         </TouchableOpacity>
       </Modal>
+      {bigPlusVisible && <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
+        <Pressable style={styles.newExpenseBtn}>
+          <Feather name={"plus"} size={36}/>
+          <Text variant={'titleMedium'}>Expense</Text>
+        </Pressable>
+      </Link>}
     </View>
   );
 };
@@ -309,7 +315,9 @@ const styles = StyleSheet.create({
     gap: 10
   },
   newExpenseBtn: {
-    alignSelf: "flex-end",
+    position: "absolute",
+    bottom: 20,
+    right: 15,
     width: 100,
     height: 100,
     borderRadius: 50,

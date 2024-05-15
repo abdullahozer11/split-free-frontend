@@ -1,9 +1,5 @@
 Priority
 ========
-Member details to show interaction with main member
-don't let edit for certain members
-other peoples members etc.
-Spending graphs
 Settings
 Themes
 Emails
