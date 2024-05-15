@@ -172,12 +172,20 @@ const GroupDetailsScreen = () => {
                 </View>
               }
             </View>
-            <View style={[styles.section, {paddingBottom: 120}]}>
+            <View style={[styles.section, {flex: 1}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
                   <Debt key={debt.id} debt={debt} members={group?.members}/>
                 )
               )}
+            </View>
+            <View style={styles.section}>
+              <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
+                <Pressable style={styles.newExpenseBtn}>
+                  <Feather name={"plus"} size={36}/>
+                  <Text variant={'titleMedium'}>Expense</Text>
+                </Pressable>
+              </Link>
             </View>
           </View>
         </View>
@@ -251,12 +259,6 @@ const GroupDetailsScreen = () => {
           <Feather name={'x'} size={28}/>
         </TouchableOpacity>
       </Modal>
-      <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
-        <Pressable style={styles.newExpenseBtn}>
-          <Feather name={"plus"} size={36}/>
-          <Text variant={'titleMedium'}>Expense</Text>
-        </Pressable>
-      </Link>
     </View>
   );
 };
@@ -307,9 +309,7 @@ const styles = StyleSheet.create({
     gap: 10
   },
   newExpenseBtn: {
-    position: "absolute",
-    bottom: 20,
-    right: 15,
+    alignSelf: "flex-end",
     width: 100,
     height: 100,
     borderRadius: 50,
