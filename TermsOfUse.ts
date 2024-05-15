@@ -1,6 +1,4 @@
-// termsOfUse.js
 export const termsText = `
-SplitFree Terms of Use
 1. Introduction
 Welcome to SplitFree! These Terms of Use ("Terms") govern your use of the SplitFree application (the "App") created and maintained by Abdullah OZER, an individual residing in Paris, France.
 

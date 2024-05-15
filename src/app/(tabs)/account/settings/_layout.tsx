@@ -8,8 +8,8 @@ export default function SettingsStack() {
       <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
       <Stack.Screen name="currency" options={{ title: 'Currency' }} />
       <Stack.Screen name="language" options={{ title: 'Language' }} />
-      <Stack.Screen name="faq" options={{ title: 'FAQ' }} />
       <Stack.Screen name="terms" options={{ title: 'Terms and conditions' }} />
+      <Stack.Screen name="faq" options={{ title: 'FAQ' }} />
     </Stack>
   );
 }

@@ -2,9 +2,9 @@ import {ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
 import {Card, Text} from 'react-native-paper';
 import React from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
+import {Feather} from "@expo/vector-icons";
 import {termsText} from "@/TermsOfUse";
 import {useNavigation} from "expo-router";
-import {Feather} from "@expo/vector-icons";
 
 const Terms = () => {
   const navigation = useNavigation();
