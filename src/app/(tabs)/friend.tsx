@@ -23,6 +23,7 @@ import {
 } from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {supabase} from "@/src/lib/supabase";
+import DebugTextInput from "@/src/components/Debug";
 
 
 export default function FriendScreen() {
@@ -110,6 +111,11 @@ export default function FriendScreen() {
           setIsNotifMenuVisible(!isNotifMenuVisible);
         }} asChild>
           <Feather style={styles.notifIcon} name={"bell"} size={36}/>
+          {freqs?.length > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{freqs?.length}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </SafeAreaView>
       <View style={styles.body}>
@@ -260,5 +266,21 @@ const styles = StyleSheet.create({
     right: 30,
     borderWidth: 1,
     borderRadius: 10,
+  },
+  badge: {
+    position: 'absolute',
+    right: 0,
+    top: -5,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
