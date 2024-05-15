@@ -6,12 +6,12 @@ import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router"
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {groupElementsByDay} from "@/src/utils/helpers";
-import {Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
+import {TextInput, Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
 import {getFriends, useAssignMember, useInsertGroupInvitation, useProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useProfileMember} from "@/src/api/members";
+import {useInsertMember, useProfileMember} from "@/src/api/members";
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
@@ -26,11 +26,14 @@ const GroupDetailsScreen = () => {
   const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(profile?.id, groupId);
   const [totalBalance, setTotalBalance] = useState(0);
   const {mutate: deleteGroup} = useDeleteGroup();
+  const {mutate: insertMember} = useInsertMember();
   const {mutate: assignMember} = useAssignMember();
   const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
   // menu related
-  const [visible, setVisible] = React.useState(false);
-  const [isFriendSelectorVisible, setIsFriendSelectorVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
+  const [isAddingNewName, setIsAddingNewName] = useState(false);
+  const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
+  const [newMemberName, setNewMemberName] = useState('');
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -96,6 +99,19 @@ const GroupDetailsScreen = () => {
     })
   };
 
+  const handleNewMember = () => {
+    insertMember({
+      name: newMemberName,
+      group_id: groupId
+    }, {
+      onSuccess: () => {
+        console.log('New member addition is dealt with success');
+        setNewMemberName('');
+        setIsAddingNewName(false);
+      }
+    })
+  };
+
   return (
     <View style={styles.container}>
       <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
@@ -127,7 +143,12 @@ const GroupDetailsScreen = () => {
               </View>
             </View>
             <View style={styles.section}>
-              <Text variant={'titleMedium'}>Members</Text>
+              <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+                <Text variant={'titleMedium'}>Members</Text>
+                <TouchableOpacity onPress={() => {setIsAddingNewName(true)}}>
+                  <Feather name={'plus-circle'} size={18} color={'green'}/>
+                </TouchableOpacity>
+              </View>
               {group?.members && group?.members?.map(member => (
                   member.visible ? <Member key={member.name}
                                            member={member}
@@ -136,6 +157,20 @@ const GroupDetailsScreen = () => {
                                            onAssign={() => {handleAssign(member.id)}} /> : null
                 )
               )}
+              {
+                isAddingNewName &&
+                <View style={{flexDirection: 'row', alignItems: "center"}}>
+                  <TextInput
+                    value={newMemberName}
+                    onChangeText={setNewMemberName}
+                    placeholder={'Enter new member name'}
+                    style={{flex: 1, backgroundColor: 'white'}}
+                  />
+                  <Pressable style={{marginLeft: 10}} onPress={handleNewMember}>
+                    <Feather name={'check'} color={'green'} size={24}/>
+                  </Pressable>
+                </View>
+              }
             </View>
             <View style={[styles.section, {paddingBottom: 120}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}

@@ -84,3 +84,26 @@ export const useUpdateMemberName = () => {
     }
   })
 }
+
+export const useInsertMember = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn({name, group_id}) {
+      const {error} = await supabase
+        .from('members')
+        .insert({name, group_id})
+        .select()
+        .single();
+      if (error) {
+        console.log('useInsertMember error: ', error);
+        throw new Error(error.message);
+      }
+      console.log("useInsertMember success");
+      return group_id;
+    },
+    async onSuccess(group_id) {
+      await queryClient.invalidateQueries(['members', group_id]);
+    }
+  })
+}

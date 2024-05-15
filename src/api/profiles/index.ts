@@ -91,7 +91,7 @@ export const useInsertFriendRequest = () => {
 
   return useMutation({
     async mutationFn(data) {
-      const {data: _, error} = await supabase
+      const {error} = await supabase
         .from('friend_requests')
         .insert({
           sender: data?.sender_id,
@@ -157,7 +157,7 @@ export const useAcceptFriend = () => {
 export const useInsertGroupInvitation = () => {
   return useMutation({
     async mutationFn(data) {
-      const {data: _, error} = await supabase
+      const {error} = await supabase
         .from('group_invitations')
         .insert(data);
       if (error) {
@@ -196,7 +196,7 @@ export const useAcceptInvite = () => {
   return useMutation({
     async mutationFn(data) {
       // console.log('input data is ', data);
-      const {data: _, error} = await supabase
+      const {error} = await supabase
         .rpc('accept_group_invite', data);
       if (error) {
         console.error('useAcceptInvite error: ', error.message);
@@ -238,7 +238,7 @@ export const useAssignMember = () => {
   return useMutation({
     async mutationFn(data) {
       console.log('input data is ', data);
-      const {data: _, error} = await supabase
+      const {error} = await supabase
         .rpc('assign_new_member', data);
       if (error) {
         console.error('useAssignMember error: ', error.message);
