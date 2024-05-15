@@ -1,28 +1,25 @@
 import {StyleSheet, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
-import {useLocalSearchParams, useNavigation, useRouter} from 'expo-router';
+import {Link, useLocalSearchParams, useNavigation} from 'expo-router';
 import CollapsableHeader from '@/src/components/CollapsableHeader';
 import { ActivityIndicator, Text, Card, Paragraph } from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
 import {useMember, useProfileMember} from '@/src/api/members';
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useProfile} from "@/src/api/profiles";
 
 const MemberDetailsScreen = () => {
   const navigation = useNavigation();
-  const router = useRouter();
   const {member_id: memberIdString} = useLocalSearchParams();
   const memberId = parseInt(typeof memberIdString === 'string' ? memberIdString : memberIdString[0]);
-  const {data: member, error: memberError, isLoading: memberLoading } = useMember(memberId);
   const {session} = useAuth();
-  const {data: profile, isLoading, isError} = useProfile(session?.user.id);
-  const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(profile?.id, member?.group_id);
+  const {data: member, error: memberError, isLoading: memberLoading } = useMember(memberId);
+  const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(session?.user.id, member?.group_id);
 
-  if (isLoading || memberLoading || profileMemberLoading) {
+  if (memberLoading || profileMemberLoading) {
     return <ActivityIndicator />;
   }
 
-  if (isError || memberError || profileMemberError) {
+  if (memberError || profileMemberError) {
     return <Text>Failed to fetch data</Text>;
   }
 
@@ -37,15 +34,6 @@ const MemberDetailsScreen = () => {
           <View style={styles.content}>
             <Card>
               <Card.Content>
-                <TouchableOpacity style={{position: "absolute", top: 10, right: 10}} onPress={() => {
-                  router.push({
-                    pathname: "/(tabs)/group/[group_id]/member/[member_id]/update",
-                    params: {group_id: member?.group_id, member_id: member?.id}
-                  });
-                }
-                }>
-                  <Feather style={styles.icon} name={"edit"} size={24}/>
-                </TouchableOpacity>
                 <View style={styles.avatarContainer}>
                   <Image
                     source={member.profile?.avatar_url ? {uri: member.profile.avatar_url} : require('@/assets/images/blank-profile.png')}
@@ -66,6 +54,9 @@ const MemberDetailsScreen = () => {
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Feather name="arrow-left" size={36} color="white" />
               </TouchableOpacity>
+              <Link href={`/(tabs)/group/${member?.group_id}]/member/${member?.id}/update`}>
+                <Feather name={"edit"} style={styles.icon} size={24} color={"white"}/>
+              </Link>
             </View>
             <View style={styles.headerContent}>
               <Text variant={'displaySmall'} style={styles.headerTitle}>

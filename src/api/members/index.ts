@@ -40,7 +40,7 @@ export const useMember = (memberId: number) => {
 
 export const useProfileMember = (profileId: string, groupId: number) => {
   return useQuery({
-    queryKey: ['profileMember'],
+    queryKey: ['profileMember', groupId],
     queryFn: async () => {
       const {data, error} = await supabase
         .from('members')
@@ -55,5 +55,6 @@ export const useProfileMember = (profileId: string, groupId: number) => {
       // console.log('useProfileMember success: ', data);
       return data;
     },
+    enabled: !!profileId && !!groupId, // Ensure the query is only enabled when both profileId and groupId are defined
   });
 };

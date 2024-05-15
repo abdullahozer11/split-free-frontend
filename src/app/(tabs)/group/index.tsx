@@ -5,11 +5,9 @@ import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import {useGroupList} from "@/src/api/groups";
 import {Text, ActivityIndicator} from "react-native-paper";
-import {Hidden} from "@/src/utils/helpers";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useAcceptInvite, useGroupInvitations, useRejectInvite} from "@/src/api/profiles";
 import {GroupInvite} from "@/src/components/Person";
-import DebugTextInput from "@/src/components/Debug";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
