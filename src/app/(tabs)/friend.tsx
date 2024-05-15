@@ -139,6 +139,11 @@ export default function FriendScreen() {
                 </View>
               )
             ))}
+            {!!searchResults.length && <View style={{flex: 1, alignItems: "center"}}>
+              <TouchableOpacity onPress={() => setSearchResults([])}>
+                <Feather name={'chevrons-up'} size={24}/>
+              </TouchableOpacity>
+            </View>}
           </ScrollView>
         </View>
         <View style={styles.balanceSection}>
