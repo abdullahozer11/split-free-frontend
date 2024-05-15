@@ -1,5 +1,5 @@
 import {supabase} from "@/src/lib/supabase";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 
 export const useMemberList = (groupId: number) => {
@@ -58,3 +58,29 @@ export const useProfileMember = (profileId: string, groupId: number) => {
     enabled: !!profileId && !!groupId, // Ensure the query is only enabled when both profileId and groupId are defined
   });
 };
+
+
+export const useUpdateMemberName = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    async mutationFn({name, member_id}) {
+      const {data: newMember, error} = await supabase
+        .from('members')
+        .update({name})
+        .eq('id', member_id)
+        .select()
+        .single();
+      if (error) {
+        console.log('useUpdateMemberName error: ', error);
+        throw new Error(error.message);
+      }
+      console.log("member name is updated");
+      return newMember;
+    },
+    async onSuccess({id, group_id}) {
+      await queryClient.invalidateQueries(['member', id]);
+      await queryClient.invalidateQueries(['members', group_id]);
+    }
+  })
+}

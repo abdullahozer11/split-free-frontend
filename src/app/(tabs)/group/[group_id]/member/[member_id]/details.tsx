@@ -1,19 +1,30 @@
-import {StyleSheet, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
-import React from 'react';
+import {Alert, StyleSheet, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {Link, useLocalSearchParams, useNavigation} from 'expo-router';
 import CollapsableHeader from '@/src/components/CollapsableHeader';
-import { ActivityIndicator, Text, Card, Paragraph } from 'react-native-paper';
+import {ActivityIndicator, Text, Card, Paragraph, TextInput, Button} from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
-import {useMember, useProfileMember} from '@/src/api/members';
+import {useMember, useProfileMember, useUpdateMemberName} from '@/src/api/members';
 import {useAuth} from "@/src/providers/AuthProvider";
 
 const MemberDetailsScreen = () => {
   const navigation = useNavigation();
   const {member_id: memberIdString} = useLocalSearchParams();
   const memberId = parseInt(typeof memberIdString === 'string' ? memberIdString : memberIdString[0]);
+
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [name, setName] = useState();
+
   const {session} = useAuth();
+
   const {data: member, error: memberError, isLoading: memberLoading } = useMember(memberId);
   const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(session?.user.id, member?.group_id);
+
+  const {mutate: updateMemberName} = useUpdateMemberName();
+
+  useEffect(() => {
+    setName(member?.name);
+  }, [member]);
 
   if (memberLoading || profileMemberLoading) {
     return <ActivityIndicator />;
@@ -23,7 +34,20 @@ const MemberDetailsScreen = () => {
     return <Text>Failed to fetch data</Text>;
   }
 
-  // console.log('member is ', member);
+  const handleNameSubmit = () => {
+    updateMemberName({
+      name,
+      member_id: memberId
+    }, {
+      onSuccess: () => {
+        console.log('member name update is dealt with success');
+        setIsEditingName(false);
+      },
+      onError: () => {
+        console.log('error is caught');
+      }
+    })
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,7 +64,27 @@ const MemberDetailsScreen = () => {
                     style={styles.avatar}/>
                 </View>
                 <Paragraph>Group: {member.group.title}</Paragraph>
-                <Paragraph>Name: {member.name}</Paragraph>
+                {!isEditingName && <View style={{flexDirection: "row", gap: 5}}>
+                  <Paragraph>
+                    Name: {member.name}
+                  </Paragraph>
+                  <TouchableOpacity onPress={() => {
+                    setIsEditingName(true);
+                  }}>
+                    <Feather name={'edit'} size={20}/>
+                  </TouchableOpacity>
+                </View>}
+                {isEditingName && <View style={{flexDirection: "row", alignItems: 'center'}}>
+                  <TextInput
+                    placeholder="Enter query key"
+                    onChangeText={setName}
+                    value={name}
+                    style={{flex: 1, backgroundColor: "beige"}}
+                  />
+                  <Button onPress={handleNameSubmit}>
+                    <Feather name={'check'} size={26} />
+                  </Button>
+                </View>}
                 <Paragraph>Attached to Profile: {member.profile?.email || 'None'}</Paragraph>
                 <Paragraph>Role: {member.role} {member.role === 'owner' ? <Feather name={'award'} size={18} color={'silver'}/> : null}</Paragraph>
                 <Paragraph>Total Balance: <Paragraph style={{color: member.total_balance >= 0 ? 'green' : 'red'}}>${member.total_balance}</Paragraph></Paragraph>
