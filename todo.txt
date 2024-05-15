@@ -1,6 +1,5 @@
 Priority
 ========
-See interactions with other members
 Member details to show interaction with main member
 don't let edit for certain members
 other peoples members etc.

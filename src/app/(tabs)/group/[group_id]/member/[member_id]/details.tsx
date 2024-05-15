@@ -6,6 +6,7 @@ import {ActivityIndicator, Text, Card, Paragraph, TextInput, Button, Dialog, Por
 import { Feather } from '@expo/vector-icons';
 import {useDeleteMember, useMember, useProfileMember, useUpdateMemberName} from '@/src/api/members';
 import {useAuth} from "@/src/providers/AuthProvider";
+import {useDebt} from "@/src/api/debts";
 
 const MemberDetailsScreen = () => {
   const navigation = useNavigation();
@@ -20,6 +21,7 @@ const MemberDetailsScreen = () => {
 
   const {data: member, error: memberError, isLoading: memberLoading } = useMember(memberId);
   const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(session?.user.id, member?.group_id);
+  const {data: debt, error: debtError, isLoading: debtLoading } = useDebt(memberId, profileMember?.id);
 
   const {mutate: updateMemberName} = useUpdateMemberName();
   const {mutate: deleteMember} = useDeleteMember();
@@ -28,15 +30,16 @@ const MemberDetailsScreen = () => {
     setName(member?.name);
   }, [member]);
 
-  if (memberLoading || profileMemberLoading) {
+  if (memberLoading || profileMemberLoading || debtLoading) {
     return <ActivityIndicator />;
   }
 
-  if (memberError || profileMemberError) {
+  if (memberError || profileMemberError || debtError) {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const isEditable = !member?.profile || member?.id == profileMember?.id;
+  const ownMember = member?.id == profileMember?.id;
+  const isEditable = !member?.profile || ownMember;
 
   const handleNameSubmit = () => {
     updateMemberName({
@@ -105,6 +108,7 @@ const MemberDetailsScreen = () => {
                 <Paragraph>Attached to Profile: {member.profile?.email || 'None'}</Paragraph>
                 <Paragraph>Role: {member.role} {member.role === 'owner' ? <Feather name={'award'} size={18} color={'silver'}/> : null}</Paragraph>
                 <Paragraph>Total Balance: <Paragraph style={{color: member.total_balance >= 0 ? 'green' : 'red'}}>${member.total_balance}</Paragraph></Paragraph>
+                  {!ownMember && debt && (debt.amount >= 0 ? <Paragraph>Owes you: €{debt.amount}</Paragraph> : <Paragraph>You owe: €{debt.amount}</Paragraph>)}
               </Card.Content>
             </Card>
           </View>
