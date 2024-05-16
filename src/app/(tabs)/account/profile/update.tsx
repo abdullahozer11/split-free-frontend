@@ -87,7 +87,7 @@ export default function UpdateProfile() {
             source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
             style={styles.avatar}/>
         </View>
-        <Text onPress={pickImage} style={styles.pickImageButton}> Select Image </Text>
+        {/*<Text onPress={pickImage} style={styles.pickImageButton}> Select Image </Text>*/}
         <View style={styles.inputSection}>
           <View style={styles.transparent}>
             <Text style={styles.label}>Full Name</Text>

@@ -1,7 +1,5 @@
 Priority
 ========
-Settings
-Themes
-Data subscriptions
 Avatar upload should work
+Data subscriptions
 AI category embeddings
