@@ -45,22 +45,22 @@ const SettingsScreen = () => {
         <SettingsItem page={'language'} containerColor={'darkorange'} iconName={'globe'} title={'Language'}/>
         <SettingsItem page={'faq'} containerColor={'orange'} iconName={'help-circle'} title={'FAQ'}/>
         <SettingsItem page={'terms'} containerColor={'blue'} iconName={'check'} title={'Term of Use'}/>
-        <View style={styles.settingsItemRow}>
-          <View style={styles.innerRow}>
-            <View style={[styles.settingsItemIconContainer, {backgroundColor: "black"}]}>
-              <Feather name={"moon"} size={24} color={'white'}/>
-            </View>
-            <Text>Dark mode</Text>
-          </View>
-          <Switch
-            thumbColor={darkThemeOn ? 'darkgrey' : 'yellow'}
-            trackColor={{true: 'orange', false: 'darkgrey'}}
-            onValueChange={() => {
-              setDarkThemeOn(!darkThemeOn);
-            }}
-            value={darkThemeOn}
-          />
-        </View>
+        {/*<View style={styles.settingsItemRow}>*/}
+        {/*  <View style={styles.innerRow}>*/}
+        {/*    <View style={[styles.settingsItemIconContainer, {backgroundColor: "black"}]}>*/}
+        {/*      <Feather name={"moon"} size={24} color={'white'}/>*/}
+        {/*    </View>*/}
+        {/*    <Text>Dark mode</Text>*/}
+        {/*  </View>*/}
+        {/*  <Switch*/}
+        {/*    thumbColor={darkThemeOn ? 'darkgrey' : 'yellow'}*/}
+        {/*    trackColor={{true: 'orange', false: 'darkgrey'}}*/}
+        {/*    onValueChange={() => {*/}
+        {/*      setDarkThemeOn(!darkThemeOn);*/}
+        {/*    }}*/}
+        {/*    value={darkThemeOn}*/}
+        {/*  />*/}
+        {/*</View>*/}
       </View>
       <View style={styles.footer}>
         <Text onPress={handleSignOut} style={styles.logout}>
