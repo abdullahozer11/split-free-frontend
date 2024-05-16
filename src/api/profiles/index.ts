@@ -252,3 +252,29 @@ export const useAssignMember = () => {
     }
   });
 };
+
+export const useUpdateProfileSingleField = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, field, value }) => {
+      const updates = {};
+      updates[field] = value;
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) {
+        console.log("useUpdateProfileSingleField error: ", error);
+        throw new Error(error.message);
+      }
+      // console.log("useUpdateProfileSingleField success");
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['profile']);
+    }
+  });
+};

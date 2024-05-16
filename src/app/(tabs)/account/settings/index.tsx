@@ -42,14 +42,13 @@ const SettingsScreen = () => {
       <Text variant={"headlineLarge"}>Settings</Text>
       <View>
         <SettingsItem page={'notifications'} containerColor={'blue'} iconName={'bell'} title={'Notifications'}/>
-        <SettingsItem page={'currency'} containerColor={'lightblue'} iconName={'dollar-sign'} title={'Currency'}/>
         <SettingsItem page={'language'} containerColor={'darkorange'} iconName={'globe'} title={'Language'}/>
         <SettingsItem page={'faq'} containerColor={'orange'} iconName={'help-circle'} title={'FAQ'}/>
         <SettingsItem page={'terms'} containerColor={'blue'} iconName={'check'} title={'Term of Use'}/>
         <View style={styles.settingsItemRow}>
           <View style={styles.innerRow}>
             <View style={[styles.settingsItemIconContainer, {backgroundColor: "black"}]}>
-              <Feather name={"moon"} size={24}/>
+              <Feather name={"moon"} size={24} color={'white'}/>
             </View>
             <Text>Dark mode</Text>
           </View>

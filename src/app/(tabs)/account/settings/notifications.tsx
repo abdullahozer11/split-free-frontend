@@ -3,8 +3,7 @@ import {StyleSheet, TouchableOpacity, View} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {Text, Switch, ActivityIndicator} from "react-native-paper";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useProfile} from "@/src/api/profiles";
-import {supabase} from "@/src/lib/supabase";
+import {useProfile, useUpdateProfileSingleField} from "@/src/api/profiles";
 import {Feather} from "@expo/vector-icons";
 import {useNavigation} from "expo-router";
 
@@ -17,10 +16,12 @@ const Notifications = () => {
   const {session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id);
 
+  const {mutate: updateProfileSF} = useUpdateProfileSingleField();
+
   useEffect(() => {
     setEmailNotifications(profile?.receive_emails);
     setMobilePopups(profile?.receive_popups);
-  }, [profile]);
+  }, []);
 
   if (isLoading) {
     return <ActivityIndicator/>;
@@ -30,34 +31,40 @@ const Notifications = () => {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const handleEmailNotifChange = async () => {
-    const {error} = await supabase
-      .from('profiles')
-      .update({
-        receive_emails: !emailNotifications
-      })
-      .eq('id', profile?.id);
-    if (error) {
-      console.log('handleEmailNotifChange error: ', error);
-      throw new Error(error.message);
-    }
-    console.log('handleEmailNotifChange success')
-    setEmailNotifications(!emailNotifications);
+  const handleEmailNotifChange = () => {
+    const newValueTemp = !emailNotifications;
+    setEmailNotifications(newValueTemp);
+    updateProfileSF({
+        id: profile?.id,
+        field: 'receive_emails',
+        value: !emailNotifications
+      }, {
+        onSuccess: () => {
+          // console.log('handleEmailNotifChange success');
+        },
+        onError: () => {
+          setEmailNotifications(!newValueTemp);
+        }
+      }
+    );
   };
 
-  const handlePopupChange = async () => {
-    const {error} = await supabase
-      .from('profiles')
-      .update({
-        receive_popups: !mobilePopups
-      })
-      .eq('id', profile?.id);
-    if (error) {
-      console.log('handlePopupChange error', error);
-      throw new Error(error.message);
-    }
-    console.log('handlePopupChange success')
-    setMobilePopups(!mobilePopups);
+  const handlePopupChange = () => {
+    const newValueTemp = !mobilePopups;
+    setMobilePopups(newValueTemp);
+    updateProfileSF({
+        id: profile?.id,
+        field: 'receive_popups',
+        value: newValueTemp
+      }, {
+        onSuccess: () => {
+          // console.log('handlePopupChange success');
+        },
+        onError: () => {
+          setMobilePopups(!newValueTemp);
+        }
+      }
+    );
   };
 
   return (
