@@ -2,6 +2,6 @@ Priority
 ========
 Settings
 Themes
-Emails
 Data subscriptions
 Avatar upload should work
+AI category embeddings
