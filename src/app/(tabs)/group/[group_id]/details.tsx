@@ -31,7 +31,7 @@ const GroupDetailsScreen = () => {
   const {session} = useAuth();
   const {data: friends, error: friendsError, isLoading: friendsLoading} = getFriends(session?.user.id);
   const {data: profile, error: profileError, isLoading: profileLoading} = useProfile(session?.user.id)
-  const {data: pendingInvites, error: pInviteError, isLoading: pInviteLoading} = usePendingGroupInvitesForGroup(groupId); // fixme use to not repeat invite on same user
+  const {data: pendingInvites, error: pInviteError, isLoading: pInviteLoading} = usePendingGroupInvitesForGroup(groupId);
   const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(profile?.id, groupId);
   const [totalBalance, setTotalBalance] = useState(0);
   const {mutate: deleteGroup} = useDeleteGroup();
@@ -121,6 +121,11 @@ const GroupDetailsScreen = () => {
       }
     })
   };
+
+  // todo need to add a field to friends list so that each friend has a field that is "membershipStatus equal to member or invited or available"
+  console.log('friends are', friends);
+  console.log('pending invites are', pendingInvites);
+  console.log('members are', group?.members);
 
   return (
     <View style={styles.container}>
