@@ -34,7 +34,7 @@ export const Member = ({member, assignable, onAssign, myOwnMember}) => {
   return (
     <Link href={`/(tabs)/group/${member.group_id}/member/${member.id}/details`} asChild>
       <Pressable style={styles.container}>
-        <View style={styles.subContainer}>
+        <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
           <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
             <Avatar.Image size={36}
                           source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>

@@ -72,7 +72,7 @@ const UpdateGroup = () => {
     updateGroup({
       group_id_input: existingGroup.id,
       title_input: title,
-      description_input: description,
+      description_input: description ?? '',
       member_names_input: namesOnly,
     }, {
       onSuccess: async () => {

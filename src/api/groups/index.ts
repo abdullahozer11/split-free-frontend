@@ -83,7 +83,6 @@ export const useUpdateGroup = () => {
         console.error('useUpdateGroup error:', error);
         throw new Error(error.message);
       }
-      return;
     },
   });
 };
