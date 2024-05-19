@@ -207,7 +207,7 @@ const GroupDetailsScreen = () => {
               <Menu
                 visible={visible}
                 onDismiss={closeMenu}
-                contentStyle={{backgroundColor: "white"}}
+                contentStyle={{marginTop: 40, backgroundColor: "white"}}
                 anchor={
                   <TouchableOpacity onPress={openMenu}>
                     <Feather name="more-horizontal" size={36} color="gold"/>

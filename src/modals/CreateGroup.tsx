@@ -14,8 +14,10 @@ import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertGroup} from "@/src/api/groups";
 import {useProfile} from "@/src/api/profiles";
 import {ActivityIndicator} from "react-native-paper";
+import {useQueryClient} from "@tanstack/react-query";
 
 const CreateGroupModal = ({isVisible, onClose}) => {
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
   const [error, setError] = useState('');
@@ -57,9 +59,10 @@ const CreateGroupModal = ({isVisible, onClose}) => {
       title,
       member_names: members,
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         resetFields();
         onClose();
+        await queryClient.invalidateQueries(['groups']);
       },
     })
   };

@@ -6,6 +6,7 @@ import {DeletableMember} from "@/src/components/Person";
 import {useGroup, useUpdateGroup} from "@/src/api/groups";
 import {Feather} from "@expo/vector-icons";
 import {SafeAreaView} from "react-native-safe-area-context";
+import {useQueryClient} from "@tanstack/react-query";
 
 const UpdateGroup = () => {
   const {group_id: idString} = useLocalSearchParams();
@@ -14,6 +15,7 @@ const UpdateGroup = () => {
   const [removingMemberId, setRemovingMemberId] = useState(null);
   const [removingMemberName, setRemovingMemberName] = useState(null);
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -68,16 +70,19 @@ const UpdateGroup = () => {
     const namesOnly: string[] = existingMembers.map(member => member.name);
 
     updateGroup({
-      group_id: existingGroup.id,
-      title: title,
-      description: description,
-      member_names: namesOnly,
+      group_id_input: existingGroup.id,
+      title_input: title,
+      description_input: description,
+      member_names_input: namesOnly,
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log("Group updated successfully");
+        navigation.goBack();
+        await queryClient.invalidateQueries(['groups']);
+        await queryClient.invalidateQueries(['group', existingGroup.id]);
+        await queryClient.invalidateQueries(['members', existingGroup.id]);
       },
     });
-    navigation.goBack();
   };
 
   const addNewMember = () => {

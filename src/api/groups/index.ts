@@ -57,50 +57,33 @@ export const useDeleteGroup = () => {
 };
 
 export const useInsertGroup = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(data) {
-      // console.log('Data received for insertion:', data);
       const {data: newGroupID, error} = await supabase
         .rpc('create_group', {
           member_names_input: data.member_names,
           title_input: data.title
         });
       if (error) {
-        console.error('Error during insertion:', error);
+        console.error('useInsertGroup error:', error);
         throw new Error(error.message);
       }
-      console.log('New group inserted:', newGroupID);
+      console.log('useInsertGroup success:', newGroupID);
       return newGroupID;
     },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['groups']);
-    }
   });
 };
 
 export const useUpdateGroup = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(newGroup) {
       const {error} = await supabase
-        .rpc('update_group', {
-          member_names_input: data.member_names,
-          group_id_input: data.group_id,
-          description_input: data.description,
-          title_input: data.title,
-        });
+        .rpc('update_group', newGroup);
       if (error) {
-        console.error('Error during update:', error);
+        console.error('useUpdateGroup error:', error);
         throw new Error(error.message);
       }
-      return data.group_id;
+      return;
     },
-    async onSuccess(groupID) {
-      await queryClient.invalidateQueries(['groups']);
-      await queryClient.invalidateQueries(['group', groupID]);
-      await queryClient.invalidateQueries(['members', groupID]);
-    }
   });
 };
