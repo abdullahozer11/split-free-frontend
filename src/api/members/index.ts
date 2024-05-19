@@ -11,9 +11,10 @@ export const useMemberList = (groupId: number) => {
         .select('id, name, profile')
         .eq('group_id', groupId);
       if (error) {
-        // console.log(error.message);
+        console.log("useMemberList error: ", error.message);
         throw new Error(error.message);
       }
+      // console.log("useMemberList success: ", data);
       return data;
     },
   });

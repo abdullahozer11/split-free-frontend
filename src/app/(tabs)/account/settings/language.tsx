@@ -7,9 +7,11 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useProfile, useUpdateProfileSingleField} from "@/src/api/profiles";
+import {useQueryClient} from "@tanstack/react-query";
 
 const Languages = () => {
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const [language, setLanguage] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const data = [
@@ -43,8 +45,9 @@ const Languages = () => {
       field: 'language',
       value: newValue
     }, {
-        onSuccess: () => {
+        onSuccess: async () => {
           // console.log('handleValueChange success');
+          await queryClient.invalidateQueries(['profile']);
         },
         onError: () => {
           setLanguage(lanTemp);

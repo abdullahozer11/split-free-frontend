@@ -8,9 +8,9 @@ const DebugTextInput = () => {
   const [queryKey, setQueryKey] = useState('');
   const queryClient = useQueryClient();
 
-  const handleInvalidateQuery = () => {
+  const handleInvalidateQuery = async () => {
     if (queryKey) {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      await queryClient.invalidateQueries({queryKey: [queryKey]});
     }
   };
 

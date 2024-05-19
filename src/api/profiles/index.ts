@@ -92,7 +92,6 @@ export const useInsertFriendRequest = () => {
 };
 
 export const useUnfriend = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(friend_id: uuid) {
       const {error} = await supabase
@@ -100,38 +99,27 @@ export const useUnfriend = () => {
         .delete()
         .or(`profile.eq.${friend_id},friend.eq.${friend_id}`);
       if (error) {
-        console.error('Error during unfriending:', error.message);
+        console.error('useUnfriend error:', error.message);
         throw new Error(error.message);
       }
-      console.log('Unfriend is successful');
-      return;
+      // console.log('useUnfriend success');
     },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['friends']);
-    }
   });
 };
 
 export const useAcceptFriend = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     async mutationFn(sender_uid) {
-      const {data: status, error} = await supabase
+      const {error} = await supabase
         .rpc('accept_friend_request', {
           sender_uid: sender_uid
         })
       if (error) {
-        console.error('Error during insertion:', error.message);
+        console.error('useAcceptFriend error:', error.message);
         throw new Error(error.message);
       }
-      console.log('Friend request is accepted', status);
-      return status;
+      // console.log('useAcceptFriend success');
     },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['friends']);
-      await queryClient.invalidateQueries(['friend_requests']);
-    }
   });
 };
 
@@ -145,59 +133,65 @@ export const useInsertGroupInvitation = () => {
         console.error('useInsertGroupInvitation error: ', error.message);
         throw new Error(error.message);
       }
-      // console.log('New group invite is inserted');
-      return;
+      // console.log('useInsertGroupInvitation success');
     },
-    async onSuccess() {
-      // invalidate something
-    }
   });
 };
 
-export const useGroupInvitations = (uid) => {
+export const useGroupInvitationsForProfile = (uid) => {
   return useQuery({
-    queryKey: ['group_invites'],
+    queryKey: ['group_invites_for_profile'],
     queryFn: async () => {
       const {data, error} = await supabase
         .from('group_invitations')
         .select('id, group_name, group_id, sender_profile:sender(id, email)')
         .eq('receiver', uid);
       if (error) {
-        console.log("useGroupInvitations error: ", error.message);
+        console.log("useGroupInvitationsForProfile error: ", error.message);
         throw new Error(error.message);
       }
-      // console.log("Group invites for uid ", uid, " is ", data);
+      // console.log("useGroupInvitationsForProfile success");
+      return data;
+    }
+  })
+}
+
+export const usePendingGroupInvitesForGroup = (groupId) => {
+  return useQuery({
+    queryKey: ['group_invites_for_group'],
+    queryFn: async () => {
+      const {data, error} = await supabase
+        .from('group_invitations')
+        .select('receiver_profile:receiver(id, email)')
+        .eq('group_id', groupId);
+      if (error) {
+        console.log("usePendingGroupInvitesForGroup error: ", error.message);
+        throw new Error(error.message);
+      }
+      // console.log("usePendingGroupInvitesForGroup success");
       return data;
     }
   })
 }
 
 export const useAcceptInvite = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(data) {
-      // console.log('input data is ', data);
       const {error} = await supabase
         .rpc('accept_group_invite', data);
       if (error) {
         console.error('useAcceptInvite error: ', error.message);
         throw new Error(error.message);
       }
-      console.log('useAcceptInvite successfull');
-      return;
+      // console.log('useAcceptInvite successfull');
     },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['groups']);
-      await queryClient.invalidateQueries(['group_invites']);
-    }
   });
 };
 
 export const useRejectInvite = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(invite_id) {
-      const {data, error} = await supabase
+      const {error} = await supabase
         .from('group_invitations')
         .delete()
         .eq('id', invite_id);
@@ -205,57 +199,39 @@ export const useRejectInvite = () => {
         console.error('useRejectInvite error: ', error.message);
         throw new Error(error.message);
       }
-      console.log('useRejectInvite is successfull');
-      return;
+      // console.log('useRejectInvite is successfull');
     },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['group_invites']);
-    }
   });
 };
 
 export const useAssignMember = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     async mutationFn(data) {
-      console.log('input data is ', data);
       const {error} = await supabase
         .rpc('assign_new_member', data);
       if (error) {
         console.error('useAssignMember error: ', error.message);
         throw new Error(error.message);
       }
-      console.log('useAssignMember successfull');
-      return data;
+      // console.log('useAssignMember success');
     },
-    async onSuccess({_group_id: groupId}) {
-      await queryClient.invalidateQueries(['members', groupId]);
-    }
   });
 };
 
 export const useUpdateProfileSingleField = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ id, field, value }) => {
       const updates = {};
       updates[field] = value;
-
       const { error } = await supabase
         .from('profiles')
         .update(updates)
         .eq('id', id);
-
       if (error) {
         console.log("useUpdateProfileSingleField error: ", error);
         throw new Error(error.message);
       }
       // console.log("useUpdateProfileSingleField success");
-      return;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['profile']);
-    }
   });
 };

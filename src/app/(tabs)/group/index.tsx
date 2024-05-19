@@ -6,17 +6,18 @@ import CustomHeader from "@/src/components/CustomHeader";
 import {useGroupList} from "@/src/api/groups";
 import {Text, ActivityIndicator} from "react-native-paper";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useAcceptInvite, useGroupInvitations, useRejectInvite} from "@/src/api/profiles";
+import {useAcceptInvite, useGroupInvitationsForProfile, useRejectInvite} from "@/src/api/profiles";
 import {GroupInvite} from "@/src/components/Person";
-import DebugTextInput from "@/src/components/Debug";
+import {useQueryClient} from "@tanstack/react-query";
 
 const GroupScreen = ({}) => {
+  const queryClient = useQueryClient();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
 
   const {data: groups, error, isLoading} = useGroupList();
   const {session} = useAuth();
-  const {data: groupInvitations, error: error2, isLoading: isLoading2} = useGroupInvitations(session?.user.id);
+  const {data: groupInvitations, error: error2, isLoading: isLoading2} = useGroupInvitationsForProfile(session?.user.id);
 
   const {mutate: acceptInvite} = useAcceptInvite();
   const {mutate: rejectInvite} = useRejectInvite();
@@ -26,7 +27,6 @@ const GroupScreen = ({}) => {
   }
 
   if (error || error2) {
-    console.log(error + ' ' + error2);
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
@@ -43,16 +43,19 @@ const GroupScreen = ({}) => {
       _profile_id: session?.user.id,
       _group_id: group_id
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log('Accept invite command handled successfully')
+        await queryClient.invalidateQueries(['groups']);
+        await queryClient.invalidateQueries(['group_invites_for_profile']);
       }
     })
   };
 
   const handleRejectInvite = ({id: invite_id}) => {
     rejectInvite(invite_id, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log('Reject invite command handled successfully')
+        await queryClient.invalidateQueries(['group_invites_for_profile']);
       }
     })
   };

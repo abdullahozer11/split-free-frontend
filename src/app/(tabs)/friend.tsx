@@ -84,20 +84,23 @@ export default function FriendScreen() {
   };
 
   const handleRemove = (friend_id) => {
-    console.log("Removing friend", friend_id);
+    // console.log("Removing friend", friend_id);
     unfriend(friend_id, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log("Successfully unfriended", friend_id);
         setIsDialogVisible(false);
+        await queryClient.invalidateQueries(['friends']);
       }
     });
   };
 
   const handleAccept = async (sender_uid) => {
     acceptFriend(sender_uid, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log('Friend request is accepted');
         setIsNotifMenuVisible(false);
+        await queryClient.invalidateQueries(['friends']);
+        await queryClient.invalidateQueries(['friend_requests']);
       }
     });
   };

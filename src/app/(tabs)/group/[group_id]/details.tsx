@@ -9,7 +9,13 @@ import {groupElementsByDay} from "@/src/utils/helpers";
 import {TextInput, Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
 import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
-import {getFriends, useAssignMember, useInsertGroupInvitation, useProfile} from "@/src/api/profiles";
+import {
+  getFriends,
+  useAssignMember,
+  useInsertGroupInvitation,
+  usePendingGroupInvitesForGroup,
+  useProfile
+} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertMember, useProfileMember} from "@/src/api/members";
 import {useQueryClient} from "@tanstack/react-query";
@@ -25,6 +31,7 @@ const GroupDetailsScreen = () => {
   const {session} = useAuth();
   const {data: friends, error: friendsError, isLoading: friendsLoading} = getFriends(session?.user.id);
   const {data: profile, error: profileError, isLoading: profileLoading} = useProfile(session?.user.id)
+  const {data: pendingInvites, error: pInviteError, isLoading: pInviteLoading} = usePendingGroupInvitesForGroup(groupId); // fixme use to not repeat invite on same user
   const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(profile?.id, groupId);
   const [totalBalance, setTotalBalance] = useState(0);
   const {mutate: deleteGroup} = useDeleteGroup();
@@ -47,17 +54,13 @@ const GroupDetailsScreen = () => {
     setTotalBalance(_balance);
   }, [group]);
 
-  if (groupLoading || expenseLoading || profileLoading || friendsLoading || profileMemberLoading) {
+  if (groupLoading || expenseLoading || profileLoading || friendsLoading || profileMemberLoading || pInviteLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (groupError || expenseError || profileError || friendsError || profileMemberError) {
+  if (groupError || expenseError || profileError || friendsError || profileMemberError || pInviteError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
-
-  const handleStats = () => {
-    console.log('stats');
-  };
 
   const promptDelete = () => {
     setIsDialogVisible(true);
@@ -85,7 +88,7 @@ const GroupDetailsScreen = () => {
         group_id: groupId,
         group_name: group.title
       }, {
-        onSuccess: () => {
+        onSuccess: async () => {
           // console.log('Successfully inserted group invitation');
           setIsFriendSelectorVisible(false);
         }
@@ -97,8 +100,9 @@ const GroupDetailsScreen = () => {
       _profile_id: profile.id,
       _member_id: memberId
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log('Member assign is dealt with success');
+        await queryClient.invalidateQueries(['members', groupId]);
       }
     })
   };
