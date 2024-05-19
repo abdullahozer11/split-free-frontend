@@ -1,5 +1,9 @@
 Priority
 ========
+Bugfix
+Generate development build install on my and vaso s devices
+
+
 Avatar upload should work
 Data subscriptions
 AI category embeddings
