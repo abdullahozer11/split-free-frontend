@@ -53,6 +53,10 @@ const GroupDetailsScreen = () => {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
+  if (!group) {
+    return null;
+  }
+
   const handleStats = () => {
     console.log('stats');
   };
@@ -61,14 +65,18 @@ const GroupDetailsScreen = () => {
     setIsDialogVisible(true);
   };
 
-  const handleDelete = () => {
-    console.log("deleting group");
-    deleteGroup(group.id, {
-      onSuccess: () => {
-        console.log("Successfully deleted group with id ", group.id);
-      }
-    });
-    navigation.goBack();
+  const handleDelete = async () => {
+    console.log('deleting group');
+    try {
+      await deleteGroup(group.id, {
+        onSuccess: () => {
+          console.log('Successfully deleted group with id', group.id);
+          navigation.goBack();
+        },
+      });
+    } catch (error) {
+      console.error('handleDelete error:', error);
+    }
   };
 
   const promptInvite = () => {
@@ -198,9 +206,9 @@ const GroupDetailsScreen = () => {
               <Feather name="arrow-left" size={36} color="gold"/>
             </TouchableOpacity>
             <View style={{flexDirection: "row", gap: 10}}>
-              <TouchableOpacity onPress={handleStats}>
-                <Feather name="pie-chart" size={36} color="gold"/>
-              </TouchableOpacity>
+              {/*<TouchableOpacity onPress={handleStats}>*/}
+              {/*  <Feather name="pie-chart" size={36} color="gold"/>*/}
+              {/*</TouchableOpacity>*/}
               <Menu
                 visible={visible}
                 onDismiss={closeMenu}

@@ -19,7 +19,7 @@ export const useUpdateProfile = () => {
         .select()
         .single();
       if (error) {
-        console.log("errorr is ", error);
+        console.log("useUpdateProfile error: ", error);
         throw new Error(error.message);
       }
       console.log("updatedProfile: ", updatedProfile);

@@ -47,7 +47,7 @@ export const useProfileMember = (profileId: string, groupId: number) => {
         .select('id, visible')
         .eq('profile', profileId)
         .eq('group_id', groupId)
-        .single();
+        .maybeSingle();
       if (error) {
         console.log("useProfileMember error: ", error.message);
         throw new Error(error.message);

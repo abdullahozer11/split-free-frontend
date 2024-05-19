@@ -9,9 +9,10 @@ export const useGroupList = () => {
       const {data, error} = await supabase
         .rpc('get_groups_summary');
       if (error) {
-        // console.log(error.message);
+        console.log('useGroupList error', error.message);
         throw new Error(error.message);
       }
+      console.log('useGroupList success', data);
       return data;
     },
   });
@@ -25,9 +26,9 @@ export const useGroup = (id: number) => {
         .from('groups')
         .select('id, title, expense_total, members(id, name, role, total_balance, visible, profile(id, avatar_url)), debts(id, amount, borrower, lender)')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       if (error) {
-        console.log(error.message);
+        console.log("useGroup error: ", error.message);
         throw new Error(error.message);
       }
       return _Group;
@@ -46,13 +47,14 @@ export const useDeleteGroup = () => {
         .delete()
         .eq('id', id);
       if (error) {
-        // console.error('Error during delete:', error);
+        console.error('useDeleteGroup error:', error);
         throw new Error(error.message);
       }
-      // console.log("group is deleted");
-      return true;
+      console.log("useDeleteGroup success");
+      return id;
     },
-    async onSuccess() {
+    async onSuccess(id) {
+      console.log('Invalidating queries...');
       await queryClient.invalidateQueries(['groups']);
     }
   });

@@ -1,6 +1,6 @@
-import {Alert, StyleSheet, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
+import {StyleSheet, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {Link, useLocalSearchParams, useNavigation} from 'expo-router';
+import {useLocalSearchParams, useNavigation} from 'expo-router';
 import CollapsableHeader from '@/src/components/CollapsableHeader';
 import {ActivityIndicator, Text, Card, Paragraph, TextInput, Button, Dialog, Portal} from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';

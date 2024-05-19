@@ -11,7 +11,7 @@ export const useExpenseList = (group_id: number) => {
         .select('id, title, amount, created_at, group_id, balances(amount, owner)')
         .eq('group_id', group_id);
       if (error) {
-        console.log(error.message);
+        console.log("useExpenseList error: ", error.message);
         throw new Error(error.message);
       }
       // console.log("Expense data is ", data);
@@ -29,7 +29,7 @@ export const useExpense = (id: number) => {
           expense_id_input: id
         });
       if (error) {
-        console.log("error iss ", error.message);
+        console.log("useExpense error: ", error.message);
         throw new Error(error.message);
       }
       // console.log("expense is ", expense);
@@ -56,7 +56,7 @@ export const useInsertExpense = (group_id: number) => {
           title_input: data.title,
         });
       if (error) {
-        console.error('Error during insertion:', error.message);
+        console.error('useInsertExpense error: ', error.message);
         throw new Error(error.message);
       }
       console.log('New expense inserted:', newExpenseID);
@@ -110,7 +110,7 @@ export const useDeleteExpense = (group_id: bigint) => {
         .delete()
         .eq('id', id);
       if (error) {
-        console.error('Error during deletion:', error.message);
+        console.error('useDeleteExpense error: ', error.message);
         throw new Error(error.message);
       }
       // console.log('Expense is deleted');

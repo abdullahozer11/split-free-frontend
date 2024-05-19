@@ -12,8 +12,6 @@ const GroupItem = ({group, onAnchor}) => {
     return true;
   };
 
-  // console.log('group is ', group);
-
   return (
     <Link href={`/group/${group.id}/details`} asChild>
       <Pressable style={styles.container}>

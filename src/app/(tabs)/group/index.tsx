@@ -8,6 +8,7 @@ import {Text, ActivityIndicator} from "react-native-paper";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useAcceptInvite, useGroupInvitations, useRejectInvite} from "@/src/api/profiles";
 import {GroupInvite} from "@/src/components/Person";
+import DebugTextInput from "@/src/components/Debug";
 
 const GroupScreen = ({}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -25,6 +26,7 @@ const GroupScreen = ({}) => {
   }
 
   if (error || error2) {
+    console.log(error + ' ' + error2);
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
@@ -95,6 +97,7 @@ const GroupScreen = ({}) => {
           ))}
         </View>
       </View>
+      <DebugTextInput/>
     </View>
   );
 };
