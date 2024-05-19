@@ -15,11 +15,11 @@ export const useDebt = (memberId: number, profileMemberId: number) => {
         throw new Error(error.message);
       }
       if (!data || data.length === 0) {
-        console.log("useDebt: No debts found");
+        // console.log("useDebt: No debts found");
         return null;
       }
 
-      console.log("useDebt success: ", data);
+      // console.log("useDebt success: ", data);
       return data;
     },
     enabled: !!memberId && !!profileMemberId && memberId !== profileMemberId,

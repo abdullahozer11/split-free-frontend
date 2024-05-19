@@ -61,11 +61,9 @@ export const useProfileMember = (profileId: string, groupId: number) => {
 
 
 export const useUpdateMemberName = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     async mutationFn({name, member_id}) {
-      const {data: newMember, error} = await supabase
+      const {error} = await supabase
         .from('members')
         .update({name})
         .eq('id', member_id)
@@ -75,13 +73,8 @@ export const useUpdateMemberName = () => {
         console.log('useUpdateMemberName error: ', error);
         throw new Error(error.message);
       }
-      console.log("member name is updated");
-      return newMember;
+      // console.log("member name is updated");
     },
-    async onSuccess({id, group_id}) {
-      await queryClient.invalidateQueries(['member', id]);
-      await queryClient.invalidateQueries(['members', group_id]);
-    }
   })
 }
 

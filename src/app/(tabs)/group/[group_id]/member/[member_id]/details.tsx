@@ -7,9 +7,11 @@ import { Feather } from '@expo/vector-icons';
 import {useDeleteMember, useMember, useProfileMember, useUpdateMemberName} from '@/src/api/members';
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useDebt} from "@/src/api/debts";
+import {useQueryClient} from "@tanstack/react-query";
 
 const MemberDetailsScreen = () => {
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const {member_id: memberIdString} = useLocalSearchParams();
   const memberId = parseInt(typeof memberIdString === 'string' ? memberIdString : memberIdString[0]);
 
@@ -44,15 +46,14 @@ const MemberDetailsScreen = () => {
   const handleNameSubmit = () => {
     updateMemberName({
       name,
-      member_id: memberId
+      member_id: member.id
     }, {
-      onSuccess: () => {
-        console.log('member name update is dealt with success');
+      onSuccess: async () => {
+        console.log('Member name update is dealt with success');
         setIsEditingName(false);
+        await queryClient.invalidateQueries(['member', memberId]);
+        await queryClient.invalidateQueries(['members', member.group_id]);
       },
-      onError: () => {
-        console.log('error is caught');
-      }
     })
   };
 
