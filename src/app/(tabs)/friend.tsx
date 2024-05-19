@@ -23,10 +23,11 @@ import {
 } from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {supabase} from "@/src/lib/supabase";
-import DebugTextInput from "@/src/components/Debug";
+import {useQueryClient} from "@tanstack/react-query";
 
 
 export default function FriendScreen() {
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -73,8 +74,9 @@ export default function FriendScreen() {
       sender_id: session?.user.id,
       receiver_id: friend_id_input,
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log("Friend request is created.")
+        await queryClient.invalidateQueries(['friends']);
         searchResults.find((sr) => sr.id == friend_id_input).friend_status = "SENT";
       }
     });
