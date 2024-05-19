@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.splitfree"
+      "package": "com.SplitFree.SplitFree"
     },
     "web": {
       "bundler": "metro",
