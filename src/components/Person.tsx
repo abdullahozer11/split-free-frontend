@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     gap: 10,
-    justifyContent: "space-between",
   },
   notifLine: {
     paddingVertical: 10,

@@ -12,11 +12,13 @@ import {Debt, Friend2, Member} from "@/src/components/Person";
 import {getFriends, useAssignMember, useInsertGroupInvitation, useProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertMember, useProfileMember} from "@/src/api/members";
+import {useQueryClient} from "@tanstack/react-query";
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
   const groupId = parseInt(typeof idString === 'string' ? idString : idString[0]);
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const {data: group, error: groupError, isLoading: groupLoading} = useGroup(groupId);
   const {data: expenses, error: expenseError, isLoading: expenseLoading} = useExpenseList(groupId);
@@ -53,10 +55,6 @@ const GroupDetailsScreen = () => {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
-  if (!group) {
-    return null;
-  }
-
   const handleStats = () => {
     console.log('stats');
   };
@@ -67,16 +65,13 @@ const GroupDetailsScreen = () => {
 
   const handleDelete = async () => {
     console.log('deleting group');
-    try {
-      await deleteGroup(group.id, {
-        onSuccess: () => {
-          console.log('Successfully deleted group with id', group.id);
-          navigation.goBack();
-        },
-      });
-    } catch (error) {
-      console.error('handleDelete error:', error);
-    }
+    await deleteGroup(group.id, {
+      onSuccess: async () => {
+        console.log('Successfully deleted group with id', group.id);
+        navigation.goBack();
+        await queryClient.invalidateQueries(['groups']);
+      },
+    });
   };
 
   const promptInvite = () => {

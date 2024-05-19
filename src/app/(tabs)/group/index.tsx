@@ -97,7 +97,6 @@ const GroupScreen = ({}) => {
           ))}
         </View>
       </View>
-      <DebugTextInput/>
     </View>
   );
 };

@@ -3,11 +3,9 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {uuid} from "expo-modules-core";
 
 export const useUpdateProfile = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     async mutationFn(data: any) {
-      const {error, data: updatedProfile} = await supabase
+      const {error} = await supabase
         .from('profiles')
         .update({
           avatar_url: data.avatar_url,
@@ -15,19 +13,14 @@ export const useUpdateProfile = () => {
           phone_number: data.phone_number,
           website: data.website,
         })
-        .eq('id', data.id)
-        .select()
-        .single();
+        .eq('id', data.id);
       if (error) {
         console.log("useUpdateProfile error: ", error);
         throw new Error(error.message);
       }
-      console.log("updatedProfile: ", updatedProfile);
-      return updatedProfile;
+      // console.log("updatedProfile success: ");
+      return;
     },
-    async onSuccess(_, {id}) {
-      await queryClient.invalidateQueries(['profile']);
-    }
   });
 };
 

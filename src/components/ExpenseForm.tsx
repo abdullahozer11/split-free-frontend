@@ -15,10 +15,12 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
 import {Feather} from "@expo/vector-icons";
+import {useQueryClient} from "@tanstack/react-query";
 
 
 export default function ExpenseForm({title: headerTitle, groupId, updatingExpense}) {
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [formState, setFormState] = useState(updatingExpense ? {
     ...updatingExpense,
@@ -122,9 +124,12 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       proof: null,
       title: title
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log('Successfully updated expense');
         navigation.goBack();
+        await queryClient.invalidateQueries(['group', group_id]);
+        await queryClient.invalidateQueries(['expense', updatingExpense.id]);
+        await queryClient.invalidateQueries(['expenses', group_id]);
       }
     });
   };
@@ -144,9 +149,12 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       payers: payers,
       participants: participants
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log("Successfully inserted expense");
         navigation.goBack();
+        await queryClient.invalidateQueries(['group', group_id]);
+        await queryClient.invalidateQueries(['expenses', group_id]);
+        await queryClient.invalidateQueries(['groups']);
       }
     });
   };

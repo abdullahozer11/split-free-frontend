@@ -6,6 +6,8 @@ import {useDeleteExpense, useExpense} from "@/src/api/expenses";
 import {Text, ActivityIndicator, Menu, Portal, Dialog, Button} from 'react-native-paper';
 import {Feather} from "@expo/vector-icons";
 import {Participant, Payer} from "@/src/components/Person";
+import {useQueryClient} from "@tanstack/react-query";
+
 
 const Description = ({text}) => {
   return (
@@ -22,6 +24,7 @@ const ExpenseDetailsScreen = () => {
   const group_id = parseInt(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
   const navigation = useNavigation();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // menu related
   const [visible, setVisible] = React.useState(false);
@@ -31,7 +34,7 @@ const ExpenseDetailsScreen = () => {
 
   const {data: expense, expenseError, expenseLoading} = useExpense(id);
 
-  const {mutate: deleteExpense} = useDeleteExpense(group_id);
+  const {mutate: deleteExpense} = useDeleteExpense();
 
   if (expenseLoading) {
     return <ActivityIndicator/>;
@@ -48,9 +51,12 @@ const ExpenseDetailsScreen = () => {
   const handleDelete = () => {
     console.log("deleting expense");
     deleteExpense(expense?.id, {
-      onSuccess: () => {
-        console.log("Successfully deleted expense");
+      onSuccess: async () => {
+        console.log("Successfully deleted expense: ", expense.id);
         navigation.goBack();
+        await queryClient.invalidateQueries(['group', group_id]);
+        await queryClient.invalidateQueries(['expenses', group_id]);
+        await queryClient.invalidateQueries(['groups']);
       }
     });
   };

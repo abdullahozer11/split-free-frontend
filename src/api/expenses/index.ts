@@ -39,8 +39,6 @@ export const useExpense = (id: number) => {
 };
 
 export const useInsertExpense = (group_id: number) => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     async mutationFn(data) {
       const {data: newExpenseID, error} = await supabase
@@ -62,11 +60,6 @@ export const useInsertExpense = (group_id: number) => {
       console.log('New expense inserted:', newExpenseID);
       return newExpenseID;
     },
-    async onSuccess() {
-      await queryClient.invalidateQueries(['group', group_id]);
-      await queryClient.invalidateQueries(['expenses', group_id]);
-      await queryClient.invalidateQueries(['groups']);
-    }
   });
 };
 
@@ -91,18 +84,12 @@ export const useUpdateExpense = () => {
         throw new Error(error.message);
       }
       // console.log('Expense is updated:', newExpense);
-      return newExpense;
+      return;
     },
-    async onSuccess(_, {id, group_id}) {
-      await queryClient.invalidateQueries(['group', group_id]);
-      await queryClient.invalidateQueries(['expense', id]);
-      await queryClient.invalidateQueries(['expenses', group_id]);
-    }
   });
 };
 
-export const useDeleteExpense = (group_id: bigint) => {
-  const queryClient = useQueryClient();
+export const useDeleteExpense = () => {
   return useMutation({
     async mutationFn(id: bigint) {
       const {error} = await supabase
@@ -114,13 +101,7 @@ export const useDeleteExpense = (group_id: bigint) => {
         throw new Error(error.message);
       }
       // console.log('Expense is deleted');
-      return id;
+      return;
     },
-    async onSuccess(id) {
-      await queryClient.invalidateQueries(['group', group_id]);
-      await queryClient.invalidateQueries(['expenses', group_id]);
-      await queryClient.invalidateQueries(['expense', id]);
-      await queryClient.invalidateQueries(['groups']);
-    }
   });
 };

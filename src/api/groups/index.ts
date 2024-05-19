@@ -12,7 +12,7 @@ export const useGroupList = () => {
         console.log('useGroupList error', error.message);
         throw new Error(error.message);
       }
-      console.log('useGroupList success', data);
+      // console.log('useGroupList success', data);
       return data;
     },
   });
@@ -26,7 +26,7 @@ export const useGroup = (id: number) => {
         .from('groups')
         .select('id, title, expense_total, members(id, name, role, total_balance, visible, profile(id, avatar_url)), debts(id, amount, borrower, lender)')
         .eq('id', id)
-        .maybeSingle();
+        .single();
       if (error) {
         console.log("useGroup error: ", error.message);
         throw new Error(error.message);
@@ -38,8 +38,6 @@ export const useGroup = (id: number) => {
 
 
 export const useDeleteGroup = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     async mutationFn(id) {
       const {error} = await supabase
@@ -53,9 +51,7 @@ export const useDeleteGroup = () => {
       console.log("useDeleteGroup success");
       return id;
     },
-    async onSuccess(id) {
-      console.log('Invalidating queries...');
-      await queryClient.invalidateQueries(['groups']);
+    async onSuccess() {
     }
   });
 };

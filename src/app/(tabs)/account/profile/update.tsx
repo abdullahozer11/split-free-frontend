@@ -8,9 +8,11 @@ import {Feather} from "@expo/vector-icons";
 import {useProfile, useUpdateProfile} from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {ActivityIndicator} from "react-native-paper";
+import {useQueryClient} from "@tanstack/react-query";
 
 export default function UpdateProfile() {
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
   const [image, setImage] = useState('');
   const [fullName, setFullName] = useState('');
   const [website, setWebsite] = useState('');
@@ -59,9 +61,9 @@ export default function UpdateProfile() {
       phone_number: phoneNumber,
       avatar_url: image,
     }, {
-      onSuccess: () => {
-        // console.log("Successfully updated profile");
+      onSuccess: async () => {
         navigation.goBack();
+        await queryClient.invalidateQueries(['profile']);
       }
     });
   };
