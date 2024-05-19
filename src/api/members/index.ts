@@ -79,33 +79,23 @@ export const useUpdateMemberName = () => {
 }
 
 export const useInsertMember = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     async mutationFn({name, group_id}) {
       const {error} = await supabase
         .from('members')
-        .insert({name, group_id})
-        .select()
-        .single();
+        .insert({name, group_id});
       if (error) {
         console.log('useInsertMember error: ', error);
         throw new Error(error.message);
       }
       console.log("useInsertMember success");
-      return group_id;
     },
-    async onSuccess(group_id) {
-      await queryClient.invalidateQueries(['members', group_id]);
-    }
   })
 }
 
 export const useDeleteMember = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
-    async mutationFn({memberId, groupId}) {
+    async mutationFn(memberId) {
       const {error} = await supabase
         .from('members')
         .delete()
@@ -114,11 +104,7 @@ export const useDeleteMember = () => {
         console.log('useDeleteMember error: ', error);
         throw new Error(error.message);
       }
-      console.log("useDeleteMember success");
-      return groupId;
+      // console.log("useDeleteMember success");
     },
-    async onSuccess(groupId) {
-      await queryClient.invalidateQueries(['members', groupId]);
-    }
   })
 }

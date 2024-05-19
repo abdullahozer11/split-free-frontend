@@ -59,13 +59,11 @@ const MemberDetailsScreen = () => {
 
   const handleDelete = () => {
     console.log("deleting member");
-    deleteMember({
-      memberId: member?.id,
-      groupId: member?.group_id
-  }, {
-      onSuccess: () => {
+    deleteMember(member?.id, {
+      onSuccess: async () => {
         console.log("Successfully deleted member");
         navigation.goBack();
+        await queryClient.invalidateQueries(['members', member?.group_id]);
       }
     });
   };

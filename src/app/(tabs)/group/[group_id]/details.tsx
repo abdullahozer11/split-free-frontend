@@ -108,11 +108,12 @@ const GroupDetailsScreen = () => {
       name: newMemberName,
       group_id: groupId
     }, {
-      onSuccess: () => {
+      onSuccess: async () => {
         console.log('New member addition is dealt with success');
         setNewMemberName('');
         setIsAddingNewName(false);
         setBigPlusVisible(true);
+        await queryClient.invalidateQueries(['members', groupId]);
       }
     })
   };

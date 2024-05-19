@@ -4,22 +4,16 @@ import {uuid} from "expo-modules-core";
 
 export const useUpdateProfile = () => {
   return useMutation({
-    async mutationFn(data: any) {
+    async mutationFn(profile) {
       const {error} = await supabase
         .from('profiles')
-        .update({
-          avatar_url: data.avatar_url,
-          full_name: data.full_name,
-          phone_number: data.phone_number,
-          website: data.website,
-        })
-        .eq('id', data.id);
+        .update(profile)
+        .eq('id', profile.id);
       if (error) {
         console.log("useUpdateProfile error: ", error);
         throw new Error(error.message);
       }
       // console.log("updatedProfile success: ");
-      return;
     },
   });
 };
@@ -52,10 +46,10 @@ export const getFriends = (uid) => {
         .select('profile:friend(id, email, avatar_url)')
         .eq('profile', uid);
       if (error) {
-        console.log("GetFriends error is ", error.message);
+        console.log("GetFriends error: ", error.message);
         throw new Error(error.message);
       }
-      // console.log("Friends are ", data);
+      // console.log("getFriends success: ", data);
       return data;
     }
   })
@@ -70,10 +64,10 @@ export const getFriendRequests = (uid) => {
         .select('id, sender, sender_profile:sender(email)')
         .eq('receiver', uid);
       if (error) {
-        console.log("Get friend requests error is ", error.message);
+        console.log("getFriendRequests error: ", error.message);
         throw new Error(error.message);
       }
-      // console.log("Friend requests are ", data);
+      // console.log("getFriendRequests success: ", data);
       return data;
     }
   })
@@ -92,8 +86,7 @@ export const useInsertFriendRequest = () => {
         console.error('useInsertFriendRequest error:', error.message);
         throw new Error(error.message);
       }
-      // console.log('New friend request is inserted');
-      return;
+      // console.log('useInsertFriendRequest success');
     },
   });
 };

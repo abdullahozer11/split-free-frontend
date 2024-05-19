@@ -76,8 +76,9 @@ export default function FriendScreen() {
     }, {
       onSuccess: async () => {
         console.log("Friend request is created.")
-        await queryClient.invalidateQueries(['friends']);
-        searchResults.find((sr) => sr.id == friend_id_input).friend_status = "SENT";
+        const newSearchResults = searchResults;
+        newSearchResults.find((sr) => sr.id == friend_id_input).friend_status = "SENT";
+        setSearchResults(newSearchResults);
       }
     });
   };
