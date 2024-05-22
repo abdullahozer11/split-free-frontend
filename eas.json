@@ -7,7 +7,14 @@
       "developmentClient": true,
       "distribution": "internal"
     },
+    "base": {
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://qpummxvizckytrrsiaig.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdW1teHZpemNreXRycnNpYWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NjgzMDgsImV4cCI6MjAyODE0NDMwOH0.DYJIU3x0pd5Ub6PDz1vlJCs07O9WFIXokQLD0By8HbQ"
+      }
+    },
     "preview": {
+      "extends": "base",
       "distribution": "internal"
     },
     "production": {}
