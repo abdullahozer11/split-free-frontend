@@ -224,7 +224,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             label="Enter amount"
             placeholder="Enter amount"
             value={amount}
-            onChangeText={(text) => handleInputChange('amount', text)}
+            onChangeText={(text) => handleInputChange('amount', text.replace(/^0+(?!$)/, ''))}
             keyboardType="numeric"
             style={{flex: 1, backgroundColor: 'white'}}
           />
