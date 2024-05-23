@@ -1,5 +1,5 @@
-import {Image, StyleSheet, Alert, View} from 'react-native';
-import {TextInput} from 'react-native-paper';
+import {Image, StyleSheet, Alert, View, TouchableOpacity} from 'react-native';
+import {Text, TextInput} from 'react-native-paper';
 import React, {useState} from 'react';
 import Button from '../../components/Button';
 import Colors from '../../constants/Colors';
@@ -37,6 +37,10 @@ const SignInScreen = () => {
     return <Icon name="google" size={30} color="black"/>;
   };
 
+  const forgotHandler = () => {
+    console.log('i forgot');
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{title: 'Sign in'}}/>
@@ -60,6 +64,9 @@ const SignInScreen = () => {
           />}
         />
       </View>
+      <Link href={"/forgot"} style={styles.forgot}>
+        <Text>Forgot Password</Text>
+      </Link>
       <Button disabled={loading} onPress={signInWithEmail} text={loading ? "Signing in..." : "Sign in"}/>
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
@@ -112,6 +119,11 @@ const styles = StyleSheet.create({
   },
   googleBtnText: {
     color: 'black',
+  },
+  forgot: {
+    fontSize: 16,
+    alignSelf: "flex-end",
+    paddingVertical: 7,
   },
 });
 
