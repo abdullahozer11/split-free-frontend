@@ -273,6 +273,11 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             members={members}
             onChange={(participants) => handleInputChange('participants', participants)}
           />
+          <TouchableOpacity onPress={() => {
+            onSubmit();
+          }}>
+            <Text style={styles.saveIcon}>Save</Text>
+          </TouchableOpacity>
           {/*<View style={{*/}
           {/*  flexDirection: "row",*/}
           {/*  gap: 15,*/}
@@ -317,6 +322,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
     borderRadius: 10,
     justifyContent: "center",
+  },
+  saveIcon: {
+    fontSize: 28,
+    fontWeight: "400",
+    width: '100%',
+    textAlign: 'center',
+    marginRight: 10,
+    borderWidth: 1,
+    padding: 10,
+    borderColor: 'green',
+    borderRadius: 10,
+    color: 'green',
   },
   currencyLabel: {
     fontSize: 14,
