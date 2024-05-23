@@ -1,4 +1,5 @@
-import {Image, StyleSheet, TextInput, Alert, View} from 'react-native';
+import {Image, StyleSheet, Alert, View} from 'react-native';
+import {TextInput} from 'react-native-paper';
 import React, {useState} from 'react';
 import Button from '../../components/Button';
 import Colors from '../../constants/Colors';
@@ -10,6 +11,12 @@ const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   async function signInWithEmail() {
     setLoading(true);
@@ -46,7 +53,11 @@ const SignInScreen = () => {
           onChangeText={setPassword}
           placeholder="Password"
           style={styles.input}
-          secureTextEntry
+          secureTextEntry={!showPassword}
+          right={<TextInput.Icon
+            icon={showPassword ? "eye-off" : "eye"}
+            onPress={togglePasswordVisibility}
+          />}
         />
       </View>
       <Button disabled={loading} onPress={signInWithEmail} text={loading ? "Signing in..." : "Sign in"}/>
@@ -79,9 +90,10 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: 'gray',
-    padding: 10,
     backgroundColor: 'white',
     borderRadius: 5,
+    fontSize: 14,
+    height: 45,
   },
   textButton: {
     alignSelf: 'center',
