@@ -1,8 +1,7 @@
 Priority
 ========
-Bugfix (black background on vaso s device)
+Bugfix (black background on Vaso's device)
 Avatar upload should work
-Data subscriptions
-AI category embeddings
+AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
 Setup and test linking
-Google auth
+Google auth finish
