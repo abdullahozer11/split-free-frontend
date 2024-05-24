@@ -1,6 +1,6 @@
 import {View, StyleSheet, Alert, Image} from 'react-native';
 import {TextInput, Text} from 'react-native-paper';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Button from '../../components/Button';
 import Colors from '../../constants/Colors';
 import {Link, Stack, useRouter} from 'expo-router';
@@ -16,6 +16,10 @@ const SignUpScreen = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -34,14 +38,34 @@ const SignUpScreen = () => {
 
   const passwordsMatch = () => password === confirmPassword;
 
-  async function signUpWithEmail() {
-    if (!passwordsMatch()) {
-      Alert.alert('Passwords do not match.');
-      return;
+  useEffect(() => {
+    if (email.length > 0) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setEmailError(emailRegex.test(email) ? '' : 'Invalid email address.');
+    } else {
+      setEmailError('');
     }
+  }, [email]);
 
-    if (!validatePassword()) {
-      Alert.alert('Password must be at least 8 characters long and contain both letters and numbers.');
+  useEffect(() => {
+    if (password.length > 0) {
+      setPasswordError(validatePassword() ? '' : 'Password must be at least 8 characters long and contain both letters and numbers.');
+    } else {
+      setPasswordError('');
+    }
+  }, [password]);
+
+  useEffect(() => {
+    if (confirmPassword.length > 0) {
+      setConfirmPasswordError(passwordsMatch() ? '' : 'Passwords do not match.');
+    } else {
+      setConfirmPasswordError('');
+    }
+  }, [confirmPassword]);
+
+  async function signUpWithEmail() {
+    if (emailError || passwordError || confirmPasswordError) {
+      Alert.alert('Please fix the errors before proceeding.');
       return;
     }
 
@@ -72,7 +96,9 @@ const SignUpScreen = () => {
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
+          error={!!emailError}
         />
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
         <TextInput
           value={password}
           onChangeText={setPassword}
@@ -83,7 +109,9 @@ const SignUpScreen = () => {
             icon={showPassword ? "eye-off" : "eye"}
             onPress={togglePasswordVisibility}
           />}
+          error={!!passwordError}
         />
+        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
@@ -94,7 +122,9 @@ const SignUpScreen = () => {
             icon={showConfirmPassword ? "eye-off" : "eye"}
             onPress={toggleConfirmPasswordVisibility}
           />}
+          error={!!confirmPasswordError}
         />
+        {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
       </View>
       <View style={styles.termsContainer}>
         <CheckBox checked={acceptance} onPress={toggleAcceptance} />
@@ -137,6 +167,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     fontSize: 14,
     height: 45,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: -8,
+    marginBottom: 8,
   },
   textButton: {
     alignSelf: 'center',
