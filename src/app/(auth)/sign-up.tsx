@@ -100,7 +100,7 @@ const SignUpScreen = () => {
         <CheckBox checked={acceptance} onPress={toggleAcceptance} />
         <Text>
           I agree to{' '}
-          <Link href="/(auth)/terms" style={{textDecorationLine: 'underline'}}>
+          <Link href="/(global)/terms" style={{textDecorationLine: 'underline'}}>
             terms and conditions
           </Link>
         </Text>

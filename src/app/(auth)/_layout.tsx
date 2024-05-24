@@ -15,7 +15,6 @@ export default function AuthLayout() {
       <Stack.Screen name="sign-up"/>
       <Stack.Screen name="forgot"/>
       <Stack.Screen name="reset"/>
-      <Stack.Screen name="terms" options={{headerShown: false}}/>
     </Stack>
   );
 }
