@@ -11,3 +11,4 @@ search on groups' page
 spending page
 remove fake currency options
 add close button for the multiselect
+Add not only expense but money transfer
