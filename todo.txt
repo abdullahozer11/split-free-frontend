@@ -4,6 +4,5 @@ Bugfix (black background on vaso s device)
 Avatar upload should work
 Data subscriptions
 AI category embeddings
-Add error field for text inputs and do real time validation
 Setup and test linking
 Google auth
