@@ -1,4 +1,4 @@
-import {Image, StyleSheet, Alert, View, TouchableOpacity} from 'react-native';
+import {Image, StyleSheet, Alert, View} from 'react-native';
 import {Text, TextInput} from 'react-native-paper';
 import React, {useState} from 'react';
 import Button from '../../components/Button';
@@ -6,6 +6,7 @@ import Colors from '../../constants/Colors';
 import {Link, Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import GoogleSignIn from "@/src/components/google";
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
@@ -71,6 +72,7 @@ const SignInScreen = () => {
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
       </Link>
+      <GoogleSignIn/>
       <Button
         text={'Login with Google'}
         accessoryLeft={<Icon name="google" size={22} color="black"/>}
