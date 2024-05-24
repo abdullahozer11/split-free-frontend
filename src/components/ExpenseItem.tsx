@@ -35,10 +35,7 @@ const ExpenseItem = ({expense}) => {
         <View>
           <Text style={{fontSize: 18, fontWeight: '600'}}>{expense.title}</Text>
         </View>
-        <Text style={{fontSize: 14, fontWeight: '300'}}>Total €{expense.amount}</Text>
-        {/*<Text style={styles.balanceEffect}>*/}
-        {/*  {impact > 0 ? '+' + impact : impact} €*/}
-        {/*</Text>*/}
+        <Text style={styles.total}>Total €{expense.amount}</Text>
       </Pressable>
     </Link>
   );
@@ -68,12 +65,10 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 25,
   },
-  balanceEffect: {
-    color: "green",
+  total: {
     fontSize: 16,
     fontWeight: "500",
     position: "absolute",
     right: 20,
-    alignSelf: "center",
   },
 });
