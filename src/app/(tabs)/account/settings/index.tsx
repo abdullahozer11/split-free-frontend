@@ -8,8 +8,9 @@ import {Text, Switch} from "react-native-paper";
 
 
 const SettingsItem = ({page, iconName, title, containerColor}) => {
+  const path = page === 'terms' ? '/(auth)/terms' : `/(tabs)/account/settings/${page}`;
   return (
-    <Link href={`/(tabs)/account/settings/${page}`} asChild>
+    <Link href={path} asChild>
       <Pressable style={styles.settingsItemRow}>
         <View style={styles.innerRow}>
           <View style={[styles.settingsItemIconContainer, {backgroundColor: containerColor}]}>

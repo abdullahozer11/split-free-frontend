@@ -6,8 +6,16 @@ export default function AuthLayout() {
   const {session} = useAuth();
 
   if (session) {
-    return <Redirect href={'/'}/>
+    return <Redirect href={'/'}/>;
   }
 
-  return <Stack />;
+  return (
+    <Stack>
+      <Stack.Screen name="sign-in"/>
+      <Stack.Screen name="sign-up"/>
+      <Stack.Screen name="forgot"/>
+      <Stack.Screen name="reset"/>
+      <Stack.Screen name="terms" options={{headerShown: false}}/>
+    </Stack>
+  );
 }

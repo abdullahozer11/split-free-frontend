@@ -64,6 +64,9 @@ const ForgotPasswordScreen = () => {
       <Link href="/sign-in" style={styles.textButton}>
         Back to Sign in
       </Link>
+      {/*<Link href="/reset" style={styles.textButton}>*/}
+      {/*  Go to reset*/}
+      {/*</Link>*/}
     </View>
   );
 };
