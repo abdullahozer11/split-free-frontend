@@ -5,7 +5,6 @@ import Button from '../../components/Button';
 import Colors from '../../constants/Colors';
 import {Link, Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
-import Icon from 'react-native-vector-icons/FontAwesome';
 import GoogleSignIn from "@/src/components/google";
 
 const SignInScreen = () => {
@@ -27,20 +26,6 @@ const SignInScreen = () => {
     }
     setLoading(false);
   }
-
-  const signInWithGoogle = () => {
-    setLoading(true);
-    console.log("Sign in with google");
-    setLoading(false);
-  };
-
-  const renderGoogleIcon = () => {
-    return <Icon name="google" size={30} color="black"/>;
-  };
-
-  const forgotHandler = () => {
-    console.log('i forgot');
-  };
 
   return (
     <View style={styles.container}>
@@ -73,12 +58,6 @@ const SignInScreen = () => {
         Create an account
       </Link>
       <GoogleSignIn/>
-      <Button
-        text={'Login with Google'}
-        accessoryLeft={<Icon name="google" size={22} color="black"/>}
-        onPress={signInWithGoogle} style={styles.googleBtn}
-        textStyle={styles.googleBtnText}
-      />
     </View>
   );
 };
