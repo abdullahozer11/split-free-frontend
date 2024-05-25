@@ -73,12 +73,17 @@ const GroupScreen = ({}) => {
     }
   };
 
+  // Filter groups based on queryKey
+  const filteredGroups = groups.filter(group =>
+    group.title.toLowerCase().includes(queryKey.toLowerCase())
+  );
+
   // Define sections for SectionList
   const sections = [];
   if (anchoredGroups.length > 0) {
     sections.push({title: "Quick Access", data: anchoredGroups});
   }
-  sections.push({title: "All Groups", data: groups.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
+  sections.push({title: "All Groups", data: filteredGroups.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
 
   return (
     <View style={styles.container}>
@@ -88,6 +93,10 @@ const GroupScreen = ({}) => {
         onChangeText={setQueryKey}
         value={queryKey}
         style={{marginHorizontal: 10}}
+        right={<TextInput.Icon
+          icon={"close"}
+          onPress={toggleSearchBarVisible}
+        />}
       />}
       <View style={styles.body}>
         <SectionList
