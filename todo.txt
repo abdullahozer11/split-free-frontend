@@ -1,12 +1,11 @@
 Priority
 ========
-AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
-Setup and test linking
-Google auth finish
-Remove fake nullables
-search on groups' page
-spending page
-add close button for the multiselect
-Add not only expense but money transfer
-Bugfix (black background on Vaso's device)
-Avatar upload should work
+9 AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
+7 Setup and test linking
+6 Google auth finish
+3 search on groups' page
+6 spending page
+4 add close button for the multiselect
+6 Add not only expense but money transfer
+? Bugfix (black background on Vaso's device)
+6 Avatar upload should work

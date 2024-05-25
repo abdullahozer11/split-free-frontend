@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import {useGroupList} from "@/src/api/groups";
-import {Text, ActivityIndicator} from "react-native-paper";
+import {Text, ActivityIndicator, TextInput} from "react-native-paper";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useAcceptInvite, useGroupInvitationsForProfile, useRejectInvite} from "@/src/api/profiles";
 import {GroupInvite} from "@/src/components/Person";
@@ -14,25 +14,28 @@ const GroupScreen = ({}) => {
   const queryClient = useQueryClient();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
+  const [searchBarVisible, setSearchBarVisible] = useState(false);
+  const [queryKey, setQueryKey] = useState('');
 
-  const {data: groups, error, isLoading} = useGroupList();
+  const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
   const {session} = useAuth();
-  const {data: groupInvitations, error: error2, isLoading: isLoading2} = useGroupInvitationsForProfile(session?.user.id);
+  const {data: groupInvitations, error: groupInvitesError, isLoading: groupInvitesLoading} = useGroupInvitationsForProfile(session?.user.id);
 
   const {mutate: acceptInvite} = useAcceptInvite();
   const {mutate: rejectInvite} = useRejectInvite();
 
-  if (isLoading || isLoading2) {
+  if (groupsLoading || groupInvitesLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (error || error2) {
+  if (groupsError || groupInvitesError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
-  function handleSearch() {
-    console.log('searching');
-  }
+  const toggleSearchBarVisible = () => {
+    setSearchBarVisible(!searchBarVisible);
+    setQueryKey('');
+  };
 
   const closeModal = () => {
     setIsModalVisible(false);
@@ -79,7 +82,13 @@ const GroupScreen = ({}) => {
 
   return (
     <View style={styles.container}>
-      <CustomHeader title={'Groups'} handleSearch={handleSearch} setIsModalVisible={setIsModalVisible}/>
+      <CustomHeader title={'Groups'} handleSearch={toggleSearchBarVisible} setIsModalVisible={setIsModalVisible}/>
+      {searchBarVisible && <TextInput
+        placeholder={''}
+        onChangeText={setQueryKey}
+        value={queryKey}
+        style={{marginHorizontal: 10}}
+      />}
       <View style={styles.body}>
         <SectionList
           sections={sections}
