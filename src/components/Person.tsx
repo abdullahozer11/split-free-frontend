@@ -38,7 +38,8 @@ export const Member = ({member, assignable, onAssign, myOwnMember}) => {
           <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
             <Avatar.Image size={36}
                           source={member.profile?.avatar_url ? {uri: member.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
-            <Text variant={"bodyLarge"}>{member.name}</Text>
+            <Text variant={"bodyLarge"} numberOfLines={1} style={{width: 200}}>
+              {member.name}</Text>
           </View>
           <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
             {myOwnMember && <Text variant={"labelMedium"} color={'green'}>Me</Text>}
@@ -79,14 +80,15 @@ export const Debt = ({debt, members}) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.subContainer, {justifyContent: "space-between"}]}>
+      <View style={[styles.subContainer, { justifyContent: 'space-between' }]}>
         <Avatar.Image size={36}
-                      source={borrower?.profile?.avatar_url ? {uri: borrower.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
-        <Text variant={"bodyLarge"}>{borrower?.name}</Text>
-        <Feather name={'arrow-right'} size={36}/>
-        <Text variant={"bodyLarge"}>{lender?.name}</Text>
+                      source={borrower?.profile?.avatar_url ? { uri: borrower.profile?.avatar_url } : require('@/assets/images/blank-profile.png')}
+        />
+        <Text style={styles.nameText} numberOfLines={1}>{borrower?.name}</Text>
+        <Feather name={'arrow-right'} size={36} />
+        <Text style={styles.nameText} numberOfLines={1}>{lender?.name}</Text>
         <Avatar.Image size={36}
-                      source={lender?.profile?.avatar_url ? {uri: lender.profile?.avatar_url} : require('@/assets/images/blank-profile.png')}/>
+                      source={lender?.profile?.avatar_url ? { uri: lender.profile?.avatar_url } : require('@/assets/images/blank-profile.png')} />
         <Text variant={'labelLarge'}>€ {debt?.amount} </Text>
       </View>
     </View>
@@ -188,7 +190,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    gap: 10,
+    gap: 3,
+  },
+  nameText: {
+    flex: 1,
+    fontSize: 14,
+    marginHorizontal: 5,
   },
   notifLine: {
     paddingVertical: 10,
