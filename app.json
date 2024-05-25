@@ -43,7 +43,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true
@@ -54,7 +55,11 @@
       },
       "eas": {
         "projectId": "eb5b67a4-daf3-42fb-b228-01e0e572a88a"
-      }
+      },
+      "googleOauthScopes": [
+        "profile",
+        "email"
+      ]
     }
   }
 }

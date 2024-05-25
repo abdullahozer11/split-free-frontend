@@ -4,7 +4,14 @@ Priority
 7 Setup and test linking
 6 Google auth finish
 6 spending page
-4 add close button for the multiselect
 6 Add not only expense but money transfer
 ? Bugfix (black background on Vaso's device)
 6 Avatar upload should work
+6 Fix app icon
+6 Add app splash screen
+
+Google Auth Finish
+1. watch tutorial
+2. read on it
+4. understand oauth1 and oauth2
+3. implement

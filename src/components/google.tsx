@@ -32,7 +32,7 @@ const GoogleSignIn = () => {
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('play services not available or outdated');
       } else {
-        console.log('some other error happened');
+        console.log('some other error happened:', error);
       }
     }
   };
