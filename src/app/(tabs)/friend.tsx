@@ -91,7 +91,7 @@ export default function FriendScreen() {
     // console.log("Removing friend", friend_id);
     unfriend(friend_id, {
       onSuccess: async () => {
-        console.log("Successfully unfriended", friend_id);
+        // console.log("Successfully unfriended", friend_id);
         setIsDialogVisible(false);
         await queryClient.invalidateQueries(['friends']);
       }

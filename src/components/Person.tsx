@@ -105,8 +105,8 @@ export const SearchProfile = ({profile, onAdd}) => {
           <Feather name={'user-plus'} size={24}/>
         </TouchableOpacity>}
         {profile.friend_status === 'FRIEND' && <Feather name={'user-check'} size={24} color={'green'}/>}
-        {profile.friend_status === 'SENT' && <Button onPress={() => {console.log('pressed')}}>Pending</Button>}
-        {profile.friend_status === 'RECEIVED' && <Button onPress={() => {console.log('pressed')}}>Accept</Button>}
+        {profile.friend_status === 'SENT' && <Button onPress={() => {console.log('pressed on pending')}}>Pending</Button>}
+        {profile.friend_status === 'RECEIVED' && <Button onPress={() => {console.log('pressed on accept')}}>Accept</Button>}
       </View>
     </View>
   );

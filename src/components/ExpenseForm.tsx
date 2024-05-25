@@ -150,7 +150,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       participants: participants
     }, {
       onSuccess: async () => {
-        console.log("Successfully inserted expense");
+        // console.log("Successfully inserted expense");
         navigation.goBack();
         await queryClient.invalidateQueries(['group', group_id]);
         await queryClient.invalidateQueries(['expenses', group_id]);

@@ -52,7 +52,7 @@ const ExpenseDetailsScreen = () => {
     console.log("deleting expense");
     deleteExpense(expense?.id, {
       onSuccess: async () => {
-        console.log("Successfully deleted expense: ", expense.id);
+        // console.log("Successfully deleted expense: ", expense.id);
         navigation.goBack();
         await queryClient.invalidateQueries(['group', group_id]);
         await queryClient.invalidateQueries(['expenses', group_id]);

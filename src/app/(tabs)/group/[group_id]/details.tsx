@@ -39,14 +39,19 @@ const GroupDetailsScreen = () => {
   const {mutate: insertMember} = useInsertMember();
   const {mutate: assignMember} = useAssignMember();
   const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
+
   // menu related
   const [visible, setVisible] = useState(false);
   const [isAddingNewName, setIsAddingNewName] = useState(false);
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState('');
+  const [isNewMenuVisible, setIsNewMenuVisible] = useState(false);
+
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
+  const openNewMenu = () => setIsNewMenuVisible(true);
+  const closeNewMenu = () => setIsNewMenuVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
 
@@ -125,10 +130,15 @@ const GroupDetailsScreen = () => {
     })
   };
 
-  // todo need to add a field to friends list so that each friend has a field that is "membershipStatus equal to member or invited or available"
-  console.log('friends are', friends);
-  console.log('pending invites are', pendingInvites);
-  console.log('members are', group?.members);
+  const handleNewExpense = () => {
+    console.log('New expense button');
+    closeNewMenu();
+  };
+
+  const handleNewTransfer = () => {
+    console.log('New transfer button');
+    closeNewMenu();
+  };
 
   return (
     <View style={styles.container}>
@@ -196,7 +206,7 @@ const GroupDetailsScreen = () => {
                 </View>
               }
             </View>
-            <View style={[styles.section, {paddingBottom: 120}]}>
+            <View style={[styles.section, {paddingBottom: 1}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
                   <Debt key={debt.id} debt={debt} members={group?.members}/>
@@ -242,6 +252,16 @@ const GroupDetailsScreen = () => {
                            titleStyle={{color: "blue"}}
                 />
               </Menu>
+              <Menu
+                visible={isNewMenuVisible}
+                onDismiss={closeNewMenu}
+                contentStyle={styles.newMenu}
+                anchor={<TouchableOpacity onPress={openNewMenu}>
+                  <Feather name={"plus"} size={32} color={'gold'}/>
+                </TouchableOpacity>}>
+                <Menu.Item onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/expense/create", params: {group_id: groupId}});}} title="New expense"/>
+                <Menu.Item onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/transfer/create", params: {group_id: groupId}});}} title="New transfer"/>
+              </Menu>
             </View>
           </View>
           <View/>
@@ -275,12 +295,6 @@ const GroupDetailsScreen = () => {
           <Feather name={'x'} size={28}/>
         </TouchableOpacity>
       </Modal>
-      {bigPlusVisible && <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
-        <Pressable style={styles.newExpenseBtn}>
-          <Feather name={"plus"} size={36}/>
-          <Text variant={'titleMedium'}>Expense</Text>
-        </Pressable>
-      </Link>}
     </View>
   );
 };
@@ -331,17 +345,19 @@ const styles = StyleSheet.create({
     gap: 10
   },
   newExpenseBtn: {
-    position: "absolute",
-    bottom: 20,
-    right: 15,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    alignSelf: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: "orange",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 0.5,
     borderStyle: "dashed",
+  },
+  newMenu: {
+    marginTop: 20,
+    backgroundColor: "white",
   },
   friendSelector: {
     width: '100%',
