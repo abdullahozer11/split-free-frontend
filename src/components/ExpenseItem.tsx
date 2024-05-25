@@ -32,10 +32,8 @@ const ExpenseItem = ({expense}) => {
         <View style={styles.expenseCatIcon}>
           <Feather name={'shopping-cart'} source={require('@/assets/images/logo.png')} style={styles.icon}/>
         </View>
-        <View>
-          <Text style={{fontSize: 18, fontWeight: '600'}}>{expense.title}</Text>
-        </View>
-        <Text style={styles.total}>Total €{expense.amount}</Text>
+        <Text style={{fontSize: 18, fontWeight: '600'}}>{expense.title}</Text>
+        <Text style={styles.total}>€{expense.amount}</Text>
       </Pressable>
     </Link>
   );
@@ -52,6 +50,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 20,
     gap: 15,
+    alignItems: "center",
   },
   expenseCatIcon: {
     justifyContent: "center",
@@ -70,5 +69,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     position: "absolute",
     right: 20,
+    alignSelf: "center",
   },
 });

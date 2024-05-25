@@ -1,7 +1,5 @@
 Priority
 ========
-Bugfix (black background on Vaso's device)
-Avatar upload should work
 AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
 Setup and test linking
 Google auth finish
@@ -12,3 +10,5 @@ spending page
 remove fake currency options
 add close button for the multiselect
 Add not only expense but money transfer
+Bugfix (black background on Vaso's device)
+Avatar upload should work
