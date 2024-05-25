@@ -123,6 +123,22 @@ export const useAcceptFriend = () => {
   });
 };
 
+export const useRejectFriend = () => {
+  return useMutation({
+    async mutationFn(uid) {
+      const {error} = await supabase
+        .from('friend_requests')
+        .delete()
+        .eq('sender', uid);
+      if (error) {
+        console.error('useRejectFriend error:', error.message);
+        throw new Error(error.message);
+      }
+      // console.log('useRejectFriend success');
+    },
+  });
+};
+
 export const useInsertGroupInvitation = () => {
   return useMutation({
     async mutationFn(data) {

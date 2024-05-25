@@ -18,7 +18,7 @@ import {
   getFriends,
   useAcceptFriend,
   useInsertFriendRequest,
-  useProfile,
+  useProfile, useRejectFriend,
   useUnfriend
 } from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
@@ -43,6 +43,7 @@ export default function FriendScreen() {
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
   const {mutate: unfriend} = useUnfriend();
   const {mutate: acceptFriend} = useAcceptFriend();
+  const {mutate: rejectFriend} = useRejectFriend();
 
   useFriendRequestSubscription(session?.user.id);
 
@@ -109,7 +110,14 @@ export default function FriendScreen() {
   };
 
   const handleIgnore = (sender_uid) => {
-
+    rejectFriend(sender_uid, {
+      onSuccess: async () => {
+        console.log('Friend request is rejected');
+        setIsNotifMenuVisible(false);
+        await queryClient.invalidateQueries(['friends']);
+        await queryClient.invalidateQueries(['friend_requests']);
+      }
+    });
   };
 
   return (
