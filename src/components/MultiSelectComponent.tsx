@@ -1,8 +1,15 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {MultiSelect} from 'react-native-element-dropdown';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { MultiSelect } from 'react-native-element-dropdown';
+import { Ionicons } from '@expo/vector-icons';
 
-const MyMultiSelect = ({selected, members, onChange}) => {
+const MyMultiSelect = ({ selected, members, onChange }) => {
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const handleDone = () => {
+    setIsDropdownVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>
@@ -24,7 +31,15 @@ const MyMultiSelect = ({selected, members, onChange}) => {
         onChange={(item) => {
           onChange(item);
         }}
+        renderRightIcon={() =>
+          {return (isDropdownVisible && <TouchableOpacity onPress={handleDone}>
+          <Text style={styles.doneButton}>Close</Text>
+          </TouchableOpacity>)}
+        }
         selectedStyle={styles.selectedStyle}
+        onFocus={() => setIsDropdownVisible(true)}
+        onBlur={() => setIsDropdownVisible(false)}
+        visible={isDropdownVisible}
       />
     </View>
   );
@@ -72,5 +87,9 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  selectedStyle: {}
+  selectedStyle: {},
+  doneButton: {
+    fontSize: 16,
+    paddingRight: 10,
+  },
 });

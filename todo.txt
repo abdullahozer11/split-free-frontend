@@ -3,7 +3,6 @@ Priority
 9 AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
 7 Setup and test linking
 6 Google auth finish
-3 search on groups' page
 6 spending page
 4 add close button for the multiselect
 6 Add not only expense but money transfer
