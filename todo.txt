@@ -8,8 +8,4 @@ Priority
 ? Bugfix (black background on Vaso's device)
 6 Avatar upload should work
 
-Google Auth Finish
-1. watch tutorial
-2. read on it
-4. understand oauth1 and oauth2
-3. implement
+postgres changes to activity log

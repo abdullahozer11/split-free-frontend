@@ -67,7 +67,7 @@ const AccountScreen = () => {
       <View style={styles.body}>
         <View style={styles.row}>
           <Card iconName={"folder"} page={'profile'} title={"Profile"}/>
-          <Card iconName={"pie-chart"} page={'spending'} title={"Spending"}/>
+          {/*<Card iconName={"pie-chart"} page={'spending'} title={"Spending"}/>*/}
           <Card iconName={"settings"} page={'settings'} title={"Settings"}/>
         </View>
       </View>
