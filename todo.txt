@@ -7,8 +7,6 @@ Priority
 6 Add not only expense but money transfer
 ? Bugfix (black background on Vaso's device)
 6 Avatar upload should work
-6 Fix app icon
-6 Add app splash screen
 
 Google Auth Finish
 1. watch tutorial
