@@ -2,10 +2,10 @@ Priority
 ========
 9 AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
 7 Setup and test linking
-6 Google auth finish
-6 spending page
-6 Add not only expense but money transfer
 ? Bugfix (black background on Vaso's device)
-6 Avatar upload should work
+6 Google auth finish
 
-postgres changes to activity log
+7 postgres changes to activity log
+6 Avatar upload should work
+6 Add not only expense but money transfer
+indexed database

@@ -75,7 +75,7 @@ const SignUpScreen = () => {
     if (error) {
       Alert.alert(error.message);
     } else {
-      Alert.alert('Account created successfully!');
+      Alert.alert('Confirm account via email');
       router.push('/sign-in');
     }
   }
