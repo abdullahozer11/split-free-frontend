@@ -19,7 +19,7 @@ import {
 import {useAuth} from "@/src/providers/AuthProvider";
 import {useInsertMember, useProfileMember} from "@/src/api/members";
 import {useQueryClient} from "@tanstack/react-query";
-import {useInsertExpenseSubscription} from "@/src/api/expenses/subscriptions";
+import {useExpenseSubscription} from "@/src/api/expenses/subscriptions";
 
 const GroupDetailsScreen = () => {
   const {group_id: idString} = useLocalSearchParams();
@@ -55,7 +55,7 @@ const GroupDetailsScreen = () => {
     setTotalBalance(_balance);
   }, [group]);
 
-  useInsertExpenseSubscription(groupId);
+  useExpenseSubscription(groupId);
 
   if (groupLoading || expenseLoading || profileLoading || friendsLoading || profileMemberLoading || pInviteLoading) {
     return <ActivityIndicator/>;

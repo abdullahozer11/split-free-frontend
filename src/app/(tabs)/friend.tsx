@@ -24,7 +24,7 @@ import {
 import {useAuth} from "@/src/providers/AuthProvider";
 import {supabase} from "@/src/lib/supabase";
 import {useQueryClient} from "@tanstack/react-query";
-import {useInsertFriendRequestSubscription} from "@/src/api/profiles/subscriptions";
+import {useFriendRequestSubscription} from "@/src/api/profiles/subscriptions";
 
 
 export default function FriendScreen() {
@@ -44,7 +44,7 @@ export default function FriendScreen() {
   const {mutate: unfriend} = useUnfriend();
   const {mutate: acceptFriend} = useAcceptFriend();
 
-  useInsertFriendRequestSubscription(session?.user.id);
+  useFriendRequestSubscription(session?.user.id);
 
   if (isLoading || profileLoading || freqIsLoading) {
     return <ActivityIndicator/>;

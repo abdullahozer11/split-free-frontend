@@ -1,5 +1,5 @@
 import {supabase} from "@/src/lib/supabase";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 
 
 export const useMemberList = (groupId: number) => {
