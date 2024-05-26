@@ -48,7 +48,7 @@ export const useDeleteGroup = () => {
         console.error('useDeleteGroup error:', error);
         throw new Error(error.message);
       }
-      console.log("useDeleteGroup success");
+      // console.log("useDeleteGroup success");
       return id;
     },
     async onSuccess() {
@@ -68,7 +68,7 @@ export const useInsertGroup = () => {
         console.error('useInsertGroup error:', error);
         throw new Error(error.message);
       }
-      console.log('useInsertGroup success:', newGroupID);
+      // console.log('useInsertGroup success:', newGroupID);
       return newGroupID;
     },
   });

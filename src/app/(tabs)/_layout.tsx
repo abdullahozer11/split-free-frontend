@@ -30,9 +30,16 @@ export default function TabLayout() {
       screenOptions={({route}) => ({
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        // tabBarStyle: {
-        //   display: route.name === 'account' ? 'none' : 'flex',
-        // },
+        tabBarStyle: {
+          height: 60
+          // display: route.name === 'account' ? 'none' : 'flex',
+        },
+        tabBarIconStyle: {
+          marginTop: 5,
+        },
+        tabBarLabelStyle: {
+          marginBottom: 5,
+        },
         // headerTitleAlign: 'center',
       })}>
       {/*<Tabs.Screen*/}

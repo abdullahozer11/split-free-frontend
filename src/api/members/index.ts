@@ -89,7 +89,7 @@ export const useInsertMember = () => {
         console.log('useInsertMember error: ', error);
         throw new Error(error.message);
       }
-      console.log("useInsertMember success");
+      // console.log("useInsertMember success");
     },
   })
 }
