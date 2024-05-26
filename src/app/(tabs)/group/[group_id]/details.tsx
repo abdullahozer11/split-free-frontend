@@ -130,15 +130,7 @@ const GroupDetailsScreen = () => {
     })
   };
 
-  const handleNewExpense = () => {
-    console.log('New expense button');
-    closeNewMenu();
-  };
-
-  const handleNewTransfer = () => {
-    console.log('New transfer button');
-    closeNewMenu();
-  };
+  console.log('friends are ', friends);
 
   return (
     <View style={styles.container}>
@@ -295,6 +287,9 @@ const GroupDetailsScreen = () => {
         {friends?.map(({profile: {id, email, avatar_url}}) => (
           <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)}/>
         ))}
+        {!friends.length && <View style={{backgroundColor: 'white', height: 60, textAlign: "center", paddingLeft: 20}}>
+          <Text variant={'headlineMedium'}>No friend is found</Text>
+        </View>}
         <TouchableOpacity style={{position: "absolute", top: 2, right: 10}} onPress={() => {setIsFriendSelectorVisible(false)}} >
           <Feather name={'x'} size={28}/>
         </TouchableOpacity>

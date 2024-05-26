@@ -10,7 +10,7 @@ import {Feather} from "@expo/vector-icons";
 import {useInsertTransfer} from "@/src/api/transfers";
 import {useQueryClient} from "@tanstack/react-query";
 
-export default function NewTransfer() {
+export default function CreateTransfer() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
 
