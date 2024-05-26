@@ -159,6 +159,12 @@ const GroupDetailsScreen = () => {
               </View>
             </View>
             <View style={styles.section}>
+              <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+                <Text variant={'titleMedium'}>Expenses</Text>
+                <TouchableOpacity onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/expense/create", params: {group_id: groupId}})}}>
+                  <Feather name={'plus-circle'} size={18} color={'green'}/>
+                </TouchableOpacity>
+              </View>
               <View>
                 {Object.keys(groupedExpenses).map((item) => (
                   <View style={styles.activityGroup} key={item}>
@@ -206,6 +212,14 @@ const GroupDetailsScreen = () => {
                 </View>
               }
             </View>
+            <View style={styles.section}>
+              <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+                <Text variant={'titleMedium'}>Transfers</Text>
+                <TouchableOpacity onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/transfer/create", params: {group_id: groupId}})}}>
+                  <Feather name={'plus-circle'} size={18} color={'green'}/>
+                </TouchableOpacity>
+              </View>
+            </View>
             <View style={[styles.section, {paddingBottom: 1}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
@@ -251,16 +265,6 @@ const GroupDetailsScreen = () => {
                 }} title="Invite a person"
                            titleStyle={{color: "blue"}}
                 />
-              </Menu>
-              <Menu
-                visible={isNewMenuVisible}
-                onDismiss={closeNewMenu}
-                contentStyle={styles.newMenu}
-                anchor={<TouchableOpacity onPress={openNewMenu}>
-                  <Feather name={"plus"} size={32} color={'gold'}/>
-                </TouchableOpacity>}>
-                <Menu.Item onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/expense/create", params: {group_id: groupId}});}} title="New expense"/>
-                <Menu.Item onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/transfer/create", params: {group_id: groupId}});}} title="New transfer"/>
               </Menu>
             </View>
           </View>
