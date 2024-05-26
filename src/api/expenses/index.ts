@@ -38,7 +38,7 @@ export const useExpense = (id: number) => {
   });
 };
 
-export const useInsertExpense = (group_id: number) => {
+export const useInsertExpense = () => {
   return useMutation({
     async mutationFn(data) {
       const {data: newExpenseID, error} = await supabase
@@ -57,7 +57,7 @@ export const useInsertExpense = (group_id: number) => {
         console.error('useInsertExpense error: ', error.message);
         throw new Error(error.message);
       }
-      console.log('New expense inserted:', newExpenseID);
+      // console.log('New expense inserted:', newExpenseID);
       return newExpenseID;
     },
   });

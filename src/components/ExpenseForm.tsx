@@ -43,7 +43,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
 
   const isUpdating = !!updatingExpense;
 
-  const {mutate: insertExpense} = useInsertExpense(groupId);
+  const {mutate: insertExpense} = useInsertExpense();
   const {mutate: updateExpense} = useUpdateExpense();
   const {data: members, isError: membersError, isLoading: membersLoading} = useMemberList(groupId);
 

@@ -4,9 +4,6 @@ Priority
 7 Setup and test linking
 ? Bugfix (black background on Vaso's device)
 6 Google auth finish
-
-7 postgres changes to activity log
 6 Avatar upload should work
 6 Add not only expense but money transfer
-indexed database
 need to add a field to friends list so that each friend has a field that is "membershipStatus equal to member or invited or available to not double invite to a group

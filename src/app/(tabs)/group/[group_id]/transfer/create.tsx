@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Alert, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {SafeAreaView} from "react-native-safe-area-context";
 import {useLocalSearchParams, useNavigation} from "expo-router";
@@ -7,9 +7,12 @@ import {ActivityIndicator, TextInput} from "react-native-paper";
 import MyDropdown from "@/src/components/DropdownComponent";
 import {useMemberList} from "@/src/api/members";
 import {Feather} from "@expo/vector-icons";
+import {useInsertTransfer} from "@/src/api/transfers";
+import {useQueryClient} from "@tanstack/react-query";
 
 export default function NewTransfer() {
   const navigation = useNavigation();
+  const queryClient = useQueryClient();
 
   const {group_id: idString} = useLocalSearchParams();
   const groupId = parseInt(typeof idString === 'string' ? idString : idString[0]);
@@ -18,6 +21,8 @@ export default function NewTransfer() {
   const [sender, setSender] = useState(null);
   const [receiver, setReceiver] = useState(null);
   const [description, setDescription] = useState('');
+
+  const {mutate: insertTransfer} = useInsertTransfer();
 
   const {data: members, isError, isLoading} = useMemberList(groupId);
 
@@ -29,6 +34,45 @@ export default function NewTransfer() {
     return <Text>Failed to fetch data</Text>;
   }
 
+  const submit = () => {
+    if (!validate()) {
+      return;
+    }
+
+    insertTransfer({
+      amount,
+      description,
+      sender,
+      receiver,
+      group_id: groupId,
+    }, {
+      onSuccess: async () => {
+        // console.log("Successfully inserted transfer");
+        navigation.goBack();
+        await queryClient.invalidateQueries(['transfers']);
+      }
+    })
+  };
+
+  const validate = () => {
+    if (!amount || amount == 0) {
+      Alert.alert('Please enter non zero amount');
+      return false;
+    }
+
+    if (!sender) {
+      Alert.alert('Please enter sender');
+      return false;
+    }
+
+    if (!receiver) {
+      Alert.alert('Please enter receiver');
+      return false;
+    }
+
+    return true;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -37,8 +81,7 @@ export default function NewTransfer() {
         }}>
           <Feather style={styles.icon} name={"arrow-left"} size={24}/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
-        }}>
+        <TouchableOpacity onPress={submit}>
           <Text style={styles.icon}>Save</Text>
         </TouchableOpacity>
       </View>
@@ -68,7 +111,7 @@ export default function NewTransfer() {
             setSender(person);
           }}
           label={"Who sent"}
-          selected={1}
+          selected={sender}
         />
       </View>
       <View style={styles.dropdownContainer}>
@@ -80,10 +123,10 @@ export default function NewTransfer() {
             setReceiver(person);
           }}
           label={"Who received"}
-          selected={1}
+          selected={receiver}
         />
       </View>
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity onPress={submit}>
         <Text style={styles.saveIcon}>Save</Text>
       </TouchableOpacity>
     </SafeAreaView>
