@@ -45,7 +45,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
 
   const {mutate: insertExpense} = useInsertExpense(groupId);
   const {mutate: updateExpense} = useUpdateExpense();
-  const {data: members, error: membersError, isLoading: membersLoading} = useMemberList(groupId);
+  const {data: members, isError: membersError, isLoading: membersLoading} = useMemberList(groupId);
 
   if (membersLoading) {
     return <ActivityIndicator/>;

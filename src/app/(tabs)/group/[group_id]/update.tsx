@@ -23,7 +23,7 @@ const UpdateGroup = () => {
   const [existingMembers, setExistingMembers] = useState([]);
   const [error, setError] = useState('');
 
-  const {data: existingGroup, error: fetchError, isLoading} = useGroup(groupId);
+  const {data: existingGroup, isError: fetchError, isLoading} = useGroup(groupId);
 
   const {mutate: updateGroup} = useUpdateGroup();
 

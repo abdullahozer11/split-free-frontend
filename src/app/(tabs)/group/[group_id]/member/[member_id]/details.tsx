@@ -21,9 +21,9 @@ const MemberDetailsScreen = () => {
 
   const {session} = useAuth();
 
-  const {data: member, error: memberError, isLoading: memberLoading } = useMember(memberId);
-  const {data: profileMember, error: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(session?.user.id, member?.group_id);
-  const {data: debt, error: debtError, isLoading: debtLoading } = useDebt(memberId, profileMember?.id);
+  const {data: member, isError: memberError, isLoading: memberLoading } = useMember(memberId);
+  const {data: profileMember, isError: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(session?.user.id, member?.group_id);
+  const {data: debt, isError: debtError, isLoading: debtLoading } = useDebt(memberId, profileMember?.id);
 
   const {mutate: updateMemberName} = useUpdateMemberName();
   const {mutate: deleteMember} = useDeleteMember();

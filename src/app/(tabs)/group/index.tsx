@@ -17,9 +17,9 @@ const GroupScreen = ({}) => {
   const [searchBarVisible, setSearchBarVisible] = useState(false);
   const [queryKey, setQueryKey] = useState('');
 
-  const {data: groups, error: groupsError, isLoading: groupsLoading} = useGroupList();
+  const {data: groups, isError: groupsError, isLoading: groupsLoading} = useGroupList();
   const {session} = useAuth();
-  const {data: groupInvitations, error: groupInvitesError, isLoading: groupInvitesLoading} = useGroupInvitationsForProfile(session?.user.id);
+  const {data: groupInvitations, isError: groupInvitesError, isLoading: groupInvitesLoading} = useGroupInvitationsForProfile(session?.user.id);
 
   const {mutate: acceptInvite} = useAcceptInvite();
   const {mutate: rejectInvite} = useRejectInvite();

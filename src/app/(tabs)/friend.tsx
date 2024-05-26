@@ -38,8 +38,8 @@ export default function FriendScreen() {
 
   const {session} = useAuth();
   const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id);
-  const {data: friends, error, isLoading} = getFriends(session?.user.id);
-  const {data: freqs, error: freqError, isLoading: freqIsLoading} = getFriendRequests(session?.user.id);
+  const {data: friends, isError, isLoading} = getFriends(session?.user.id);
+  const {data: freqs, isError: freqError, isLoading: freqIsLoading} = getFriendRequests(session?.user.id);
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
   const {mutate: unfriend} = useUnfriend();
   const {mutate: acceptFriend} = useAcceptFriend();
@@ -51,7 +51,7 @@ export default function FriendScreen() {
     return <ActivityIndicator/>;
   }
 
-  if (error || profileError || freqError) {
+  if (isError || profileError || freqError) {
     return <Text>Failed to fetch data</Text>;
   }
 

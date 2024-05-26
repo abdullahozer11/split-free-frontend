@@ -11,7 +11,7 @@ export default function UpdateExpense() {
   const expenseId = parseInt(typeof expenseIdString === 'string' ? expenseIdString : expenseIdString[0]);
   const group_id = parseInt(typeof groupIdString === 'string' ? groupIdString : groupIdString[0]);
 
-  const {data: expense, error: expenseError, isLoading: expenseLoading} = useExpense(expenseId);
+  const {data: expense, isError: expenseError, isLoading: expenseLoading} = useExpense(expenseId);
 
   if (expenseLoading) {
     return <ActivityIndicator/>;
