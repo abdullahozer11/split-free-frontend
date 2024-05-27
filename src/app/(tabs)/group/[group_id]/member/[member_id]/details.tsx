@@ -1,4 +1,4 @@
-import {StyleSheet, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
+import {StyleSheet, View, SafeAreaView, TouchableOpacity, Image, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useLocalSearchParams, useNavigation} from 'expo-router';
 import CollapsableHeader from '@/src/components/CollapsableHeader';
@@ -54,6 +54,10 @@ const MemberDetailsScreen = () => {
         await queryClient.invalidateQueries(['member', memberId]);
         await queryClient.invalidateQueries(['members', member.group_id]);
       },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     })
   };
 
@@ -64,7 +68,11 @@ const MemberDetailsScreen = () => {
         // console.log("Successfully deleted member");
         navigation.goBack();
         await queryClient.invalidateQueries(['members', member?.group_id]);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 

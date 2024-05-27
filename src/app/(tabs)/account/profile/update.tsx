@@ -1,4 +1,4 @@
-import {Image, ScrollView, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+import {Alert, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import {View, Text} from '@/src/components/Themed';
 import {supabase} from "@/src/lib/supabase";
 import * as ImagePicker from 'expo-image-picker';
@@ -64,7 +64,11 @@ export default function UpdateProfile() {
       onSuccess: async () => {
         navigation.goBack();
         await queryClient.invalidateQueries(['profile']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 

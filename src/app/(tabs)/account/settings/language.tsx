@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import {Alert, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {ActivityIndicator, Text} from 'react-native-paper';
 import React, {useEffect, useState} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -49,10 +49,12 @@ const Languages = () => {
           // console.log('handleValueChange success');
           await queryClient.invalidateQueries(['profile']);
         },
-        onError: () => {
+        onError: (error) => {
           setLanguage(lanTemp);
           setIsFocus(true);
-        }
+          console.error('Server error:', error);
+          Alert.alert('Error', 'Server error.');
+        },
       })
   };
 

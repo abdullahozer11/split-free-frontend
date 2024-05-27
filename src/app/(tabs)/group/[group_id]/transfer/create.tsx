@@ -50,7 +50,11 @@ export default function CreateTransfer() {
         // console.log("Successfully inserted transfer");
         navigation.goBack();
         await queryClient.invalidateQueries(['transfers']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     })
   };
 

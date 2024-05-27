@@ -1,4 +1,4 @@
-import {StyleSheet, View, SafeAreaView, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, SafeAreaView, TouchableOpacity, Alert} from 'react-native';
 import React, {useState} from "react";
 import {useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
@@ -57,7 +57,11 @@ const ExpenseDetailsScreen = () => {
         await queryClient.invalidateQueries(['group', group_id]);
         await queryClient.invalidateQueries(['expenses', group_id]);
         await queryClient.invalidateQueries(['groups']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 

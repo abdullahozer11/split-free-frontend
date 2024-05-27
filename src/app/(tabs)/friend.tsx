@@ -1,4 +1,4 @@
-import {View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, ScrollView, StyleSheet, TouchableOpacity, Alert} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
@@ -83,7 +83,11 @@ export default function FriendScreen() {
         const newSearchResults = searchResults;
         newSearchResults.find((sr) => sr.id == friend_id_input).friend_status = "SENT";
         setSearchResults(newSearchResults);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 
@@ -94,7 +98,11 @@ export default function FriendScreen() {
         // console.log("Successfully unfriended", friend_id);
         setIsDialogVisible(false);
         await queryClient.invalidateQueries(['friends']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 
@@ -105,7 +113,11 @@ export default function FriendScreen() {
         setIsNotifMenuVisible(false);
         await queryClient.invalidateQueries(['friends']);
         await queryClient.invalidateQueries(['friend_requests']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 
@@ -116,7 +128,11 @@ export default function FriendScreen() {
         setIsNotifMenuVisible(false);
         await queryClient.invalidateQueries(['friends']);
         await queryClient.invalidateQueries(['friend_requests']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 

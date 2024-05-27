@@ -1,4 +1,4 @@
-import {StyleSheet, View, TouchableOpacity, Pressable} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Pressable, Alert} from 'react-native';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {useDeleteGroup, useGroup} from "@/src/api/groups";
@@ -82,6 +82,10 @@ const GroupDetailsScreen = () => {
         navigation.goBack();
         await queryClient.invalidateQueries(['groups']);
       },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 
@@ -99,7 +103,11 @@ const GroupDetailsScreen = () => {
         onSuccess: async () => {
           // console.log('Successfully inserted group invitation');
           setIsFriendSelectorVisible(false);
-        }
+        },
+        onError: (error) => {
+          console.error('Server error:', error);
+          Alert.alert('Error', 'Server error.');
+        },
       })
   };
 
@@ -111,7 +119,11 @@ const GroupDetailsScreen = () => {
       onSuccess: async () => {
         console.log('Member assign is dealt with success');
         await queryClient.invalidateQueries(['members', groupId]);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     })
   };
 
@@ -126,7 +138,11 @@ const GroupDetailsScreen = () => {
         setIsAddingNewName(false);
         setBigPlusVisible(true);
         await queryClient.invalidateQueries(['members', groupId]);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     })
   };
 

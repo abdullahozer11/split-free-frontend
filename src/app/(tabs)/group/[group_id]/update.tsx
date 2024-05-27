@@ -82,6 +82,10 @@ const UpdateGroup = () => {
         await queryClient.invalidateQueries(['group', existingGroup.id]);
         await queryClient.invalidateQueries(['members', existingGroup.id]);
       },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'There was an error updating the group. Please try again.');
+      },
     });
   };
 

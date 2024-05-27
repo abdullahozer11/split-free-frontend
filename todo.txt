@@ -1,7 +1,6 @@
 Priority
 ========
 NO 9 AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
-NO 7 Setup and test linking
 YES ? Bugfix (black background on Vaso's device)
 NO 6 Google auth finish
 NO 6 Avatar upload should work

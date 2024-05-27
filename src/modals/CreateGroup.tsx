@@ -6,7 +6,7 @@ import {
   TextInput,
   Pressable,
   Modal,
-  TouchableOpacity,
+  TouchableOpacity, Alert,
 } from "react-native";
 import {Feather} from '@expo/vector-icons';
 import Participants from "@/src/modals/CreateGroupParticipants";
@@ -63,6 +63,10 @@ const CreateGroupModal = ({isVisible, onClose}) => {
         resetFields();
         onClose();
         await queryClient.invalidateQueries(['groups']);
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'There was an error saving the group. Please try again.');
       },
     })
   };

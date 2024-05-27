@@ -1,4 +1,4 @@
-import {View, StyleSheet, SectionList} from 'react-native';
+import {View, StyleSheet, SectionList, Alert} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useState} from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
@@ -50,7 +50,11 @@ const GroupScreen = ({}) => {
         console.log('Accept invite command handled successfully')
         await queryClient.invalidateQueries(['groups']);
         await queryClient.invalidateQueries(['group_invites_for_profile']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     })
   };
 
@@ -59,7 +63,11 @@ const GroupScreen = ({}) => {
       onSuccess: async () => {
         console.log('Reject invite command handled successfully')
         await queryClient.invalidateQueries(['group_invites_for_profile']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     })
   };
 

@@ -130,7 +130,11 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
         await queryClient.invalidateQueries(['group', group_id]);
         await queryClient.invalidateQueries(['expense', updatingExpense.id]);
         await queryClient.invalidateQueries(['expenses', group_id]);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 
@@ -155,7 +159,11 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
         await queryClient.invalidateQueries(['group', group_id]);
         await queryClient.invalidateQueries(['expenses', group_id]);
         await queryClient.invalidateQueries(['groups']);
-      }
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
     });
   };
 
