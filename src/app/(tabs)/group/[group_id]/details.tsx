@@ -130,8 +130,6 @@ const GroupDetailsScreen = () => {
     })
   };
 
-  console.log('friends are ', friends);
-
   return (
     <View style={styles.container}>
       <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
@@ -204,14 +202,14 @@ const GroupDetailsScreen = () => {
                 </View>
               }
             </View>
-            <View style={styles.section}>
-              <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
-                <Text variant={'titleMedium'}>Transfers</Text>
-                <TouchableOpacity onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/transfer/create", params: {group_id: groupId}})}}>
-                  <Feather name={'plus-circle'} size={18} color={'green'}/>
-                </TouchableOpacity>
-              </View>
-            </View>
+            {/*<View style={styles.section}>*/}
+            {/*  <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>*/}
+            {/*    <Text variant={'titleMedium'}>Transfers</Text>*/}
+            {/*    <TouchableOpacity onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/transfer/create", params: {group_id: groupId}})}}>*/}
+            {/*      <Feather name={'plus-circle'} size={18} color={'green'}/>*/}
+            {/*    </TouchableOpacity>*/}
+            {/*  </View>*/}
+            {/*</View>*/}
             <View style={[styles.section, {paddingBottom: 1}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
@@ -294,6 +292,12 @@ const GroupDetailsScreen = () => {
           <Feather name={'x'} size={28}/>
         </TouchableOpacity>
       </Modal>
+      {bigPlusVisible && <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
+        <Pressable style={styles.newExpenseBtn}>
+          <Feather name={"plus"} size={36}/>
+          <Text variant={'titleMedium'}>Expense</Text>
+        </Pressable>
+      </Link>}
     </View>
   );
 };
