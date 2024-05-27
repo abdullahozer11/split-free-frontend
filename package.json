@@ -25,6 +25,7 @@
     "base64-arraybuffer": "^1.0.2",
     "dayjs": "^1.11.10",
     "expo": "~51.0.8",
+    "expo-auth-session": "^5.5.2",
     "expo-crypto": "~13.0.2",
     "expo-dev-client": "~4.0.14",
     "expo-device": "~6.0.2",
