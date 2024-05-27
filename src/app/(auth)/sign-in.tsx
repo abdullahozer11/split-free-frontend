@@ -57,7 +57,7 @@ const SignInScreen = () => {
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
       </Link>
-      <GoogleSignIn/>
+      {/*<GoogleSignIn/>*/}
     </View>
   );
 };
