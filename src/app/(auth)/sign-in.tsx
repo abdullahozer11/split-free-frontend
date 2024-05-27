@@ -6,6 +6,25 @@ import Colors from '../../constants/Colors';
 import {Link, Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
 import GoogleSignIn from "@/src/components/google";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
+import * as Linking from "expo-linking";
+
+const createSessionFromUrl = async (url: string) => {
+  const {params, errorCode} = QueryParams.getQueryParams(url);
+
+  if (errorCode) throw new Error(errorCode);
+  const {access_token, refresh_token} = params;
+
+  if (!access_token) return;
+
+  const {data, error} = await supabase.auth.setSession({
+    access_token,
+    refresh_token,
+  });
+  if (error) throw error;
+  return data.session;
+};
+
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
@@ -13,6 +32,11 @@ const SignInScreen = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const url = Linking.useURL();
+  if (url) {
+    createSessionFromUrl(url);
+  }
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -56,6 +80,9 @@ const SignInScreen = () => {
       <Button disabled={loading} onPress={signInWithEmail} text={loading ? "Signing in..." : "Sign in"}/>
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
+      </Link>
+      <Link href="/magic" style={[styles.textButton, styles.magicButton]}>
+        Send Magic
       </Link>
       {/*<GoogleSignIn/>*/}
     </View>
@@ -106,6 +133,15 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     paddingVertical: 7,
   },
+  magicButton: {
+    width: "100%",
+    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 50,
+    textAlign: "center",
+    fontSize: 18,
+    color: 'maroon',
+  }
 });
 
 export default SignInScreen;

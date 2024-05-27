@@ -21,7 +21,8 @@ export default function TabLayout() {
 
   if (!session) {
     return (
-      <Redirect href={'/sign-in'}/>
+      // <Redirect href={'/sign-in'}/>
+      <Redirect href={'/test'}/>
     );
   }
 
