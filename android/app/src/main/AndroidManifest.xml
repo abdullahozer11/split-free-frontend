@@ -30,9 +30,9 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="split-free-frontend"/>
-        <data android:scheme="com.SplitFree"/>
-        <data android:scheme="exp+split-free-frontend"/>
+        <data android:scheme="xyz.splitfree"/>
+        <data android:scheme="xyz.splitfree"/>
+        <data android:scheme="exp+xyz.splitfree"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

@@ -1,4 +1,4 @@
-rootProject.name = 'split-free-frontend'
+rootProject.name = 'SplitFree'
 
 dependencyResolutionManagement {
   versionCatalogs {

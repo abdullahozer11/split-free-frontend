@@ -83,9 +83,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.SplitFree'
+    namespace 'xyz.splitfree'
     defaultConfig {
-        applicationId 'com.SplitFree'
+        applicationId 'xyz.splitfree'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

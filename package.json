@@ -1,5 +1,5 @@
 {
-  "name": "split-free-frontend",
+  "name": "SplitFree",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
