@@ -2,7 +2,7 @@
   "expo": {
     "scheme": "xyz.splitfree",
     "name": "SplitFree",
-    "slug": "xyz.splitfree",
+    "slug": "split-free-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -53,13 +53,13 @@
       "router": {
         "origin": false
       },
-      "eas": {
-        "projectId": "eb5b67a4-daf3-42fb-b228-01e0e572a88a"
-      },
       "googleOauthScopes": [
         "profile",
         "email"
-      ]
+      ],
+      "eas": {
+        "projectId": "eb5b67a4-daf3-42fb-b228-01e0e572a88a"
+      }
     }
   }
 }
