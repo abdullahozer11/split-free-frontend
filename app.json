@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "split-free-frontend",
-    "slug": "split-free-frontend",
+    "scheme": "xyz.splitfree",
+    "name": "xyz.splitfree",
+    "slug": "xyz.splitfree",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "split-free-frontend",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -33,7 +33,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.SplitFree"
+      "package": "com.xyz.splitfree"
     },
     "web": {
       "bundler": "metro",
