@@ -226,7 +226,7 @@ const GroupDetailsScreen = () => {
             {/*    </TouchableOpacity>*/}
             {/*  </View>*/}
             {/*</View>*/}
-            <View style={[styles.section, {paddingBottom: 1}]}>
+            <View style={[styles.section, {paddingBottom: 120}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
                   <Debt key={debt.id} debt={debt} members={group?.members}/>
@@ -364,10 +364,12 @@ const styles = StyleSheet.create({
     gap: 10
   },
   newExpenseBtn: {
-    alignSelf: "center",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    position: "absolute",
+    bottom: 20,
+    right: 15,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: "orange",
     justifyContent: "center",
     alignItems: "center",
