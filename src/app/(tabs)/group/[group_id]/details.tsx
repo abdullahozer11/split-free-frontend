@@ -46,12 +46,9 @@ const GroupDetailsScreen = () => {
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState('');
-  const [isNewMenuVisible, setIsNewMenuVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
-  const openNewMenu = () => setIsNewMenuVisible(true);
-  const closeNewMenu = () => setIsNewMenuVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
 
@@ -100,9 +97,10 @@ const GroupDetailsScreen = () => {
         group_id: groupId,
         group_name: group.title
       }, {
-        onSuccess: async () => {
-          // console.log('Successfully inserted group invitation');
+        onSuccess: () => {
+          console.log('Successfully inserted group invitation');
           setIsFriendSelectorVisible(false);
+          queryClient.invalidateQueries(['group_invites_for_group']);
         },
         onError: (error) => {
           console.error('Server error:', error);
@@ -145,6 +143,24 @@ const GroupDetailsScreen = () => {
       },
     })
   };
+
+  // Create a list of member ids
+  const memberIds = group?.members.map(member => member.profile?.id);
+
+  // Create a list of pending invite ids
+  const pendingInviteIds = pendingInvites.map(invite => invite.receiver_profile.id);
+
+  // Update friends with membership status
+  const updatedFriends = friends.map(friend => {
+    const friendId = friend.profile.id;
+    if (memberIds.includes(friendId)) {
+      return {...friend, membershipStatus: 'member'};
+    } else if (pendingInviteIds.includes(friendId)) {
+      return {...friend, membershipStatus: 'invited'};
+    } else {
+      return {...friend, membershipStatus: 'available'};
+    }
+  });
 
   return (
     <View style={styles.container}>
@@ -375,10 +391,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 0.5,
     borderStyle: "dashed",
-  },
-  newMenu: {
-    marginTop: 20,
-    backgroundColor: "white",
   },
   friendSelector: {
     width: '100%',
