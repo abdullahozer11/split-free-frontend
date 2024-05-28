@@ -154,6 +154,22 @@ export const useInsertGroupInvitation = () => {
   });
 };
 
+export const useDeleteGroupInvitation = () => {
+  return useMutation({
+    async mutationFn(invite_id) {
+      const {error} = await supabase
+        .from('group_invitations')
+        .delete()
+        .eq('id', invite_id);
+      if (error) {
+        console.error('useDeleteGroupInvitation error: ', error.message);
+        throw new Error(error.message);
+      }
+      // console.log('useDeleteGroupInvitation success');
+    },
+  });
+};
+
 export const useGroupInvitationsForProfile = (uid) => {
   return useQuery({
     queryKey: ['group_invites_for_profile'],
@@ -178,7 +194,7 @@ export const usePendingGroupInvitesForGroup = (groupId) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('group_invitations')
-        .select('receiver_profile:receiver(id, email)')
+        .select('id, receiver_profile:receiver(id, email)')
         .eq('group_id', groupId);
       if (error) {
         console.log("usePendingGroupInvitesForGroup error: ", error.message);

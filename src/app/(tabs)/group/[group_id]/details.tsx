@@ -11,7 +11,7 @@ import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
 import {
   getFriends,
-  useAssignMember,
+  useAssignMember, useDeleteGroupInvitation,
   useInsertGroupInvitation,
   usePendingGroupInvitesForGroup,
   useProfile
@@ -39,6 +39,7 @@ const GroupDetailsScreen = () => {
   const {mutate: insertMember} = useInsertMember();
   const {mutate: assignMember} = useAssignMember();
   const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
+  const {mutate: deleteGroupInvitation} = useDeleteGroupInvitation();
 
   // menu related
   const [visible, setVisible] = useState(false);
@@ -72,10 +73,9 @@ const GroupDetailsScreen = () => {
   };
 
   const handleDelete = async () => {
-    console.log('deleting group');
     await deleteGroup(group.id, {
       onSuccess: async () => {
-        console.log('Successfully deleted group with id', group.id);
+        // console.log('Successfully deleted group with id', group.id);
         navigation.goBack();
         await queryClient.invalidateQueries(['groups']);
       },
@@ -98,7 +98,7 @@ const GroupDetailsScreen = () => {
         group_name: group.title
       }, {
         onSuccess: () => {
-          console.log('Successfully inserted group invitation');
+          // console.log('Successfully inserted group invitation');
           setIsFriendSelectorVisible(false);
           queryClient.invalidateQueries(['group_invites_for_group']);
         },
@@ -109,13 +109,34 @@ const GroupDetailsScreen = () => {
       })
   };
 
+  const handleRemoveInvite = (user_id) => {
+    const invite = pendingInvites.find((invite) => invite.receiver_profile.id === user_id);
+
+    if (!invite) {
+      console.error('Invite not found for user_id:', user_id);
+      Alert.alert('Error', 'Invite not found.');
+      return;
+    }
+
+    deleteGroupInvitation(invite.id, {
+      onSuccess: () => {
+        // console.log('Successfully deleted group invitation');
+        queryClient.invalidateQueries(['group_invites_for_group']);
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
+    });
+  };
+
   const handleAssign = (memberId) => {
     assignMember({
       _profile_id: profile.id,
       _member_id: memberId
     }, {
       onSuccess: async () => {
-        console.log('Member assign is dealt with success');
+        // console.log('Member assign is dealt with success');
         await queryClient.invalidateQueries(['members', groupId]);
       },
       onError: (error) => {
@@ -131,7 +152,7 @@ const GroupDetailsScreen = () => {
       group_id: groupId
     }, {
       onSuccess: async () => {
-        console.log('New member addition is dealt with success');
+        // console.log('New member addition is dealt with success');
         setNewMemberName('');
         setIsAddingNewName(false);
         setBigPlusVisible(true);
@@ -314,8 +335,8 @@ const GroupDetailsScreen = () => {
       {/*Start Friend Selector for invite*/}
       <Modal visible={isFriendSelectorVisible} onDismiss={() => {setIsFriendSelectorVisible(false)}} contentContainerStyle={styles.friendSelector}>
         <View style={{height: 20, backgroundColor: 'white'}} />
-        {friends?.map(({profile: {id, email, avatar_url}}) => (
-          <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)}/>
+        {updatedFriends?.map(({profile: {id, email, avatar_url}, membershipStatus}) => (
+          <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)} onRemoveInvite={() => handleRemoveInvite(id)} status={membershipStatus}/>
         ))}
         {!friends.length && <View style={{backgroundColor: 'white', height: 60, textAlign: "center", paddingLeft: 20}}>
           <Text variant={'headlineMedium'}>No friend is found</Text>
