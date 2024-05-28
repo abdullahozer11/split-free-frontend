@@ -52,11 +52,34 @@ const GroupDetailsScreen = () => {
   const closeMenu = () => setVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
+  const [updatedFriends, setUpdatedFriends] = useState([]);
 
   useEffect(() => {
     const _balance = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id)?.total_balance || null;
     setTotalBalance(_balance);
   }, [group]);
+
+  useEffect(() => {
+    // Create a list of member ids
+    const memberIds = group?.members?.map(member => member.profile?.id) || [];
+
+    // Create a list of pending invite ids
+    const pendingInviteIds = pendingInvites.map(invite => invite.receiver_profile.id);
+
+    // Update friends with membership status
+    const newUpdatedFriends = friends.map(friend => {
+      const friendId = friend.profile.id;
+      if (memberIds.includes(friendId)) {
+        return {...friend, membershipStatus: 'member'};
+      } else if (pendingInviteIds.includes(friendId)) {
+        return {...friend, membershipStatus: 'invited'};
+      } else {
+        return {...friend, membershipStatus: 'available'};
+      }
+    });
+
+    setUpdatedFriends(newUpdatedFriends);
+  }, [friends, pendingInvites, group]);
 
   useExpenseSubscription(groupId);
 
@@ -164,24 +187,6 @@ const GroupDetailsScreen = () => {
       },
     })
   };
-
-  // Create a list of member ids
-  const memberIds = group?.members.map(member => member.profile?.id);
-
-  // Create a list of pending invite ids
-  const pendingInviteIds = pendingInvites.map(invite => invite.receiver_profile.id);
-
-  // Update friends with membership status
-  const updatedFriends = friends.map(friend => {
-    const friendId = friend.profile.id;
-    if (memberIds.includes(friendId)) {
-      return {...friend, membershipStatus: 'member'};
-    } else if (pendingInviteIds.includes(friendId)) {
-      return {...friend, membershipStatus: 'invited'};
-    } else {
-      return {...friend, membershipStatus: 'available'};
-    }
-  });
 
   return (
     <View style={styles.container}>
