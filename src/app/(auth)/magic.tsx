@@ -1,6 +1,6 @@
 import {Image, StyleSheet, View} from 'react-native';
 import {TextInput} from 'react-native-paper';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Button from '../../components/Button';
 import {Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
@@ -12,6 +12,19 @@ const MagicScreen = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [buttonText, setButtonText] = useState('Send Magic Link');
+  const [countdown, setCountdown] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000);
+    } else {
+      setButtonText('Resend Magic Link');
+    }
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const sendMagicLink = async () => {
     setLoading(true);
@@ -23,7 +36,8 @@ const MagicScreen = () => {
         },
       });
       if (error) throw error;
-      setButtonText('Resend Magic Link');
+      setButtonText('Resend Magic Link in 60s');
+      setCountdown(5);
     } catch (error) {
       // handle error (e.g., show error message)
       console.error(error);
@@ -45,9 +59,9 @@ const MagicScreen = () => {
         />
       </View>
       <Button
-        disabled={loading}
+        disabled={loading || countdown > 0}
         onPress={sendMagicLink}
-        text={loading ? "Sending..." : buttonText}
+        text={loading ? "Sending..." : countdown > 0 ? `Resend in ${countdown}s` : buttonText}
       />
     </View>
   );

@@ -2,7 +2,6 @@ Priority
 ========
 NO 9 AI category embeddings >> each time user creates an expense vector proximity calc should be triggered
 YES ? Bugfix (black background on Vaso's device)
-NO 6 Google auth finish
 NO 6 Avatar upload should work
 NO 6 Money transfer details screen, and money transfer update form
-need to add a field to friends list so that each friend has a field that is "membershipStatus equal to member or invited or available to not double invite to a group
+MAYBE 6 Google auth finish
