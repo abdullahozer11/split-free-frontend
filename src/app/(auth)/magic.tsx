@@ -21,7 +21,7 @@ const MagicScreen = () => {
         setCountdown((prevCountdown) => prevCountdown - 1);
       }, 1000);
     } else {
-      setButtonText('Resend Magic Link');
+      setButtonText('Send Magic Link');
     }
     return () => clearInterval(timer);
   }, [countdown]);
