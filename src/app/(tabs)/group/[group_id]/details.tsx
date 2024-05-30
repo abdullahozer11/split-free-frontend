@@ -340,7 +340,7 @@ const GroupDetailsScreen = () => {
       {/*Start Friend Selector for invite*/}
       <Modal visible={isFriendSelectorVisible} onDismiss={() => {setIsFriendSelectorVisible(false)}} contentContainerStyle={styles.friendSelector}>
         <View style={{height: 20, backgroundColor: 'white'}} />
-        {updatedFriends?.map(({profile: {id, email, avatar_url}, membershipStatus}) => (
+        {updatedFriends && updatedFriends?.map(({profile: {id, email, avatar_url}, membershipStatus}) => (
           <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)} onRemoveInvite={() => handleRemoveInvite(id)} status={membershipStatus}/>
         ))}
         {!friends.length && <View style={{backgroundColor: 'white', height: 60, textAlign: "center", paddingLeft: 20}}>
