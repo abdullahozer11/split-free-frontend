@@ -91,7 +91,7 @@ const GroupScreen = ({}) => {
   if (anchoredGroups.length > 0) {
     sections.push({title: "Quick Access", data: anchoredGroups});
   }
-  sections.push({title: "All Groups", data: filteredGroups.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
+  sections.push({title: anchoredGroups.length > 0 ? "Other Groups" : "All Groups", data: filteredGroups.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
 
   return (
     <View style={styles.container}>
