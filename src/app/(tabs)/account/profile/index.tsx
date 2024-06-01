@@ -45,20 +45,24 @@ export default function ProfileScreen() {
       </View>
       <View style={styles.infoSection}>
         <View style={styles.transparent}>
-          <Text style={styles.label}>Full Name</Text>
-          <Text style={styles.info}>{profile?.full_name}</Text>
-        </View>
-        <View style={styles.transparent}>
           <Text style={styles.label}>Email</Text>
           <Text style={styles.info}>{profile?.email}</Text>
+        </View>
+        <View style={styles.transparent}>
+          <Text style={styles.label}>Full Name</Text>
+          <Text style={styles.info}>{profile?.full_name}</Text>
         </View>
         <View style={styles.transparent}>
           <Text style={styles.label}>Phone Number</Text>
           <Text style={styles.info}>{profile?.phone_number}</Text>
         </View>
+        {/*<View style={styles.transparent}>*/}
+        {/*  <Text style={styles.label}>Password</Text>*/}
+        {/*  <Text style={styles.info}>********</Text>*/}
+        {/*</View>*/}
         <View style={styles.transparent}>
-          <Text style={styles.label}>Password</Text>
-          <Text style={styles.info}>********</Text>
+          <Text style={styles.label}>Website</Text>
+          <Text style={styles.info}>{profile?.website}</Text>
         </View>
       </View>
     </View>
