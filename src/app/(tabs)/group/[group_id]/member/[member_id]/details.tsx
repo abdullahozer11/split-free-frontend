@@ -114,7 +114,7 @@ const MemberDetailsScreen = () => {
                 </View>}
                 <Paragraph>Attached to Profile: {member.profile?.email || 'None'}</Paragraph>
                 <Paragraph>Role: {member.role} {member.role === 'owner' ? <Feather name={'award'} size={18} color={'silver'}/> : null}</Paragraph>
-                <Paragraph>Total Balance: <Paragraph style={{color: member.total_balance >= 0 ? 'green' : 'red'}}>${member.total_balance}</Paragraph></Paragraph>
+                <Paragraph>Total Balance: <Paragraph style={{color: member.total_balance >= 0 ? 'green' : 'red'}}>${member.total_balance.toFixed(2)}</Paragraph></Paragraph>
                   {!ownMember && debt && (debt.amount >= 0 ? <Paragraph>Owes you: €{debt.amount}</Paragraph> : <Paragraph>You owe: €{debt.amount}</Paragraph>)}
               </Card.Content>
             </Card>

@@ -89,13 +89,13 @@ export const Debt = ({debt, members}) => {
         <Text style={styles.nameText} numberOfLines={1}>{lender?.name}</Text>
         <Avatar.Image size={36}
                       source={lender?.profile?.avatar_url ? { uri: lender.profile?.avatar_url } : require('@/assets/images/blank-profile.png')} />
-        <Text variant={'labelLarge'}>€ {debt?.amount} </Text>
+        <Text variant={'labelLarge'}>€ {debt?.amount?.toFixed(2)} </Text>
       </View>
     </View>
   );
 };
 
-export const SearchProfile = ({profile, onAdd}) => {
+export const SearchProfile = ({profile, onAdd, onCancel}) => {
   return (
     <View style={styles.container}>
       <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
@@ -105,7 +105,7 @@ export const SearchProfile = ({profile, onAdd}) => {
           <Feather name={'user-plus'} size={24}/>
         </TouchableOpacity>}
         {profile.friend_status === 'FRIEND' && <Feather name={'user-check'} size={24} color={'green'}/>}
-        {profile.friend_status === 'SENT' && <Button onPress={() => {console.log('pressed on pending')}}>Pending</Button>}
+        {profile.friend_status === 'SENT' && <Button onPress={() => onCancel(profile.id)}>Pending</Button>}
         {profile.friend_status === 'RECEIVED' && <Button onPress={() => {console.log('pressed on accept')}}>Accept</Button>}
       </View>
     </View>

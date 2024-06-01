@@ -16,7 +16,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {
   getFriendRequests,
   getFriends,
-  useAcceptFriend,
+  useAcceptFriend, useDeleteFriendRequest,
   useInsertFriendRequest,
   useProfile, useRejectFriend,
   useUnfriend
@@ -41,6 +41,7 @@ export default function FriendScreen() {
   const {data: friends, isError, isLoading} = getFriends(session?.user.id);
   const {data: freqs, isError: freqError, isLoading: freqIsLoading} = getFriendRequests(session?.user.id);
   const {mutate: insertFriendRequest} = useInsertFriendRequest();
+  const {mutate: deleteFriendRequest} = useDeleteFriendRequest();
   const {mutate: unfriend} = useUnfriend();
   const {mutate: acceptFriend} = useAcceptFriend();
   const {mutate: rejectFriend} = useRejectFriend();
@@ -90,6 +91,22 @@ export default function FriendScreen() {
       },
     });
   };
+
+  const handleCancelFriendReq = (receiver_id) => {
+    deleteFriendRequest({
+      sender: session?.user.id,
+      receiver: receiver_id
+  }, {
+      onSuccess: async () => {
+        console.log("Friend request is deleted.")
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
+    });
+  };
+
 
   const handleRemove = (friend_id) => {
     // console.log("Removing friend", friend_id);
@@ -174,7 +191,7 @@ export default function FriendScreen() {
             {searchResults?.map((profile) => (
               profile.id !== session?.user.id && (
                 <View key={profile.id}>
-                  <SearchProfile onAdd={handleAddFriend} profile={profile}/>
+                  <SearchProfile onAdd={handleAddFriend} onCancel={handleCancelFriendReq} profile={profile}/>
                 </View>
               )
             ))}
@@ -189,11 +206,11 @@ export default function FriendScreen() {
           <View style={{flexDirection: "row", marginHorizontal: 15}}>
             <View style={{flex: 1}}>
               <Text style={{fontSize: 18}}>Total Receivable:</Text>
-              <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ €{profile?.total_receivable}</Text>
+              <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ €{profile?.total_receivable?.toFixed(2)}</Text>
             </View>
             <View style={{flex: 1}}>
               <Text style={{fontSize: 18}}>Total Payable:</Text>
-              <Text style={{fontSize: 24, fontWeight: "bold"}}>- €{profile?.total_payable}</Text>
+              <Text style={{fontSize: 24, fontWeight: "bold"}}>- €{profile?.total_payable.toFixed(2)}</Text>
             </View>
           </View>
           <ProgressBar animatedValue={0.7} theme={{colors: {primary: 'green'}}} style={{height: 18, borderRadius: 10}}/>

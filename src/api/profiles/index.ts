@@ -91,6 +91,25 @@ export const useInsertFriendRequest = () => {
   });
 };
 
+export const useDeleteFriendRequest = () => {
+  return useMutation({
+    async mutationFn(req) {
+      console.log('profile is: ', req.sender);
+      console.log('receiver is: ', req.receiver);
+      const {error} = await supabase
+        .from('friend_requests')
+        .delete()
+        .eq('sender', req.sender)
+        .eq('receiver', req.receiver);
+      if (error) {
+        console.error('useDeleteFriendRequest error:', error.message);
+        throw new Error(error.message);
+      }
+      // console.log('useDeleteFriendRequest success');
+    },
+  });
+};
+
 export const useUnfriend = () => {
   return useMutation({
     async mutationFn(friend_id: uuid) {

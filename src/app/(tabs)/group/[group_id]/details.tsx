@@ -55,7 +55,7 @@ const GroupDetailsScreen = () => {
   const [updatedFriends, setUpdatedFriends] = useState([]);
 
   useEffect(() => {
-    const _balance = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id)?.total_balance || null;
+    const _balance = group?.members.find(mb => mb.profile && mb.profile.id == profile?.id)?.total_balance?.toFixed(2) || null;
     setTotalBalance(_balance);
   }, [group]);
 
@@ -64,10 +64,10 @@ const GroupDetailsScreen = () => {
     const memberIds = group?.members?.map(member => member.profile?.id) || [];
 
     // Create a list of pending invite ids
-    const pendingInviteIds = pendingInvites.map(invite => invite.receiver_profile.id);
+    const pendingInviteIds = pendingInvites?.map(invite => invite.receiver_profile.id);
 
     // Update friends with membership status
-    const newUpdatedFriends = friends.map(friend => {
+    const newUpdatedFriends = friends?.map(friend => {
       const friendId = friend.profile.id;
       if (memberIds.includes(friendId)) {
         return {...friend, membershipStatus: 'member'};
