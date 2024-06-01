@@ -1,5 +1,5 @@
 import {StyleSheet, View, SafeAreaView, TouchableOpacity, Alert} from 'react-native';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {useDeleteExpense, useExpense} from "@/src/api/expenses";
@@ -30,17 +30,23 @@ const ExpenseDetailsScreen = () => {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
+  const [amountPerParticipant, setAmountPerParticipant] = useState(0);
+
   const [isDialogVisible, setIsDialogVisible] = useState(false);
 
-  const {data: expense, expenseError, expenseLoading} = useExpense(id);
+  const {data: expense, isError: isExpenseError, isLoading: expenseLoading} = useExpense(id);
 
   const {mutate: deleteExpense} = useDeleteExpense();
+
+  useEffect(() => {
+    setAmountPerParticipant(((expense?.amount ?? 0) / (expense?.participants?.length)).toFixed(2));
+  }, [expense]);
 
   if (expenseLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (expenseError) {
+  if (isExpenseError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
@@ -83,7 +89,7 @@ const ExpenseDetailsScreen = () => {
           <View style={styles.members}>
             {expense?.participants?.map(participant => (
                 <Participant key={participant.id} participant={participant}
-                             amount={expense?.amount / expense?.participants?.length | 0}/>
+                             amount={amountPerParticipant}/>
               )
             )}
           </View>
