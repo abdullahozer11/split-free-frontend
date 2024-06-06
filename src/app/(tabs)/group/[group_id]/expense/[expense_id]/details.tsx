@@ -34,6 +34,7 @@ const ExpenseDetailsScreen = () => {
   const [amountPerParticipant, setAmountPerParticipant] = useState(0);
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [isDialog2Visible, setIsDialog2Visible] = useState(false);
 
   const {data: expense, isError: isExpenseError, isLoading: expenseLoading} = useExpense(id);
 
@@ -81,6 +82,15 @@ const ExpenseDetailsScreen = () => {
       id: expense?.id,
       group_id: expense?.group_id,
       settled: true,
+    }, {
+      onSuccess: async () => {
+        setIsDialog2Visible(false);
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+        setIsDialog2Visible(false);
+      },
     })
   };
 
@@ -110,7 +120,7 @@ const ExpenseDetailsScreen = () => {
               )}
             </View>
           </View>
-          {expense?.settled ? <Text style={styles.settledText}>Settled</Text> : <TouchableOpacity onPress={handleSettle}>
+          {expense?.settled ? <Text style={styles.settledText}>Settled</Text> : <TouchableOpacity onPress={() => setIsDialog2Visible(true)}>
             <Text style={styles.settleButton}>Mark as settled</Text>
           </TouchableOpacity>}
         </View>
@@ -131,7 +141,7 @@ const ExpenseDetailsScreen = () => {
                   <Feather name="more-horizontal" size={36} color="white"/>
                 </TouchableOpacity>
               }>
-              {!expense?.settled && <Menu.Item onPress={handleSettle} title="Set settled"
+              {!expense?.settled && <Menu.Item onPress={() => setIsDialog2Visible(true)} title="Set settled"
                           titleStyle={{color: "green"}}
               />}
               {!expense?.settled && <Menu.Item onPress={() => {
@@ -164,6 +174,19 @@ const ExpenseDetailsScreen = () => {
           <Dialog.Actions>
             <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
             <Button onPress={handleDelete}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog visible={isDialog2Visible} onDismiss={() => {
+          setIsDialog2Visible(false);
+        }}>
+          <Dialog.Icon icon="alert"/>
+          <Dialog.Title>Are you sure to settle this expense?</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">This action cannot be taken back</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsDialog2Visible(false)}>Cancel</Button>
+            <Button onPress={handleSettle}>Settle</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
