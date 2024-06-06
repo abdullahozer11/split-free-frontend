@@ -62,12 +62,12 @@ const MemberDetailsScreen = () => {
   };
 
   const handleDelete = () => {
-    console.log("deleting member");
     deleteMember(member?.id, {
       onSuccess: async () => {
         // console.log("Successfully deleted member");
         navigation.goBack();
         await queryClient.invalidateQueries(['members', member?.group_id]);
+        await queryClient.invalidateQueries(['expense']);
       },
       onError: (error) => {
         console.error('Server error:', error);
