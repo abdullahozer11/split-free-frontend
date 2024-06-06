@@ -94,8 +94,6 @@ const ExpenseDetailsScreen = () => {
     })
   };
 
-  console.log('expense settled is ', expense?.settled);
-
   return (
     <SafeAreaView style={styles.container}>
       <CollapsableHeader H_MAX_HEIGHT={200} H_MIN_HEIGHT={52} content={
