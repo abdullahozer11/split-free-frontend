@@ -69,9 +69,9 @@ const GroupDetailsScreen = () => {
     // Update friends with membership status
     const newUpdatedFriends = friends?.map(friend => {
       const friendId = friend.profile.id;
-      if (memberIds.includes(friendId)) {
+      if (memberIds?.includes(friendId)) {
         return {...friend, membershipStatus: 'member'};
-      } else if (pendingInviteIds.includes(friendId)) {
+      } else if (pendingInviteIds?.includes(friendId)) {
         return {...friend, membershipStatus: 'invited'};
       } else {
         return {...friend, membershipStatus: 'available'};

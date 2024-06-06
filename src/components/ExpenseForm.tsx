@@ -139,7 +139,6 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   };
 
   const onCreate = async () => {
-    console.log("Creating expense")
     // console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
     // const imagePath = await uploadImage(image);
     insertExpense({
@@ -232,7 +231,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             label="Enter amount"
             placeholder="Enter amount"
             value={amount}
-            onChangeText={(text) => handleInputChange('amount', text.replace(/^0+(?!$)/, ''))}
+            onChangeText={(text) => handleInputChange('amount', text.replace(',', '.').replace(/^0+(?!$)/, ''))}
             keyboardType="numeric"
             style={{flex: 1, backgroundColor: 'white'}}
           />

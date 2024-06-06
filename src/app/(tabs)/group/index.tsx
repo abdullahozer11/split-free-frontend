@@ -1,4 +1,4 @@
-import {View, StyleSheet, SectionList, Alert} from 'react-native';
+import {View, StyleSheet, Alert, ScrollView} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useState} from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
@@ -47,7 +47,7 @@ const GroupScreen = ({}) => {
       _group_id: group_id
     }, {
       onSuccess: async () => {
-        console.log('Accept invite command handled successfully')
+        // console.log('Accept invite command handled successfully')
         await queryClient.invalidateQueries(['groups']);
         await queryClient.invalidateQueries(['group_invites_for_profile']);
       },
@@ -82,7 +82,7 @@ const GroupScreen = ({}) => {
   };
 
   // Filter groups based on queryKey
-  const filteredGroups = groups.filter(group =>
+  const filteredGroups = groups?.filter(group =>
     group.title.toLowerCase().includes(queryKey.toLowerCase())
   );
 
@@ -106,15 +106,24 @@ const GroupScreen = ({}) => {
           onPress={toggleSearchBarVisible}
         />}
       />}
-      <View style={styles.body}>
-        <SectionList
-          sections={sections}
-          renderItem={({item}) => <GroupItem group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>}
-          renderSectionHeader={({section: {title}}) => (
-            <Text style={styles.sectionHeader}>{title}</Text>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-        />
+      <ScrollView style={styles.body}>
+        {sections.map((section) => {
+          if (section.title === 'Quick Access') {
+            return (
+              <View key={section.title}>
+                <Text variant={"headlineLarge"}>Quick Access</Text>
+                {section.data.map((item) => <GroupItem key={item.id} group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>)}
+              </View>
+            );
+          } else {
+            return (
+              <View key={section.title}>
+                <Text variant={"headlineLarge"}>Other Groups</Text>
+                {section.data.map((item) => <GroupItem key={item.id} group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>)}
+              </View>
+            );
+          }
+        })}
         <CreateGroupModal isVisible={isModalVisible} onClose={closeModal}/>
         <View style={{flex: 1}}>
           {groupInvitations.length != 0 && <Text variant={'titleLarge'}>Group Invites</Text>}
@@ -125,7 +134,7 @@ const GroupScreen = ({}) => {
             />
           ))}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };

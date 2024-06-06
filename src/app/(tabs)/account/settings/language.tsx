@@ -16,7 +16,7 @@ const Languages = () => {
   const [isFocus, setIsFocus] = useState(false);
   const data = [
     { label: 'English', value: 'en' },
-    { label: 'French', value: 'fr' },
+    // { label: 'French', value: 'fr' },
   ];
 
   const {session} = useAuth();
