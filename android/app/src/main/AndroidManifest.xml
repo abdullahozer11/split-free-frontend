@@ -33,6 +33,7 @@
         <data android:scheme="xyz.splitfree"/>
         <data android:scheme="xyz.splitfree"/>
         <data android:scheme="exp+xyz.splitfree"/>
+        <data android:scheme="exp+split-free-frontend"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>
