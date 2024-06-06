@@ -2,11 +2,12 @@ import {StyleSheet, View, SafeAreaView, TouchableOpacity, Alert} from 'react-nat
 import React, {useEffect, useState} from "react";
 import {useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {useDeleteExpense, useExpense} from "@/src/api/expenses";
+import {useDeleteExpense, useExpense, useSettleExpense} from "@/src/api/expenses";
 import {Text, ActivityIndicator, Menu, Portal, Dialog, Button} from 'react-native-paper';
 import {Feather} from "@expo/vector-icons";
 import {Participant, Payer} from "@/src/components/Person";
 import {useQueryClient} from "@tanstack/react-query";
+import {formatDateString} from "@/src/utils/helpers";
 
 
 const Description = ({text}) => {
@@ -37,6 +38,7 @@ const ExpenseDetailsScreen = () => {
   const {data: expense, isError: isExpenseError, isLoading: expenseLoading} = useExpense(id);
 
   const {mutate: deleteExpense} = useDeleteExpense();
+  const {mutate: settleExpense} = useSettleExpense();
 
   useEffect(() => {
     setAmountPerParticipant(((expense?.amount ?? 0) / (expense?.participants?.length)).toFixed(2));
@@ -55,6 +57,8 @@ const ExpenseDetailsScreen = () => {
     setIsDialogVisible(true);
   };
 
+  // console.log('last modified date is ', formatDateString(expense.last_modified));
+
   const handleDelete = () => {
     console.log("deleting expense");
     deleteExpense(expense?.id, {
@@ -72,28 +76,43 @@ const ExpenseDetailsScreen = () => {
     });
   };
 
+  const handleSettle = () => {
+    settleExpense({
+      id: expense?.id,
+      group_id: expense?.group_id,
+      settled: true,
+    })
+  };
+
+  console.log('expense settled is ', expense?.settled);
+
   return (
     <SafeAreaView style={styles.container}>
       <CollapsableHeader H_MAX_HEIGHT={200} H_MIN_HEIGHT={52} content={
         <View style={styles.content}>
           <Text variant={"headlineLarge"}>Expense</Text>
-
           {expense?.description && <Description text={expense?.description}/>}
-
-          <Text variant={'titleSmall'}>Who paid?</Text>
-          <View style={styles.members}>
-            {expense?.payers?.map(payer => (
-              <Payer key={payer.id} payer={payer} amount={expense?.amount}/>)
-            )}
+          <View style={styles.section}>
+            <Text variant={'titleSmall'}>Who paid?</Text>
+            <View style={styles.members}>
+              {expense?.payers?.map(payer => (
+                <Payer key={payer.id} payer={payer} amount={expense?.amount?.toFixed(2)}/>)
+              )}
+            </View>
           </View>
-          <Text variant={'titleSmall'}>Who shared?</Text>
-          <View style={styles.members}>
-            {expense?.participants?.map(participant => (
-                <Participant key={participant.id} participant={participant}
-                             amount={amountPerParticipant}/>
-              )
-            )}
+          <View style={styles.section}>
+            <Text variant={'titleSmall'}>Who shared?</Text>
+            <View style={styles.members}>
+              {expense?.participants?.map(participant => (
+                  <Participant key={participant.id} participant={participant}
+                               amount={amountPerParticipant}/>
+                )
+              )}
+            </View>
           </View>
+          {expense?.settled ? <Text style={styles.settledText}>Settled</Text> : <TouchableOpacity onPress={handleSettle}>
+            <Text style={styles.settleButton}>Mark as settled</Text>
+          </TouchableOpacity>}
         </View>
       } headerContent={
         <View style={styles.header}>
@@ -112,10 +131,13 @@ const ExpenseDetailsScreen = () => {
                   <Feather name="more-horizontal" size={36} color="white"/>
                 </TouchableOpacity>
               }>
-              <Menu.Item onPress={() => {
+              {!expense?.settled && <Menu.Item onPress={handleSettle} title="Set settled"
+                          titleStyle={{color: "green"}}
+              />}
+              {!expense?.settled && <Menu.Item onPress={() => {
                 closeMenu();
                 router.push({pathname: "/(tabs)/group/[group_id]/expense/[expense_id]/update", params: {group_id: group_id, expense_id: id}});
-              }} title="Edit expense"/>
+              }} title="Edit expense"/>}
               <Menu.Item onPress={() => {
                 promptDelete();
                 closeMenu();
@@ -126,7 +148,7 @@ const ExpenseDetailsScreen = () => {
           </View>
           <View style={styles.headerContent}>
             <Text variant={'displaySmall'} style={styles.headerTitle}>{expense?.title}</Text>
-            <Text style={styles.syncInfo}>Last modified on January 21, 2024</Text>
+            <Text style={styles.syncInfo}>Last modified on {expense && formatDateString(expense.last_modified)}</Text>
           </View>
         </View>
       }/>
@@ -158,6 +180,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+  },
+  section: {
+    marginTop: 10,
   },
   header: {
     justifyContent: "center",
@@ -199,5 +224,24 @@ const styles = StyleSheet.create({
   headerContent: {
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  settleButton: {
+    marginTop: 10,
+    width: '100%',
+    borderColor: 'green',
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    textAlign: "center",
+    color: "green",
+    fontSize: 20,
+  },
+  settledText: {
+    marginTop: 10,
+    width: '100%',
+    textAlign: "center",
+    color: "green",
+    fontSize: 26,
   },
 });

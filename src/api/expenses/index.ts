@@ -105,3 +105,22 @@ export const useDeleteExpense = () => {
     },
   });
 };
+
+export const useSettleExpense = () => {
+  return useMutation({
+    async mutationFn(expense) {
+      const {error} = await supabase
+        .rpc('settle_expense', {
+          expense_id: expense.id,
+          _group_id: expense.group_id,
+          _settled: expense.settled
+        });
+      if (error) {
+        console.error('useSettleExpense error: ', error.message);
+        throw new Error(error.message);
+      }
+      console.log('useSettleExpense success');
+      return;
+    },
+  });
+};

@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION get_groups_summary()
 RETURNS TABLE (
     id BIGINT,
-    status TEXT,
+    settled BOOLEAN,
     title TEXT,
     expense_count BIGINT,
     member_count BIGINT
@@ -10,7 +10,7 @@ BEGIN
     RETURN QUERY
     SELECT
         g.id,
-        g.status,
+        g.settled,
         g.title,
         COUNT(DISTINCT e.id) AS expense_count,
         COUNT(DISTINCT m.id) AS member_count
@@ -21,6 +21,6 @@ BEGIN
     LEFT JOIN
         expenses e ON g.id = e.group_id
     GROUP BY
-        g.id, g.status, g.title;
+        g.id, g.settled, g.title;
 END;
 $$ LANGUAGE plpgsql;

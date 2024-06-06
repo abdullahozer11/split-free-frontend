@@ -82,7 +82,7 @@ BEGIN
     END LOOP;
 
     -- post expense actions are grouped up
-    PERFORM post_expense(_group_id);
+    PERFORM algo.post_expense(_group_id);
 END;
 $$
 LANGUAGE plpgsql;
