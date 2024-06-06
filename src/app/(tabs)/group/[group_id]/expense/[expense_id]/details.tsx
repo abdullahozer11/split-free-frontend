@@ -47,6 +47,7 @@ const ExpenseDetailsScreen = () => {
   }
 
   if (isExpenseError) {
+    console.log('isExpenseError is:', isExpenseError);
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
