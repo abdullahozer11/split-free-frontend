@@ -32,7 +32,7 @@ const GroupItem = ({group, onAnchor}) => {
             <FontAwesome size={22} style={styles.fixWidth} name={'info'}/>
             <Text style={{color: '#aaa'}}>{group.expense_count} Expenses</Text>
           </View>
-          <Text style={{color: group.settled ? 'green' : 'red'}}>{group.settled ? 'Settled' : 'Unsettled'}</Text>
+          <Text style={{color: group.settled ? 'green' : 'red'}}>{group.settled ? 'Settled' : 'Not Settled'}</Text>
         </View>
       </Pressable>
     </Link>
