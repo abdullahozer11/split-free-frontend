@@ -25,6 +25,8 @@ const GroupScreen = ({}) => {
   const {mutate: acceptInvite} = useAcceptInvite();
   const {mutate: rejectInvite} = useRejectInvite();
 
+  useGroupSubscriptions();
+
   if (groupsLoading || groupInvitesLoading) {
     return <ActivityIndicator/>;
   }
@@ -32,8 +34,6 @@ const GroupScreen = ({}) => {
   if (groupsError || groupInvitesError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
-
-  useGroupSubscriptions();
 
   const toggleSearchBarVisible = () => {
     setSearchBarVisible(!searchBarVisible);
