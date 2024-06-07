@@ -62,7 +62,7 @@ export default function FriendScreen() {
       .rpc('search_friends', {
         keyword_input: searchQuery,
         profile_id_input: session?.user.id,
-        limit_input: 10,
+        limit_input: 6,
         offset_input: 0,
       });
     if (error) {

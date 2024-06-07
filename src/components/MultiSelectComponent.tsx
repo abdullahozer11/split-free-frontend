@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { MultiSelect } from 'react-native-element-dropdown';
-import { Ionicons } from '@expo/vector-icons';
+import {Feather} from "@expo/vector-icons";
 
 const MyMultiSelect = ({ selected, members, onChange }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -9,6 +9,22 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
   const handleDone = () => {
     setIsDropdownVisible(false);
   };
+
+  const renderItem = item => {
+    return (
+      <View style={styles.line}>
+        <Text style={styles.lineLabel}>{item.name}</Text>
+        {selected.includes(item.id) && (
+          <Feather
+            color="green"
+            name="check"
+            size={24}
+          />
+        )}
+      </View>
+    );
+  };
+
 
   return (
     <View style={styles.container}>
@@ -31,6 +47,7 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
         onChange={(item) => {
           onChange(item);
         }}
+        renderItem={renderItem}
         renderRightIcon={() =>
           {return (isDropdownVisible && <TouchableOpacity onPress={handleDone}>
           <Text style={styles.doneButton}>Close</Text>
@@ -87,9 +104,21 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  selectedStyle: {},
+  selectedStyle: {
+  },
   doneButton: {
     fontSize: 16,
     paddingRight: 10,
   },
+  line: {
+    flexDirection: "row",
+    height: 60,
+    paddingVertical: 5,
+    paddingHorizontal: 20,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  lineLabel: {
+    fontSize: 16
+  }
 });
