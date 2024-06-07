@@ -49,7 +49,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
     setTitle('');
   };
 
-  const saveData = async () => {
+  const handleCreateGroup = async () => {
     if (!validateData()) {
       console.log('Invalid group data');
       return;
@@ -101,7 +101,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
             <TouchableOpacity onPress={onClose}>
               <Feather name="x" size={24} color="black"/>
             </TouchableOpacity>
-            <Pressable onPress={saveData}>
+            <Pressable onPress={handleCreateGroup}>
               <Text style={styles.doneText}>Done</Text>
             </Pressable>
           </View>

@@ -68,7 +68,6 @@ const ExpenseDetailsScreen = () => {
         navigation.goBack();
         await queryClient.invalidateQueries(['group', group_id]);
         await queryClient.invalidateQueries(['expenses', group_id]);
-        await queryClient.invalidateQueries(['groups']);
       },
       onError: (error) => {
         console.error('Server error:', error);

@@ -9,6 +9,7 @@ import {useAuth} from "@/src/providers/AuthProvider";
 import {useAcceptInvite, useGroupInvitationsForProfile, useRejectInvite} from "@/src/api/profiles";
 import {GroupInvite} from "@/src/components/Person";
 import {useQueryClient} from "@tanstack/react-query";
+import {useGroupSubscriptions} from "@/src/api/groups/subscriptions";
 
 const GroupScreen = ({}) => {
   const queryClient = useQueryClient();
@@ -31,6 +32,8 @@ const GroupScreen = ({}) => {
   if (groupsError || groupInvitesError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
+
+  useGroupSubscriptions();
 
   const toggleSearchBarVisible = () => {
     setSearchBarVisible(!searchBarVisible);

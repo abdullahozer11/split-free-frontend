@@ -101,10 +101,11 @@ const GroupDetailsScreen = () => {
     setIsDialog2Visible(true);
   };
 
-  const handleSettle = () => {
-      settleGroup(group.id, {
+  const handleSettle = async () => {
+    await settleGroup(group.id, {
       onSuccess: async () => {
         console.log('Successfully settled group with id', group.id);
+        setIsDialog2Visible(false);
         await queryClient.invalidateQueries(['groups']);
         await queryClient.invalidateQueries(['debts']);
       },
@@ -370,7 +371,7 @@ const GroupDetailsScreen = () => {
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+            <Button onPress={() => setIsDialog2Visible(false)}>Cancel</Button>
             <Button onPress={handleSettle}>Settle</Button>
           </Dialog.Actions>
         </Dialog>
