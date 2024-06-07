@@ -17,7 +17,7 @@ export const useMemberSubscription = (group_id) => {
           filter: 'group_id=eq.' + group_id,
         },
         (payload) => {
-          console.log('Change received!', payload);
+          // console.log('Change received!', payload);
           queryClient.invalidateQueries(['members', group_id]);
         }
       )

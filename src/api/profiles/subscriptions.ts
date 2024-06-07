@@ -17,7 +17,7 @@ export const useFriendRequestSubscription = (uid) => {
           filter: 'receiver=eq.' + uid,
         },
         (payload) => {
-          console.log('Change received!', payload);
+          // console.log('Change received!', payload);
           queryClient.invalidateQueries(['friend_requests']);
         }
       )

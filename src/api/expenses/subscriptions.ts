@@ -17,7 +17,7 @@ export const useExpenseSubscription = (group_id) => {
           filter: 'group_id=eq.' + group_id,
         },
         (payload) => {
-          console.log('Change received!', payload);
+          // console.log('Change received!', payload);
           queryClient.invalidateQueries(['expenses', group_id]);
           queryClient.invalidateQueries(['groups']);
         }
