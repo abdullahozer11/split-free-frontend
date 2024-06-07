@@ -112,8 +112,7 @@ export const useSettleExpense = () => {
       const {error} = await supabase
         .rpc('settle_expense', {
           expense_id: expense.id,
-          _group_id: expense.group_id,
-          _settled: expense.settled
+          _group_id: expense.group_id
         });
       if (error) {
         console.error('useSettleExpense error: ', error.message);

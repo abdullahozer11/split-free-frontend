@@ -85,6 +85,8 @@ const ExpenseDetailsScreen = () => {
     }, {
       onSuccess: async () => {
         setIsDialog2Visible(false);
+        await queryClient.invalidateQueries(['groups']);
+        await queryClient.invalidateQueries(['debts']);
       },
       onError: (error) => {
         console.error('Server error:', error);

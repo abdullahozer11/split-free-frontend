@@ -1,7 +1,7 @@
 import {StyleSheet, View, TouchableOpacity, Pressable, Alert} from 'react-native';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
-import {useDeleteGroup, useGroup} from "@/src/api/groups";
+import {useDeleteGroup, useGroup, useSettleGroup} from "@/src/api/groups";
 import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
@@ -36,6 +36,7 @@ const GroupDetailsScreen = () => {
   const {data: profileMember, isError: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(profile?.id, groupId);
   const [totalBalance, setTotalBalance] = useState(0);
   const {mutate: deleteGroup} = useDeleteGroup();
+  const {mutate: settleGroup} = useSettleGroup();
   const {mutate: insertMember} = useInsertMember();
   const {mutate: assignMember} = useAssignMember();
   const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
@@ -51,6 +52,7 @@ const GroupDetailsScreen = () => {
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [isDialog2Visible, setIsDialog2Visible] = useState(false);
   const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
   const [updatedFriends, setUpdatedFriends] = useState([]);
 
@@ -93,6 +95,24 @@ const GroupDetailsScreen = () => {
 
   const promptDelete = () => {
     setIsDialogVisible(true);
+  };
+
+  const promptSettle = () => {
+    setIsDialog2Visible(true);
+  };
+
+  const handleSettle = () => {
+      settleGroup(group.id, {
+      onSuccess: async () => {
+        console.log('Successfully settled group with id', group.id);
+        await queryClient.invalidateQueries(['groups']);
+        await queryClient.invalidateQueries(['debts']);
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
+    });
   };
 
   const handleDelete = async () => {
@@ -303,6 +323,11 @@ const GroupDetailsScreen = () => {
                   router.push({pathname: "/(tabs)/group/[group_id]/update", params: {group_id: groupId}});
                 }} title="Edit Group"/>
                 <Menu.Item onPress={() => {
+                  promptSettle();
+                }} title="Settle all expenses"
+                           titleStyle={{color: "green"}}
+                />
+                <Menu.Item onPress={() => {
                   promptDelete();
                   closeMenu();
                 }} title="Delete Group"
@@ -334,6 +359,19 @@ const GroupDetailsScreen = () => {
           <Dialog.Actions>
             <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
             <Button onPress={handleDelete}>Ok</Button>
+          </Dialog.Actions>
+        </Dialog>
+        <Dialog visible={isDialog2Visible} onDismiss={() => {
+          setIsDialog2Visible(false);
+        }}>
+          <Dialog.Icon icon="alert"/>
+          <Dialog.Title>Are you sure to settle this group?</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">This action cannot be taken back</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
+            <Button onPress={handleSettle}>Settle</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

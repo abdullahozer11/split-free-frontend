@@ -86,3 +86,18 @@ export const useUpdateGroup = () => {
     },
   });
 };
+
+export const useSettleGroup = () => {
+  return useMutation({
+    async mutationFn(id) {
+      const {error} = await supabase
+        .rpc('settle_group', {_id: id});
+      if (error) {
+        console.error('useSettleGroup error: ', error.message);
+        throw new Error(error.message);
+      }
+      console.log('useSettleGroup success');
+      return;
+    },
+  });
+};
