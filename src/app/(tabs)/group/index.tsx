@@ -121,7 +121,7 @@ const GroupScreen = ({}) => {
           } else {
             return (
               <View key={section.title}>
-                <Text variant={"headlineLarge"}>Other Groups</Text>
+                <Text variant={"headlineLarge"}>{section.title}</Text>
                 {section.data.map((item) => <GroupItem key={item.id} group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>)}
               </View>
             );

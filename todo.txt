@@ -4,13 +4,3 @@ NO 9 AI category embeddings >> each time user creates an expense vector proximit
 NO 6 Avatar upload should work
 NO 6 Money transfer details screen, and money transfer update form
 MAYBE 6 Google auth finish
-
-### Feature
-either mark settled the whole group or the expense or all the expenses that you're involved
-
-expense edit set as settled
-once settled only title or description can be updated.
-Settle all expenses for everybody
-Settle expenses where I payed or participated
-if all expenses are settled group will also be settled
-
