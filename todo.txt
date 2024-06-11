@@ -4,3 +4,4 @@ NO 9 AI category embeddings >> each time user creates an expense vector proximit
 NO 6 Avatar upload should work
 NO 6 Money transfer details screen, and money transfer update form
 MAYBE 6 Google auth finish
+YES Add member problems
