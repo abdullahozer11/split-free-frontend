@@ -9,6 +9,8 @@ Welcome to the **SplitFree** app! This app is designed to help you split expense
 - **Group Expense Management**: Ideal for managing shared expenses for trips, events, or any group activities.
 - **Free and Ad-Free**: Enjoy the full functionality of the app without any interruptions from ads.
 
+<img src="https://i.ibb.co/BC1st9k/Split-Free.png" alt="Screenshot of Adding Members" width="300"/>
+
 ## Getting Started
 
 Follow these steps to get started with the SplitFree app:
@@ -48,6 +50,38 @@ Use the Expo Go app on your mobile device to scan the QR code and start using th
 - Add Members: Add all the members who are participating in the expenses.
 - Record Expenses: Input all the expenses and assign them to the relevant members.
 - Settle Up: Let the app calculate the ideal minimum amount of transfers needed to settle all expenses.
+
+## Screenshots
+
+<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-around;">
+
+<div style="margin: 10px;">
+  <img src="https://i.ibb.co/mT4ZWHr/sc-create-group.jpg" alt="Screenshot of Group Creation" width="300"/>
+  <p>Description: Creating a group for your event or trip.</p>
+</div>
+
+<div style="margin: 10px;">
+  <img src="https://i.ibb.co/jHjGHC3/sc-create-group-add-members.jpg" alt="Screenshot of Adding Members" width="300"/>
+  <p>Description: Adding members who are participating in the expenses.</p>
+</div>
+
+<div style="margin: 10px;">
+  <img src="https://i.ibb.co/58wptwX/sc-expense-form.jpg" alt="Screenshot of Recording Expenses" width="300"/>
+  <p>Description: Inputting expenses and assigning them to relevant members.</p>
+</div>
+
+<div style="margin: 10px;">
+  <img src="https://i.ibb.co/ZLHp33Q/sc-group-index.jpg" alt="Screenshot of Group Page" width="300"/>
+  <p>Description: Displaying group index page and its contents.</p>
+</div>
+
+<div style="margin: 10px;">
+  <img src="https://i.ibb.co/GtVfWhw/sc-settings.jpg" alt="Screenshot of Settings Page" width="300"/>
+  <p>Description: Settings.</p>
+</div>
+
+</div>
+
 
 ### Contributing
 - We welcome contributions from the community! To contribute:
