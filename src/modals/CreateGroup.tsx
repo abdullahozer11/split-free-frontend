@@ -47,6 +47,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
   const resetFields = () => {
     setTitle('');
+    setMembers([profile?.full_name])
   };
 
   const handleCreateGroup = async () => {

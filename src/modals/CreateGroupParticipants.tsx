@@ -33,10 +33,15 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
   };
 
   const validateMemberName = () => {
+    if (!name) {
+      setError('Enter name first');
+      return false;
+    }
     if (members.includes(name)) {
       setError('Name is already in the list');
       return false;
     }
+    setError('');
     return true;
   };
 
@@ -64,10 +69,11 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
               style={styles.input}
             />
           </View>
-          <TouchableOpacity disabled={!name} style={styles.invitationRow} onPress={addMember}>
+          <TouchableOpacity style={styles.invitationRow} onPress={addMember}>
             <Feather style={styles.icon} name="user-plus" size={24} color="black"/>
-            <Text style={styles.text}>Add a new member to SplitFree</Text>
+            <Text style={styles.text}>Add a new member</Text>
           </TouchableOpacity>
+          <Text style={{color: 'red', marginLeft: 20}}>{error}</Text>
           <View style={styles.people}>
             {members.map((member, index) => (
               index === 0 ? (
@@ -77,7 +83,6 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
               )
             ))}
           </View>
-          <Text style={{color: 'red'}}>{error}</Text>
           <View style={styles.footer}>
             <TouchableOpacity style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Cancel</Text>
@@ -203,6 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 5,
     marginHorizontal: 10,
+    backgroundColor: 'green'
   },
   icon: {
     fontSize: 22,
