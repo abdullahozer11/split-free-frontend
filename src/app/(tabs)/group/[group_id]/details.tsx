@@ -1,7 +1,7 @@
 import {StyleSheet, View, TouchableOpacity, Pressable, Alert} from 'react-native';
 import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
-import {useDeleteGroup, useGroup, useSettleGroup} from "@/src/api/groups";
+import {useDeleteGroup, useExitGroup, useGroup, useSettleGroup} from "@/src/api/groups";
 import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import ExpenseItem from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
@@ -11,9 +11,8 @@ import {useExpenseList} from "@/src/api/expenses";
 import {Debt, Friend2, Member} from "@/src/components/Person";
 import {
   getFriends,
-  useAssignMember, useDeleteGroupInvitation,
-  useInsertGroupInvitation,
-  usePendingGroupInvitesForGroup,
+  useAssignMember,
+  useInsertGroupInvitation, usePendingGroupInvitesForGroup,
   useProfile
 } from "@/src/api/profiles";
 import {useAuth} from "@/src/providers/AuthProvider";
@@ -35,17 +34,18 @@ const GroupDetailsScreen = () => {
   const {data: pendingInvites, isError: pInviteError, isLoading: pInviteLoading} = usePendingGroupInvitesForGroup(groupId);
   const {data: profileMember, isError: profileMemberError, isLoading: profileMemberLoading} = useProfileMember(profile?.id, groupId);
   const [totalBalance, setTotalBalance] = useState(0);
+  const {mutate: exitGroup} = useExitGroup();
   const {mutate: deleteGroup} = useDeleteGroup();
   const {mutate: settleGroup} = useSettleGroup();
   const {mutate: insertMember} = useInsertMember();
   const {mutate: assignMember} = useAssignMember();
   const {mutate: insertGroupInvitation} = useInsertGroupInvitation();
-  const {mutate: deleteGroupInvitation} = useDeleteGroupInvitation();
 
   // menu related
   const [visible, setVisible] = useState(false);
   const [isAddingNewName, setIsAddingNewName] = useState(false);
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
+  const [isGroupExiterVisible, setIsGroupExiterVisible] = useState(false);
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState('');
 
@@ -134,6 +134,27 @@ const GroupDetailsScreen = () => {
     setIsFriendSelectorVisible(true);
   };
 
+  const promptExitGroup = () => {
+      setIsGroupExiterVisible(true);
+  };
+
+  const handleExitGroup = () => {
+    exitGroup({
+      _profile_id: session?.user.id,
+      _group_id: groupId
+    }, {
+      onSuccess: async () => {
+        // console.log("Group exited successfully");
+        navigation.goBack();
+        await queryClient.invalidateQueries(['groups']);
+      },
+      onError: (error) => {
+        console.error('Server error:', error);
+        Alert.alert('Error', 'There was an error exiting the group. Please try again.');
+      }
+    });
+  };
+
   const handleInvite = (id) => {
       insertGroupInvitation({
         sender: session?.user.id,
@@ -153,31 +174,10 @@ const GroupDetailsScreen = () => {
       })
   };
 
-  const handleRemoveInvite = (user_id) => {
-    const invite = pendingInvites.find((invite) => invite.receiver_profile.id === user_id);
-
-    if (!invite) {
-      console.error('Invite not found for user_id:', user_id);
-      Alert.alert('Error', 'Invite not found.');
-      return;
-    }
-
-    deleteGroupInvitation(invite.id, {
-      onSuccess: () => {
-        // console.log('Successfully deleted group invitation');
-        queryClient.invalidateQueries(['group_invites_for_group']);
-      },
-      onError: (error) => {
-        console.error('Server error:', error);
-        Alert.alert('Error', 'Server error.');
-      },
-    });
-  };
-
   const handleAssign = (memberId) => {
     assignMember({
-      _profile_id: profile.id,
-      _member_id: memberId
+      _member_id: memberId,
+      _group_id: groupId
     }, {
       onSuccess: async () => {
         // console.log('Member assign is dealt with success');
@@ -253,11 +253,13 @@ const GroupDetailsScreen = () => {
                 </TouchableOpacity>
               </View>
               {group?.members && group?.members?.map(member => (
-                  member.visible ? <Member key={member.name}
-                                           member={member}
-                                           myOwnMember={member.id == profileMember?.id}
-                                           assignable={!profileMember?.visible && !member.profile}
-                                           onAssign={() => {handleAssign(member.id)}} /> : null
+                  <Member key={member.name}
+                          member={member}
+                          myOwnMember={member.id == profileMember?.id}
+                          assignable={!profileMember && !member.profile}
+                          onAssign={() => {
+                            handleAssign(member.id);
+                          }}/>
                 )
               )}
               {
@@ -339,12 +341,17 @@ const GroupDetailsScreen = () => {
                 }} title="Invite a person"
                            titleStyle={{color: "blue"}}
                 />
+                <Menu.Item onPress={() => {
+                  promptExitGroup();
+                }} title="Exit group"
+                           titleStyle={{color: "red"}}
+                />
               </Menu>
             </View>
           </View>
           <View/>
           <Text style={styles.headerTitle}>{group.title}</Text>
-          <Text style={styles.syncInfo}>Last Sync On January 21, 2024</Text>
+          {/*<Text style={styles.syncInfo}>Last Sync On January 21, 2024</Text>*/}
         </View>
       }
       />
@@ -375,12 +382,25 @@ const GroupDetailsScreen = () => {
             <Button onPress={handleSettle}>Settle</Button>
           </Dialog.Actions>
         </Dialog>
+        <Dialog visible={isGroupExiterVisible} onDismiss={() => {
+          setIsGroupExiterVisible(false);
+        }}>
+          <Dialog.Icon icon="alert"/>
+          <Dialog.Title>Are you sure to exit this group?</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">This action cannot be taken back</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsGroupExiterVisible(false)}>Cancel</Button>
+            <Button onPress={handleExitGroup}>Exit</Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
       {/*Start Friend Selector for invite*/}
       <Modal visible={isFriendSelectorVisible} onDismiss={() => {setIsFriendSelectorVisible(false)}} contentContainerStyle={styles.friendSelector}>
         <View style={{height: 20, backgroundColor: 'white'}} />
         {updatedFriends && updatedFriends?.map(({profile: {id, email, avatar_url}, membershipStatus}) => (
-          <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)} onRemoveInvite={() => handleRemoveInvite(id)} status={membershipStatus}/>
+          <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)} status={membershipStatus}/>
         ))}
         {!friends.length && <View style={{backgroundColor: 'white', height: 60, textAlign: "center", paddingLeft: 20}}>
           <Text variant={'headlineMedium'}>No friend is found</Text>

@@ -173,22 +173,6 @@ export const useInsertGroupInvitation = () => {
   });
 };
 
-export const useDeleteGroupInvitation = () => {
-  return useMutation({
-    async mutationFn(invite_id) {
-      const {error} = await supabase
-        .from('group_invitations')
-        .delete()
-        .eq('id', invite_id);
-      if (error) {
-        console.error('useDeleteGroupInvitation error: ', error.message);
-        throw new Error(error.message);
-      }
-      // console.log('useDeleteGroupInvitation success');
-    },
-  });
-};
-
 export const useGroupInvitationsForProfile = (uid) => {
   return useQuery({
     queryKey: ['group_invites_for_profile'],
@@ -225,41 +209,11 @@ export const usePendingGroupInvitesForGroup = (groupId) => {
   })
 }
 
-export const useAcceptInvite = () => {
-  return useMutation({
-    async mutationFn(data) {
-      const {error} = await supabase
-        .rpc('accept_group_invite', data);
-      if (error) {
-        console.error('useAcceptInvite error: ', error.message);
-        throw new Error(error.message);
-      }
-      // console.log('useAcceptInvite successfull');
-    },
-  });
-};
-
-export const useRejectInvite = () => {
-  return useMutation({
-    async mutationFn(invite_id) {
-      const {error} = await supabase
-        .from('group_invitations')
-        .delete()
-        .eq('id', invite_id);
-      if (error) {
-        console.error('useRejectInvite error: ', error.message);
-        throw new Error(error.message);
-      }
-      // console.log('useRejectInvite is successfull');
-    },
-  });
-};
-
 export const useAssignMember = () => {
   return useMutation({
     async mutationFn(data) {
       const {error} = await supabase
-        .rpc('assign_new_member', data);
+        .rpc('self_assign_to', data);
       if (error) {
         console.error('useAssignMember error: ', error.message);
         throw new Error(error.message);

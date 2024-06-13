@@ -27,3 +27,30 @@ export const useGroupSubscriptions = () => {
     };
   }, []);
 };
+
+export const useGroupInviteSubscriptions = (profile_id) => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const groupInviteSubscription = supabase
+      .channel('table-filter-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'insert',
+          schema: 'public',
+          table: 'group_invitations',
+          filter: 'receiver=eq.' + profile_id,
+        },
+        (payload) => {
+          // console.log('Change received!', payload);
+          queryClient.invalidateQueries(['groups']);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      groupInviteSubscription.unsubscribe();
+    };
+  }, []);
+};

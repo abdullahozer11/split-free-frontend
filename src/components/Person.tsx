@@ -126,14 +126,14 @@ export const Friend = ({email, avatar_url, onRemove}) => {
   );
 };
 
-export const Friend2 = ({email, avatar_url, onInvite, onRemoveInvite, status}) => {
+export const Friend2 = ({email, avatar_url, onInvite, status}) => {
   return (
     <View style={[styles.container, {borderRadius: 0}]}>
       <View style={[styles.subContainer, {justifyContent: 'space-between'}]}>
         <Avatar.Image size={36} source={avatar_url ? {uri: avatar_url} : require('@/assets/images/blank-profile.png')}/>
         <Text variant={"bodyLarge"}>{email}</Text>
         {status === 'available' && <TouchableOpacity onPress={onInvite}><Feather name={'user-plus'} size={24}/></TouchableOpacity>}
-        {status === 'invited' && <TouchableOpacity onPress={onRemoveInvite}><Text variant={'labelMedium'}>Pending</Text></TouchableOpacity>}
+        {status === 'invited' && <Text variant={'labelMedium'}>Invited</Text>}
         {status === 'member' && <Feather name={'user-check'} size={24}/>}
       </View>
     </View>

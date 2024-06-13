@@ -1,5 +1,5 @@
 import {supabase} from "@/src/lib/supabase";
-import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {useQuery, useMutation} from "@tanstack/react-query";
 
 
 export const useGroupList = () => {
@@ -24,7 +24,7 @@ export const useGroup = (id: number) => {
     queryFn: async () => {
       const {data: _Group, error} = await supabase
         .from('groups')
-        .select('id, title, expense_total, members(id, name, role, total_balance, visible, profile(id, avatar_url)), debts(id, amount, borrower, lender)')
+        .select('id, title, expense_total, members(id, name, role, total_balance, profile(id, avatar_url)), debts(id, amount, borrower, lender)')
         .eq('id', id)
         .single();
       if (error) {
@@ -51,8 +51,6 @@ export const useDeleteGroup = () => {
       // console.log("useDeleteGroup success");
       return id;
     },
-    async onSuccess() {
-    }
   });
 };
 
@@ -97,6 +95,21 @@ export const useSettleGroup = () => {
         throw new Error(error.message);
       }
       console.log('useSettleGroup success');
+      return;
+    },
+  });
+};
+
+export const useExitGroup = () => {
+  return useMutation({
+    async mutationFn(data) {
+      const {error} = await supabase
+        .rpc('exit_group', data)
+      if (error) {
+        console.error('useExitGroup error:', error);
+        throw new Error(error.message);
+      }
+      // console.log("useExitGroup success");
       return;
     },
   });

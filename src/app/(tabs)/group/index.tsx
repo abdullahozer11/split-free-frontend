@@ -1,37 +1,29 @@
-import {View, StyleSheet, Alert, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useState} from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import {useGroupList} from "@/src/api/groups";
 import {Text, ActivityIndicator, TextInput} from "react-native-paper";
+import {useGroupInviteSubscriptions, useGroupSubscriptions} from "@/src/api/groups/subscriptions";
 import {useAuth} from "@/src/providers/AuthProvider";
-import {useAcceptInvite, useGroupInvitationsForProfile, useRejectInvite} from "@/src/api/profiles";
-import {GroupInvite} from "@/src/components/Person";
-import {useQueryClient} from "@tanstack/react-query";
-import {useGroupSubscriptions} from "@/src/api/groups/subscriptions";
 
 const GroupScreen = ({}) => {
-  const queryClient = useQueryClient();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
   const [searchBarVisible, setSearchBarVisible] = useState(false);
   const [queryKey, setQueryKey] = useState('');
-
   const {data: groups, isError: groupsError, isLoading: groupsLoading} = useGroupList();
+
   const {session} = useAuth();
-  const {data: groupInvitations, isError: groupInvitesError, isLoading: groupInvitesLoading} = useGroupInvitationsForProfile(session?.user.id);
-
-  const {mutate: acceptInvite} = useAcceptInvite();
-  const {mutate: rejectInvite} = useRejectInvite();
-
   useGroupSubscriptions();
+  useGroupInviteSubscriptions(session?.user.id);
 
-  if (groupsLoading || groupInvitesLoading) {
+  if (groupsLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (groupsError || groupInvitesError) {
+  if (groupsError) {
     return <Text variant={'displayLarge'}>Failed to fetch data</Text>;
   }
 
@@ -42,36 +34,6 @@ const GroupScreen = ({}) => {
 
   const closeModal = () => {
     setIsModalVisible(false);
-  };
-
-  const handleAcceptInvite = ({group_id}) => {
-    acceptInvite({
-      _profile_id: session?.user.id,
-      _group_id: group_id
-    }, {
-      onSuccess: async () => {
-        // console.log('Accept invite command handled successfully')
-        await queryClient.invalidateQueries(['groups']);
-        await queryClient.invalidateQueries(['group_invites_for_profile']);
-      },
-      onError: (error) => {
-        console.error('Server error:', error);
-        Alert.alert('Error', 'Server error.');
-      },
-    })
-  };
-
-  const handleRejectInvite = ({id: invite_id}) => {
-    rejectInvite(invite_id, {
-      onSuccess: async () => {
-        console.log('Reject invite command handled successfully')
-        await queryClient.invalidateQueries(['group_invites_for_profile']);
-      },
-      onError: (error) => {
-        console.error('Server error:', error);
-        Alert.alert('Error', 'Server error.');
-      },
-    })
   };
 
   const handleAnchor = (group, anchored) => {
@@ -128,15 +90,6 @@ const GroupScreen = ({}) => {
           }
         })}
         <CreateGroupModal isVisible={isModalVisible} onClose={closeModal}/>
-        <View style={{flex: 1}}>
-          {groupInvitations.length != 0 && <Text variant={'titleLarge'}>Group Invites</Text>}
-          {groupInvitations?.map((gi) => (
-            <GroupInvite key={gi.id} invite={gi}
-                         onAccept={() => {handleAcceptInvite(gi)}}
-                         onReject={() => {handleRejectInvite(gi)}}
-            />
-          ))}
-        </View>
       </ScrollView>
     </View>
   );

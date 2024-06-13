@@ -45,15 +45,15 @@ export const useProfileMember = (profileId: string, groupId: number) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('members')
-        .select('id, visible')
+        .select('id')
         .eq('profile', profileId)
         .eq('group_id', groupId)
-        .single();
+        .maybeSingle();
       if (error) {
         console.log("useProfileMember error: ", error.message);
         throw new Error(error.message);
       }
-      // console.log('useProfileMember success: ', data);
+      console.log('useProfileMember success: ', data);
       return data;
     },
     enabled: !!profileId && !!groupId, // Ensure the query is only enabled when both profileId and groupId are defined

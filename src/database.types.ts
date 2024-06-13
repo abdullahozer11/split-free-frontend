@@ -253,6 +253,7 @@ export type Database = {
       expenses: {
         Row: {
           amount: number
+          category: string
           created_at: string
           currency: string
           date: string
@@ -266,6 +267,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          category?: string
           created_at?: string
           currency?: string
           date?: string
@@ -279,6 +281,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          category?: string
           created_at?: string
           currency?: string
           date?: string
@@ -468,7 +471,6 @@ export type Database = {
           profile: string | null
           role: string
           total_balance: number
-          visible: boolean
         }
         Insert: {
           created_at?: string
@@ -478,7 +480,6 @@ export type Database = {
           profile?: string | null
           role?: string
           total_balance?: number
-          visible?: boolean
         }
         Update: {
           created_at?: string
@@ -488,7 +489,6 @@ export type Database = {
           profile?: string | null
           role?: string
           total_balance?: number
-          visible?: boolean
         }
         Relationships: [
           {
@@ -626,20 +626,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      accept_group_invite: {
-        Args: {
-          _profile_id: string
-          _group_id: number
-        }
-        Returns: undefined
-      }
-      assign_new_member: {
-        Args: {
-          _profile_id: string
-          _member_id: number
-        }
-        Returns: undefined
-      }
       create_expense: {
         Args: {
           group_id_input: number
@@ -660,6 +646,10 @@ export type Database = {
           member_names_input: string[]
         }
         Returns: number
+      }
+      deleteuser: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       get_groups_summary: {
         Args: Record<PropertyKey, never>
@@ -684,6 +674,26 @@ export type Database = {
           avatar_url: string
           friend_status: string
         }[]
+      }
+      self_assign_to: {
+        Args: {
+          _member_id: number
+          _group_id: number
+        }
+        Returns: undefined
+      }
+      settle_expense: {
+        Args: {
+          expense_id: number
+          _group_id: number
+        }
+        Returns: undefined
+      }
+      settle_group: {
+        Args: {
+          _id: number
+        }
+        Returns: undefined
       }
       update_expense: {
         Args: {
@@ -716,6 +726,7 @@ export type Database = {
           amount: number
           id: number
           title: string
+          settled: boolean
           currency: string
           description: string
           date: string

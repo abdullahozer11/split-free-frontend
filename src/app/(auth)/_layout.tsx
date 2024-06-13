@@ -11,7 +11,6 @@ export default function AuthLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="test"/>
       <Stack.Screen name="sign-in"/>
       <Stack.Screen name="sign-up"/>
       <Stack.Screen name="forgot"/>

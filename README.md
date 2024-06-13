@@ -9,7 +9,7 @@ Welcome to the **SplitFree** app! This app is designed to help you split expense
 - **Group Expense Management**: Ideal for managing shared expenses for trips, events, or any group activities.
 - **Free and Ad-Free**: Enjoy the full functionality of the app without any interruptions from ads.
 
-<img src="https://i.ibb.co/BC1st9k/Split-Free.png" alt="Screenshot of Adding Members" width="300"/>
+<img src="https://i.ibb.co/BC1st9k/Split-Free.png" alt="SplitFree Logo" width="300"/>
 
 ## Getting Started
 
