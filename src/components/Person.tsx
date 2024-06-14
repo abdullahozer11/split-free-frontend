@@ -159,24 +159,6 @@ export const NotifLine = ({text, onAccept, onIgnore}) => {
   );
 };
 
-export const GroupInvite = ({invite, onAccept, onReject}) => {
-  return (
-      <View style={styles.container}>
-        <View style={styles.subContainer}>
-          <Text>{invite.sender_profile.email} invited you to group "{invite.group_name}"</Text>
-        </View>
-        <View style={{flexDirection: "row", gap: 10, marginLeft: 10}}>
-          <TouchableOpacity style={{borderWidth: 1, borderRadius: 5, padding: 5, backgroundColor: 'green'}} onPress={onAccept}>
-            <Feather name={'check'} size={24}/>
-          </TouchableOpacity>
-          <TouchableOpacity style={{borderWidth: 1, borderRadius: 5, padding: 5, backgroundColor: 'red'}} onPress={onReject}>
-            <Feather name={'x'} size={24}/>
-          </TouchableOpacity>
-        </View>
-      </View>
-  );
-};
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
