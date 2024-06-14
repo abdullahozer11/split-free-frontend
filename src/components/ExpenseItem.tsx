@@ -2,14 +2,15 @@ import {StyleSheet, View, Text, Pressable} from 'react-native';
 import React from "react";
 import {MaterialIcons} from "@expo/vector-icons";
 import {Link} from "expo-router";
-import {exp_cat} from "@/src/utils/expense_categories";
+import {exp_cats} from "@/src/utils/expense_categories";
 
 const ExpenseItem = ({expense}) => {
+  const exp_cat = exp_cats.find((exp) => exp.name == expense.category);
   return (
     <Link href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`} asChild>
       <Pressable style={styles.expenseItem}>
-        <View style={styles.expenseCatIcon}>
-          <MaterialIcons name={exp_cat[expense.category ?? 'shopping-cart']} style={styles.icon}/>
+        <View style={[styles.expenseCatIcon, {backgroundColor: exp_cat.bg_color}]}>
+          <MaterialIcons name={exp_cat.icon} style={styles.icon}/>
         </View>
         <Text style={{fontSize: 18, fontWeight: '600', width: 200}} numberOfLines={1}>{expense.title}</Text>
         <Text style={styles.total}>€{expense.amount}</Text>
@@ -37,7 +38,6 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     borderRadius: 15,
-    backgroundColor: "orange",
     padding: 5,
   },
   icon: {

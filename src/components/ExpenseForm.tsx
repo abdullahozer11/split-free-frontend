@@ -14,14 +14,27 @@ import {currencyOptions} from "@/src/constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
-import {Feather} from "@expo/vector-icons";
+import {Feather, MaterialIcons} from "@expo/vector-icons";
 import {useQueryClient} from "@tanstack/react-query";
+import {exp_cats} from "@/src/utils/expense_categories";
+
+
+const renderCatItem = item => {
+  return (
+    <View style={styles.line}>
+      <Text style={styles.lineLabel}>{item.name}</Text>
+      <MaterialIcons size={24} name={item.icon}/>
+    </View>
+  );
+};
 
 
 export default function ExpenseForm({title: headerTitle, groupId, updatingExpense}) {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isFocus, setIsFocus] = useState(false);
+
   const [formState, setFormState] = useState(updatingExpense ? {
     ...updatingExpense,
     id: updatingExpense.id,
@@ -37,6 +50,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     image: null,
     currency: 'EUR',
     amount: '0',
+    category: 'shopping',
     group_id: groupId,
     inputDate: new Date(),
   });
@@ -56,7 +70,8 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     return <Text>Failed to fetch data</Text>;
   }
 
-  const {title, description, payers, participants, image, currency, amount, group_id, inputDate} = formState;
+  const {title, description, payers, participants, image, currency, amount, group_id, inputDate, category} = formState;
+  console.log('category is ', category);
 
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
@@ -119,6 +134,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       currency: currency,
       date: formatDate(inputDate),
       description: description,
+      category: category,
       participants: participants,
       payers: payers,
       proof: null,
@@ -146,6 +162,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       title: title,
       description: description ? description : null,
       currency: currency,
+      category: category,
       amount: amount,
       date: formatDate(inputDate),
       proof: null,
@@ -279,6 +296,20 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             members={members}
             onChange={(participants) => handleInputChange('participants', participants)}
           />
+          <Dropdown
+            data={exp_cats}
+            labelField={'name'}
+            valueField={'name'}
+            placeholder={!isFocus ? 'Select a category' : '...'}
+            onChange={(item) => {
+              handleInputChange('category', item.name);
+              setIsFocus(false);
+            }}
+            style={[styles.currencyDropdown, {width: '100%', borderWidth: 0.5}]}
+            selectedTextStyle={{marginLeft: 10}}
+            renderItem={renderCatItem}
+            value={category}
+          />
           <TouchableOpacity onPress={() => {
             onSubmit();
           }}>
@@ -366,5 +397,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 10,
     paddingHorizontal: 15,
+  },
+  line: {
+    flexDirection: "row",
+    height: 60,
+    paddingVertical: 5,
+    paddingHorizontal: 20,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  lineLabel: {
+    fontSize: 16
   },
 });

@@ -25,7 +25,7 @@ export const useExpense = (id: number) => {
   return useQuery({
     queryKey: ['expense', id],
     queryFn: async () => {
-      const {data: [expense], error} = await supabase
+      const {data: expense, error} = await supabase
         .rpc('use_expense', {
           expense_id_input: id
         });
@@ -47,6 +47,7 @@ export const useInsertExpense = () => {
           amount_input: data.amount,
           currency_input: data.currency,
           date_input: data.date,
+          category_input: data.category,
           description_input: data.description,
           group_id_input: data.group_id,
           participants_input: data.participants,
@@ -72,6 +73,7 @@ export const useUpdateExpense = () => {
         .rpc('update_expense', {
           expense_id: data.id,
           amount_input: data.amount,
+          category_input: data.category,
           currency_input: data.currency,
           date_input: data.date,
           description_input: data.description,
