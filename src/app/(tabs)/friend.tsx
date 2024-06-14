@@ -171,7 +171,7 @@ export default function FriendScreen() {
       <View style={styles.body}>
         {isNotifMenuVisible && <View style={styles.notifications}>
           {freqs.map((freq) => (
-            <NotifLine key={freq.id} text={'Invite from ' + freq.sender_profile.email} onAccept={() => handleAccept(freq.sender)} onIgnore={() => handleIgnore(freq.sender)}/>
+            <NotifLine key={freq.id} email={freq.sender_profile.email} onAccept={() => handleAccept(freq.sender)} onIgnore={() => handleIgnore(freq.sender)}/>
           ))}
         </View>}
         <View style={styles.searchSection}>
@@ -309,7 +309,6 @@ const styles = StyleSheet.create({
   },
   notifications: {
     backgroundColor: "white",
-    width: 300,
     position: "absolute",
     top: -10,
     zIndex: 999,

@@ -140,16 +140,17 @@ export const Friend2 = ({email, avatar_url, onInvite, status}) => {
   );
 };
 
-export const NotifLine = ({text, onAccept, onIgnore}) => {
+export const NotifLine = ({email, onAccept, onIgnore}) => {
   return (
     <>
       <View style={styles.notifLine}>
-        <Text>{text}</Text>
-        <View style={{flexDirection: "row"}}>
-          <TouchableOpacity onPress={onAccept}>
+        <Text>Invite from </Text>
+        <Text style={{maxWidth: 220}} numberOfLines={1}>{email}</Text>
+        <View style={{flexDirection: "row", gap: 5, paddingLeft: 10}}>
+          <TouchableOpacity style={[styles.smallButton, {borderColor: "green"}]} onPress={onAccept}>
             <Feather name={"check"} size={24} color={"green"}/>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onIgnore}>
+          <TouchableOpacity style={[styles.smallButton, {borderColor: "red"}]} onPress={onIgnore}>
             <Feather name={"x"} size={24} color={"red"}/>
           </TouchableOpacity>
         </View>
@@ -184,5 +185,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center"
+  },
+  smallButton: {
+    borderWidth: 0.5,
+    borderRadius: 5,
   },
 });
