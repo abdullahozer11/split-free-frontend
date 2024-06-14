@@ -1,10 +1,11 @@
-import {Image, StyleSheet, View, Text, Alert} from 'react-native';
+import {Image, StyleSheet, View, Text, Alert, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from "react";
 import {supabase} from "@/src/lib/supabase";
 import {ActivityIndicator, TextInput} from "react-native-paper";
 import Button from '@/src/components/Button';
 import {useNavigation} from "expo-router";
 import {useAuth} from "@/src/providers/AuthProvider";
+import {Feather} from "@expo/vector-icons";
 
 const Password = () => {
   const navigation = useNavigation();
@@ -101,6 +102,13 @@ const Password = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => {
+          navigation.goBack();
+        }}>
+          <Feather name={"arrow-left"} size={36}/>
+        </TouchableOpacity>
+      </View>
       <View style={styles.inputs}>
         <Image source={require('@/assets/images/logo.png')} style={styles.logo}/>
         <Text style={styles.headLine}>Change Password</Text>
@@ -184,5 +192,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "600",
     marginBottom: 20
+  },
+  header: {
+    height: 60,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    position: "absolute",
+    top: 60,
   },
 });
