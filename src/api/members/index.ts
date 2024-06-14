@@ -53,7 +53,7 @@ export const useProfileMember = (profileId: string, groupId: number) => {
         console.log("useProfileMember error: ", error.message);
         throw new Error(error.message);
       }
-      console.log('useProfileMember success: ', data);
+      // console.log('useProfileMember success: ', data);
       return data;
     },
     enabled: !!profileId && !!groupId, // Ensure the query is only enabled when both profileId and groupId are defined
