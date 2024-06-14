@@ -4,7 +4,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {Feather} from '@expo/vector-icons';
 import {supabase} from "@/src/lib/supabase";
 import {Link, useNavigation} from "expo-router";
-import {Text, Switch} from "react-native-paper";
+import {Text} from "react-native-paper";
 
 
 const SettingsItem = ({page, iconName, title, containerColor}) => {
@@ -44,7 +44,8 @@ const SettingsScreen = () => {
         <SettingsItem page={'notifications'} containerColor={'blue'} iconName={'bell'} title={'Notifications'}/>
         <SettingsItem page={'language'} containerColor={'darkorange'} iconName={'globe'} title={'Language'}/>
         <SettingsItem page={'faq'} containerColor={'orange'} iconName={'help-circle'} title={'FAQ'}/>
-        <SettingsItem page={'terms'} containerColor={'blue'} iconName={'check'} title={'Term of Use'}/>
+        <SettingsItem page={'terms'} containerColor={'blue'} iconName={'check'} title={'Terms of Use'}/>
+        <SettingsItem page={'password'} containerColor={'yellow'} iconName={'lock'} title={'Change Password'}/>
         {/*<View style={styles.settingsItemRow}>*/}
         {/*  <View style={styles.innerRow}>*/}
         {/*    <View style={[styles.settingsItemIconContainer, {backgroundColor: "black"}]}>*/}
