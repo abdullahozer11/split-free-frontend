@@ -55,7 +55,6 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
         }
         selectedStyle={styles.selectedStyle}
         onFocus={() => setIsDropdownVisible(true)}
-        onBlur={() => setIsDropdownVisible(false)}
         visible={isDropdownVisible}
       />
     </View>

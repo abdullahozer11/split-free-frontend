@@ -7,16 +7,17 @@ import {
 } from "@/src/api/expenses";
 import {Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
 import {getFormattedDate, uploadImage, formatDate} from "@/src/utils/helpers";
-import {ActivityIndicator, Avatar, Text, TextInput} from "react-native-paper";
+import {ActivityIndicator, Avatar, Button, Text, TextInput, Tooltip} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import {Dropdown} from "react-native-element-dropdown";
 import {currencyOptions} from "@/src/constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
-import {Feather, MaterialIcons} from "@expo/vector-icons";
+import {Feather, FontAwesome6, MaterialIcons} from "@expo/vector-icons";
 import {useQueryClient} from "@tanstack/react-query";
 import {exp_cats} from "@/src/utils/expense_categories";
+import {supabase} from "@/src/lib/supabase.ts";
 
 
 const renderCatItem = item => {
@@ -34,6 +35,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   const queryClient = useQueryClient();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
+  const [isLoading, setLoading] = useState();
 
   const [formState, setFormState] = useState(updatingExpense ? {
     ...updatingExpense,
@@ -195,6 +197,29 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     }
   };
 
+  const handleGenerateCat = async () => {
+    // check if title is not empty
+    if (!title) {
+      Alert.alert('You must enter a title first');
+      return;
+    }
+
+    setLoading(true);
+    // make a call to the edge function
+    const {data, error} = await supabase.functions.invoke('embed-expense-title', {
+      body: JSON.stringify({"title": title})
+    });
+    setLoading(false);
+
+    if (error) {
+      console.error('Server error:', error);
+      Alert.alert('Error', 'Server error.');
+      return;
+    }
+
+    handleInputChange('category', data?.name);
+  };
+
   const handleInputChange = (fieldName, value) => {
     setFormState(prevFormState => ({
       ...prevFormState,
@@ -295,20 +320,29 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             members={members}
             onChange={(participants) => handleInputChange('participants', participants)}
           />
-          <Dropdown
-            data={exp_cats}
-            labelField={'name'}
-            valueField={'name'}
-            placeholder={!isFocus ? 'Select a category' : '...'}
-            onChange={(item) => {
-              handleInputChange('category', item.name);
-              setIsFocus(false);
-            }}
-            style={[styles.currencyDropdown, {width: '100%', borderWidth: 0.5}]}
-            selectedTextStyle={{marginLeft: 10}}
-            renderItem={renderCatItem}
-            value={category}
-          />
+          <Text>Pick expense category or use AI to generate</Text>
+          <View style={{flexDirection: "row", gap: 5}}>
+            <Dropdown
+              data={exp_cats}
+              labelField={'name'}
+              valueField={'name'}
+              placeholder={!isFocus ? 'Select a category' : '...'}
+              onChange={(item) => {
+                handleInputChange('category', item.name);
+                setIsFocus(false);
+              }}
+              style={[styles.currencyDropdown, {flex: 1, borderWidth: 0.5}]}
+              selectedTextStyle={{marginLeft: 10}}
+              renderItem={renderCatItem}
+              value={category}
+            />
+            <Tooltip title="Auto generate">
+              <Button style={{backgroundColor: 'white', justifyContent: "center", borderRadius: 10, flex: 1}}
+                      onPress={handleGenerateCat} disabled={isLoading}>
+                {isLoading ? <ActivityIndicator/> : <FontAwesome6 name={'wand-magic-sparkles'} size={18} color={'black'}/>}
+              </Button>
+            </Tooltip>
+          </View>
           <TouchableOpacity onPress={() => {
             onSubmit();
           }}>

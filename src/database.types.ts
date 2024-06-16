@@ -629,6 +629,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_category_with_embedding: {
+        Args: {
+          query_embedding: string
+        }
+        Returns: string
+      }
       get_groups_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
