@@ -10,7 +10,7 @@ const ExpenseItem = ({expense}) => {
     <Link href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`} asChild>
       <Pressable style={styles.expenseItem}>
         <View style={[styles.expenseCatIcon, {backgroundColor: exp_cat.bg_color}]}>
-          <MaterialIcons name={exp_cat.icon} style={styles.icon}/>
+          <MaterialIcons name={exp_cat.icon} style={styles.icon} color={exp_cat.icon_color}/>
         </View>
         <Text style={{fontSize: 18, fontWeight: '600', width: 200}} numberOfLines={1}>{expense.title}</Text>
         <Text style={styles.total}>€{expense.amount}</Text>

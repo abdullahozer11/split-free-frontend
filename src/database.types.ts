@@ -9,39 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      activity_logs: {
-        Row: {
-          changed_at: string | null
-          changed_by: string | null
-          group_id: number | null
-          id: number
-          new_data: Json | null
-          old_data: Json | null
-          operation: string | null
-          table_name: string | null
-        }
-        Insert: {
-          changed_at?: string | null
-          changed_by?: string | null
-          group_id?: number | null
-          id?: number
-          new_data?: Json | null
-          old_data?: Json | null
-          operation?: string | null
-          table_name?: string | null
-        }
-        Update: {
-          changed_at?: string | null
-          changed_by?: string | null
-          group_id?: number | null
-          id?: number
-          new_data?: Json | null
-          old_data?: Json | null
-          operation?: string | null
-          table_name?: string | null
-        }
-        Relationships: []
-      }
       balances: {
         Row: {
           amount: number
@@ -471,6 +438,7 @@ export type Database = {
           profile: string | null
           role: string
           total_balance: number
+          visible: boolean
         }
         Insert: {
           created_at?: string
@@ -480,6 +448,7 @@ export type Database = {
           profile?: string | null
           role?: string
           total_balance?: number
+          visible?: boolean
         }
         Update: {
           created_at?: string
@@ -489,6 +458,7 @@ export type Database = {
           profile?: string | null
           role?: string
           total_balance?: number
+          visible?: boolean
         }
         Relationships: [
           {
@@ -637,6 +607,7 @@ export type Database = {
           proof_input: string
           payers_input: number[]
           participants_input: number[]
+          category_input?: string
         }
         Returns: number
       }
@@ -649,6 +620,13 @@ export type Database = {
       }
       deleteuser: {
         Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      exit_group: {
+        Args: {
+          _profile_id: string
+          _group_id: number
+        }
         Returns: undefined
       }
       get_groups_summary: {
@@ -706,6 +684,7 @@ export type Database = {
           proof_input: string
           payers_input: number[]
           participants_input: number[]
+          category_input?: string
         }
         Returns: undefined
       }
@@ -722,21 +701,7 @@ export type Database = {
         Args: {
           expense_id_input: number
         }
-        Returns: {
-          amount: number
-          id: number
-          title: string
-          settled: boolean
-          currency: string
-          description: string
-          date: string
-          last_modified: string
-          group_id: number
-          payers: Json
-          participants: Json
-          payer_ids: Json
-          participant_ids: Json
-        }[]
+        Returns: Json
       }
     }
     Enums: {

@@ -71,7 +71,6 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   }
 
   const {title, description, payers, participants, image, currency, amount, group_id, inputDate, category} = formState;
-  console.log('category is ', category);
 
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
