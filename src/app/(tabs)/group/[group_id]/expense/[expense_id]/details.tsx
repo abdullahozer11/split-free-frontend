@@ -1,6 +1,6 @@
-import {StyleSheet, View, SafeAreaView, TouchableOpacity, Alert} from 'react-native';
+import {StyleSheet, View, SafeAreaView, TouchableOpacity, Alert, Pressable} from 'react-native';
 import React, {useEffect, useState} from "react";
-import {useLocalSearchParams, useNavigation, useRouter} from "expo-router";
+import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {useDeleteExpense, useExpense, useSettleExpense} from "@/src/api/expenses";
 import {Text, ActivityIndicator, Menu, Portal, Dialog, Button} from 'react-native-paper';
@@ -119,6 +119,13 @@ const ExpenseDetailsScreen = () => {
               )}
             </View>
           </View>
+          {!expense?.settled &&
+          <Link href={`/(tabs)/group/${group_id}/expense/${id}/update`} asChild>
+            <Pressable>
+              <Text style={[styles.settleButton, {color: '#2196F3', borderColor: '#2196F3'}]}>Edit expense</Text>
+            </Pressable>
+          </Link>
+          }
           {expense?.settled ? <Text style={styles.settledText}>Settled</Text> : <TouchableOpacity onPress={() => setIsDialog2Visible(true)}>
             <Text style={styles.settleButton}>Mark as settled</Text>
           </TouchableOpacity>}
