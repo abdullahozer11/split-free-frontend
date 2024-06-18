@@ -6,6 +6,12 @@ export const exp_cats = [
     'bg_color': '#FF5722' // deep orange
   },
   {
+    'name': 'other',
+    'icon': 'assignment',
+    'icon_color': '#ffffff', // white
+    'bg_color': '#000000' // black
+  },
+  {
     'name': 'restaurant',
     'icon': 'restaurant',
     'icon_color': '#ffffff', // white

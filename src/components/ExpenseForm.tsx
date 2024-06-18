@@ -206,7 +206,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
 
     setLoading(true);
     // make a call to the edge function
-    const {data, error} = await supabase.functions.invoke('embed-expense-title', {
+    const {data, error} = await supabase.functions.invoke('gemini', {
       body: JSON.stringify({"title": title})
     });
     setLoading(false);
@@ -216,8 +216,13 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       Alert.alert('Error', 'Server error.');
       return;
     }
-
-    handleInputChange('category', data?.name);
+    const exp_cat_names = exp_cats.map((exp_cat) => exp_cat?.name);
+    const newName = data?.name?.toLowerCase();
+    if (exp_cat_names.includes(newName)) {
+      handleInputChange('category', newName);
+    } else {
+      handleInputChange('category', 'other');
+    }
   };
 
   const handleInputChange = (fieldName, value) => {
