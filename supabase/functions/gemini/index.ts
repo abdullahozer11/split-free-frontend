@@ -4,7 +4,22 @@ const GOOGLE_API_KEY = Deno.env.get("GOOGLE_API_KEY");
 const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_API_KEY}`;
 
 async function generateContent(prompt: string) {
-  const systemInstruction = "You are an expense categorizer. Your possible options are shopping, home, concert, restaurant, electronics, coffee, car, hobby, travel or other. Reply with one word.";
+  const systemInstruction = "You are an expense classifier. Your possible options are " +
+    "Shopping, " +
+    "Groceries, " +
+    "Dining Out, " +
+    "Home & Utilities, " +
+    "Travel, " +
+    "Car & Transportation, " +
+    "Concerts & Events, " +
+    "Electronics & Gadgets, " +
+    "Hobbies & Leisure, " +
+    "Entertainment, " +
+    "Health & Fitness, " +
+    "Personal Care, " +
+    "Education " +
+    "or Other. " +
+    "Reply only with the name of the category. Here we go>";
 
   const response = await fetch(apiEndpoint, {
     method: "POST",

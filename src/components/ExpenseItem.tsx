@@ -5,7 +5,7 @@ import {Link} from "expo-router";
 import {exp_cats} from "@/src/utils/expense_categories";
 
 const ExpenseItem = ({expense}) => {
-  const exp_cat = exp_cats.find((exp) => exp.name == expense.category);
+  const exp_cat = exp_cats.find((exp) => exp.name == expense.category) || exp_cats.find((exp) => exp.name == 'Other');
   return (
     <Link href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`} asChild>
       <Pressable style={styles.expenseItem}>

@@ -113,24 +113,6 @@ export type Database = {
           },
         ]
       }
-      expense_categories: {
-        Row: {
-          embedding: string | null
-          id: number
-          name: string
-        }
-        Insert: {
-          embedding?: string | null
-          id?: number
-          name: string
-        }
-        Update: {
-          embedding?: string | null
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
       expense_participants: {
         Row: {
           expense: number
@@ -220,7 +202,7 @@ export type Database = {
       expenses: {
         Row: {
           amount: number
-          category: string
+          category: string | null
           created_at: string
           currency: string
           date: string
@@ -234,7 +216,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
-          category?: string
+          category?: string | null
           created_at?: string
           currency?: string
           date?: string
@@ -248,7 +230,7 @@ export type Database = {
         }
         Update: {
           amount?: number
-          category?: string
+          category?: string | null
           created_at?: string
           currency?: string
           date?: string
@@ -628,12 +610,6 @@ export type Database = {
           _group_id: number
         }
         Returns: undefined
-      }
-      get_category_with_embedding: {
-        Args: {
-          query_embedding: string
-        }
-        Returns: string
       }
       get_groups_summary: {
         Args: Record<PropertyKey, never>

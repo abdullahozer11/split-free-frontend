@@ -1,62 +1,92 @@
 export const exp_cats = [
   {
-    'name': 'shopping',
+    'name': 'Shopping',
     'icon': 'shopping-cart',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#FF5722' // deep orange
+    'icon_color': '#000000',
+    'bg_color': '#FFC107',
   },
   {
-    'name': 'other',
-    'icon': 'assignment',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#000000' // black
+    'name': 'Groceries',
+    'icon': 'food-bank',
+    'icon_color': '#FFFFFF',
+    'bg_color': '#FF5722',
   },
   {
-    'name': 'restaurant',
+    'name': 'Dining Out',
     'icon': 'restaurant',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#FFEB3B' // yellow
+    'icon_color': '#FFFFFF',
+    'bg_color': '#673AB7',
   },
   {
-    'name': 'home',
+    'name': 'Home & Utilities',
     'icon': 'home',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#4CAF50' // green
+    'icon_color': '#000000',
+    'bg_color': '#4CAF50',
   },
   {
-    'name': 'travel',
+    'name': 'Travel',
     'icon': 'airplanemode-active',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#03A9F4' // light blue
+    'icon_color': '#FFFFFF',
+    'bg_color': '#F44336',
   },
   {
-    'name': 'car',
+    'name': 'Car & Transportation',
     'icon': 'directions-car',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#9C27B0' // purple
+    'icon_color': '#FFFFFF',
+    'bg_color': '#9C27B0',
   },
   {
-    'name': 'concert',
+    'name': 'Concerts & Events',
     'icon': 'music-note',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#E91E63' // pink
+    'icon_color': '#000000',
+    'bg_color': '#CDDC39',
   },
   {
-    'name': 'electronics',
+    'name': 'Electronics & Gadgets',
     'icon': 'computer',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#2196F3' // blue
+    'icon_color': '#FFFFFF',
+    'bg_color': '#FFEB3B',
   },
   {
-    'name': 'coffee',
-    'icon': 'coffee',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#795548' // brown
+    'name': 'Hobbies & Leisure',
+    'icon': 'menu-book',
+    'icon_color': '#000000',
+    'bg_color': '#00BCD4',
   },
   {
-    'name': 'hobby',
-    'icon': 'color-lens',
-    'icon_color': '#ffffff', // white
-    'bg_color': '#FFC107' // amber
-  }
+    'name': 'Entertainment',
+    'icon': 'sports-esports',
+    'icon_color': '#FFFFFF',
+    'bg_color': '#009688',
+  },
+  {
+    'name': 'Health & Fitness',
+    'icon': 'monitor-heart',
+    'icon_color': '#FFFFFF',
+    'bg_color': '#795548',
+  },
+  {
+    'name': 'Personal Care',
+    'icon': 'child-care',
+    'icon_color': '#000000',
+    'bg_color': '#FF9800',
+  },
+  {
+    'name': 'Education',
+    'icon': 'book',
+    'icon_color': '#FFFFFF',
+    'bg_color': '#607D8B',
+  },
+  {
+    'name': 'Gifts & Donations',
+    'icon': 'card-giftcard',
+    'icon_color': '#000000',
+    'bg_color': '#03A9F4',
+  },
+  {
+    'name': 'Other',
+    'icon': 'all-inclusive',
+    'icon_color': '#000000',
+    'bg_color': '#9b72e3',
+  },
 ];

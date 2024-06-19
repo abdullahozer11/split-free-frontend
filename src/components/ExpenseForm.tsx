@@ -52,7 +52,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
     image: null,
     currency: 'EUR',
     amount: '0',
-    category: 'shopping',
+    category: 'Other',
     group_id: groupId,
     inputDate: new Date(),
   });
@@ -217,7 +217,8 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       return;
     }
     const exp_cat_names = exp_cats.map((exp_cat) => exp_cat?.name);
-    const newName = data?.name?.toLowerCase();
+    const newName = data?.name;
+    // console.log("new name is ", newName);
     if (exp_cat_names.includes(newName)) {
       handleInputChange('category', newName);
     } else {
