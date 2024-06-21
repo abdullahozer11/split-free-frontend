@@ -97,7 +97,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
       return false;
     }
 
-    if (!payers) {
+    if (!payers.length) {
       console.log('Add who paid this expense');
       Alert.alert('Add who paid this expense');
       return false;
