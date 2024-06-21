@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import {useDeleteGroup, useExitGroup, useGroup, useSettleGroup} from "@/src/api/groups";
 import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
-import ExpenseItem from "@/src/components/ExpenseItem";
+import {ExpenseItem} from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {groupElementsByDay} from "@/src/utils/helpers";
 import {TextInput, Menu, Text, Dialog, Button, Portal, ActivityIndicator, Modal} from 'react-native-paper';
@@ -309,9 +309,9 @@ const GroupDetailsScreen = () => {
               <Feather name="arrow-left" size={36} color="gold"/>
             </TouchableOpacity>
             <View style={{flexDirection: "row", gap: 10}}>
-              {/*<TouchableOpacity onPress={handleStats}>*/}
-              {/*  <Feather name="pie-chart" size={36} color="gold"/>*/}
-              {/*</TouchableOpacity>*/}
+              <Link href={`/(tabs)/group/${groupId}/stats`}>
+                <Feather name="pie-chart" size={36} color="gold"/>
+              </Link>
               <Menu
                 visible={visible}
                 onDismiss={closeMenu}

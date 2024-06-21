@@ -8,7 +8,8 @@ export const useExpenseList = (group_id: number) => {
     queryFn: async () => {
       const {data, error} = await supabase
         .from('expenses')
-        .select('id, title, amount, created_at, group_id, category, balances(amount, owner)')
+        .select('id, title, amount, date, created_at, group_id, category, balances(amount, owner), ' +
+          'payers:expense_payers(member), participants:expense_participants(member)')
         .eq('group_id', group_id)
         .order('id', { ascending: false });
       if (error) {

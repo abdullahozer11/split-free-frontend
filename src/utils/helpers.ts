@@ -85,3 +85,20 @@ export function formatDateString(dateString) {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   return date.toLocaleDateString('en-US', options);
 }
+
+export const inThisMonth = (dateS) => {
+  // Get today's date
+  const today = new Date();
+  const date = new Date(dateS);
+
+  // Get the month and year of today's date
+  const currentMonth = today.getMonth(); // getMonth() returns month index from 0 (January) to 11 (December)
+  const currentYear = today.getFullYear(); // getFullYear() returns the 4-digit year
+
+  // Get the month and year of the given date
+  const dateMonth = date.getMonth();
+  const dateYear = date.getFullYear();
+
+  // Check if the month and year of the given date is the same as today's month and year
+  return dateMonth === currentMonth && dateYear === currentYear;
+};
