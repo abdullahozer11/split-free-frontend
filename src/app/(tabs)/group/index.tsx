@@ -65,7 +65,7 @@ const GroupScreen = ({}) => {
         placeholder={''}
         onChangeText={setQueryKey}
         value={queryKey}
-        style={{marginHorizontal: 10}}
+        style={{backgroundColor: 'white',marginHorizontal: 10}}
         right={<TextInput.Icon
           icon={"close"}
           onPress={toggleSearchBarVisible}
