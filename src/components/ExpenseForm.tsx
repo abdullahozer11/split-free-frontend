@@ -341,6 +341,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
               selectedTextStyle={{marginLeft: 10}}
               renderItem={renderCatItem}
               value={category}
+              dropdownPosition={'top'}
             />
             <Tooltip title="Auto generate">
               <Button style={{backgroundColor: 'white', justifyContent: "center", borderRadius: 10, flex: 1}}
