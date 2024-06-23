@@ -159,9 +159,9 @@ export default function FriendScreen() {
         <Text style={styles.title}>Friends</Text>
         <TouchableOpacity onPress={() => {
           setIsNotifMenuVisible(!isNotifMenuVisible);
-        }} asChild>
+        }} disabled={!freqs?.length} asChild>
           <Feather style={styles.notifIcon} name={"bell"} size={36}/>
-          {freqs?.length > 0 && (
+          {!!freqs?.length && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{freqs?.length}</Text>
             </View>
@@ -218,7 +218,7 @@ export default function FriendScreen() {
         <View>
           <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
             <UnderlinedText text={"All Friends"} fontSize={20} fontWeight={"700"}/>
-            <Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20}/>
+            {/*<Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20}/>*/}
           </View>
           <View style={styles.personContainer}>
             {friends?.map(({profile: {id, email, avatar_url}}) => (
