@@ -59,6 +59,10 @@ const Stats = () => {
       return acc;
     }, {});
 
+    const groupedArray = Object.entries(grouped);
+    const sortedGroupedArray = groupedArray.sort((a, b) => b[1].total - a[1].total);
+    const sortedGrouped = Object.fromEntries(sortedGroupedArray);
+
     const grouped2 = personalExpensesM.reduce((acc, expense) => {
       if (!acc[expense?.category]) {
         const exp_cat = exp_cats.find((exp) => exp.name == expense?.category) || exp_cats.find((exp) => exp.name == 'Other');
@@ -68,7 +72,11 @@ const Stats = () => {
       return acc;
     }, {});
 
-    return {groupedExpensesM: grouped, groupedExpensesPerM: grouped2};
+    const groupedArray2 = Object.entries(grouped2);
+    const sortedGroupedArray2 = groupedArray2.sort((a, b) => b[1].total - a[1].total);
+    const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
+
+    return {groupedExpensesM: sortedGrouped, groupedExpensesPerM: sortedGrouped2};
   }, [expensesM, personalExpensesM]);
 
   const {groupedExpenses, groupedExpensesPer} = useMemo(() => {
@@ -83,6 +91,10 @@ const Stats = () => {
       return acc;
     }, {});
 
+    const groupedArray = Object.entries(grouped);
+    const sortedGroupedArray = groupedArray.sort((a, b) => b[1].total - a[1].total);
+    const sortedGrouped = Object.fromEntries(sortedGroupedArray);
+
     const grouped2 = personalExpenses.reduce((acc, expense) => {
       if (!acc[expense?.category]) {
         const exp_cat = exp_cats.find((exp) => exp.name == expense?.category) || exp_cats.find((exp) => exp.name == 'Other');
@@ -92,7 +104,11 @@ const Stats = () => {
       return acc;
     }, {});
 
-    return {groupedExpenses: grouped, groupedExpensesPer: grouped2};
+    const groupedArray2 = Object.entries(grouped2);
+    const sortedGroupedArray2 = groupedArray2.sort((a, b) => b[1].total - a[1].total);
+    const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
+
+    return {groupedExpenses: sortedGrouped, groupedExpensesPer: sortedGrouped2};
   }, [expenses, personalExpenses]);
 
   const {biggestExpense, biggestExpensePer} = useMemo(() => {
@@ -220,15 +236,15 @@ const Stats = () => {
               />}
               <View style={{gap: 2}}>
                 {!!firstColumn.length && firstColumn.map((category) => (
-                  <View key={category} style={[{flexDirection: "row"}, styles.gap]}>
+                  <View key={category} style={{flexDirection: "row", gap: 2}}>
                     <View style={{height: lh, width: lh, borderRadius: lh / 2, backgroundColor: groupedExpensesF[category].category.bg_color}}/>
                     <Text style={{fontSize: lh * 2 / 3}}>{category}</Text>
                   </View>
                 ))}
               </View>
-              <View>
+              <View style={{gap: 2}}>
                 {!!secondColumn.length && secondColumn.map((category) => (
-                  <View key={category} style={[styles.row, styles.gap]}>
+                  <View key={category} style={{flexDirection: "row", gap: 2}}>
                     <View style={{height: lh, width: lh, borderRadius: lh / 2, backgroundColor: groupedExpensesF[category].category.bg_color}}/>
                     <Text style={{fontSize: lh * 2 / 3}}>{category}</Text>
                   </View>
