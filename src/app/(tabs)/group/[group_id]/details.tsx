@@ -421,12 +421,11 @@ const GroupDetailsScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "black",
+    backgroundColor: "#F6F6F6FF",
     flex: 1,
   },
   content: {
     flex: 1,
-    backgroundColor: "#F6F6F6FF",
   },
   header: {
     justifyContent: "center",
