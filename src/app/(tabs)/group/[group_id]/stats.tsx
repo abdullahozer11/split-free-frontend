@@ -192,6 +192,7 @@ const Stats = () => {
             <Text variant={"headlineMedium"}>Statistics</Text>
             <View style={styles.row}>
               <Menu
+                contentStyle={{backgroundColor: 'white', position: 'relative', top: 80}}
                 visible={visible}
                 onDismiss={closeMenu}
                 anchor={<TouchableOpacity onPress={openMenu} style={styles.row}>
