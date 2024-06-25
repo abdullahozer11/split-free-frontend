@@ -17,7 +17,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "userInterfaceStyle": "light"
+      "userInterfaceStyle": "light",
+      "bundleIdentifier": "xyz.splitfree"
     },
     "android": {
       "permissions": [
