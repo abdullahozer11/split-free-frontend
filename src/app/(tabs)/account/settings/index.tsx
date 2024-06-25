@@ -46,6 +46,7 @@ const SettingsScreen = () => {
         <SettingsItem page={'faq'} containerColor={'orange'} iconName={'help-circle'} title={'FAQ'}/>
         <SettingsItem page={'terms'} containerColor={'blue'} iconName={'check'} title={'Terms of Use'}/>
         <SettingsItem page={'password'} containerColor={'yellow'} iconName={'lock'} title={'Change Password'}/>
+        <SettingsItem page={'delete'} containerColor={'red'} iconName={'lock'} title={'Delete Account'}/>
         {/*<View style={styles.settingsItemRow}>*/}
         {/*  <View style={styles.innerRow}>*/}
         {/*    <View style={[styles.settingsItemIconContainer, {backgroundColor: "black"}]}>*/}

@@ -26,10 +26,15 @@ export default function AuthProvider({children}: PropsWithChildren) {
     fetchSession();
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-    })
-  }, [])
+    });
+  }, []);
 
-  return <AuthContext.Provider value={{session, loading}}>{children}</AuthContext.Provider>;
+  // Function to update session in context
+  const updateSession = (newSession: Session | null) => {
+    setSession(newSession);
+  };
+
+  return <AuthContext.Provider value={{session, loading, setSession: updateSession}}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => useContext(AuthContext);
