@@ -47,7 +47,7 @@ const SignInScreen = () => {
     const {error} = await supabase.auth.signInWithPassword({email, password});
     if (error) {
       Alert.alert(error.message);
-      console.log('error.message')
+      console.log(error.message);
     }
     setLoading(false);
   }
