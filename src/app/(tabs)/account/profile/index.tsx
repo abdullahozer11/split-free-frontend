@@ -10,7 +10,7 @@ import {ActivityIndicator} from "react-native-paper";
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const {session} = useAuth();
+  const {setSession, session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id)
 
   if (isLoading) {
@@ -18,6 +18,7 @@ export default function ProfileScreen() {
   }
 
   if (isError) {
+    setSession(null);
     return <Text>Failed to fetch data</Text>;
   }
 

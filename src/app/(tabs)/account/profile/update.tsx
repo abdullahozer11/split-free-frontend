@@ -19,7 +19,7 @@ export default function UpdateProfile() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const {mutate: updateProfile} = useUpdateProfile();
 
-  const {session} = useAuth();
+  const {setSession, session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id);
 
   useEffect(() => {
@@ -34,6 +34,7 @@ export default function UpdateProfile() {
   }
 
   if (isError) {
+    setSession(null);
     return <Text>Failed to fetch data</Text>;
   }
 

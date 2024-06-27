@@ -6,6 +6,7 @@ import {Link, useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
 import {useProfile} from "@/src/api/profiles";
 import {ActivityIndicator} from "react-native-paper";
+import {supabase} from "@/src/lib/supabase.ts";
 
 const Card = ({iconName, title, page}) => {
   return (
@@ -20,7 +21,7 @@ const Card = ({iconName, title, page}) => {
 };
 
 const AccountScreen = () => {
-  const {session} = useAuth();
+  const {setSession, session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id)
 
   if (isLoading) {
@@ -28,6 +29,7 @@ const AccountScreen = () => {
   }
 
   if (isError) {
+    setSession(null);
     return <Text>Failed to fetch data</Text>;
   }
 

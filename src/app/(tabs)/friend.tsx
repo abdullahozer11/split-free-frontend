@@ -36,7 +36,7 @@ export default function FriendScreen() {
   const [isNotifMenuVisible, setIsNotifMenuVisible] = useState(false);
   const [removingFriend, setRemovingFriend] = useState({email: null, id: null});
 
-  const {session} = useAuth();
+  const {setSession, session} = useAuth();
   const {data: profile, isLoading: profileLoading, isError: profileError} = useProfile(session?.user.id);
   const {data: friends, isError, isLoading} = getFriends(session?.user.id);
   const {data: freqs, isError: freqError, isLoading: freqIsLoading} = getFriendRequests(session?.user.id);
@@ -52,7 +52,12 @@ export default function FriendScreen() {
     return <ActivityIndicator/>;
   }
 
-  if (isError || profileError || freqError) {
+  if (profileError) {
+    setSession(null);
+    return <Text>Failed to fetch data</Text>;
+  }
+
+  if (isError || freqError) {
     return <Text>Failed to fetch data</Text>;
   }
 

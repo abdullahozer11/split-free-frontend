@@ -19,7 +19,7 @@ const Languages = () => {
     // { label: 'French', value: 'fr' },
   ];
 
-  const {session} = useAuth();
+  const {setSession, session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id);
 
   const {mutate: updateProfileSF} = useUpdateProfileSingleField();
@@ -33,6 +33,7 @@ const Languages = () => {
   }
 
   if (isError) {
+    setSession(null);
     return <Text>Failed to fetch data</Text>;
   }
 

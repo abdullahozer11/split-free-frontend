@@ -126,7 +126,7 @@ const MemberDetailsScreen = () => {
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Feather name="arrow-left" size={36} color="white" />
               </TouchableOpacity>
-              {isEditable && <TouchableOpacity onPress={() => setIsDialogVisible(true)}>
+              {isEditable && !ownMember && <TouchableOpacity onPress={() => setIsDialogVisible(true)}>
                 <Feather name={'trash'} size={24} color={'red'}/>
               </TouchableOpacity>}
             </View>

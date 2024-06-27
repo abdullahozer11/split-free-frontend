@@ -24,7 +24,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
 
   const {mutate: insertGroup} = useInsertGroup();
 
-  const {session} = useAuth();
+  const {setSession, session} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id);
   const [members, setMembers] = useState([]);
 
@@ -37,6 +37,7 @@ const CreateGroupModal = ({isVisible, onClose}) => {
   }
 
   if (isError) {
+    setSession(null);
     return <Text>Failed to fetch data</Text>;
   }
 

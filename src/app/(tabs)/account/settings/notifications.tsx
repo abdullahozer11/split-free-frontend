@@ -13,7 +13,7 @@ const Notifications = () => {
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [mobilePopups, setMobilePopups] = useState(false);
 
-  const {session} = useAuth();
+  const {session, setSession} = useAuth();
   const {data: profile, isLoading, isError} = useProfile(session?.user.id);
 
   const {mutate: updateProfileSF} = useUpdateProfileSingleField();
@@ -28,6 +28,7 @@ const Notifications = () => {
   }
 
   if (isError) {
+    setSession(null);
     return <Text>Failed to fetch data</Text>;
   }
 
