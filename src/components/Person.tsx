@@ -41,7 +41,7 @@ export const Member = ({member, assignable, onAssign, myOwnMember}) => {
             <Text variant={"bodyLarge"} numberOfLines={1} style={{width: 200}}>
               {member.name}</Text>
           </View>
-          <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
+          <View style={{flexDirection: "row", gap: 10, alignItems: "center", marginRight: 10}}>
             {myOwnMember && <Text variant={"labelMedium"} color={'green'}>Me</Text>}
             {member.role === 'owner' ? <Feather name={'award'} size={24} color={'silver'}/> : null}
             {assignable && <TouchableOpacity onPress={onAssign}>
@@ -80,7 +80,7 @@ export const Debt = ({debt, members}) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.subContainer, { justifyContent: 'space-between' }]}>
+      <View style={styles.subContainer}>
         <Avatar.Image size={36}
                       source={borrower?.profile?.avatar_url ? { uri: borrower.profile?.avatar_url } : require('@/assets/images/blank-profile.png')}
         />
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 12,
     marginHorizontal: 5,
   },
   notifLine: {
