@@ -113,6 +113,68 @@ export type Database = {
           },
         ]
       }
+      debts_for_expense: {
+        Row: {
+          amount: number
+          borrower: number
+          created_at: string
+          currency: string
+          expense_id: number
+          group_id: number
+          id: number
+          lender: number
+        }
+        Insert: {
+          amount: number
+          borrower: number
+          created_at?: string
+          currency: string
+          expense_id: number
+          group_id: number
+          id?: number
+          lender: number
+        }
+        Update: {
+          amount?: number
+          borrower?: number
+          created_at?: string
+          currency?: string
+          expense_id?: number
+          group_id?: number
+          id?: number
+          lender?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debts_for_expense_borrower_fkey"
+            columns: ["borrower"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "debts_for_expense_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "debts_for_expense_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "debts_for_expense_lender_fkey"
+            columns: ["lender"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense_participants: {
         Row: {
           expense: number
@@ -462,6 +524,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          currency: string
           email: string | null
           full_name: string | null
           id: string
@@ -477,6 +540,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          currency?: string
           email?: string | null
           full_name?: string | null
           id: string
@@ -492,6 +556,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          currency?: string
           email?: string | null
           full_name?: string | null
           id?: string
