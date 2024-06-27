@@ -6,7 +6,7 @@ export const useDebt = (memberId: number, profileMemberId: number) => {
     queryKey: ['debt', memberId, profileMemberId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('debts')
+        .from('debts_simple')
         .select()
         .or(`borrower.eq.${memberId},lender.eq.${profileMemberId}`)
         .or(`lender.eq.${memberId},borrower.eq.${profileMemberId}`);
