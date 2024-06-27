@@ -209,6 +209,8 @@ const GroupDetailsScreen = () => {
     })
   };
 
+  const isOwner = session?.user.id == group?.owner;
+
   return (
     <View style={styles.container}>
       <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
@@ -331,21 +333,21 @@ const GroupDetailsScreen = () => {
                            titleStyle={{color: "green"}}
                 />
                 <Menu.Item onPress={() => {
-                  promptDelete();
-                  closeMenu();
-                }} title="Delete Group"
-                           titleStyle={{color: "red"}}
-                />
-                <Menu.Item onPress={() => {
                   promptInvite();
                 }} title="Invite a person"
                            titleStyle={{color: "blue"}}
                 />
-                <Menu.Item onPress={() => {
+                {isOwner ? <Menu.Item onPress={() => {
+                  promptDelete();
+                  closeMenu();
+                }} title="Delete Group"
+                            titleStyle={{color: "red"}}
+                /> :
+                  <Menu.Item onPress={() => {
                   promptExitGroup();
                 }} title="Exit group"
-                           titleStyle={{color: "red"}}
-                />
+                  titleStyle={{color: "red"}}
+                  />}
               </Menu>
             </View>
           </View>
