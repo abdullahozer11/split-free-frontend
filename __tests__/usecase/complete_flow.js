@@ -4,8 +4,13 @@ const { supabase } = require('../../jest.setup');
 const email = 'jest@splitfree.xyz';
 const password = 'jestjest';
 let groupId = 0;
+let expenseId = 0;
+let expenseId2 = 0;
 let memberId = 0;
 let group = null;
+let Alice = null;
+let Michael = null;
+let John = null;
 
 describe('Flow complete', () => {
 
@@ -65,7 +70,7 @@ describe('Flow complete', () => {
   });
 
   test('should create a group', async () => {
-    const member_names = ['Owner', 'Michael', 'John']
+    const member_names = ['Alice', 'Michael', 'John']
     const title = 'Holidays'
     try {
       const {data: _groupId, error} = await supabase
@@ -147,6 +152,9 @@ describe('Flow complete', () => {
         .single();
       expect(error).toBeNull();
       group = _Group;
+      Alice = group.members[0].id;
+      Michael = group.members[1].id;
+      John = group.members[2].id;
       expect(group).toBeDefined();
       expect(group.id).toBe(groupId);
       expect(group.members.length).toEqual(3);
@@ -157,7 +165,7 @@ describe('Flow complete', () => {
     }
   })
 
-  test('should create an expense', async () => {
+  test('should create expenses', async () => {
     try {
       const {data: newExpenseID, error} = await supabase
         .rpc('create_expense', {
@@ -167,17 +175,50 @@ describe('Flow complete', () => {
           category_input: 'Shopping',
           description_input: '',
           group_id_input: groupId,
-          participants_input: [group.members[0].id, group.members[1].id],
-          payers_input: [group.members[2].id],
+          participants_input: [Alice, Michael],
+          payers_input: [John],
           proof_input: '',
           title_input: 'Bowling',
         });
       expect(error).toBeNull();
       expect(newExpenseID).toBeDefined();
       expect(newExpenseID).toBeGreaterThan(0);
+      expenseId = newExpenseID;
+      const {data: newExpenseID2, error: error2} = await supabase
+        .rpc('create_expense', {
+          amount_input: 90,
+          currency_input: "EUR",
+          date_input: new Date(),
+          category_input: 'Entertainment',
+          description_input: '',
+          group_id_input: groupId,
+          participants_input: [Alice, Michael, John],
+          payers_input: [Alice],
+          proof_input: '',
+          title_input: 'Ski trip',
+        });
+      expect(error2).toBeNull();
+      expect(newExpenseID2).toBeDefined();
+      expect(newExpenseID2).toBeGreaterThan(0);
+      expenseId2 = newExpenseID2;
     } catch (error) {
-      console.error('Error creating expense:', error.message);
+      console.error('Error creating expenses:', error.message);
       throw error;
+    }
+  });
+
+  test('group settled status changes after inserting an expense', async () => {
+    try {
+      const {data: group, error} = await supabase
+        .from('groups')
+        .select()
+        .eq('id', groupId)
+        .single();
+      expect(error).toBeNull();
+      expect(group).toBeDefined();
+      expect(group.settled).toBeFalsy();
+    } catch (error) {
+      console.error('Error setting group settled status:', error.message);
     }
   });
 
@@ -197,20 +238,22 @@ describe('Flow complete', () => {
     }
   })
 
-  test('should fetch balances for a group', async () => {
+  test('should fetch debts_per_expense for a group', async () => {
     try {
-      const {data: balances, error} = await supabase
-        .from('balances')
+      const {data: debts_per_expense, error} = await supabase
+        .from('debts_per_expense')
         .select()
         .eq('group_id', groupId);
       expect(error).toBeNull();
-      expect(balances).toBeDefined();
-      expect(Array.isArray(balances)).toBeTruthy();
-      expect(balances.length).toBeGreaterThan(0);
-      const totalBalance = balances.reduce((sum, balance) => sum + balance.amount, 0);
-      expect(totalBalance).toEqual(0);
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(4);
+      expect(debts_per_expense.find((db) => db.lender == John && db.borrower == Michael).amount).toEqual(15);
+      expect(debts_per_expense.find((db) => db.lender == John && db.borrower == Alice).amount).toEqual(15);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == Michael).amount).toEqual(30);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(30);
     } catch (error) {
-      console.error('Error fetching balances:', error.message);
+      console.error('Error fetching debts_per_expense:', error.message);
       throw error;
     }
   })
@@ -219,12 +262,15 @@ describe('Flow complete', () => {
     try {
       const {data: debts, error} = await supabase
         .from('debts')
-        .select()
+        .select('amount, lender, borrower, group_id')
         .eq('group_id', groupId);
       expect(error).toBeNull();
       expect(debts).toBeDefined();
       expect(Array.isArray(debts)).toBeTruthy();
-      expect(debts.length).toBeGreaterThan(0);
+      expect(debts.length).toEqual(3);
+      expect(debts.find((db) => db.lender == Alice && db.borrower ==  John).amount).toEqual(15);
+      expect(debts.find((db) => db.lender == Alice && db.borrower ==  Michael).amount).toEqual(30);
+      expect(debts.find((db) => db.lender == John && db.borrower ==  Michael).amount).toEqual(15);
       // any debt.amount cannot be negative
       const negativeDebts = debts.filter(debt => debt.amount < 0);
       expect(negativeDebts.length).toBe(0);
@@ -234,20 +280,427 @@ describe('Flow complete', () => {
     }
   });
 
-    test('should fetch simple debts for a group', async() => {
+  test('should fetch total balances for group members', async () => {
     try {
-      const {data: debts, error} = await supabase
-        .from('debts_simple')
-        .select()
+      const {data: members, error} = await supabase
+        .from('members')
+        .select('id, total_balance')
         .eq('group_id', groupId);
       expect(error).toBeNull();
+      expect(members).toBeDefined();
+      expect(Array.isArray(members)).toBeTruthy();
+      expect(members.length).toEqual(3);
+      const totalBalance = members.reduce((sum, member) => sum + member.total_balance, 0);
+      expect(totalBalance).toEqual(0);
+      expect(members.find((mb) => mb.id == Alice).total_balance).toEqual(45);
+      expect(members.find((mb) => mb.id == Michael).total_balance).toEqual(-45);
+      expect(members.find((mb) => mb.id == John).total_balance).toEqual(0);
+    } catch (error) {
+      console.error('Error fetching balances:', error.message);
+      throw error;
+    }
+  })
+
+  test('should fetch expense_total for a group', async () => {
+    try {
+      const {data, error} = await supabase
+        .from('groups')
+        .select('expense_total')
+        .eq('id', groupId)
+        .single();
+      expect(error).toBeNull();
+      expect(data).toBeDefined();
+      expect(data.expense_total).toEqual(120);
+    } catch (error) {
+      console.error('Error fetching expense total:', error.message);
+      throw error;
+    }
+  })
+
+  test('should delete expense', async () => {
+    try {
+      const {error: deleteError} = await supabase
+        .from('expenses')
+        .delete()
+        .eq('id', expenseId);
+      expect(deleteError).toBeNull();
+      const {error: fetchError} = await supabase
+        .from('expenses')
+        .select()
+        .eq('id', expenseId)
+        .single();
+      expect(fetchError).toBeDefined();
+      // debts per expense reflects the change
+      const {data: debts_per_expense, error: error2} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error2).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(2);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == Michael).amount).toEqual(30);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(30);
+      // debts reflects the change
+      const {data: debts, error: error3} = await supabase
+        .from('debts')
+        .select()
+        .eq('group_id', groupId);
+      expect(error3).toBeNull();
       expect(debts).toBeDefined();
       expect(Array.isArray(debts)).toBeTruthy();
-      expect(debts.length).toBeGreaterThan(0);
-      const negativeDebts = debts.filter(debt => debt.amount < 0);
-      expect(negativeDebts.length).toBe(0);
+      expect(debts.length).toEqual(2);
+      expect(debts.find((db) => db.lender == Alice && db.borrower == Michael).amount).toEqual(30);
+      expect(debts.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(30);
     } catch (error) {
-      console.error('Error fetching debts:', error.message);
+      console.error('Error deleting expense:', error.message);
+      throw error;
+    }
+  })
+
+  test('should update expense', async () => {
+    try {
+      const {error: updateError} = await supabase
+        .rpc('update_expense', {expense_id: expenseId2, amount_input: 93});
+      expect(updateError).toBeNull();
+      const {data, error: fetchError} = await supabase
+        .from('expenses')
+        .select()
+        .eq('id', expenseId2)
+        .single();
+      expect(fetchError).toBeNull();
+      expect(data).toBeDefined();
+      expect(data.amount).toEqual(93);
+      // debts per expense reflects the change
+      const {data: debts_per_expense, error: error4} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error4).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(2);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == Michael).amount).toEqual(31);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(31);
+    } catch (error) {
+      console.error('Error updating expense:', error.message);
+      throw error;
+    }
+  })
+
+  test('should create a decimal amount expense', async () => {
+    try {
+      // delete existing expenses
+      await supabase
+        .from('expenses')
+        .delete()
+        .eq('group_id', groupId);
+      const {data: expenseId, error} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 1.5,
+          title_input: 'Decimal expense',
+          payers_input: [Alice],
+          participants_input: [Alice, John]
+        });
+      expect(error).toBeNull();
+      // fetch the expense
+      const {data: expense, error: fetchError} = await supabase
+        .from('expenses')
+        .select()
+        .eq('id', expenseId)
+        .single();
+      expect(fetchError).toBeNull();
+      expect(expense).toBeDefined();
+      expect(expense.amount).toEqual(1.5);
+      // fetch debts per expense
+      const {data: debts_per_expense, error: error2} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error2).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(1);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(0.75);
+      // fetch debts
+      const {data: debts, error: error3} = await supabase
+        .from('debts')
+        .select()
+        .eq('group_id', groupId);
+      expect(error3).toBeNull();
+      expect(debts).toBeDefined();
+      expect(Array.isArray(debts)).toBeTruthy();
+      expect(debts.length).toEqual(1);
+      expect(debts.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(0.75);
+    } catch (error) {
+      console.error('Error creating decimal amount expense:', error.message);
+      throw error;
+    }
+  });
+
+  test('should create odd expense amount', async () => {
+    try {
+      // delete existing expenses
+      await supabase
+        .from('expenses')
+        .delete()
+        .eq('group_id', groupId);
+      const {data: fetchedExpenseId, error} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 1,
+          title_input: 'Non-even expense',
+          payers_input: [Alice],
+          participants_input: [Alice, John]
+        });
+      expect(error).toBeNull();
+      expenseId = fetchedExpenseId;
+      // fetch debts_per_expense
+      const {data: debts_per_expense, error: error2} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error2).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(1);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(0.5);
+      // fetch debts
+      const {data: debts, error: error3} = await supabase
+        .from('debts')
+        .select()
+        .eq('group_id', groupId);
+      expect(error3).toBeNull();
+      expect(debts).toBeDefined();
+      expect(Array.isArray(debts)).toBeTruthy();
+      expect(debts.length).toEqual(1);
+      expect(debts.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(0.5);
+    } catch (error) {
+      console.error('Error creating non-even expense:', error.message);
+      throw error;
+    }
+  })
+
+  test('can update expense amount to decimal value', async () => {
+    try {
+      const {error} = await supabase
+        .rpc('update_expense', {
+          expense_id: expenseId,
+          amount_input: 3.4,
+        });
+      expect(error).toBeNull();
+      const {data: expense, error: fetchError} = await supabase
+        .from('expenses')
+        .select()
+        .eq('id', expenseId)
+        .single();
+      expect(fetchError).toBeNull();
+      expect(expense).toBeDefined();
+      expect(expense.amount).toEqual(3.4);
+      // fetch debts_per_expense
+      const {data: debts_per_expense, error: error2} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error2).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(1);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(1.7);
+    } catch (error) {
+      console.error('Error updating expense amount to decimal:', error.message);
+      throw error;
+    }
+  })
+
+  test('settle as expense an check its impact', async () => {
+    try {
+      const {error} = await supabase
+        .rpc('settle_expense', {
+          expense_id: expenseId,
+          _group_id: groupId,
+        });
+      expect(error).toBeNull();
+      const {data: expense, error: fetchError} = await supabase
+        .from('expenses')
+        .select()
+        .eq('id', expenseId)
+        .single();
+      expect(fetchError).toBeNull();
+      expect(expense).toBeDefined();
+      expect(expense.settled).toBeTruthy()
+      // fetch debts_per_expense
+      const {data: debts_per_expense, error: error2} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error2).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(0);
+      // group is also settled
+      const {data: group, error: error3} = await supabase
+        .from('groups')
+        .select()
+        .eq('id', groupId)
+        .single();
+      expect(error3).toBeNull();
+      expect(group).toBeDefined();
+      expect(group.settled).toBeTruthy();
+  } catch (error) {
+      console.error('Error creating non-even expense:', error.message);
+      throw error;
+    }
+  })
+
+   test('equal debts should cancel each other', async () => {
+    try {
+      const {error} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 64,
+          title_input: 'Equal debts',
+          payers_input: [Alice],
+          participants_input: [Alice, John]
+        });
+      expect(error).toBeNull();
+      const {error: error2} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 64,
+          title_input: 'Equal debts',
+          payers_input: [John],
+          participants_input: [Alice, John]
+        });
+      expect(error2).toBeNull();
+      // fetch debts per expense
+      const {data: debts_per_expense, error: error3} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error3).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(2);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(32);
+      expect(debts_per_expense.find((db) => db.lender == John && db.borrower == Alice).amount).toEqual(32);
+      // fetch de2
+      const {data: debts, error: error4} = await supabase
+        .from('debts')
+        .select()
+        .eq('group_id', groupId);
+      expect(error4).toBeNull();
+      expect(debts).toBeDefined();
+      expect(Array.isArray(debts)).toBeTruthy();
+      expect(debts.length).toEqual(0);
+    } catch (error) {
+      console.error('Error creating equal debts:', error.message);
+      throw error;
+    }
+  });
+
+  test('equal debts should cancel each other', async () => {
+    try {
+      // delete old expenses
+      const {error: error5} = await supabase
+        .from('expenses')
+        .delete()
+        .eq('group_id', groupId);
+      expect(error5).toBeNull();
+      const {error} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 63,
+          title_input: 'Equal debts',
+          payers_input: [Alice],
+          participants_input: [Alice, John]
+        });
+      expect(error).toBeNull();
+      const {error: error2} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 63,
+          title_input: 'Equal debts',
+          payers_input: [John],
+          participants_input: [Alice, John]
+        });
+      expect(error2).toBeNull();
+      // fetch debts per expense
+      const {data: debts_per_expense, error: error3} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error3).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(2);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(31.5);
+      expect(debts_per_expense.find((db) => db.lender == John && db.borrower == Alice).amount).toEqual(31.5);
+      // fetch debts
+      const {data: debts, error: error4} = await supabase
+        .from('debts')
+        .select()
+        .eq('group_id', groupId);
+      expect(error4).toBeNull();
+      expect(debts).toBeDefined();
+      expect(Array.isArray(debts)).toBeTruthy();
+      expect(debts.length).toEqual(0);
+    } catch (error) {
+      console.error('Error creating equal debts:', error.message);
+      throw error;
+    }
+  });
+
+  test('bigger second debt overrides the firsts amount', async () => {
+    try {
+      // delete old expenses
+      const {error: error5} = await supabase
+        .from('expenses')
+        .delete()
+        .eq('group_id', groupId);
+      expect(error5).toBeNull();
+      const {error} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 60,
+          title_input: 'Equal debts',
+          payers_input: [Alice],
+          participants_input: [Alice, John]
+        });
+      expect(error).toBeNull();
+      const {error: error2} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 64,
+          title_input: 'Equal debts',
+          payers_input: [John],
+          participants_input: [Alice, John]
+        });
+      expect(error2).toBeNull();
+      // fetch debts per expense
+      const {data: debts_per_expense, error: error3} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error3).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(2);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(30);
+      expect(debts_per_expense.find((db) => db.lender == John && db.borrower == Alice).amount).toEqual(32);
+      // fetch debts
+      const {data: debts, error: error4} = await supabase
+        .from('debts')
+        .select()
+        .eq('group_id', groupId);
+      expect(error4).toBeNull();
+      expect(debts).toBeDefined();
+      expect(Array.isArray(debts)).toBeTruthy();
+      expect(debts.length).toEqual(1);
+      expect(debts.find((db) => db.lender == John && db.borrower == Alice).amount).toEqual(2);
+    } catch (error) {
+      console.error('Error creating equal debts:', error.message);
       throw error;
     }
   });
