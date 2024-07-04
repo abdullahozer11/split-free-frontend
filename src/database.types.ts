@@ -119,7 +119,7 @@ export type Database = {
           borrower: number
           created_at: string
           currency: string
-          expense_id: number
+          expense: number
           group_id: number
           id: number
           lender: number
@@ -128,8 +128,8 @@ export type Database = {
           amount: number
           borrower: number
           created_at?: string
-          currency: string
-          expense_id: number
+          currency?: string
+          expense: number
           group_id: number
           id?: number
           lender: number
@@ -139,7 +139,7 @@ export type Database = {
           borrower?: number
           created_at?: string
           currency?: string
-          expense_id?: number
+          expense?: number
           group_id?: number
           id?: number
           lender?: number
@@ -153,13 +153,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "debts_for_expense_expense_id_fkey"
-            columns: ["expense_id"]
-            isOneToOne: false
-            referencedRelation: "expenses"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "debts_for_expense_group_id_fkey"
             columns: ["group_id"]
             isOneToOne: false
@@ -168,6 +161,65 @@ export type Database = {
           },
           {
             foreignKeyName: "debts_for_expense_lender_fkey"
+            columns: ["lender"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_debts_for_expense_expense_fkey"
+            columns: ["expense"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      debts_simple: {
+        Row: {
+          amount: number
+          borrower: number
+          created_at: string
+          currency: string
+          group_id: number
+          id: number
+          lender: number
+        }
+        Insert: {
+          amount?: number
+          borrower: number
+          created_at?: string
+          currency?: string
+          group_id: number
+          id?: number
+          lender: number
+        }
+        Update: {
+          amount?: number
+          borrower?: number
+          created_at?: string
+          currency?: string
+          group_id?: number
+          id?: number
+          lender?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_debts_simple_borrower_fkey"
+            columns: ["borrower"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_debts_simple_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_debts_simple_lender_fkey"
             columns: ["lender"]
             isOneToOne: false
             referencedRelation: "members"
