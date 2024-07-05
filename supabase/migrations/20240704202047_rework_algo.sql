@@ -285,14 +285,6 @@ alter table "public"."balances" drop constraint "public_Balance_owner_fkey";
 
 alter table "public"."balances" drop constraint "unique_owner_expense";
 
-alter table "public"."debts_for_expense" drop constraint "debts_for_expense_borrower_fkey";
-
-alter table "public"."debts_for_expense" drop constraint "debts_for_expense_expense_id_fkey";
-
-alter table "public"."debts_for_expense" drop constraint "debts_for_expense_group_id_fkey";
-
-alter table "public"."debts_for_expense" drop constraint "debts_for_expense_lender_fkey";
-
 alter table "public"."balances" drop constraint "Balance_pkey";
 
 alter table "public"."debts_for_expense" drop constraint "debts_for_expense_pkey";
