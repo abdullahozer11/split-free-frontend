@@ -1,4 +1,4 @@
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, ScrollView} from 'react-native';
 import GroupItem from "@/src/components/GroupItem";
 import React, {useState} from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
@@ -59,23 +59,23 @@ const GroupScreen = ({}) => {
   sections.push({title: anchoredGroups.length > 0 ? "Other Groups" : "All Groups", data: filteredGroups.filter(g => !anchoredGroups.some(ag => ag.id === g.id))});
 
   return (
-    <View style={styles.container}>
+    <View className={'flex-1'}>
       <CustomHeader title={'Groups'} handleSearch={toggleSearchBarVisible} setIsModalVisible={setIsModalVisible}/>
       {searchBarVisible && <TextInput
         placeholder={''}
         onChangeText={setQueryKey}
         value={queryKey}
-        style={{backgroundColor: 'white',marginHorizontal: 10}}
+        className={'bg-white mx-2'}
         right={<TextInput.Icon
           icon={"close"}
           onPress={toggleSearchBarVisible}
         />}
       />}
-      <ScrollView style={styles.body}>
+      <ScrollView className={'px-4 pt-4 flex-1'}>
         {sections.map((section) => {
           if (section.title === 'Quick Access') {
             return (
-              <View key={section.title}>
+              <View key={section.title} className={'mb-2'}>
                 <Text variant={"headlineLarge"}>Quick Access</Text>
                 {section.data.map((item) => <GroupItem key={item.id} group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>)}
               </View>
@@ -94,21 +94,5 @@ const GroupScreen = ({}) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  sectionHeader: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  body: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    flex: 1,
-  },
-});
 
 export default GroupScreen;

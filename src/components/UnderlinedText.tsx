@@ -15,6 +15,7 @@ export default UnderlinedText;
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    height: 80
   },
   underline: {
     backgroundColor: 'orange',

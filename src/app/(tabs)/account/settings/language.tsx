@@ -1,4 +1,4 @@
-import {Alert, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Alert, TouchableOpacity, View} from 'react-native';
 import {ActivityIndicator, Text} from 'react-native-paper';
 import React, {useEffect, useState} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,7 +15,7 @@ const Languages = () => {
   const [language, setLanguage] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const data = [
-    { label: 'English', value: 'en' },
+    {label: 'English', value: 'en'},
     // { label: 'French', value: 'fr' },
   ];
 
@@ -46,36 +46,34 @@ const Languages = () => {
       field: 'language',
       value: newValue
     }, {
-        onSuccess: async () => {
-          // console.log('handleValueChange success');
-          await queryClient.invalidateQueries(['profile']);
-        },
-        onError: (error) => {
-          setLanguage(lanTemp);
-          setIsFocus(true);
-          console.error('Server error:', error);
-          Alert.alert('Error', 'Server error.');
-        },
-      })
+      onSuccess: async () => {
+        // console.log('handleValueChange success');
+        await queryClient.invalidateQueries(['profile']);
+      },
+      onError: (error) => {
+        setLanguage(lanTemp);
+        setIsFocus(true);
+        console.error('Server error:', error);
+        Alert.alert('Error', 'Server error.');
+      },
+    })
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          navigation.goBack();
-        }}>
-          <Feather name={"arrow-left"} size={36} />
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="h-16 justify-center px-4">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Feather name="arrow-left" size={36}/>
         </TouchableOpacity>
       </View>
-      <View style={styles.body}>
-        <Text variant={'headlineLarge'}>Select Language</Text>
+      <View className="flex-1 justify-center items-center px-6 gap-6">
+        <Text className="text-3xl font-semibold">Select Language</Text>
         <Dropdown
-          style={[styles.dropdown]}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
+          className="w-full border-gray-300 border rounded-md px-4"
+          placeholderStyle="text-gray-500 text-base"
+          selectedTextStyle="text-base"
+          inputSearchStyle="h-10 text-base"
+          iconStyle="w-5 h-5"
           data={data}
           search
           maxHeight={300}
@@ -90,12 +88,7 @@ const Languages = () => {
             handleValueChange(item.value);
           }}
           renderLeftIcon={() => (
-            <Feather
-              style={styles.icon}
-              color={'black'}
-              name="globe"
-              size={20}
-            />
+            <Feather name="globe" size={20} className="text-black"/>
           )}
         />
       </View>
@@ -104,47 +97,3 @@ const Languages = () => {
 };
 
 export default Languages;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  header: {
-    height: 60,
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  body: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    gap: 20
-  },
-  dropdown: {
-    height: 50,
-    width: '100%',
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-    color: 'gray',
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});

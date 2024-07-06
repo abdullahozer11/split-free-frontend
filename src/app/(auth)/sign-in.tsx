@@ -1,11 +1,9 @@
-import {Image, StyleSheet, Alert, View} from 'react-native';
+import {Image, Alert, View} from 'react-native';
 import {Text, TextInput} from 'react-native-paper';
 import React, {useState} from 'react';
 import Button from '../../components/Button';
-import Colors from '../../constants/Colors';
 import {Link, Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
-import GoogleSignIn from "@/src/components/google";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as Linking from "expo-linking";
 
@@ -53,96 +51,38 @@ const SignInScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 justify-center p-5 bg-white">
       <Stack.Screen options={{title: 'Sign in'}}/>
-      <Image source={require('@/assets/images/logo.png')} style={styles.logo}/>
-      <View style={styles.inputs}>
+      <Image source={require('@/assets/images/logo.png')} className="h-52 w-52 self-center"/>
+      <View className="space-y-2.5">
         <TextInput
           value={email}
           onChangeText={setEmail}
           placeholder="Email"
-          style={styles.input}
+          className="border border-gray-400 bg-white rounded-md text-sm h-11"
         />
         <TextInput
           value={password}
           onChangeText={setPassword}
           placeholder="Password"
-          style={styles.input}
+          className="border border-gray-400 bg-white rounded-md text-sm h-11"
           secureTextEntry={!showPassword}
-          right={<TextInput.Icon
-            icon={showPassword ? "eye-off" : "eye"}
-            onPress={togglePasswordVisibility}
-          />}
+          right={<TextInput.Icon icon={showPassword ? "eye-off" : "eye"} onPress={togglePasswordVisibility}/>}
         />
       </View>
-      <Link href={"/forgot"} style={styles.forgot}>
+      <Link href="/forgot" className="self-end py-1.5 text-lg">
         <Text>Forgot Password</Text>
       </Link>
       <Button disabled={loading} onPress={signInWithEmail} text={loading ? "Signing in..." : "Sign in"}/>
-      <Link href="/sign-up" style={styles.textButton}>
+      <Link href="/sign-up" className="self-center font-bold text-blue-500 my-2.5">
         Create an account
       </Link>
-      <Link href="/magic" style={[styles.textButton, styles.magicButton]}>
+      <Link href="/magic" className="w-full border p-2.5 rounded-full text-center text-lg text-maroon border-gray-400">
         Send Magic
       </Link>
-      {/*<GoogleSignIn/>*/}
+      {/* <GoogleSignIn /> */}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    justifyContent: 'center',
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  label: {
-    color: 'gray',
-  },
-  inputs: {
-    gap: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    backgroundColor: 'white',
-    borderRadius: 5,
-    fontSize: 14,
-    height: 45,
-  },
-  textButton: {
-    alignSelf: 'center',
-    fontWeight: 'bold',
-    color: Colors.light.tint,
-    marginVertical: 10,
-  },
-  logo: {
-    height: 200,
-    aspectRatio: 1,
-    alignSelf: "center",
-  },
-  googleBtn: {
-    backgroundColor: 'white',
-    borderWidth: 0.5,
-  },
-  googleBtnText: {
-    color: 'black',
-  },
-  forgot: {
-    fontSize: 16,
-    alignSelf: "flex-end",
-    paddingVertical: 7,
-  },
-  magicButton: {
-    width: "100%",
-    borderWidth: 1,
-    paddingVertical: 10,
-    borderRadius: 50,
-    textAlign: "center",
-    fontSize: 18,
-    color: 'maroon',
-  }
-});
 
 export default SignInScreen;

@@ -1,4 +1,4 @@
-import {StyleSheet, View, Text, Image, Animated, Pressable, TouchableOpacity} from 'react-native';
+import {View, Text, Image, Animated, Pressable, TouchableOpacity} from 'react-native';
 import React, {useState} from "react";
 import {useAuth} from "@/src/providers/AuthProvider";
 import {SafeAreaView} from "react-native-safe-area-context";
@@ -6,15 +6,14 @@ import {Link, useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
 import {useProfile} from "@/src/api/profiles";
 import {ActivityIndicator} from "react-native-paper";
-import {supabase} from "@/src/lib/supabase.ts";
 
 const Card = ({iconName, title, page}) => {
   return (
     <Link href={`/(tabs)/account/${page}`} asChild>
-      <Pressable style={styles.cardContainer}>
+      <Pressable className="h-24 w-24 rounded-md border-2 border-gray-400 items-center bg-white justify-between py-5">
         <View/>
         <Feather name={iconName} size={24} color="black"/>
-        <Text style={styles.cardText}>{title}</Text>
+        <Text className="text-lg font-semibold text-black">{title}</Text>
       </Pressable>
     </Link>
   );
@@ -51,23 +50,24 @@ const AccountScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Animated.View style={[styles.header, {opacity: headerOpacity, transform: [{translateY: headerTranslateY}]}]}>
+    <SafeAreaView className={'flex-1 bg-black'}>
+      <View className="h-44 bg-black z-10 flex-row gap-4 px-6 items-center">
         <TouchableOpacity onPress={() => {
           navigation.goBack();
         }}>
-          <Feather name={"arrow-left"} style={styles.back} color={'white'} />
+          <Feather name={"arrow-left"} size={32} color={'white'} />
         </TouchableOpacity>
         <Image
           source={profile?.avatar_url ? {uri: profile.avatar_url} : require('@/assets/images/blank-profile.png')}
-          style={styles.avatar}/>
+          className="w-20 h-20 rounded-full"
+        />
         <View>
-          <Text style={styles.name}>{profile.full_name}</Text>
-          <Text style={styles.email}>{profile.email}</Text>
+          <Text className="text-4xl font-medium text-white">{profile.full_name}</Text>
+          <Text className="text-md font-light text-white">{profile.email}</Text>
         </View>
-      </Animated.View>
-      <View style={styles.body}>
-        <View style={styles.row}>
+      </View>
+      <View className="bg-white flex-1 p-5">
+        <View className="flex-row justify-between items-center px-2.5 mt-2.5">
           <Card iconName={"folder"} page={'profile'} title={"Profile"}/>
           {/*<Card iconName={"pie-chart"} page={'spending'} title={"Spending"}/>*/}
           <Card iconName={"settings"} page={'settings'} title={"Settings"}/>
@@ -78,76 +78,3 @@ const AccountScreen = () => {
 };
 
 export default AccountScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
-  },
-  body: {
-    backgroundColor: 'white',
-    flex: 1,
-    borderTopEndRadius: 20,
-    borderTopStartRadius: 20,
-    padding: 20,
-  },
-  header: {
-    height: 180,
-    backgroundColor: 'black',
-    zIndex: 1,
-    flexDirection: "row",
-    gap: 16,
-    paddingVertical: 70,
-    paddingHorizontal: 24,
-    alignItems: "center",
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: '#eee',
-  },
-  imageSelector: {
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'black',
-  },
-  name: {
-    fontSize: 32,
-    fontWeight: '500',
-    color: 'white',
-  },
-  email: {
-    fontSize: 16,
-    fontWeight: '300',
-    color: 'white',
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginTop: 10,
-  },
-  cardContainer: {
-    height: 100,
-    width: 100,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#eee',
-    alignItems: "center",
-    backgroundColor: "white",
-    justifyContent: "space-between",
-    paddingVertical: 20,
-  },
-  cardText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'black',
-  },
-  back: {
-    fontSize: 30,
-  }
-});

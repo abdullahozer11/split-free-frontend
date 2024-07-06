@@ -1,4 +1,4 @@
-import {View, ScrollView, StyleSheet, TouchableOpacity, Alert} from 'react-native';
+import {View, ScrollView, TouchableOpacity, Alert} from 'react-native';
 import React, {useState} from "react";
 import {Feather} from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
@@ -160,39 +160,40 @@ export default function FriendScreen() {
 
   return (
     <>
-      <SafeAreaView style={styles.header}>
-        <Text style={styles.title}>Friends</Text>
+      <SafeAreaView className={'flex-row justify-between items-end bg-gray-100 p-4'}>
+        <Text className={'text-5xl'}>Friends</Text>
         <TouchableOpacity onPress={() => {
           setIsNotifMenuVisible(!isNotifMenuVisible);
         }} disabled={!freqs?.length} asChild>
-          <Feather style={styles.notifIcon} name={"bell"} size={36}/>
+          <Feather name={"bell"} size={36}/>
           {!!freqs?.length && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{freqs?.length}</Text>
+            <View className="absolute top-0 right-0 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center">
+              <Text className="text-white text-xs">{freqs?.length}</Text>
             </View>
           )}
         </TouchableOpacity>
       </SafeAreaView>
-      <View style={styles.body}>
-        {isNotifMenuVisible && <View style={styles.notifications}>
-          {freqs.map((freq) => (
-            <NotifLine key={freq.id} email={freq.sender_profile.email} onAccept={() => handleAccept(freq.sender)} onIgnore={() => handleIgnore(freq.sender)}/>
-          ))}
-        </View>}
-        <View style={styles.searchSection}>
+      <View className="p-4 bg-gray-100">
+        {isNotifMenuVisible && (
+          <View className="absolute top-0 right-0 bg-white border rounded-lg border-gray-400 p-2 mr-2 z-10">
+            {freqs.map(freq => (
+              <NotifLine key={freq.id} email={freq.sender_profile.email} onAccept={() => handleAccept(freq.sender)}
+                         onIgnore={() => handleIgnore(freq.sender)}/>
+            ))}
+          </View>
+        )}
+        <View className="mb-4">
           <Searchbar
             placeholder="Search"
             onChangeText={setSearchQuery}
             value={searchQuery}
-            mode={'view'}
-            style={{backgroundColor: 'white'}}
-            onClearIconPress={() => {
-              setSearchQuery(null);
-            }}
+            mode="view"
+            className="bg-white"
+            onClearIconPress={() => setSearchQuery(null)}
             onIconPress={handleSearch}
             loading={searchLoading}
           />
-          <ScrollView style={{backgroundColor: 'white'}}>
+          <ScrollView className={'bg-white'}>
             {searchResults?.map((profile) => (
               profile.id !== session?.user.id && (
                 <View key={profile.id}>
@@ -200,32 +201,32 @@ export default function FriendScreen() {
                 </View>
               )
             ))}
-            {!!searchResults.length && <View style={{flex: 1, alignItems: "center"}}>
+            {!!searchResults.length && <View className='flex-1 items-center'>
               <TouchableOpacity onPress={() => setSearchResults([])}>
                 <Feather name={'chevrons-up'} size={24}/>
               </TouchableOpacity>
             </View>}
           </ScrollView>
         </View>
-        <View style={styles.balanceSection}>
-          <View style={{flexDirection: "row", marginHorizontal: 15}}>
-            <View style={{flex: 1}}>
-              <Text style={{fontSize: 18}}>Total Receivable:</Text>
-              <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>+ €{profile?.total_receivable?.toFixed(2)}</Text>
-            </View>
-            <View style={{flex: 1}}>
-              <Text style={{fontSize: 18}}>Total Payable:</Text>
-              <Text style={{fontSize: 24, fontWeight: "bold"}}>- €{profile?.total_payable.toFixed(2)}</Text>
-            </View>
-          </View>
-          <ProgressBar animatedValue={0.7} theme={{colors: {primary: 'green'}}} style={{height: 18, borderRadius: 10}}/>
-        </View>
         <View>
-          <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
-            <UnderlinedText text={"All Friends"} fontSize={20} fontWeight={"700"}/>
-            {/*<Feather style={{fontSize: 20, fontWeight: "500"}} name={"chevron-down"} size={20}/>*/}
+          <View className={'m-15 flex-row justify-between mr-5'}>
+            <View className={'items-end'}>
+              <Text className={'text-xl'}>Total Receivable:</Text>
+              <Text className={'text-xl font-bold text-green-700'}>+ €{profile?.total_receivable?.toFixed(2)}</Text>
+            </View>
+            <View className={'items-end'}>
+              <Text className={'text-xl'}>Total Payable:</Text>
+              <Text className={'text-xl font-bold'}>- €{profile?.total_payable.toFixed(2)}</Text>
+            </View>
           </View>
-          <View style={styles.personContainer}>
+          <ProgressBar animatedValue={0.7} theme={{colors: {primary: 'green'}}} style={{height: 18, borderRadius: 10}}
+                       className={'h-18'}/>
+        </View>
+        <View className="mb-4">
+          <View className="flex-row gap-1 mt-5">
+            <UnderlinedText text="All Friends" fontSize={32} fontWeight="700"/>
+          </View>
+          <View className="p-4 gap-4">
             {friends?.map(({profile: {id, email, avatar_url}}) => (
               <Friend key={id} email={email} avatar_url={avatar_url} onRemove={() => {
                 setRemovingFriend({
@@ -256,85 +257,3 @@ export default function FriendScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: '#F6F6F6FF',
-    width: "100%",
-    height: 130,
-    flexDirection: "row",
-    padding: 10,
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    paddingBottom: 20,
-  },
-  iconsContainer: {
-    flexDirection: 'row',
-    marginRight: 16,
-  },
-  iconContainer: {
-    marginLeft: 16,
-    borderRadius: 10,
-    width: 60,
-    height: 60,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "orange",
-  },
-  transparent: {
-    backgroundColor: "transparent",
-  },
-  title: {
-    fontSize: 40,
-  },
-  body: {
-    padding: 16,
-    backgroundColor: '#F6F6F6FF',
-    flex: 1,
-  },
-  balanceSection: {
-    marginBottom: 30,
-    gap: 15,
-  },
-  personContainer: {
-    gap: 10,
-    padding: 10,
-  },
-  searchBox: {
-    backgroundColor: "white",
-    padding: 10,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-  },
-  searchSection: {
-    marginBottom: 20,
-  },
-  notifIcon: {
-    marginRight: 10,
-  },
-  notifications: {
-    backgroundColor: "white",
-    position: "absolute",
-    top: -10,
-    zIndex: 999,
-    right: 30,
-    borderWidth: 1,
-    borderRadius: 10,
-  },
-  badge: {
-    position: 'absolute',
-    right: 0,
-    top: -5,
-    backgroundColor: 'red',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  badgeText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-});

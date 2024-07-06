@@ -1,5 +1,5 @@
-import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
-import {Text, TextInput, Button} from 'react-native-paper';
+import {View, TouchableOpacity, Alert} from 'react-native';
+import {Text, TextInput} from 'react-native-paper';
 import React, {useState} from "react";
 import {useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
@@ -33,30 +33,42 @@ const Delete = () => {
     }
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          navigation.goBack();
-        }}>
-          <Feather name={"arrow-left"} size={36}/>
+ return (
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <View className="h-16 px-4 flex-row justify-start items-center">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Feather name="arrow-left" size={36} />
         </TouchableOpacity>
       </View>
-      <View style={styles.content}>
-        <Text variant={'headlineMedium'}>DELETE ACCOUNT</Text>
-        <Text variant={'labelMedium'}>This action is undoable, all data related to the account will be lost forever</Text>
-        <Text style={styles.redText}>Are you sure you want to delete your account?</Text>
-        <Text>Please type, </Text><Text style={{fontWeight: 700}}>"{verifText}"</Text>
+      <View className="flex-1 p-4 justify-center">
+        <Text className="text-4xl font-semibold mb-4 mx-auto">DELETE ACCOUNT</Text>
+        <Text className="text-xl text-gray-600 mb-4">This action is undoable, all data related to the account will be lost forever.</Text>
+        <Text className="text-2xl text-red-600 mb-2">Are you sure you want to delete your account?</Text>
+        <Text className="text-2xl mb-2">Please type, <Text className="font-bold">"{verifText}"</Text></Text>
         <TextInput
           value={verif}
           onChangeText={setVerif}
           placeholder=""
-          style={styles.input}
+          className="w-full border-gray-300 border rounded-md px-4 mb-2 bg-white text-sm"
         />
-        {errorText && <Text style={styles.redText}>{errorText}</Text>}
-        <View style={styles.row}>
-          <Button contentStyle={{backgroundColor: "white", padding: 10}} labelStyle={{color: "red"}} onPress={handleDelete}>DELETE</Button>
-          <Button contentStyle={{backgroundColor: "white", padding: 10}} onPress={() => navigation.goBack()}>CANCEL</Button>
+        {errorText && <Text className="text-red-600 mb-2">{errorText}</Text>}
+        <View className="flex-row justify-center gap-4 px-5">
+          <TouchableOpacity
+            onPress={handleDelete}
+            className="w-1/2 bg-white font-bold py-3 rounded-md items-center"
+          >
+            <Text className={'text-xl font-semibold text-red-500'}>
+              Delete
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            className="w-1/2 bg-white font-bold py-3 rounded-md items-center"
+          >
+            <Text className={'text-xl font-semibold'}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -64,34 +76,3 @@ const Delete = () => {
 };
 
 export default Delete;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F6F6F6FF",
-  },
-  header: {
-    height: 60,
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    gap: 20,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  input: {
-    backgroundColor: 'white',
-    width: '100%'
-  },
-  redText: {
-    color: 'red'
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 30,
-  },
-});

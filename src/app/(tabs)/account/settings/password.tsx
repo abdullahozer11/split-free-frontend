@@ -1,4 +1,4 @@
-import {Image, StyleSheet, View, Text, Alert, TouchableOpacity} from 'react-native';
+import {Image, View, Text, Alert, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from "react";
 import {supabase} from "@/src/lib/supabase";
 import {ActivityIndicator, TextInput} from "react-native-paper";
@@ -101,103 +101,68 @@ const Password = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          navigation.goBack();
-        }}>
-          <Feather name={"arrow-left"} size={36}/>
+    <View className="p-4 bg-white flex-1 justify-center">
+      <View className="absolute top-12 left-0 right-0 h-16 justify-center px-4">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Feather name="arrow-left" size={44}/>
         </TouchableOpacity>
       </View>
-      <View style={styles.inputs}>
-        <Image source={require('@/assets/images/logo.png')} style={styles.logo}/>
-        <Text style={styles.headLine}>Change Password</Text>
+      <View className="flex items-center justify-center">
+        <Image source={require('@/assets/images/logo.png')} className="h-60 w-60"/>
+        <Text className="text-3xl font-semibold mb-4">Change Password</Text>
         <TextInput
           value={oldPassword}
           onChangeText={setOldPassword}
           placeholder="Old Password"
-          style={styles.input}
+          className="w-full border-gray-300 border rounded-md px-2 mb-2 bg-white"
           secureTextEntry={!showOldPassword}
-          right={<TextInput.Icon
-            icon={showPassword ? "eye-off" : "eye"}
-            onPress={toggleOldPasswordVisibility}
-          />}
+          right={
+            <TextInput.Icon
+              icon={showOldPassword ? "eye-off" : "eye"}
+              onPress={toggleOldPasswordVisibility}
+            />
+          }
           error={!!passwordError}
         />
         <TextInput
           value={password}
           onChangeText={setPassword}
           placeholder="New Password"
-          style={styles.input}
+          className="w-full border-gray-300 border rounded-md px-2 mb-2 bg-white"
           secureTextEntry={!showPassword}
-          right={<TextInput.Icon
-            icon={showPassword ? "eye-off" : "eye"}
-            onPress={togglePasswordVisibility}
-          />}
+          right={
+            <TextInput.Icon
+              icon={showPassword ? "eye-off" : "eye"}
+              onPress={togglePasswordVisibility}
+            />
+          }
           error={!!passwordError}
         />
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        {passwordError && <Text className="text-red-600 text-sm mb-2">{passwordError}</Text>}
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           placeholder="Confirm New Password"
-          style={styles.input}
+          className="w-full border-gray-300 border rounded-md px-2 mb-2 bg-white"
           secureTextEntry={!showConfirmPassword}
-          right={<TextInput.Icon
-            icon={showConfirmPassword ? "eye-off" : "eye"}
-            onPress={toggleConfirmPasswordVisibility}
-          />}
+          right={
+            <TextInput.Icon
+              icon={showConfirmPassword ? "eye-off" : "eye"}
+              onPress={toggleConfirmPasswordVisibility}
+            />
+          }
           error={!!confirmPasswordError}
         />
-        {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
-        <Button disabled={loading} onPress={changePassword} text={loading ? "Submitting..." : "Submit"}/>
+        {confirmPasswordError && <Text className="text-red-600 text-sm mb-2">{confirmPasswordError}</Text>}
+        <Button
+          disabled={loading}
+          onPress={changePassword}
+          text={loading ? "Submitting..." : "Submit"}
+          className="w-full bg-blue-500 text-white font-bold py-3 rounded-md mt-4 bg-black"
+        />
       </View>
     </View>
   );
 };
 
 export default Password;
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    justifyContent: 'center',
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  inputs: {
-    gap: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    backgroundColor: 'white',
-    borderRadius: 5,
-    fontSize: 14,
-    height: 45,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: -8,
-    marginBottom: 8,
-  },
-  logo: {
-    height: 200,
-    aspectRatio: 1,
-    alignSelf: "center",
-  },
-  headLine: {
-    textAlign: "center",
-    fontSize: 32,
-    fontWeight: "600",
-    marginBottom: 20
-  },
-  header: {
-    height: 60,
-    justifyContent: "center",
-    paddingHorizontal: 20,
-    position: "absolute",
-    top: 60,
-  },
-});

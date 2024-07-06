@@ -9,43 +9,17 @@ import {useNavigation} from "expo-router";
 const Terms = () => {
   const navigation = useNavigation();
   return (
-    <SafeAreaView style={styles.container}>
-        <TouchableOpacity onPress={() => {navigation.goBack()}}>
-          <Feather name={"arrow-left"} size={36}/>
-        </TouchableOpacity>
-      <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={{height: '100%'}}
-        >
-          <Markdown>
-            {termsText}
-          </Markdown>
-        </ScrollView>
+    <SafeAreaView className="flex-1 p-4 bg-gray-100">
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Feather name="arrow-left" size={36} />
+      </TouchableOpacity>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" className="h-full">
+        <Markdown>
+          {termsText}
+        </Markdown>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 export default Terms;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#F6F6F6FF",
-  },
-  header: {
-    marginTop: 10,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  card: {
-    marginVertical: 8,
-    backgroundColor: "white",
-  },
-  text: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
-});

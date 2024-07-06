@@ -1,4 +1,4 @@
-import {View, StyleSheet, Alert, Image} from 'react-native';
+import {View, Alert, Image} from 'react-native';
 import {TextInput, Text} from 'react-native-paper';
 import React, {useState, useEffect} from 'react';
 import Button from '../../components/Button';
@@ -85,52 +85,47 @@ const SignUpScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 justify-center p-5 bg-white">
       <Stack.Screen options={{title: 'Sign up'}}/>
-      <Image source={require('@/assets/images/logo.png')} style={styles.logo}/>
-      <View style={styles.inputs}>
+      <Image source={require('@/assets/images/logo.png')} className="h-52 w-52 self-center"/>
+      <View className="space-y-2.5">
         <TextInput
           value={email}
           onChangeText={setEmail}
           placeholder="Email"
-          style={styles.input}
+          className="border border-gray-400 bg-white rounded-md text-sm h-11"
           keyboardType="email-address"
           autoCapitalize="none"
           error={!!emailError}
         />
-        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+        {emailError ? <Text className="text-red-500 text-xs mt-1 mb-2">{emailError}</Text> : null}
         <TextInput
           value={password}
           onChangeText={setPassword}
           placeholder="Password"
-          style={styles.input}
+          className="border border-gray-400 bg-white rounded-md text-sm h-11"
           secureTextEntry={!showPassword}
-          right={<TextInput.Icon
-            icon={showPassword ? "eye-off" : "eye"}
-            onPress={togglePasswordVisibility}
-          />}
+          right={<TextInput.Icon icon={showPassword ? "eye-off" : "eye"} onPress={togglePasswordVisibility}/>}
           error={!!passwordError}
         />
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        {passwordError ? <Text className="text-red-500 text-xs mt-1 mb-2">{passwordError}</Text> : null}
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           placeholder="Confirm Password"
-          style={styles.input}
+          className="border border-gray-400 bg-white rounded-md text-sm h-11"
           secureTextEntry={!showConfirmPassword}
-          right={<TextInput.Icon
-            icon={showConfirmPassword ? "eye-off" : "eye"}
-            onPress={toggleConfirmPasswordVisibility}
-          />}
+          right={<TextInput.Icon icon={showConfirmPassword ? "eye-off" : "eye"}
+                                 onPress={toggleConfirmPasswordVisibility}/>}
           error={!!confirmPasswordError}
         />
-        {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
+        {confirmPasswordError ? <Text className="text-red-500 text-xs mt-1 mb-2">{confirmPasswordError}</Text> : null}
       </View>
-      <View style={styles.termsContainer}>
-        <CheckBox checked={acceptance} onPress={toggleAcceptance} />
+      <View className="flex-row items-center">
+        <CheckBox checked={acceptance} onPress={toggleAcceptance}/>
         <Text>
           I agree to{' '}
-          <Link href="/(global)/terms" style={{textDecorationLine: 'underline'}}>
+          <Link href="/(global)/terms" className="underline">
             terms and conditions
           </Link>
         </Text>
@@ -140,54 +135,11 @@ const SignUpScreen = () => {
         onPress={signUpWithEmail}
         text={loading ? 'Creating account...' : 'Create account'}
       />
-      <Link href="/sign-in" style={styles.textButton}>
+      <Link href="/sign-in" className="self-center font-bold text-blue-500">
         Sign in
       </Link>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    justifyContent: 'center',
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  label: {
-    color: 'gray',
-  },
-  inputs: {
-    gap: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    backgroundColor: 'white',
-    borderRadius: 5,
-    fontSize: 14,
-    height: 45,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: -8,
-    marginBottom: 8,
-  },
-  textButton: {
-    alignSelf: 'center',
-    fontWeight: 'bold',
-    color: Colors.light.tint,
-  },
-  logo: {
-    height: 200,
-    aspectRatio: 1,
-    alignSelf: "center",
-  },
-  termsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-});
 
 export default SignUpScreen;

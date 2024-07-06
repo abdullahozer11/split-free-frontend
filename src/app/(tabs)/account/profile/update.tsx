@@ -1,7 +1,5 @@
 import {Alert, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import {View, Text} from '@/src/components/Themed';
-import {supabase} from "@/src/lib/supabase";
-import * as ImagePicker from 'expo-image-picker';
 import {useEffect, useState} from "react";
 import {useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
@@ -38,22 +36,6 @@ export default function UpdateProfile() {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-    });
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
   const handleSubmit = () => {
     updateProfile({
       id: profile?.id,
@@ -74,128 +56,50 @@ export default function UpdateProfile() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          navigation.goBack();
-        }}>
-          <Feather style={styles.icon} name={"arrow-left"} size={24}/>
+    <View className="flex-1 bg-gray-100 p-10 justify-center">
+      <View className="flex-row justify-between items-center mt-10 bg-transparent mb-10">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Feather name="arrow-left" size={32} className="text-black"/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
-          handleSubmit();
-        }}>
-          <Text style={styles.icon}>Save</Text>
+        <TouchableOpacity onPress={handleSubmit}>
+          <Text className="text-black text-3xl">Save</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.body}>
-        <Text style={styles.title}>Update Profile</Text>
-        <View style={styles.avatarContainer}>
+      <ScrollView className="flex-1">
+        <Text className="text-4xl mb-4 text-center">Update Profile</Text>
+        <View className="items-center bg-transparent">
           <Image
             source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
-            style={styles.avatar}/>
+            className={"w-48 h-48 rounded-full border-2 border-gray-300"}
+          />
         </View>
-        {/*<Text onPress={pickImage} style={styles.pickImageButton}> Select Image </Text>*/}
-        <View style={styles.inputSection}>
-          <View style={styles.transparent}>
-            <Text style={styles.label}>Full Name</Text>
+        <View className="mt-4 bg-transparent">
+          <View className="bg-transparent mb-2">
+            <Text className="text-sm font-semibold opacity-70">Full Name</Text>
             <TextInput
-              style={styles.input}
+              className={"bg-white text-black h-12 rounded-md px-4"}
               value={fullName}
-              onChangeText={(text) => setFullName(text)}
+              onChangeText={setFullName}
             />
           </View>
-          <View style={styles.transparent}>
-            <Text style={styles.label}>Phone Number</Text>
+          <View className="bg-transparent mb-2">
+            <Text className="text-sm font-semibold opacity-70">Phone Number</Text>
             <TextInput
-              style={styles.input}
+              className={"bg-white text-black h-12 rounded-md px-4"}
               value={phoneNumber}
-              onChangeText={(text) => setPhoneNumber(text)}
+              onChangeText={setPhoneNumber}
             />
           </View>
-          <View style={styles.transparent}>
-            <Text style={styles.label}>Website</Text>
+          <View className="bg-transparent mb-2">
+            <Text className="text-sm font-semibold opacity-70">Website</Text>
             <TextInput
-              style={styles.input}
+              className={"bg-white text-black h-12 rounded-md px-4"}
               value={website}
-              onChangeText={(text) => setWebsite(text)}
+              onChangeText={setWebsite}
             />
           </View>
         </View>
       </ScrollView>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F6F6F6FF',
-    padding: 40,
-    gap: 20,
-  },
-  header: {
-    marginTop: 10,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  body: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  avatarContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  avatar: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    borderWidth: 2,
-    borderColor: '#eee',
-    marginBottom: 10,
-  },
-  pickImageButton: {
-    alignSelf: "center",
-    fontWeight: "bold",
-    color: 'black',
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    opacity: 0.6,
-  },
-  inputSection: {
-    backgroundColor: 'transparent',
-    marginTop: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    opacity: 0.7,
-  },
-  input: {
-    fontSize: 16,
-    fontWeight: '700',
-    backgroundColor: 'white',
-    height: 50,
-    alignItems: "center",
-    borderRadius: 10,
-    paddingLeft: 10,
-  },
-  icon: {
-    fontSize: 28,
-    fontWeight: "400",
-  },
-  transparent: {
-    backgroundColor: 'transparent',
-    gap: 10,
-    marginBottom: 10,
-  },
-});
+};

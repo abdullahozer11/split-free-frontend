@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {StyleSheet, TouchableOpacity, View} from "react-native";
+import {TouchableOpacity, View} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {Text, Switch, ActivityIndicator} from "react-native-paper";
 import {useAuth} from "@/src/providers/AuthProvider";
@@ -69,19 +69,19 @@ const Notifications = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={() => {navigation.goBack()}}>
-          <Feather name={"arrow-left"} size={36}/>
-        </TouchableOpacity>
-      <Text variant="headlineLarge" style={styles.title}>Notifications</Text>
-      <View style={styles.setting}>
+    <SafeAreaView className="flex-1 bg-gray-100 p-4">
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Feather name="arrow-left" size={36}/>
+      </TouchableOpacity>
+      <Text className="text-2xl font-semibold mb-6">Notifications</Text>
+      <View className="bg-white rounded-md p-4 mb-4 flex-row justify-between items-center">
         <Text>Email Notifications</Text>
         <Switch
           value={emailNotifications}
           onValueChange={handleEmailNotifChange}
         />
       </View>
-      <View style={styles.setting}>
+      <View className="bg-white rounded-md p-4 mb-4 flex-row justify-between items-center">
         <Text>Mobile Popups</Text>
         <Switch
           value={mobilePopups}
@@ -93,22 +93,3 @@ const Notifications = () => {
 };
 
 export default Notifications;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#F6F6F6FF',
-  },
-  title: {
-    marginBottom: 24,
-  },
-  setting: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-    padding: 8,
-    borderRadius: 4,
-  },
-});

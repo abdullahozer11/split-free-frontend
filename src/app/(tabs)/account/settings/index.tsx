@@ -1,5 +1,5 @@
-import {Pressable, StyleSheet, View} from 'react-native';
-import React, {useState} from "react";
+import {Pressable, View} from 'react-native';
+import React from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {Feather} from '@expo/vector-icons';
 import {supabase} from "@/src/lib/supabase";
@@ -10,9 +10,9 @@ import {Text} from "react-native-paper";
 const SettingsItem = ({page, iconName, title, containerColor}) => {
   return (
     <Link href={`/(tabs)/account/settings/${page}`} asChild>
-      <Pressable style={styles.settingsItemRow}>
-        <View style={styles.innerRow}>
-          <View style={[styles.settingsItemIconContainer, {backgroundColor: containerColor}]}>
+      <Pressable className="flex-row justify-between items-center p-2">
+        <View className="flex-row items-center gap-4">
+          <View className={`w-14 h-14 rounded-md flex items-center justify-center`} style={{backgroundColor: containerColor}}>
             <Feather name={iconName} size={24}/>
           </View>
           <Text>{title}</Text>
@@ -24,51 +24,30 @@ const SettingsItem = ({page, iconName, title, containerColor}) => {
 };
 
 const SettingsScreen = () => {
-  const [darkThemeOn, setDarkThemeOn] = useState(false);
-
   const navigation = useNavigation();
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Pressable onPress={() => {
-        navigation.goBack();
-      }}>
-        <Feather name="chevron-left" size={36}/>
+    <SafeAreaView className="flex-1 bg-gray-100 p-4 gap-4">
+      <Pressable onPress={() => navigation.goBack()}>
+        <Feather name="chevron-left" size={36} />
       </Pressable>
-      <Text variant={"headlineLarge"}>Settings</Text>
-      <View>
-        <SettingsItem page={'notifications'} containerColor={'blue'} iconName={'bell'} title={'Notifications'}/>
-        <SettingsItem page={'language'} containerColor={'darkorange'} iconName={'globe'} title={'Language'}/>
-        <SettingsItem page={'faq'} containerColor={'orange'} iconName={'help-circle'} title={'FAQ'}/>
-        <SettingsItem page={'terms'} containerColor={'blue'} iconName={'check'} title={'Terms of Use'}/>
-        <SettingsItem page={'password'} containerColor={'yellow'} iconName={'lock'} title={'Change Password'}/>
-        <SettingsItem page={'delete'} containerColor={'red'} iconName={'lock'} title={'Delete Account'}/>
-        {/*<View style={styles.settingsItemRow}>*/}
-        {/*  <View style={styles.innerRow}>*/}
-        {/*    <View style={[styles.settingsItemIconContainer, {backgroundColor: "black"}]}>*/}
-        {/*      <Feather name={"moon"} size={24} color={'white'}/>*/}
-        {/*    </View>*/}
-        {/*    <Text>Dark mode</Text>*/}
-        {/*  </View>*/}
-        {/*  <Switch*/}
-        {/*    thumbColor={darkThemeOn ? 'darkgrey' : 'yellow'}*/}
-        {/*    trackColor={{true: 'orange', false: 'darkgrey'}}*/}
-        {/*    onValueChange={() => {*/}
-        {/*      setDarkThemeOn(!darkThemeOn);*/}
-        {/*    }}*/}
-        {/*    value={darkThemeOn}*/}
-        {/*  />*/}
-        {/*</View>*/}
+      <Text className="text-3xl font-semibold">Settings</Text>
+      <View className="mt-4">
+        <SettingsItem page="notifications" containerColor="blue" iconName="bell" title="Notifications" />
+        <SettingsItem page="language" containerColor="darkorange" iconName="globe" title="Language" />
+        <SettingsItem page="faq" containerColor="orange" iconName="help-circle" title="FAQ" />
+        <SettingsItem page="terms" containerColor="blue" iconName="check" title="Terms of Use" />
+        <SettingsItem page="password" containerColor="yellow" iconName="lock" title="Change Password" />
+        <SettingsItem page="delete" containerColor="red" iconName="lock" title="Delete Account" />
       </View>
-      <View style={styles.footer}>
-        <Text onPress={handleSignOut} style={styles.logout}>
+      <View className="absolute bottom-0 left-0 right-0 p-4 gap-2 mb-4">
+        <Text onPress={handleSignOut} className="text-red-600 text-center text-2xl">
           Log out
         </Text>
-        <Text style={styles.version}>
+        <Text className="text-gray-600 text-center">
           SplitFree 1.0.0
         </Text>
       </View>
@@ -77,53 +56,3 @@ const SettingsScreen = () => {
 };
 
 export default SettingsScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#F6F6F6FF',
-    padding: 20,
-    flex: 1,
-    gap: 10,
-  },
-  title: {
-    marginTop: 30,
-    fontWeight: '500',
-    marginBottom: 40,
-  },
-  settingsItemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    justifyContent: "space-between"
-  },
-  settingsItemIconContainer: {
-    backgroundColor: 'pink',
-    borderRadius: 10,
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    gap: 10,
-    marginBottom: 20,
-  },
-  logout: {
-    fontWeight: '400',
-    color: 'red',
-    textAlign: 'center',
-  },
-  version: {
-    fontWeight: '400',
-    textAlign: 'center',
-  },
-  innerRow: {
-    flexDirection: "row",
-    alignItems: 'center',
-    gap: 20,
-  },
-});

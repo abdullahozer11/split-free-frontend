@@ -1,7 +1,5 @@
-import {Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {Image, TouchableOpacity} from 'react-native';
 import {View, Text} from '@/src/components/Themed';
-import {supabase} from "@/src/lib/supabase";
-import * as ImagePicker from 'expo-image-picker';
 import {Link, useNavigation} from "expo-router";
 import {Feather} from "@expo/vector-icons";
 import {useAuth} from "@/src/providers/AuthProvider";
@@ -22,99 +20,43 @@ export default function ProfileScreen() {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          navigation.goBack();
-        }}>
-          <Feather name={"x"} size={30}/>
+    <View className="flex-1 bg-gray-100 p-10 gap-4 justify-center">
+      <View className="flex-row justify-between items-center bg-gray-100 mb-5">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Feather name="x" size={32} />
         </TouchableOpacity>
-        <Link href={`/account/profile/update`}>
-          <Feather name={"edit"} size={30}/>
+        <Link href="/account/profile/update">
+          <Feather name="edit" size={30} />
         </Link>
       </View>
-      <Text style={styles.title}>Profile</Text>
-      <View style={styles.avatarContainer}>
-        <Image
-          source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
-          style={styles.avatar}/>
+      <View className="bg-gray-100">
+        <Text className="text-2xl font-bold">Profile</Text>
+        <View className="flex justify-center items-center bg-gray-100">
+          <Image
+            source={profile?.avatar_url ? {uri: profile?.avatar_url} : require('@/assets/images/blank-profile.png')}
+            className={"w-48 h-48 rounded-full border-2 border-gray-300"}
+          />
+        </View>
+        <View className="flex flex-col gap-2 bg-gray-100">
+          <View className="bg-transparent">
+            <Text className="text-sm font-semibold opacity-70">Email</Text>
+            <Text className="text-lg font-bold">{profile?.email}</Text>
+          </View>
+          <View className="bg-transparent">
+            <Text className="text-sm font-semibold opacity-70">Full Name</Text>
+            <Text className="text-lg font-bold">{profile?.full_name}</Text>
+          </View>
+          <View className="bg-transparent">
+            <Text className="text-sm font-semibold opacity-70">Phone Number</Text>
+            <Text className="text-lg font-bold">{profile?.phone_number}</Text>
+          </View>
+          <View className="bg-transparent">
+            <Text className="text-sm font-semibold opacity-70">Website</Text>
+            <Text className="text-lg font-bold">{profile?.website}</Text>
+          </View>
       </View>
-      <View style={styles.infoSection}>
-        <View style={styles.transparent}>
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.info}>{profile?.email}</Text>
-        </View>
-        <View style={styles.transparent}>
-          <Text style={styles.label}>Full Name</Text>
-          <Text style={styles.info}>{profile?.full_name}</Text>
-        </View>
-        <View style={styles.transparent}>
-          <Text style={styles.label}>Phone Number</Text>
-          <Text style={styles.info}>{profile?.phone_number}</Text>
-        </View>
-        {/*<View style={styles.transparent}>*/}
-        {/*  <Text style={styles.label}>Password</Text>*/}
-        {/*  <Text style={styles.info}>********</Text>*/}
-        {/*</View>*/}
-        <View style={styles.transparent}>
-          <Text style={styles.label}>Website</Text>
-          <Text style={styles.info}>{profile?.website}</Text>
-        </View>
       </View>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F6F6F6FF',
-    padding: 40,
-    gap: 20,
-  },
-  header: {
-    marginTop: 10,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-  },
-  avatarContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  avatar: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    borderWidth: 2,
-    borderColor: '#eee',
-  },
-  infoSection: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    gap: 10,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    opacity: 0.7,
-  },
-  info: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  transparent: {
-    backgroundColor: 'transparent',
-  },
-});
+};

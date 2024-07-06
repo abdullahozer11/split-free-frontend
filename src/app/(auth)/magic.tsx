@@ -1,4 +1,4 @@
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, View} from 'react-native';
 import {TextInput} from 'react-native-paper';
 import React, {useState, useEffect} from 'react';
 import Button from '../../components/Button';
@@ -47,15 +47,15 @@ const MagicScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 justify-center p-5 bg-white">
       <Stack.Screen options={{title: 'Magic Link'}}/>
-      <Image source={require('@/assets/images/logo.png')} style={styles.logo}/>
-      <View style={styles.inputs}>
+      <Image source={require('@/assets/images/logo.png')} className="h-52 w-52 self-center"/>
+      <View className="space-y-2.5">
         <TextInput
           value={email}
           onChangeText={setEmail}
           placeholder="Email"
-          style={styles.input}
+          className="border border-gray-400 bg-white rounded-md text-sm h-11"
         />
       </View>
       <Button
@@ -66,30 +66,5 @@ const MagicScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    justifyContent: 'center',
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  inputs: {
-    gap: 10,
-  },
-  logo: {
-    height: 200,
-    aspectRatio: 1,
-    alignSelf: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    backgroundColor: 'white',
-    borderRadius: 5,
-    fontSize: 14,
-    height: 45,
-  },
-});
 
 export default MagicScreen;
