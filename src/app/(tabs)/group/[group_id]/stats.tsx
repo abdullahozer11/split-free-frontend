@@ -220,11 +220,11 @@ const Stats = () => {
           <View style={styles.row}>
             <View>
               <Text variant={"headlineMedium"}>Spent</Text>
-              <Text variant={"headlineSmall"}>€{expenseTotalF}</Text>
+              <Text variant={"headlineSmall"}>€{expenseTotalF.toFixed(2)}</Text>
             </View>
             <View>
               <Text variant={"headlineMedium"}>You paid for</Text>
-              <Text variant={"headlineSmall"} style={{color: 'green'}}>+ €{payedAmountF}</Text>
+              <Text variant={"headlineSmall"} style={{color: 'green'}}>+ €{payedAmountF.toFixed(2)}</Text>
             </View>
           </View>
           <View style={styles.gap}>

@@ -705,6 +705,76 @@ describe('Flow complete', () => {
     }
   });
 
+  test('should round up digits after 2 digits after comma', async () => {
+    try {
+      // delete existing expenses
+      const {error: error5} = await supabase
+        .from('expenses')
+        .delete()
+        .eq('group_id', groupId);
+      expect(error5).toBeNull();
+      const {data: fetchedExpenseId, error} = await supabase
+        .rpc('create_expense', {
+          group_id_input: groupId,
+          amount_input: 1.001,
+          title_input: 'Round up digits',
+          payers_input: [Alice],
+          participants_input: [Alice, John, Michael]
+        });
+      expect(error).toBeNull();
+      // fetch the expense
+      const {data: expense, error: fetchError} = await supabase
+        .from('expenses')
+        .select()
+        .eq('id', fetchedExpenseId)
+        .single();
+      expect(fetchError).toBeNull();
+      expect(expense).toBeDefined();
+      expect(expense.amount).toEqual(1.00);
+      // try to update to a three digit decimal
+      const {error: updateError} = await supabase
+        .rpc('update_expense', {
+          expense_id: fetchedExpenseId,
+          amount_input: 1.002,
+        });
+      expect(updateError).toBeNull();
+      // fetch the updated expense
+      const {data: updatedExpense, error: fetchUpdatedError} = await supabase
+        .from('expenses')
+        .select()
+        .eq('id', fetchedExpenseId)
+        .single();
+      expect(fetchUpdatedError).toBeNull();
+      expect(updatedExpense).toBeDefined();
+      expect(updatedExpense.amount).toEqual(1.00);
+      // fetch debts per expense
+      const {data: debts_per_expense, error: error2} = await supabase
+        .from('debts_per_expense')
+        .select()
+        .eq('group_id', groupId);
+      expect(error2).toBeNull();
+      expect(debts_per_expense).toBeDefined();
+      expect(Array.isArray(debts_per_expense)).toBeTruthy();
+      expect(debts_per_expense.length).toEqual(2);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(0.33);
+      expect(debts_per_expense.find((db) => db.lender == Alice && db.borrower == Michael).amount).toEqual(0.33);
+      // fetch debts
+      const {data: debts, error: error3} = await supabase
+        .from('debts')
+        .select()
+        .eq('group_id', groupId);
+      expect(error3).toBeNull();
+      expect(debts).toBeDefined();
+      expect(Array.isArray(debts)).toBeTruthy();
+      expect(debts.length).toEqual(2);
+      expect(debts.find((db) => db.lender == Alice && db.borrower == John).amount).toEqual(0.33);
+      expect(debts.find((db) => db.lender == Alice && db.borrower == Michael).amount).toEqual(0.33);
+    } catch (error) {
+      console.error('Error creating round up digits:', error.message);
+      throw error;
+    }
+  })
+
   test('should delete a group', async () => {
     try {
       const {error} = await supabase
