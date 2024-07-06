@@ -228,6 +228,7 @@ const GroupDetailsScreen = () => {
                     {totalBalance || 0}€
                 </Text>
               </View>
+              {/*last settlement date*/}
             </View>
             <View style={styles.section}>
               <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
@@ -285,14 +286,6 @@ const GroupDetailsScreen = () => {
                 </View>
               }
             </View>
-            {/*<View style={styles.section}>*/}
-            {/*  <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>*/}
-            {/*    <Text variant={'titleMedium'}>Transfers</Text>*/}
-            {/*    <TouchableOpacity onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/transfer/create", params: {group_id: groupId}})}}>*/}
-            {/*      <Feather name={'plus-circle'} size={18} color={'green'}/>*/}
-            {/*    </TouchableOpacity>*/}
-            {/*  </View>*/}
-            {/*</View>*/}
             <View style={[styles.section, {paddingBottom: 120}]}>
               {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
@@ -329,11 +322,13 @@ const GroupDetailsScreen = () => {
                 }} title="Edit Group"/>
                 <Menu.Item onPress={() => {
                   promptSettle();
+                  closeMenu();
                 }} title="Settle all expenses"
                            titleStyle={{color: "green"}}
                 />
                 <Menu.Item onPress={() => {
                   promptInvite();
+                  closeMenu();
                 }} title="Invite a person"
                            titleStyle={{color: "blue"}}
                 />
@@ -345,6 +340,7 @@ const GroupDetailsScreen = () => {
                 /> :
                   <Menu.Item onPress={() => {
                   promptExitGroup();
+                  closeMenu();
                 }} title="Exit group"
                   titleStyle={{color: "red"}}
                   />}
