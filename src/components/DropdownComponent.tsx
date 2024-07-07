@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, Image, View, Text} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 
 const MyDropdown = ({selected, label, data, onChange}) => {

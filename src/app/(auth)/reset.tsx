@@ -1,7 +1,7 @@
 import { View, StyleSheet, Alert, Image } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import React, { useState } from 'react';
-import Button from '../../components/Button';
+import Button from '@/src/components/Button';
 import { Stack, useRouter } from 'expo-router';
 import { supabase } from "@/src/lib/supabase";
 

@@ -1,7 +1,7 @@
 import {Image, View} from 'react-native';
 import {TextInput} from 'react-native-paper';
 import React, {useState, useEffect} from 'react';
-import Button from '../../components/Button';
+import Button from '@/src/components/Button';
 import {Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
 import {makeRedirectUri} from "expo-auth-session";

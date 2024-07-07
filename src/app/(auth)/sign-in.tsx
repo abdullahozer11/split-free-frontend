@@ -1,7 +1,7 @@
 import {Image, Alert, View} from 'react-native';
 import {Text, TextInput} from 'react-native-paper';
 import React, {useState} from 'react';
-import Button from '../../components/Button';
+import Button from '@/src/components/Button';
 import {Link, Stack} from 'expo-router';
 import {supabase} from "@/src/lib/supabase";
 import * as QueryParams from "expo-auth-session/build/QueryParams";

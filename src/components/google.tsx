@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Button from '../components/Button';
+import { StyleSheet } from 'react-native';
+import Button from '@/src/components/Button';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {supabase} from "@/src/lib/supabase";
