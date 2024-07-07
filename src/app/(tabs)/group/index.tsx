@@ -75,15 +75,15 @@ const GroupScreen = ({}) => {
         {sections.map((section) => {
           if (section.title === 'Quick Access') {
             return (
-              <View key={section.title} className={'mb-2'}>
-                <Text variant={"headlineLarge"}>Quick Access</Text>
+              <View key={section.title} className={'mb-4'}>
+                <Text variant={"headlineLarge"} className={'mb-2'}>Quick Access</Text>
                 {section.data.map((item) => <GroupItem key={item.id} group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>)}
               </View>
             );
           } else {
             return (
-              <View key={section.title}>
-                <Text variant={"headlineLarge"}>{section.title}</Text>
+              <View key={section.title} className={'mb-4'}>
+                <Text variant={"headlineLarge"} className={'mb-2'}>{section.title}</Text>
                 {section.data.map((item) => <GroupItem key={item.id} group={item} onAnchor={(anchored) => handleAnchor(item, anchored)}/>)}
               </View>
             );

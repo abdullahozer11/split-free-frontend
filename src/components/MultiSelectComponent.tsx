@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import { MultiSelect } from 'react-native-element-dropdown';
 import {Feather} from "@expo/vector-icons";
 
@@ -12,8 +13,8 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
 
   const renderItem = item => {
     return (
-      <View style={styles.line}>
-        <Text style={styles.lineLabel}>{item.name}</Text>
+      <View className={'flex-row h-16 px-3 py-2 justify-between items-center'}>
+        <Text variant={"bodyLarge"}>{item.name}</Text>
         {selected.includes(item.id) && (
           <Feather
             color="green"
@@ -25,14 +26,13 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
     );
   };
 
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>
+    <View className={'rounded-md border-[0.5px] bg-white p-2'}>
+      <Text variant={'titleMedium'} className={'pl-2 pt-2'}>
         Who shares this expense?
       </Text>
       <MultiSelect
-        style={styles.dropdown}
+        className={'pl-7 pr-2 mt-2'}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
@@ -50,11 +50,11 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
         renderItem={renderItem}
         renderRightIcon={() =>
           {return (isDropdownVisible && <TouchableOpacity onPress={handleDone}>
-          <Text style={styles.doneButton}>Close</Text>
+          <Text variant={'labelLarge'} className={'mr-3'}>Close</Text>
           </TouchableOpacity>)}
         }
-        selectedStyle={styles.selectedStyle}
         onFocus={() => setIsDropdownVisible(true)}
+        onBlur={() => setIsDropdownVisible(false)}
         visible={isDropdownVisible}
       />
     </View>
@@ -64,30 +64,6 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
 export default MyMultiSelect;
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-    borderColor: 'black',
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-  },
-  dropdown: {
-    paddingLeft: 30,
-    paddingRight: 8,
-    marginTop: 30,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  label: {
-    position: 'absolute',
-    backgroundColor: 'white',
-    left: 10,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
   placeholderStyle: {
     fontSize: 16,
   },
@@ -103,21 +79,4 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  selectedStyle: {
-  },
-  doneButton: {
-    fontSize: 16,
-    paddingRight: 10,
-  },
-  line: {
-    flexDirection: "row",
-    height: 60,
-    paddingVertical: 5,
-    paddingHorizontal: 20,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  lineLabel: {
-    fontSize: 16
-  }
 });

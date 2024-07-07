@@ -1,4 +1,4 @@
-import {StyleSheet, View, SafeAreaView, TouchableOpacity, Alert, Pressable} from 'react-native';
+import {View, SafeAreaView, TouchableOpacity, Alert, Pressable} from 'react-native';
 import React, {useEffect, useState} from "react";
 import {Link, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
@@ -12,8 +12,8 @@ import {formatDateString} from "@/src/utils/helpers";
 
 const Description = ({text}) => {
   return (
-    <View style={{backgroundColor: 'white', padding: 10, borderRadius: 10, marginVertical: 10}}>
-      <Text variant={'labelLarge'} style={{textDecorationLine: 'underline'}}>Description</Text>
+    <View className='bg-white rounded-[10px] p-4'>
+      <Text variant={'labelLarge'} className='underline'>Description</Text>
       <Text variant={'bodyLarge'}>{text}</Text>
     </View>
   );
@@ -96,22 +96,22 @@ const ExpenseDetailsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className='flex-1'>
       <CollapsableHeader H_MAX_HEIGHT={200} H_MIN_HEIGHT={52} content={
-        <View style={styles.content}>
+        <View className='flex-1 p-5'>
           <Text variant={"headlineLarge"}>Expense</Text>
           {expense?.description && <Description text={expense?.description}/>}
-          <View style={styles.section}>
+          <View className='mt-2'>
             <Text variant={'titleSmall'}>Who paid?</Text>
-            <View style={styles.members}>
+            <View style={{gap: 10}} className='my-2'>
               {expense?.payers?.map(payer => (
                 <Payer key={payer.id} payer={payer} amount={expense?.amount?.toFixed(2)}/>)
               )}
             </View>
           </View>
-          <View style={styles.section}>
+          <View className='mt-2'>
             <Text variant={'titleSmall'}>Who shared?</Text>
-            <View style={styles.members}>
+            <View style={{gap: 10}} className='my-2'>
               {expense?.participants?.map(participant => (
                   <Participant key={participant.id} participant={participant}
                                amount={amountPerParticipant}/>
@@ -122,17 +122,17 @@ const ExpenseDetailsScreen = () => {
           {!expense?.settled &&
           <Link href={`/(tabs)/group/${group_id}/expense/${id}/update`} asChild>
             <Pressable>
-              <Text style={[styles.settleButton, {color: '#2196F3', borderColor: '#2196F3'}]}>Edit expense</Text>
+              <Text className='mt-2 w-full border-blue-500 text-blue-500 border-[1px] rounded-[20px] p-2 text-center text-xl'>Edit expense</Text>
             </Pressable>
           </Link>
           }
-          {expense?.settled ? <Text style={styles.settledText}>Settled</Text> : <TouchableOpacity onPress={() => setIsDialog2Visible(true)}>
-            <Text style={styles.settleButton}>Mark as settled</Text>
+          {expense?.settled ? <Text className='mt-4 w-full text-center text-green-600 text-4xl'>Settled</Text> : <TouchableOpacity onPress={() => setIsDialog2Visible(true)}>
+            <Text className='mt-2 w-full border-green-500 text-green-500 border-[1px] rounded-[20px] p-2 text-center text-xl'>Mark as settled</Text>
           </TouchableOpacity>}
         </View>
       } headerContent={
-        <View style={styles.header}>
-          <View style={styles.headerBar}>
+        <View className='justify-center items-center flex-1'>
+          <View className='flex-row justify-between items-center w-full h-[50px] px-5 absolute top-5 left-0 bg-transparent'>
             <TouchableOpacity onPress={() => {
               navigation.goBack();
             }}>
@@ -162,9 +162,9 @@ const ExpenseDetailsScreen = () => {
               />
             </Menu>
           </View>
-          <View style={styles.headerContent}>
-            <Text variant={'displaySmall'} style={styles.headerTitle}>{expense?.title}</Text>
-            <Text style={styles.syncInfo}>Last modified on {expense && formatDateString(expense.last_modified)}</Text>
+          <View className='justify-between items-center'>
+            <Text variant={'displaySmall'} className='text-white mb-2 max-w-[70%]'>{expense?.title}</Text>
+            <Text className='text-sm font-200 text-white'>Last modified on {expense && formatDateString(expense.last_modified)}</Text>
           </View>
         </View>
       }/>
@@ -201,76 +201,3 @@ const ExpenseDetailsScreen = () => {
 };
 
 export default ExpenseDetailsScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  section: {
-    marginTop: 10,
-  },
-  header: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-  headerTitle: {
-    color: 'white',
-    marginBottom: 10,
-    maxWidth: "70%",
-  },
-  syncInfo: {
-    fontSize: 12,
-    fontWeight: "300",
-    color: "white",
-  },
-  row: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: 'space-between',
-    marginHorizontal: 10,
-  },
-  members: {
-    marginVertical: 10,
-    gap: 10,
-  },
-  headerBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    height: 50,
-    paddingHorizontal: 20,
-    position: "absolute",
-    top: 20,
-    left: 0,
-    backgroundColor: "transparent",
-  },
-  headerContent: {
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  settleButton: {
-    marginTop: 10,
-    width: '100%',
-    borderColor: 'green',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    textAlign: "center",
-    color: "green",
-    fontSize: 20,
-  },
-  settledText: {
-    marginTop: 10,
-    width: '100%',
-    textAlign: "center",
-    color: "green",
-    fontSize: 26,
-  },
-});

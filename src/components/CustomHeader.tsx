@@ -1,19 +1,20 @@
-import {Text, StyleSheet, View, Pressable} from 'react-native';
+import {View, Pressable} from 'react-native';
+import {Text} from 'react-native-paper';
 import React from "react";
 import {Feather} from "@expo/vector-icons";
 import {SafeAreaView} from "react-native-safe-area-context";
 
 const CustomHeader = ({handleSearch, setIsModalVisible, title}) => {
   return (
-    <SafeAreaView style={styles.header}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={[styles.iconsContainer, styles.transparent]}>
-        <Pressable onPress={handleSearch} style={[styles.iconContainer, {backgroundColor: "white"}]}>
+    <SafeAreaView className={'bg-gray-100 w-full flex-row p-13 items-end justify-between pb-3'} >
+      <Text variant={'displayMedium'} className={'ml-2'}>{title}</Text>
+      <View className={'flex-row mr-2 bg-transparent'} >
+        <Pressable onPress={handleSearch} className={'ml-2 w-16 h-16 justify-center items-center bg-white rounded-md'}>
           <Feather size={42} name={'search'}/>
         </Pressable>
         <Pressable onPress={() => {
           setIsModalVisible(true);
-        }} style={styles.iconContainer}>
+        }} className={'ml-2 w-16 h-16 justify-center items-center bg-orange-300 rounded-md'}>
           <Feather size={42} name={'plus'}/>
         </Pressable>
       </View>
@@ -22,35 +23,3 @@ const CustomHeader = ({handleSearch, setIsModalVisible, title}) => {
 };
 
 export default CustomHeader;
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: '#F6F6F6FF',
-    width: "100%",
-    height: 130,
-    flexDirection: "row",
-    padding: 10,
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    paddingBottom: 20,
-  },
-  iconsContainer: {
-    flexDirection: 'row',
-    marginRight: 16,
-  },
-  iconContainer: {
-    marginLeft: 16,
-    borderRadius: 10,
-    width: 60,
-    height: 60,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "orange",
-  },
-  transparent: {
-    backgroundColor: "transparent",
-  },
-  title: {
-    fontSize: 40,
-  },
-});

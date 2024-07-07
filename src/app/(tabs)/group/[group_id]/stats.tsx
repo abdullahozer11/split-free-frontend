@@ -1,4 +1,4 @@
-import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
+import {View, TouchableOpacity, ScrollView} from 'react-native';
 import {ActivityIndicator, Button, Menu, Text} from 'react-native-paper';
 import React, {useMemo, useState} from "react";
 import {useLocalSearchParams, useNavigation} from "expo-router";
@@ -178,8 +178,8 @@ const Stats = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView className='flex-1 bg-gray-100'>
+      <View className='m-2 flex-row items-center'>
         <TouchableOpacity onPress={() => {
           navigation.goBack();
         }}>
@@ -187,15 +187,15 @@ const Stats = () => {
         </TouchableOpacity>
       </View>
       <ScrollView>
-        <View style={styles.content}>
-          <View style={styles.row}>
+        <View className='flex-1 p-5' style={{gap: 20}}>
+          <View className='flex-row justify-between items-center'>
             <Text variant={"headlineMedium"}>Statistics</Text>
-            <View style={styles.row}>
+            <View className='flex-row justify-between items-center'>
               <Menu
                 contentStyle={{backgroundColor: 'white', position: 'relative', top: 80}}
                 visible={visible}
                 onDismiss={closeMenu}
-                anchor={<TouchableOpacity onPress={openMenu} style={styles.row}>
+                anchor={<TouchableOpacity onPress={openMenu} className='flex-row justify-between items-center'>
                   <Text variant={"headlineMedium"}>{selected}</Text>
                   <Feather name={"chevron-down"} size={24}/>
                 </TouchableOpacity>}
@@ -211,25 +211,25 @@ const Stats = () => {
               </Menu>
             </View>
           </View>
-          <View style={[styles.row, {borderRadius: 30, overflow: 'hidden'}]}>
+          <View className='flex-row justify-between items-center rounded-[15px] overflow-hidden'>
             <Button textColor={toggleOnGroup ? 'gray' : 'white'} onPress={() => setToggleOnGroup(false)}
-                    style={[styles.switchButton, {backgroundColor: toggleOnGroup ? 'lightgray' : 'black'}]}>Group</Button>
+                    className='flex-1 rounded-[0px]' style={{backgroundColor: toggleOnGroup ? 'lightgray' : 'black'}}>Group</Button>
             <Button textColor={toggleOnGroup ? 'white' : 'gray'} onPress={() => setToggleOnGroup(true)}
-                    style={[styles.switchButton, {backgroundColor: toggleOnGroup ? 'black' : 'lightgray'}]}>Personal</Button>
+                    className='flex-1 rounded-[0px]' style={{backgroundColor: toggleOnGroup ? 'black' : 'lightgray'}}>Personal</Button>
           </View>
-          <View style={styles.row}>
+          <View className='flex-row justify-between items-center'>
             <View>
               <Text variant={"headlineMedium"}>Spent</Text>
               <Text variant={"headlineSmall"}>€{expenseTotalF.toFixed(2)}</Text>
             </View>
             <View>
               <Text variant={"headlineMedium"}>You paid for</Text>
-              <Text variant={"headlineSmall"} style={{color: 'green'}}>+ €{payedAmountF.toFixed(2)}</Text>
+              <Text variant={"headlineSmall"} className='text-green-600'>+ €{payedAmountF.toFixed(2)}</Text>
             </View>
           </View>
-          <View style={styles.gap}>
+          <View style={{gap: 10}}>
             <Text variant={"headlineMedium"}>Spending Breakdown</Text>
-            <View style={[styles.row, {gap: 3}]}>
+            <View className='flex-row justify-between items-center'>
               {!!series.length && <PieChart
                 widthAndHeight={120}
                 series={series}
@@ -245,7 +245,7 @@ const Stats = () => {
               </View>
               <View style={{gap: 2}}>
                 {!!secondColumn.length && secondColumn.map((category) => (
-                  <View key={category} style={{flexDirection: "row", gap: 2}}>
+                  <View key={category} style={{gap: 2}} className='flex-row'>
                     <View style={{height: lh, width: lh, borderRadius: lh / 2, backgroundColor: groupedExpensesF[category].category.bg_color}}/>
                     <Text style={{fontSize: lh * 2 / 3}}>{category}</Text>
                   </View>
@@ -253,9 +253,9 @@ const Stats = () => {
               </View>
             </View>
           </View>
-          <View style={styles.gap}>
+          <View style={{gap: 10}}>
             <Text variant={"headlineMedium"}>Spending per category</Text>
-            <View style={styles.gap}>
+            <View style={{gap: 10}}>
               {Object.keys(groupedExpensesF).map((category) => (
                 <GroupedExpenseItem
                   key={category}
@@ -265,7 +265,7 @@ const Stats = () => {
               ))}
             </View>
           </View>
-          {biggestExpenseF && <View style={styles.gap}>
+          {biggestExpenseF && <View style={{gap: 10}}>
             <Text variant={"headlineMedium"}>Largest Spending</Text>
             <ExpenseItem key={biggestExpenseF?.id} expense={biggestExpenseF}/>
           </View>}
@@ -276,33 +276,3 @@ const Stats = () => {
 };
 
 export default Stats;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F6F6F6FF",
-  },
-  header: {
-    marginTop: 10,
-    marginHorizontal: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    gap: 20
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  switchButton: {
-    borderRadius: 0,
-    flex: 1,
-  },
-  gap: {
-    gap: 10
-  },
-});

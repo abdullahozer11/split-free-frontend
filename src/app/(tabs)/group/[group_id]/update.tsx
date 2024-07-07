@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {StyleSheet, View, ScrollView, TouchableOpacity, Alert} from "react-native";
+import {View, ScrollView, TouchableOpacity, Alert} from "react-native";
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import {ActivityIndicator, Button, TextInput, Text, Dialog, Portal} from "react-native-paper";
 import {DeletableMember} from "@/src/components/Person";
@@ -115,28 +115,28 @@ const UpdateGroup = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backIconContainer} onPress={() => {
+    <SafeAreaView className='flex-1 justify-center mb-[60px]'>
+      <View className='w-full justify-between items-center flex-row px-4 mt-7'>
+        <TouchableOpacity className='justify-center items-center' onPress={() => {
           navigation.goBack();
         }}>
           <Feather name={"arrow-left"} size={36}/>
         </TouchableOpacity>
         <Text variant={'headlineLarge'}>Update Group</Text>
-        <TouchableOpacity style={styles.backIconContainer} onPress={() => {
+        <TouchableOpacity className='justify-center items-center' onPress={() => {
           onSubmit();
         }}>
           <Text variant={"headlineMedium"}>Save</Text>
         </TouchableOpacity>
       </View>
       {/* Form for updating group */}
-      <View style={styles.formContainer}>
+      <View style={{gap: 10}} className='justify-center p-5'>
         <TextInput
           label="Title"
           placeholder="Enter group name"
           value={title}
           onChangeText={(text) => setTitle(text)}
-          style={{backgroundColor: 'white'}}
+          className='bg-white'
         />
         <TextInput
           label="Description (optional)"
@@ -144,19 +144,19 @@ const UpdateGroup = () => {
           onChangeText={(text) => setDescription(text)}
           placeholder="Enter group description"
           multiline={true}
-          style={{backgroundColor: 'white'}}
+          className='bg-white'
         />
         <TextInput
           label="New member name"
           value={newMemberName}
           onChangeText={(text) => setNewMemberName(text)}
           placeholder="Add new member"
-          style={{backgroundColor: 'white'}}
+          className='bg-white'
         />
         <Button icon="plus" mode="outlined" onPress={addNewMember}>Add Member</Button>
-        <ScrollView style={styles.memberList}>
+        <ScrollView className='px-2'>
           {existingMembers.map((member) => (
-            <View key={member.name} style={styles.memberContainer}>
+            <View key={member.name} className='mb-2'>
               <DeletableMember member={member} onDelete={() => onMemberDelete(member.id, member.name)}/>
             </View>
           ))}
@@ -182,32 +182,3 @@ const UpdateGroup = () => {
 };
 
 export default UpdateGroup;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  formContainer: {
-    justifyContent: "center",
-    padding: 20,
-    gap: 10,
-  },
-  memberList: {
-    paddingHorizontal: 10,
-  },
-  memberContainer: {
-    marginBottom: 10,
-  },
-  header: {
-    width: '100%',
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: 20,
-    marginTop: 30,
-  },
-  backIconContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  }
-});

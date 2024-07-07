@@ -1,5 +1,4 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
 import Button from '@/src/components/Button';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -43,20 +42,10 @@ const GoogleSignIn = () => {
       text={'Login with Google'}
       accessoryLeft={<Icon name="google" size={22} color="black" />}
       onPress={signInWithGoogle}
-      style={styles.googleBtn}
-      textStyle={styles.googleBtnText}
+      className={'bg-white rounded-md]'}
+      textStyle={{color: 'black'}}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  googleBtn: {
-    backgroundColor: 'white',
-    borderWidth: 0.5,
-  },
-  googleBtnText: {
-    color: 'black',
-  },
-});
 
 export default GoogleSignIn;

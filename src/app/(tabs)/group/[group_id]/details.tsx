@@ -212,34 +212,34 @@ const GroupDetailsScreen = () => {
   const isOwner = session?.user.id == group?.owner;
 
   return (
-    <View style={styles.container}>
-      <CollapsableHeader H_MIN_HEIGHT={120} H_MAX_HEIGHT={240} content={
-        <View style={styles.content}>
+    <View className='bg-[#F6F6F6FF] flex-1'>
+      <CollapsableHeader H_MIN_HEIGHT={150} H_MAX_HEIGHT={240} content={
+        <View className='flex-1'>
           {/*First Section*/}
-          <View style={{padding: 20, flex: 1}}>
-            <View style={{flexDirection: "row", marginHorizontal: 15, paddingBottom: 30}}>
-              <View style={{flex: 1}}>
-                <Text style={{fontSize: 18}}>Group spent:</Text>
-                <Text style={{fontSize: 24, fontWeight: "bold"}}>{group?.expense_total || 0}€</Text>
+          <View className='p-5 flex-1'>
+            <View className='flex-row mx-4 pb-7'>
+              <View className='flex-1'>
+                <Text variant='titleLarge' >Group spent:</Text>
+                <Text variant='headlineMedium' className='font-bold'>{group?.expense_total || 0}€</Text>
               </View>
-              <View style={{flex: 1}}>
-                <Text style={{fontSize: 18}}>Total Receivable:</Text>
-                <Text style={{fontSize: 24, fontWeight: "bold", color: "green"}}>
+              <View className='flex-1'>
+                <Text variant='titleLarge'>Total Receivable:</Text>
+                <Text variant='headlineMedium' className='text-green-600 font-bold'>
                     {totalBalance || 0}€
                 </Text>
               </View>
               {/*last settlement date*/}
             </View>
-            <View style={styles.section}>
-              <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
-                <Text variant={'titleMedium'}>Expenses</Text>
+            <View>
+              <View className='flex-row items-center mb-2'>
+                <Text variant={'titleLarge'} className='font-semibold'>Expenses</Text>
                 <TouchableOpacity onPress={() => {router.push({pathname: "/(tabs)/group/[group_id]/expense/create", params: {group_id: groupId}})}}>
                   <Feather name={'plus-circle'} size={18} color={'green'}/>
                 </TouchableOpacity>
               </View>
               <View>
                 {Object.keys(groupedExpenses).map((item) => (
-                  <View style={styles.activityGroup} key={item}>
+                  <View className='my-4 gap-y-5' key={item}>
                     <Text variant={'titleMedium'}>{item}</Text>
                     {groupedExpenses[item].map((expense) => (
                       <ExpenseItem key={expense.id} expense={expense}/>
@@ -248,9 +248,9 @@ const GroupDetailsScreen = () => {
                 ))}
               </View>
             </View>
-            <View style={styles.section}>
-              <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
-                <Text variant={'titleMedium'}>Members</Text>
+            <View>
+              <View className='flex-row items-center gap-x-2 mb-4'>
+                <Text variant={'titleLarge'} className='font-semibold'>Members</Text>
                 <TouchableOpacity onPress={() => {setIsAddingNewName(true); setBigPlusVisible(false)}}>
                   <Feather name={'plus-circle'} size={18} color={'green'}/>
                 </TouchableOpacity>
@@ -267,17 +267,17 @@ const GroupDetailsScreen = () => {
               )}
               {
                 isAddingNewName &&
-                <View style={{flexDirection: 'row', alignItems: "center"}}>
+                <View className='flex-row items-center'>
                   <TextInput
                     value={newMemberName}
                     onChangeText={setNewMemberName}
                     placeholder={'Enter new member name'}
-                    style={{flex: 1, backgroundColor: 'white'}}
+                    className='flex-1 bg-white'
                   />
-                  <Pressable style={{marginLeft: 10}} onPress={handleNewMember}>
+                  <Pressable className='ml-2' onPress={handleNewMember}>
                     <Feather name={'check'} color={'green'} size={24}/>
                   </Pressable>
-                  <Pressable style={{marginLeft: 10}} onPress={() => {
+                  <Pressable styleclassName='ml-2' onPress={() => {
                     setIsAddingNewName(false);
                     setBigPlusVisible(true);
                   }}>
@@ -286,8 +286,8 @@ const GroupDetailsScreen = () => {
                 </View>
               }
             </View>
-            <View style={[styles.section, {paddingBottom: 120}]}>
-              {group?.debts.length != 0 && <Text variant={'titleMedium'}>Debts</Text>}
+            <View className='pb-[120px] mt-3'>
+              {group?.debts.length != 0 && <Text variant={'titleLarge'} className='mb-3 font-semibold' >Debts</Text>}
               {group?.debts && group?.debts?.map(debt => (
                   <Debt key={debt.id} debt={debt} members={group?.members}/>
                 )
@@ -296,15 +296,15 @@ const GroupDetailsScreen = () => {
           </View>
         </View>
       } headerContent={
-        <View style={styles.header}>
-          <View style={styles.headerBar}>
+        <View className='justify-center items-center'>
+          <View className='flex-row justify-between items-center w-full h-[50px] absolute top-5 left-0 bg-transparent'>
             <TouchableOpacity onPress={() => {
               navigation.goBack();
             }}>
               <Feather name="arrow-left" size={36} color="gold"/>
             </TouchableOpacity>
-            <View style={{flexDirection: "row", gap: 10}}>
-              <Link href={`/(tabs)/group/${groupId}/stats`}>
+            <View className='flex-row'>
+              <Link href={`/(tabs)/group/${groupId}/stats`} className='mr-2'>
                 <Feather name="pie-chart" size={36} color="gold"/>
               </Link>
               <Menu
@@ -348,8 +348,7 @@ const GroupDetailsScreen = () => {
             </View>
           </View>
           <View/>
-          <Text style={styles.headerTitle}>{group.title}</Text>
-          {/*<Text style={styles.syncInfo}>Last Sync On January 21, 2024</Text>*/}
+          <Text variant='headlineMedium' className='text-white mt-6'>{group.title}</Text>
         </View>
       }
       />
@@ -395,20 +394,22 @@ const GroupDetailsScreen = () => {
         </Dialog>
       </Portal>
       {/*Start Friend Selector for invite*/}
-      <Modal visible={isFriendSelectorVisible} onDismiss={() => {setIsFriendSelectorVisible(false)}} contentContainerStyle={styles.friendSelector}>
-        <View style={{height: 20, backgroundColor: 'white'}} />
+      <Modal visible={isFriendSelectorVisible}
+             onDismiss={() => {setIsFriendSelectorVisible(false)}}
+             contentContainerStyle={{ width: '100%', paddingHorizontal: 10, alignSelf: "center", borderRadius: 20 }}>
+        <View className='h-[20px] bg-white'/>
         {updatedFriends && updatedFriends?.map(({profile: {id, email, avatar_url}, membershipStatus}) => (
           <Friend2 key={id} email={email} avatar_url={avatar_url} onInvite={() => handleInvite(id)} status={membershipStatus}/>
         ))}
-        {!friends.length && <View style={{backgroundColor: 'white', height: 60, textAlign: "center", paddingLeft: 20}}>
+        {!friends.length && <View className='bg-white h-15 text-center pl-5'>
           <Text variant={'headlineMedium'}>No friend is found</Text>
         </View>}
-        <TouchableOpacity style={{position: "absolute", top: 2, right: 10}} onPress={() => {setIsFriendSelectorVisible(false)}} >
+        <TouchableOpacity className='absolute top-[2px] right-[10px]' onPress={() => {setIsFriendSelectorVisible(false)}} >
           <Feather name={'x'} size={28}/>
         </TouchableOpacity>
       </Modal>
       {bigPlusVisible && <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
-        <Pressable style={styles.newExpenseBtn}>
+        <Pressable className='absolute bottom-2 right-4 w-[100px] h-[100px]  rounded-full bg-orange-400 justify-center items-center'>
           <Feather name={"plus"} size={36}/>
           <Text variant={'titleMedium'}>Expense</Text>
         </Pressable>
@@ -416,70 +417,5 @@ const GroupDetailsScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#F6F6F6FF",
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-  },
-  header: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-    gap: 20,
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "white",
-  },
-  syncInfo: {
-    fontSize: 12,
-    fontWeight: "300",
-    color: "white",
-  },
-  headerBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-    height: 50,
-    paddingHorizontal: 20,
-    position: "absolute",
-    top: 20,
-    left: 0,
-    backgroundColor: "transparent",
-  },
-  activityGroup: {
-    marginTop: 10,
-    gap: 10,
-  },
-  section: {
-    marginBottom: 10,
-    gap: 10
-  },
-  newExpenseBtn: {
-    position: "absolute",
-    bottom: 20,
-    right: 15,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "orange",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 0.5,
-    borderStyle: "dashed",
-  },
-  friendSelector: {
-    width: '100%',
-    paddingHorizontal: 10,
-    alignSelf: "center",
-    borderRadius: 20,
-  },
-});
 
 export default GroupDetailsScreen;

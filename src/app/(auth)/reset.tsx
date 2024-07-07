@@ -52,50 +52,44 @@ const ResetPasswordScreen = () => {
     }
   }
 
-  return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ title: 'Reset Password' }} />
-      <Image source={require('@/assets/images/logo.png')} style={styles.logo} />
-      <View style={styles.inputs}>
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          placeholder="New Password"
-          style={styles.input}
-          secureTextEntry={!showPassword}
-          right={<TextInput.Icon
-            icon={showPassword ? "eye-off" : "eye"}
-            onPress={togglePasswordVisibility}
-          />}
-        />
-        <TextInput
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          placeholder="Confirm New Password"
-          style={styles.input}
-          secureTextEntry={!showConfirmPassword}
-          right={<TextInput.Icon
-            icon={showConfirmPassword ? "eye-off" : "eye"}
-            onPress={toggleConfirmPasswordVisibility}
-          />}
-        />
-      </View>
-      <Button
-        disabled={loading}
-        onPress={resetPassword}
-        text={loading ? 'Resetting password...' : 'Reset Password'}
+return (
+  <View className="flex-1 justify-center p-5 bg-white">
+    <Stack.Screen options={{ title: 'Reset Password' }} />
+    <Image source={require('@/assets/images/logo.png')} className="h-[200px] aspect-square self-center" />
+    <View style={{gap: 10}}>
+      <TextInput
+        value={password}
+        onChangeText={setPassword}
+        placeholder="New Password"
+        className="border-[1px] border-gray-300 bg-white rounded-[5px] h-[45px] text-[14px]"
+        secureTextEntry={!showPassword}
+        right={<TextInput.Icon
+          icon={showPassword ? "eye-off" : "eye"}
+          onPress={togglePasswordVisibility}
+        />}
+      />
+      <TextInput
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        placeholder="Confirm New Password"
+        className="border-[1px] border-gray-300 bg-white rounded-[5px] h-[45px] text-[14px]"
+        secureTextEntry={!showConfirmPassword}
+        right={<TextInput.Icon
+          icon={showConfirmPassword ? "eye-off" : "eye"}
+          onPress={toggleConfirmPasswordVisibility}
+        />}
       />
     </View>
+    <Button
+      disabled={loading}
+      onPress={resetPassword}
+      text={loading ? 'Resetting password...' : 'Reset Password'}
+    />
+  </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    justifyContent: 'center',
-    flex: 1,
-    backgroundColor: 'white',
-  },
   inputs: {
     gap: 10,
   },

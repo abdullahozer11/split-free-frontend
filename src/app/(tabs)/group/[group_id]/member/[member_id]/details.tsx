@@ -1,4 +1,4 @@
-import {StyleSheet, View, SafeAreaView, TouchableOpacity, Image, Alert} from 'react-native';
+import {View, SafeAreaView, TouchableOpacity, Image, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useLocalSearchParams, useNavigation} from 'expo-router';
 import CollapsableHeader from '@/src/components/CollapsableHeader';
@@ -77,21 +77,21 @@ const MemberDetailsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className='flex-1'>
       <CollapsableHeader
         H_MAX_HEIGHT={200}
         H_MIN_HEIGHT={52}
         content={
-          <View style={styles.content}>
+          <View className='justify-center items-center flex-1 mt-5'>
             <Card>
               <Card.Content>
-                <View style={styles.avatarContainer}>
+                <View className='justify-center items-center bg-transparent'>
                   <Image
                     source={member.profile?.avatar_url ? {uri: member.profile.avatar_url} : require('@/assets/images/blank-profile.png')}
-                    style={styles.avatar}/>
+                    className='w-[160px] h-[160px] rounded-full'/>
                 </View>
                 <Paragraph>Group: {member.group.title}</Paragraph>
-                {!isEditingName && <View style={{flexDirection: "row", gap: 5}}>
+                {!isEditingName && <View style={{gap: 5}} className='flex-row'>
                   <Paragraph>
                     Name: {member.name}
                   </Paragraph>
@@ -101,12 +101,12 @@ const MemberDetailsScreen = () => {
                     <Feather name={'edit'} size={20}/>
                   </TouchableOpacity>}
                 </View>}
-                {isEditingName && <View style={{flexDirection: "row", alignItems: 'center'}}>
+                {isEditingName && <View className='flex-row items-center'>
                   <TextInput
                     placeholder="Enter query key"
                     onChangeText={setName}
                     value={name}
-                    style={{flex: 1, backgroundColor: "beige"}}
+                    className='flex-1 bg-beige-300'
                   />
                   <Button onPress={handleNameSubmit}>
                     <Feather name={'check'} size={26} />
@@ -121,8 +121,8 @@ const MemberDetailsScreen = () => {
           </View>
         }
         headerContent={
-          <View style={styles.header}>
-            <View style={styles.headerBar}>
+          <View className='justify-center items-center flex-1'>
+            <View className='flex-row justify-between items-center w-full h-[50px] absolute top-4 left-0 bg-transparent'>
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Feather name="arrow-left" size={36} color="white" />
               </TouchableOpacity>
@@ -130,11 +130,11 @@ const MemberDetailsScreen = () => {
                 <Feather name={'trash'} size={24} color={'red'}/>
               </TouchableOpacity>}
             </View>
-            <View style={styles.headerContent}>
-              <Text variant={'displaySmall'} style={styles.headerTitle}>
+            <View className='justify-between items-center'>
+              <Text variant={'displaySmall'} className='text-white mb-2 mw-[70%]'>
                 {member?.name} {member.id == profileMember?.id && '(me)'}
               </Text>
-              <Text style={{color: 'white'}}>Created At: {new Date(member.created_at).toLocaleString()}</Text>
+              <Text className='text-white'>Created At: {new Date(member.created_at).toLocaleString()}</Text>
             </View>
           </View>
         }
@@ -159,56 +159,3 @@ const MemberDetailsScreen = () => {
 };
 
 export default MemberDetailsScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 10,
-    paddingVertical: 50,
-    alignItems: "center",
-    flex: 1,
-  },
-  header: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-  },
-  headerTitle: {
-    color: 'white',
-    marginBottom: 10,
-    maxWidth: '70%',
-  },
-  headerBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    height: 50,
-    paddingHorizontal: 20,
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    backgroundColor: 'transparent',
-  },
-  headerContent: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-    avatarContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  avatar: {
-    width: 160,
-    height: 160,
-    borderRadius: 100,
-    borderWidth: 2,
-    borderColor: '#eee',
-  },
-  icon: {
-    opacity: 0.6,
-  },
-});

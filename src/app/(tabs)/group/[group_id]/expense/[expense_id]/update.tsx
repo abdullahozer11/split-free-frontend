@@ -1,5 +1,4 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
 import ExpenseForm from "@/src/components/ExpenseForm";
 import {useLocalSearchParams} from "expo-router";
@@ -22,15 +21,8 @@ export default function UpdateExpense() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className='flex-1 p-5'>
       <ExpenseForm title={"Update Expense"} groupId={group_id} updatingExpense={expense}/>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-});

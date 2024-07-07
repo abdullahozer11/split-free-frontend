@@ -219,8 +219,8 @@ export default function FriendScreen() {
               <Text className={'text-xl font-bold'}>- €{profile?.total_payable.toFixed(2)}</Text>
             </View>
           </View>
-          <ProgressBar animatedValue={0.7} theme={{colors: {primary: 'green'}}} style={{height: 18, borderRadius: 10}}
-                       className={'h-18'}/>
+          <ProgressBar animatedValue={0.7} theme={{colors: {primary: 'green'}}}
+                       className={'h-[18px] rounded-[10px]'}/>
         </View>
         <View className="mb-4">
           <View className="flex-row gap-1 mt-5">

@@ -5,8 +5,8 @@ import {
   useInsertExpense,
   useUpdateExpense
 } from "@/src/api/expenses";
-import {Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View} from "react-native";
-import {getFormattedDate, uploadImage, formatDate} from "@/src/utils/helpers";
+import {Alert, Pressable, ScrollView, TouchableOpacity, View} from "react-native";
+import {getFormattedDate, formatDate} from "@/src/utils/helpers";
 import {ActivityIndicator, Avatar, Button, Text, TextInput, Tooltip} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import {Dropdown} from "react-native-element-dropdown";
@@ -22,8 +22,8 @@ import {supabase} from "@/src/lib/supabase.ts";
 
 const renderCatItem = item => {
   return (
-    <View style={styles.line}>
-      <Text style={styles.lineLabel}>{item.name}</Text>
+    <View className={'flex-row h-12 px-2 justify-between items-center'}>
+      <Text variant={'titleSmall'}>{item.name}</Text>
       <MaterialIcons size={24} name={item.icon}/>
     </View>
   );
@@ -69,7 +69,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
 
   if (membersError) {
     console.log(membersError);
-    return <Text>Failed to fetch data</Text>;
+    return <Text variant={'headlineLarge'}>Failed to fetch data</Text>;
   }
 
   const {title, description, payers, participants, image, currency, amount, group_id, inputDate, category} = formState;
@@ -234,21 +234,21 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
   };
 
   return (
-    <ScrollView style={styles.form}>
-      <View style={styles.header}>
+    <ScrollView className={'flex-1'}>
+      <View className={'mt-1 bg-transparent flex-row justify-between items-center'}>
         <TouchableOpacity onPress={() => {
           navigation.goBack();
         }}>
-          <Feather style={styles.icon} name={"arrow-left"} size={24}/>
+          <Feather className={'font-bold'} name={"arrow-left"} size={32}/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+        <TouchableOpacity className={'bg-white w-24 h-12 rounded-md justify-center items-center'} onPress={() => {
           onSubmit();
         }}>
-          <Text style={styles.icon}>Save</Text>
+          <Text variant={"headlineLarge"} className={'font-semibold'}>Save</Text>
         </TouchableOpacity>
       </View>
-      <Text variant="headlineLarge" style={styles.title}>{headerTitle}</Text>
-      <View style={styles.inputs}>
+      <Text variant="headlineLarge" className={'my-3'}>{headerTitle}</Text>
+      <View className={'gap-2'}>
         <View>
           <TextInput
             label="Enter expense title"
@@ -257,7 +257,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             onChangeText={(text) => {
               handleInputChange('title', text);
             }}
-            style={{backgroundColor: 'white'}}
+            className={'bg-white'}
           />
         </View>
         <View>
@@ -269,21 +269,21 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
               handleInputChange('description', text);
             }}
             multiline={true}
-            style={{backgroundColor: 'white'}}
+            className={'bg-white'}
           />
         </View>
-        <View style={{flexDirection: "row", gap: 5}}>
+        <View className={'flex-row gap-x-1'}>
           <TextInput
             label="Enter amount"
             placeholder="Enter amount"
             value={amount}
             onChangeText={(text) => handleInputChange('amount', text.replace(',', '.').replace(/^0+(?!$)/, ''))}
             keyboardType="numeric"
-            style={{flex: 1, backgroundColor: 'white'}}
+            className={'flex-1 bg-white'}
           />
           <Dropdown
             placeholder={'Select currency'}
-            style={styles.currencyDropdown}
+            className={"rounded-md text-xl text-pink-300 bg-white px-2 w-16"}
             data={currencyOptions}
             labelField={'label'}
             valueField={'value'}
@@ -295,7 +295,7 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             onPress={() => {
               setShowDatePicker(!showDatePicker);
             }}
-            style={styles.datetimeButton}
+            className={'bg-white px-2 rounded justify-center'}
           >
             <Text variant={"labelMedium"}>{getFormattedDate(inputDate)}</Text>
           </Pressable>
@@ -307,8 +307,8 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
               onChange={onDateChange}/>
           )}
         </View>
-        <View style={{gap: 20}}>
-          <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+        <View style={{gap: 10}}>
+          <View style={{gap: 10}} className={'flex-row items-center'}>
             <Avatar.Image size={48} source={require('@/assets/images/blank-profile.png')}/>
             <MyDropdown
               labelField="name"
@@ -326,8 +326,8 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
             members={members}
             onChange={(participants) => handleInputChange('participants', participants)}
           />
-          <Text>Pick expense category or use AI to generate</Text>
-          <View style={{flexDirection: "row", gap: 5}}>
+          <Text variant={'bodyLarge'}>Pick expense category or use AI to generate</Text>
+          <View className={'flex-row gap-4'}>
             <Dropdown
               data={exp_cats}
               labelField={'name'}
@@ -337,98 +337,26 @@ export default function ExpenseForm({title: headerTitle, groupId, updatingExpens
                 handleInputChange('category', item.name);
                 setIsFocus(false);
               }}
-              style={[styles.currencyDropdown, {flex: 1, borderWidth: 0.5}]}
+              className={"flex-1 rounded-md text-xl text-pink-300 bg-white p-2"}
               selectedTextStyle={{marginLeft: 10}}
               renderItem={renderCatItem}
               value={category}
               dropdownPosition={'top'}
             />
             <Tooltip title="Auto generate">
-              <Button style={{backgroundColor: 'white', justifyContent: "center", borderRadius: 10, flex: 1}}
+              <Button className={'bg-white justify-center rounded-md flex-1'}
                       onPress={handleGenerateCat} disabled={isLoading}>
                 {isLoading ? <ActivityIndicator/> : <FontAwesome6 name={'wand-magic-sparkles'} size={18} color={'black'}/>}
               </Button>
             </Tooltip>
           </View>
-          <TouchableOpacity onPress={() => {
+          <TouchableOpacity className={'bg-white rounded-md border-2 border-green-500'} onPress={() => {
             onSubmit();
           }}>
-            <Text style={styles.saveIcon}>Save</Text>
+            <Text className={'font-bold text-center py-4 text-green-500'}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  form: {
-    flex: 1,
-  },
-  header: {
-    marginTop: 10,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  icon: {
-    fontSize: 28,
-    fontWeight: "400",
-  },
-  datetimeButton: {
-    backgroundColor: "white",
-    paddingHorizontal: 2,
-    borderRadius: 10,
-    justifyContent: "center",
-  },
-  saveIcon: {
-    fontSize: 28,
-    fontWeight: "400",
-    width: '100%',
-    textAlign: 'center',
-    marginRight: 10,
-    borderWidth: 1,
-    padding: 10,
-    borderColor: 'green',
-    borderRadius: 10,
-    color: 'green',
-  },
-  currencyLabel: {
-    fontSize: 14,
-    color: 'pink',
-    marginBottom: 4,
-    fontWeight: "500",
-  },
-  currencyDropdown: {
-    backgroundColor: "white",
-    color: 'pink',
-    padding: 6,
-    borderRadius: 6,
-    fontSize: 18,
-    width: 60,
-  },
-  inputs: {
-    gap: 10,
-  },
-  title: {
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  groupDropdown: {
-    backgroundColor: "white",
-    padding: 10,
-    paddingHorizontal: 15,
-  },
-  line: {
-    flexDirection: "row",
-    height: 60,
-    paddingVertical: 5,
-    paddingHorizontal: 20,
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  lineLabel: {
-    fontSize: 16
-  },
-});

@@ -6,15 +6,13 @@ const MyDropdown = ({selected, label, data, onChange}) => {
   const [isFocus, setIsFocus] = useState<boolean>(false);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>
+    <View className='bg-white border-[0.5px] rounded flex-1'>
+      <Text variant='titleMedium' className='absolute left-[10px] bg-white top-[8px] z-999 px-2'>
         {label}
       </Text>
       <Dropdown
-        style={[
-          styles.dropdown,
-          isFocus && {borderColor: 'blue'},
-        ]}
+        style={isFocus && {borderColor: 'blue'}}
+        className='pl-[30px] pr-[8px] mt-[30px]'
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
@@ -40,30 +38,6 @@ const MyDropdown = ({selected, label, data, onChange}) => {
 export default MyDropdown;
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-    borderColor: 'black',
-    borderWidth: 0.5,
-    borderRadius: 8,
-    flex: 1,
-  },
-  dropdown: {
-    paddingLeft: 30,
-    paddingRight: 8,
-    marginTop: 30,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  label: {
-    position: 'absolute',
-    backgroundColor: 'white',
-    left: 10,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
   placeholderStyle: {
     fontSize: 16,
   },

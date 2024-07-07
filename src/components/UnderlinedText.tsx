@@ -3,25 +3,11 @@ import React from "react";
 
 const UnderlinedText = ({ text, fontSize, fontWeight }) => {
   return (
-    <View style={styles.container}>
+    <View className='items-center mb-4'>
       <Text style={{fontSize: fontSize, fontWeight: fontWeight}}>{text}</Text>
-      <View style={[styles.underline, {top: fontSize - 4}]} />
+      <View style={{top: fontSize - 4}} className='bg-orange-400 h-3 w-full absolute opacity-50'/>
     </View>
   );
 };
 
 export default UnderlinedText;
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    height: 80
-  },
-  underline: {
-    backgroundColor: 'orange',
-    height: 10,
-    width: '100%',
-    position: 'absolute',
-    opacity: 0.55,
-  },
-});

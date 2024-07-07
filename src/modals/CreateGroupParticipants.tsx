@@ -5,10 +5,10 @@ import {Feather} from "@expo/vector-icons";
 
 const Member = ({name, onRemove, owner}) => {
   return (
-    <View style={styles.person}>
-      <Image source={require('@/assets/images/blank-profile.png')} style={styles.avatar}/>
-      <Text style={styles.personName}>{name}</Text>
-      {!owner && <TouchableOpacity style={styles.removeIcon} onPress={onRemove}>
+    <View className="p-2.5 flex-row items-center rounded-lg bg-white pl-7" style={{ gap: 10 }}>
+      <Image source={require('@/assets/images/blank-profile.png')} className="w-10 h-10 rounded-full mr-2.5"/>
+      <Text className="text-lg font-semibold">{name}</Text>
+      {!owner && <TouchableOpacity className="absolute right-3" onPress={onRemove}>
         <Feather name="x" size={28} color="red"/>
       </TouchableOpacity>}
     </View>
@@ -58,23 +58,23 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
       visible={isVisible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalContainer}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Add Participants</Text>
+      <View className="flex-1 justify-center items-center bg-[rgba(0,0,0,0.5)]">
+        <View className="absolute top-0 right-0 w-[70%] h-full bg-gray-300" style={{ gap: 20 }}>
+          <View className="px-5">
+            <Text className="text-2xl font-medium mt-12 mb-2.5">Add Participants</Text>
             <TextInput
               value={name}
               onChangeText={setName}
               placeholder="Enter name"
-              style={styles.input}
+              className="h-12.5 bg-white rounded-lg p-2.5 text-lg"
             />
           </View>
-          <TouchableOpacity style={styles.invitationRow} onPress={addMember}>
-            <Feather style={styles.icon} name="user-plus" size={24} color="black"/>
-            <Text style={styles.text}>Add a new member</Text>
+          <TouchableOpacity className="flex-row items-center px-5 border rounded-lg p-1.5 mx-2.5 bg-green-600" style={{ gap: 10 }} onPress={addMember}>
+            <Feather className="text-xl" name="user-plus" size={24} color="black"/>
+            <Text className="text-lg font-medium">Add a new member</Text>
           </TouchableOpacity>
-          <Text style={{color: 'red', marginLeft: 20}}>{error}</Text>
-          <View style={styles.people}>
+          <Text className="text-red-500 ml-5">{error}</Text>
+          <View className="flex-1 py-1.5 px-5" style={{ gap: 10 }}>
             {members.map((member, index) => (
               index === 0 ? (
                 <Member key={index} name={member} owner={true}/>
@@ -83,21 +83,18 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
               )
             ))}
           </View>
-          <View style={styles.footer}>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
-              <Text style={styles.buttonText}>Cancel</Text>
+          <View className="flex-row items-center p-2.5 bg-white absolute bottom-0 w-full" style={{ gap: 40 }}>
+            <TouchableOpacity className="bg-transparent p-2.5 mb-4 flex-row items-center" onPress={onClose} style={{ gap: 5 }}>
+              <Text className="text-lg font-semibold">Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => {
+            <TouchableOpacity className="bg-transparent p-2.5 mb-4 flex-row items-center" onPress={() => {
               onSubmit(members);
               resetFields();
-            }}>
+            }} style={{ gap: 5 }}>
               <Feather name={"check"} size={24} color="black"/>
-              <Text style={styles.buttonText}>Done</Text>
+              <Text className="text-lg font-semibold">Done</Text>
             </TouchableOpacity>
           </View>
-        </View>
-        <View style={styles.participantsDisplay}>
-          <Text>TODO</Text>
         </View>
       </View>
     </Modal>
@@ -105,125 +102,3 @@ const Participants = ({isVisible, onClose, onSubmit, members: membersP}) => {
 };
 
 export default Participants;
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  container: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    width: "80%",
-    height: "100%",
-    backgroundColor: "#dddddd",
-    gap: 20,
-  },
-  header: {
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '500',
-    marginTop: 50,
-    marginBottom: 10,
-  },
-  input: {
-    height: 50,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 18,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    gap: 40,
-    backgroundColor: "white",
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-  },
-  pModalFooterButtonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-  },
-  button: {
-    backgroundColor: 'transparent',
-    padding: 10,
-    marginBottom: 16,
-    flexDirection: 'row',
-    alignItems: "center",
-    gap: 5,
-  },
-  buttonText: {
-    color: 'black',
-    fontSize: 21,
-    fontWeight: '600',
-  },
-  participantsDisplay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: 100,
-    height: 100,
-  },
-  people: {
-    flex: 1,
-    paddingVertical: 5,
-    paddingHorizontal: 20,
-    gap: 10,
-  },
-  person: {
-    padding: 10,
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'center',
-    borderRadius: 10,
-    backgroundColor: "white",
-    paddingLeft: 30,
-  },
-  personName: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  invitationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 5,
-    marginHorizontal: 10,
-    backgroundColor: 'green'
-  },
-  icon: {
-    fontSize: 22,
-  },
-  text: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  nearbyF: {
-    fontSize: 20,
-    fontWeight: '500',
-    marginLeft: 10,
-  },
-  removeIcon: {
-    position: "absolute",
-    right: 12,
-  },
-});

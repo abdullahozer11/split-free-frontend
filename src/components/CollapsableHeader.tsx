@@ -1,6 +1,5 @@
 import React, {useRef} from "react";
-import {View, Animated, Image, ScrollView, Text} from "react-native";
-import {StyleSheet} from 'react-native';
+import {View, Animated, ScrollView} from "react-native";
 
 
 const CollapsibleHeader = ({content, headerContent, H_MAX_HEIGHT, H_MIN_HEIGHT}) => {
@@ -13,7 +12,7 @@ const CollapsibleHeader = ({content, headerContent, H_MAX_HEIGHT, H_MIN_HEIGHT})
   });
 
   return (
-    <View style={styles.container}>
+    <View className={'flex-1'}>
       <ScrollView
         onScroll={Animated.event([
           {nativeEvent: {contentOffset: {y: scrollOffsetY}}}
@@ -21,13 +20,11 @@ const CollapsibleHeader = ({content, headerContent, H_MAX_HEIGHT, H_MIN_HEIGHT})
         )}
         scrollEventThrottle={16}
       >
-        <View style={[styles.content, {paddingTop: H_MAX_HEIGHT}]}>
+        <View style={{paddingTop: H_MAX_HEIGHT}} className={'min-h-900'}>
           {content}
         </View>
       </ScrollView>
-      <Animated.View
-        style={[styles.header, {height: headerScrollHeight}]}
-      >
+      <Animated.View style={{height: headerScrollHeight}} className="absolute left-0 right-0 top-0 w-full overflow-hidden z-999 p-10 bg-black">
         {headerContent}
       </Animated.View>
     </View>
@@ -35,24 +32,3 @@ const CollapsibleHeader = ({content, headerContent, H_MAX_HEIGHT, H_MIN_HEIGHT})
 };
 
 export default CollapsibleHeader;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    minHeight: 900,
-  },
-  header: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    width: "100%",
-    overflow: "hidden",
-    zIndex: 999,
-    // STYLE
-    padding: 10,
-    backgroundColor: "black",
-  },
-});
