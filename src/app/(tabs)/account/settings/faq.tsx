@@ -1,10 +1,10 @@
-import {TouchableOpacity, ScrollView} from 'react-native';
+import { TouchableOpacity, ScrollView } from "react-native";
 import React from "react";
-import {SafeAreaView} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Markdown from "react-native-markdown-display";
-import {Feather} from "@expo/vector-icons";
-import {faqText} from "@/faq";
-import {useNavigation} from "expo-router";
+import { Feather } from "@expo/vector-icons";
+import { faqText } from "@/faq";
+import { useNavigation } from "expo-router";
 
 const FAQ = () => {
   const navigation = useNavigation();

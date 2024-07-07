@@ -12,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "userInterfaceStyle": "light",
@@ -56,10 +54,7 @@
       "router": {
         "origin": false
       },
-      "googleOauthScopes": [
-        "profile",
-        "email"
-      ],
+      "googleOauthScopes": ["profile", "email"],
       "eas": {
         "projectId": "eb5b67a4-daf3-42fb-b228-01e0e572a88a"
       }

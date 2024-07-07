@@ -1,3 +1,3 @@
-import { LogBox } from 'react-native';
+import { LogBox } from "react-native";
 
-LogBox.ignoreLogs(['TextInput.Icon:']);
+LogBox.ignoreLogs(["TextInput.Icon:"]);

@@ -1,31 +1,31 @@
-import {useQueryClient} from "@tanstack/react-query";
-import {useEffect} from "react";
-import {supabase} from "@/src/lib/supabase";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { supabase } from "@/src/lib/supabase";
 
 export const useGroupSubscriptions = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const groupSubscription = supabase
-      .channel('table-filter-changes')
+      .channel("table-filter-changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'groups',
+          event: "*",
+          schema: "public",
+          table: "groups",
         },
         (payload) => {
           // console.log('Change received!', payload);
-          queryClient.invalidateQueries(['groups']);
-        }
+          queryClient.invalidateQueries(["groups"]);
+        },
       )
       .subscribe();
 
     return () => {
       groupSubscription.unsubscribe();
     };
-  }, []);
+  }, [queryClient]);
 };
 
 export const useGroupInviteSubscriptions = (profile_id) => {
@@ -33,24 +33,24 @@ export const useGroupInviteSubscriptions = (profile_id) => {
 
   useEffect(() => {
     const groupInviteSubscription = supabase
-      .channel('table-filter-changes')
+      .channel("table-filter-changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'insert',
-          schema: 'public',
-          table: 'group_invitations',
-          filter: 'receiver=eq.' + profile_id,
+          event: "insert",
+          schema: "public",
+          table: "group_invitations",
+          filter: "receiver=eq." + profile_id,
         },
         (payload) => {
           // console.log('Change received!', payload);
-          queryClient.invalidateQueries(['groups']);
-        }
+          queryClient.invalidateQueries(["groups"]);
+        },
       )
       .subscribe();
 
     return () => {
       groupInviteSubscription.unsubscribe();
     };
-  }, []);
+  }, [profile_id, queryClient]);
 };

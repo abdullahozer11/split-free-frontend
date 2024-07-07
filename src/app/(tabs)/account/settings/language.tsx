@@ -1,13 +1,13 @@
-import {Alert, TouchableOpacity, View} from 'react-native';
-import {ActivityIndicator, Text} from 'react-native-paper';
-import React, {useEffect, useState} from "react";
+import { Alert, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text } from "react-native-paper";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Dropdown } from 'react-native-element-dropdown';
+import { Dropdown } from "react-native-element-dropdown";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
-import {useAuth} from "@/src/providers/AuthProvider";
-import {useProfile, useUpdateProfileSingleField} from "@/src/api/profiles";
-import {useQueryClient} from "@tanstack/react-query";
+import { useAuth } from "@/src/providers/AuthProvider";
+import { useProfile, useUpdateProfileSingleField } from "@/src/api/profiles";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Languages = () => {
   const navigation = useNavigation();
@@ -15,21 +15,21 @@ const Languages = () => {
   const [language, setLanguage] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const data = [
-    {label: 'English', value: 'en'},
+    { label: "English", value: "en" },
     // { label: 'French', value: 'fr' },
   ];
 
-  const {setSession, session} = useAuth();
-  const {data: profile, isLoading, isError} = useProfile(session?.user.id);
+  const { setSession, session } = useAuth();
+  const { data: profile, isLoading, isError } = useProfile(session?.user.id);
 
-  const {mutate: updateProfileSF} = useUpdateProfileSingleField();
+  const { mutate: updateProfileSF } = useUpdateProfileSingleField();
 
   useEffect(() => {
     setLanguage(profile?.language);
-  }, []);
+  }, [profile?.language]);
 
   if (isLoading) {
-    return <ActivityIndicator/>;
+    return <ActivityIndicator />;
   }
 
   if (isError) {
@@ -41,29 +41,32 @@ const Languages = () => {
     const lanTemp = language;
     setIsFocus(false);
     setLanguage(newValue);
-    updateProfileSF({
-      id: profile?.id,
-      field: 'language',
-      value: newValue
-    }, {
-      onSuccess: async () => {
-        // console.log('handleValueChange success');
-        await queryClient.invalidateQueries(['profile']);
+    updateProfileSF(
+      {
+        id: profile?.id,
+        field: "language",
+        value: newValue,
       },
-      onError: (error) => {
-        setLanguage(lanTemp);
-        setIsFocus(true);
-        console.error('Server error:', error);
-        Alert.alert('Error', 'Server error.');
+      {
+        onSuccess: async () => {
+          // console.log('handleValueChange success');
+          await queryClient.invalidateQueries(["profile"]);
+        },
+        onError: (error) => {
+          setLanguage(lanTemp);
+          setIsFocus(true);
+          console.error("Server error:", error);
+          Alert.alert("Error", "Server error.");
+        },
       },
-    })
+    );
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="h-16 justify-center px-4">
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="arrow-left" size={36}/>
+          <Feather name="arrow-left" size={36} />
         </TouchableOpacity>
       </View>
       <View className="flex-1 justify-center items-center px-6 gap-6">
@@ -79,16 +82,16 @@ const Languages = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder={!isFocus ? 'Select a language' : '...'}
+          placeholder={!isFocus ? "Select a language" : "..."}
           searchPlaceholder="Search..."
           value={language}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={item => {
+          onChange={(item) => {
             handleValueChange(item.value);
           }}
           renderLeftIcon={() => (
-            <Feather name="globe" size={20} className="text-black"/>
+            <Feather name="globe" size={20} className="text-black" />
           )}
         />
       </View>

@@ -159,4 +159,4 @@ You can provide feedback or suggestions on our Play Store page.
 **Are there any plans for new features or updates in the future?**
 
 Yes, we plan to add many new features and updates in the future.
-`
+`;

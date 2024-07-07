@@ -32,20 +32,23 @@ Follow these steps to get started with the SplitFree app:
   git clone https://github.com/yourusername/expo-expense-splitter.git
   cd expo-expense-splitter
   ```
+
 ### Install dependencies
 
-  ```bash
-  npm install
-  ```
+```bash
+npm install
+```
 
 ### Start the Expo development server
 
-  ```
-  expo start
-  ```
+```
+expo start
+```
+
 Use the Expo Go app on your mobile device to scan the QR code and start using the app.
 
 ## Usage
+
 - Create a Group: Start by creating a group for your event or trip.
 - Add Members: Add all the members who are participating in the expenses.
 - Record Expenses: Input all the expenses and assign them to the relevant members.
@@ -82,32 +85,36 @@ Use the Expo Go app on your mobile device to scan the QR code and start using th
 
 </div>
 
-
 ### Contributing
+
 - We welcome contributions from the community! To contribute:
 
 1. Fork the repository.
 
 2. Create a new branch:
 
-  ```
-  git checkout -b feature/your-feature-name
-  ```
+```
+git checkout -b feature/your-feature-name
+```
 
 3. Make your changes.
 
 4. Commit your changes
 
-  ```
-  git commit -m "Add some feature"
-  ```
+```
+git commit -m "Add some feature"
+```
+
 5. Push to the branch:
-  ```
-  git push origin feature/your-feature-name
-  ```
+
+```
+git push origin feature/your-feature-name
+```
+
 6. Open a pull request.
 
 ### License
+
 This project is licensed under the MIT License. See the LICENSE file for details.
 
 Contact

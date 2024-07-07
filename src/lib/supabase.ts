@@ -1,18 +1,18 @@
-import 'react-native-url-polyfill/auto';
-import * as SecureStore from 'expo-secure-store';
-import { createClient } from '@supabase/supabase-js';
-import {Database} from "@/src/database.types";
+import "react-native-url-polyfill/auto";
+import * as SecureStore from "expo-secure-store";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/src/database.types";
 
 function removeUserMetaData(itemValue: string) {
-    let parsedItemValue = JSON.parse(itemValue);
+  let parsedItemValue = JSON.parse(itemValue);
 
-    // Remove properties from the object
-    if (parsedItemValue) {
-        delete parsedItemValue.user?.identities;
-        delete parsedItemValue.user?.user_metadata;
-    }
-    // Convert the modified object back to a JSON string
-    return JSON.stringify(parsedItemValue);
+  // Remove properties from the object
+  if (parsedItemValue) {
+    delete parsedItemValue.user?.identities;
+    delete parsedItemValue.user?.user_metadata;
+  }
+  // Convert the modified object back to a JSON string
+  return JSON.stringify(parsedItemValue);
 }
 
 const ExpoSecureStoreAdapter = {
@@ -26,7 +26,6 @@ const ExpoSecureStoreAdapter = {
     SecureStore.deleteItemAsync(key);
   },
 };
-
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "";
