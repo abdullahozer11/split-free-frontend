@@ -29,8 +29,8 @@ Follow these steps to get started with the SplitFree app:
 - Clone the repository:
 
   ```bash
-  git clone https://github.com/yourusername/expo-expense-splitter.git
-  cd expo-expense-splitter
+  git clone https://github.com/abdullahozer11/split-free-frontend.git
+  cd split-free-frontend
   ```
 
 ### Install dependencies
