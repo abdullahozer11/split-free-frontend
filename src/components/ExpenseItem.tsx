@@ -14,7 +14,12 @@ export const ExpenseItem = ({ expense }) => {
       href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`}
       asChild
     >
-      <Pressable className="bg-white py-3 px-1 pr-4 rounded-lg gap-x-4 items-center mx-1 flex flex-row justify-between mb-2">
+      <Pressable
+        style={
+          expense?.settled && { borderWidth: 1, borderColor: "lightgreen" }
+        }
+        className="bg-white py-3 px-1 pr-4 rounded-lg gap-x-4 items-center mx-1 flex flex-row justify-between mb-2"
+      >
         <View
           style={{ backgroundColor: exp_cat.bg_color }}
           className="justify-center items-center h-12 w-12 rounded-lg p-2"
@@ -28,9 +33,16 @@ export const ExpenseItem = ({ expense }) => {
         <Text variant="titleMedium" numberOfLines={1} className="flex-1 mx-4">
           {expense.title}
         </Text>
-        <Text variant="titleSmall" className="text-right">
-          €{expense.amount}
-        </Text>
+        <View>
+          <Text variant="titleSmall" className="text-right">
+            €{expense.amount}
+          </Text>
+          {expense?.settled && (
+            <Text variant={"titleSmall"} className={"text-green-500"}>
+              settled
+            </Text>
+          )}
+        </View>
       </Pressable>
     </Link>
   );

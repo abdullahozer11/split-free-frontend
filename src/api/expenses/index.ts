@@ -8,7 +8,7 @@ export const useExpenseList = (group_id: number) => {
       const { data, error } = await supabase
         .from("expenses")
         .select(
-          "id, title, amount, date, created_at, group_id, category, " +
+          "id, title, amount, date, created_at, group_id, category, settled, " +
             "payers:expense_payers(member), participants:expense_participants(member)",
         )
         .eq("group_id", group_id)
