@@ -46,10 +46,10 @@ export const useFriends = (uid) => {
         .select("profile:friend(id, email, avatar_url)")
         .eq("profile", uid);
       if (error) {
-        console.log("GetFriends error: ", error.message);
+        console.log("useFriends error: ", error.message);
         throw new Error(error.message);
       }
-      // console.log("getFriends success: ", data);
+      // console.log("useFriends success: ", data);
       return data;
     },
   });
@@ -64,10 +64,10 @@ export const useFriendRequests = (uid) => {
         .select("id, sender, sender_profile:sender(email)")
         .eq("receiver", uid);
       if (error) {
-        console.log("getFriendRequests error: ", error.message);
+        console.log("useFriendRequests error: ", error.message);
         throw new Error(error.message);
       }
-      // console.log("getFriendRequests success: ", data);
+      // console.log("useFriendRequests success: ", data);
       return data;
     },
   });
@@ -164,24 +164,6 @@ export const useInsertGroupInvitation = () => {
         throw new Error(error.message);
       }
       // console.log('useInsertGroupInvitation success');
-    },
-  });
-};
-
-export const useGroupInvitationsForProfile = (uid) => {
-  return useQuery({
-    queryKey: ["group_invites_for_profile"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("group_invitations")
-        .select("id, group_name, group_id, sender_profile:sender(id, email)")
-        .eq("receiver", uid);
-      if (error) {
-        console.log("useGroupInvitationsForProfile error: ", error.message);
-        throw new Error(error.message);
-      }
-      // console.log("useGroupInvitationsForProfile success");
-      return data;
     },
   });
 };

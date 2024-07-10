@@ -108,7 +108,7 @@ const GroupDetailsScreen = () => {
         .find((mb) => mb.profile && mb.profile.id === profile?.id)
         ?.total_balance?.toFixed(2) || null;
     setTotalBalance(_balance);
-  }, [profile?.id, group]);
+  }, [group, profile?.id]);
 
   useEffect(() => {
     // Create a list of member ids
@@ -116,7 +116,7 @@ const GroupDetailsScreen = () => {
 
     // Create a list of pending invite ids
     const pendingInviteIds = pendingInvites?.map(
-      (invite) => invite.receiver_profile.id,
+      (invite) => invite?.receiver_profile?.id,
     );
 
     // Update friends with membership status
