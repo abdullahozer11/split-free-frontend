@@ -5,6 +5,11 @@ module.exports = {
     jest: true,
   },
   rules: {
-    "prettier/prettier": "error",
+    "prettier/prettier": [
+      "error",
+      {
+        endOfLine: "auto", // or "lf" or "crlf"
+      },
+    ],
   },
 };
