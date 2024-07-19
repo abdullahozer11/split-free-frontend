@@ -28,9 +28,6 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
-
 # typescript
 *.tsbuildinfo
 
@@ -42,6 +39,8 @@ expo-env.d.ts
 
 .idea
 .env
+.env.local
+.env.prod
 supabase
 
 # local api calls for test purposes
