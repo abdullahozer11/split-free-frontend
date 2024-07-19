@@ -245,15 +245,15 @@ export default function FriendScreen() {
         <View>
           <View className={"m-15 flex-row justify-between mr-5"}>
             <View className={"items-end"}>
-              <Text className={"text-xl"}>Total Receivable:</Text>
-              <Text className={"text-xl font-bold text-green-700"}>
+              <Text className={"text-2xl"}>Total Receivable:</Text>
+              <Text className={"text-2xl font-bold text-green-700"}>
                 + €{profile?.total_receivable?.toFixed(2)}
               </Text>
             </View>
             <View className={"items-end"}>
-              <Text className={"text-xl"}>Total Payable:</Text>
-              <Text className={"text-xl font-bold"}>
-                - €{profile?.total_payable.toFixed(2)}
+              <Text className={"text-2xl"}>Total Payable:</Text>
+              <Text className={"text-2xl font-bold"}>
+                - €{Math.abs(profile?.total_payable.toFixed(2))}
               </Text>
             </View>
           </View>
