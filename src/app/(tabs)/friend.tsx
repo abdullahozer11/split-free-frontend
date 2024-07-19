@@ -6,7 +6,6 @@ import { Friend, NotifLine, SearchProfile } from "@/src/components/Person";
 import {
   Text,
   ActivityIndicator,
-  ProgressBar,
   Searchbar,
   Dialog,
   Button,
@@ -258,11 +257,6 @@ export default function FriendScreen() {
               </Text>
             </View>
           </View>
-          <ProgressBar
-            animatedValue={0.7}
-            theme={{ colors: { primary: "green" } }}
-            className={"h-[18px] rounded-[10px]"}
-          />
         </View>
         <View className="mb-4">
           <View className="flex-row gap-1 mt-5">
