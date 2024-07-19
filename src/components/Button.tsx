@@ -11,7 +11,7 @@ const Button = ({
   return (
     <Pressable
       {...pressableProps}
-      className="flex-row bg-light-tint p-4 items-center rounded-full my-4 justify-around"
+      className="flex-row bg-black p-4 items-center rounded-full my-4 justify-around"
       style={style}
     >
       {accessoryLeft && <View>{accessoryLeft}</View>}
