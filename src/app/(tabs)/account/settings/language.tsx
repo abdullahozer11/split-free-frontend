@@ -72,7 +72,7 @@ const Languages = () => {
       <View className="flex-1 justify-center items-center px-6 gap-6">
         <Text className="text-3xl font-semibold">Select Language</Text>
         <Dropdown
-          className="w-full border-gray-300 border rounded-md px-4"
+          className="w-full border-gray-300 border rounded-md px-4 h-20"
           placeholderStyle="text-gray-500 text-base"
           selectedTextStyle="text-base"
           inputSearchStyle="h-10 text-base"
