@@ -196,7 +196,7 @@ export default function FriendScreen() {
           )}
         </TouchableOpacity>
       </SafeAreaView>
-      <View className="p-4 bg-gray-100">
+      <View className="p-4 bg-gray-100 h-screen">
         {isNotifMenuVisible && !!freqs.length && (
           <View className="absolute top-0 right-0 bg-white border rounded-lg border-gray-400 p-2 mr-2 z-10">
             {freqs.map((freq) => (
