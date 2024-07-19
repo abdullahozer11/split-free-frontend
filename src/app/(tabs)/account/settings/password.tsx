@@ -1,5 +1,5 @@
 import { Image, View, Text, Alert, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { ActivityIndicator, TextInput } from "react-native-paper";
 import Button from "@/src/components/Button";
