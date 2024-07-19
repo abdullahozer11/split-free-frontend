@@ -24,7 +24,7 @@ const GoogleSignIn = () => {
           provider: "google",
           token: userInfo.idToken,
         });
-        console.log(error, data);
+        console.log("GoogleSignIn error is ", error, data);
       } else {
         throw new Error("no ID token present!");
       }

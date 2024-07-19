@@ -47,7 +47,7 @@ const SignInScreen = () => {
     });
     if (error) {
       Alert.alert(error.message);
-      console.log(error.message);
+      console.log("signInWithEmail error is ", error.message);
     }
     setLoading(false);
   }

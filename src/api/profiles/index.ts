@@ -28,7 +28,7 @@ export const useProfile = (uid) => {
         .eq("id", uid)
         .single();
       if (error) {
-        console.log(error.message);
+        console.log("useProfile error is ", error.message);
         throw new Error(error.message);
       }
       // console.log("Fetched profile is :", profile);
