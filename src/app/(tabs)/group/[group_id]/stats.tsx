@@ -5,21 +5,26 @@ import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { exp_cats } from "@/src/utils/expense_categories";
-import { ExpenseItem, GroupedExpenseItem } from "@/src/components/ExpenseItem.jsx";
+import {
+  ExpenseItem,
+  GroupedExpenseItem,
+} from "@/src/components/ExpenseItem.tsx";
 import { useExpenseList } from "@/src/api/expenses/index.ts";
 import { useProfileMember } from "@/src/api/members/index.ts";
-import { useAuth } from "@/src/providers/AuthProvider.jsx";
+import { useAuth } from "@/src/providers/AuthProvider.tsx";
 import PieChart from "react-native-pie-chart/src/index.tsx";
 import { inThisMonth } from "@/src/utils/helpers.ts";
 
-const Selection = {
-  Global: "Global",
-  Month: "This Month",
-};
+enum Selection {
+  Month = "This Month",
+  Global = "Global",
+}
 
 const Stats = () => {
   const { group_id: idString } = useLocalSearchParams();
-  const groupId = parseInt(typeof idString === "string" ? idString : idString[0]);
+  const groupId = parseInt(
+    typeof idString === "string" ? idString : idString[0],
+  );
   const [toggleOnGroup, setToggleOnGroup] = useState(true);
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(Selection.Global);
@@ -58,7 +63,8 @@ const Stats = () => {
   }, [profileMember?.id, expensesM]);
 
   const { groupedExpensesM, groupedExpensesPerM } = useMemo(() => {
-    if (!expensesM.length) return { groupedExpensesM: [], groupedExpensesPerM: [] };
+    if (!expensesM.length)
+      return { groupedExpensesM: [], groupedExpensesPerM: [] };
 
     const grouped = expensesM.reduce((acc, expense) => {
       if (!acc[expense?.category]) {
@@ -72,7 +78,9 @@ const Stats = () => {
     }, {});
 
     const groupedArray = Object.entries(grouped);
-    const sortedGroupedArray = groupedArray.sort((a, b) => b[1].total - a[1].total);
+    const sortedGroupedArray = groupedArray.sort(
+      (a, b) => b[1].total - a[1].total,
+    );
     const sortedGrouped = Object.fromEntries(sortedGroupedArray);
 
     const grouped2 = personalExpensesM.reduce((acc, expense) => {
@@ -87,7 +95,9 @@ const Stats = () => {
     }, {});
 
     const groupedArray2 = Object.entries(grouped2);
-    const sortedGroupedArray2 = groupedArray2.sort((a, b) => b[1].total - a[1].total);
+    const sortedGroupedArray2 = groupedArray2.sort(
+      (a, b) => b[1].total - a[1].total,
+    );
     const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
 
     return {
@@ -97,7 +107,8 @@ const Stats = () => {
   }, [expensesM, personalExpensesM]);
 
   const { groupedExpenses, groupedExpensesPer } = useMemo(() => {
-    if (!expenses.length) return { groupedExpenses: [], groupedExpensesPer: [] };
+    if (!expenses.length)
+      return { groupedExpenses: [], groupedExpensesPer: [] };
 
     const grouped = expenses.reduce((acc, expense) => {
       if (!acc[expense?.category]) {
@@ -111,7 +122,9 @@ const Stats = () => {
     }, {});
 
     const groupedArray = Object.entries(grouped);
-    const sortedGroupedArray = groupedArray.sort((a, b) => b[1].total - a[1].total);
+    const sortedGroupedArray = groupedArray.sort(
+      (a, b) => b[1].total - a[1].total,
+    );
     const sortedGrouped = Object.fromEntries(sortedGroupedArray);
 
     const grouped2 = personalExpenses.reduce((acc, expense) => {
@@ -126,7 +139,9 @@ const Stats = () => {
     }, {});
 
     const groupedArray2 = Object.entries(grouped2);
-    const sortedGroupedArray2 = groupedArray2.sort((a, b) => b[1].total - a[1].total);
+    const sortedGroupedArray2 = groupedArray2.sort(
+      (a, b) => b[1].total - a[1].total,
+    );
     const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
 
     return {
@@ -136,7 +151,8 @@ const Stats = () => {
   }, [expenses, personalExpenses]);
 
   const { biggestExpense, biggestExpensePer } = useMemo(() => {
-    if (!expenses.length) return { biggestExpense: null, biggestExpensePer: null };
+    if (!expenses.length)
+      return { biggestExpense: null, biggestExpensePer: null };
     const max1 = expenses.reduce(
       (max, expense) => (expense.amount > max.amount ? expense : max),
       expenses[0],
@@ -162,9 +178,13 @@ const Stats = () => {
   }, [personalExpensesM, expensesM]);
 
   const { expenseTotal, expenseTotalPer, payedAmount } = useMemo(() => {
-    if (!expenses.length) return { expenseTotal: 0, expenseTotalPer: 0, payedAmount: 0 };
+    if (!expenses.length)
+      return { expenseTotal: 0, expenseTotalPer: 0, payedAmount: 0 };
     const sum1 = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const sum2 = personalExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const sum2 = personalExpenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0,
+    );
     const expenses3 = personalExpenses.filter((ex) =>
       ex?.payers?.some((payer) => payer.member === profileMember?.id),
     );
@@ -173,9 +193,13 @@ const Stats = () => {
   }, [personalExpenses, profileMember, expenses]);
 
   const { expenseTotalM, expenseTotalPerM, payedAmountM } = useMemo(() => {
-    if (!expensesM.length) return { expenseTotalM: 0, expenseTotalPerM: 0, payedAmountM: 0 };
+    if (!expensesM.length)
+      return { expenseTotalM: 0, expenseTotalPerM: 0, payedAmountM: 0 };
     const sum1 = expensesM.reduce((sum, expense) => sum + expense.amount, 0);
-    const sum2 = personalExpensesM.reduce((sum, expense) => sum + expense.amount, 0);
+    const sum2 = personalExpensesM.reduce(
+      (sum, expense) => sum + expense.amount,
+      0,
+    );
     const expenses3 = personalExpensesM.filter((ex) =>
       ex?.payers?.some((payer) => payer.member === profileMember?.id),
     );
@@ -198,7 +222,8 @@ const Stats = () => {
       ? expenseTotalPer
       : expenseTotalPerM;
 
-  const payedAmountF = selected === Selection.Global ? payedAmount : payedAmountM;
+  const payedAmountF =
+    selected === Selection.Global ? payedAmount : payedAmountM;
 
   const groupedExpensesF = toggleOnGroup
     ? selected === Selection.Global
@@ -216,15 +241,21 @@ const Stats = () => {
       ? biggestExpensePer
       : biggestExpensePerM;
 
-  const series = Object.keys(groupedExpensesF).map((category) => groupedExpensesF[category].total);
+  const series = Object.keys(groupedExpensesF).map(
+    (category) => groupedExpensesF[category].total,
+  );
   const sliceColor = Object.keys(groupedExpensesF).map(
     (category) => groupedExpensesF[category].category.bg_color,
   );
 
   const categories = Object.keys(groupedExpensesF);
-  const maxCategoriesPerColumn = categories.length > 6 ? categories.length / 2 : 5;
+  const maxCategoriesPerColumn =
+    categories.length > 6 ? categories.length / 2 : 5;
   const firstColumn = categories.slice(0, maxCategoriesPerColumn);
-  const secondColumn = categories.slice(maxCategoriesPerColumn, maxCategoriesPerColumn * 2);
+  const secondColumn = categories.slice(
+    maxCategoriesPerColumn,
+    maxCategoriesPerColumn * 2,
+  );
   const lh = categories.length > 10 ? 16 : 20;
 
   if (isLoading || profileMemberLoading) {
@@ -324,18 +355,26 @@ const Stats = () => {
             <Text variant={"headlineMedium"}>Spending Breakdown</Text>
             <View className="flex-row justify-between items-center">
               {!!series.length && (
-                <PieChart widthAndHeight={120} series={series} sliceColor={sliceColor} />
+                <PieChart
+                  widthAndHeight={120}
+                  series={series}
+                  sliceColor={sliceColor}
+                />
               )}
               <View style={{ gap: 2 }}>
                 {!!firstColumn.length &&
                   firstColumn.map((category) => (
-                    <View key={category} style={{ flexDirection: "row", gap: 2 }}>
+                    <View
+                      key={category}
+                      style={{ flexDirection: "row", gap: 2 }}
+                    >
                       <View
                         style={{
                           height: lh,
                           width: lh,
                           borderRadius: lh / 2,
-                          backgroundColor: groupedExpensesF[category].category.bg_color,
+                          backgroundColor:
+                            groupedExpensesF[category].category.bg_color,
                         }}
                       />
                       <Text style={{ fontSize: (lh * 2) / 3 }}>{category}</Text>
@@ -345,13 +384,18 @@ const Stats = () => {
               <View style={{ gap: 2 }}>
                 {!!secondColumn.length &&
                   secondColumn.map((category) => (
-                    <View key={category} style={{ gap: 2 }} className="flex-row">
+                    <View
+                      key={category}
+                      style={{ gap: 2 }}
+                      className="flex-row"
+                    >
                       <View
                         style={{
                           height: lh,
                           width: lh,
                           borderRadius: lh / 2,
-                          backgroundColor: groupedExpensesF[category].category.bg_color,
+                          backgroundColor:
+                            groupedExpensesF[category].category.bg_color,
                         }}
                       />
                       <Text style={{ fontSize: (lh * 2) / 3 }}>{category}</Text>
@@ -375,7 +419,10 @@ const Stats = () => {
           {biggestExpenseF && (
             <View style={{ gap: 10 }}>
               <Text variant={"headlineMedium"}>Largest Spending</Text>
-              <ExpenseItem key={biggestExpenseF?.id} expense={biggestExpenseF} />
+              <ExpenseItem
+                key={biggestExpenseF?.id}
+                expense={biggestExpenseF}
+              />
             </View>
           )}
         </View>

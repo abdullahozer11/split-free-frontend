@@ -5,7 +5,7 @@ import { useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "@/src/lib/supabase.ts";
-import { useAuth } from "@/src/providers/AuthProvider.jsx";
+import { useAuth } from "@/src/providers/AuthProvider.tsx";
 
 const Delete = () => {
   const navigation = useNavigation();
@@ -27,7 +27,10 @@ const Delete = () => {
 
     if (error) {
       console.error("Server error:", error);
-      Alert.alert("Error", "There was an error deleting the account. Please try again.");
+      Alert.alert(
+        "Error",
+        "There was an error deleting the account. Please try again.",
+      );
     } else {
       setSession(null);
     }
@@ -41,9 +44,12 @@ const Delete = () => {
         </TouchableOpacity>
       </View>
       <View className="flex-1 p-4 justify-center">
-        <Text className="text-4xl font-semibold mb-4 mx-auto">DELETE ACCOUNT</Text>
+        <Text className="text-4xl font-semibold mb-4 mx-auto">
+          DELETE ACCOUNT
+        </Text>
         <Text className="text-xl text-gray-600 mb-4">
-          This action is undoable, all data related to the account will be lost forever.
+          This action is undoable, all data related to the account will be lost
+          forever.
         </Text>
         <Text className="text-2xl text-red-600 mb-2">
           Are you sure you want to delete your account?
