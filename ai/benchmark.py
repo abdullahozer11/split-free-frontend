@@ -1,21 +1,8 @@
-import os
-
 import requests
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Retrieve environment variables
-supabase_url = os.getenv('EXPO_PUBLIC_SUPABASE_URL', '')
-supabase_anon_key = os.getenv('EXPO_PUBLIC_SUPABASE_ANON', '')
-
-if not supabase_url or not supabase_anon_key:
-    raise ValueError("Environment variables EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON are required.")
 
 # Define the endpoint URL for your Supabase edge function
-SUPABASE_EDGE_FUNCTION_URL = f"{supabase_url}/functions/v1/gemini"
-AUTHORIZATION_TOKEN = supabase_anon_key
+SUPABASE_EDGE_FUNCTION_URL = "https://qpummxvizckytrrsiaig.supabase.co/functions/v1/gemini"
+AUTHORIZATION_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdW1teHZpemNreXRycnNpYWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NjgzMDgsImV4cCI6MjAyODE0NDMwOH0.DYJIU3x0pd5Ub6PDz1vlJCs07O9WFIXokQLD0By8HbQ"
 
 # Define the test cases: each test case is a tuple of (expense_title, expected_category)
 test_cases = {
@@ -53,7 +40,6 @@ test_cases = {
     ]
 }
 
-
 def call_supabase_function(expense_title):
     headers = {
         'Authorization': f'Bearer {AUTHORIZATION_TOKEN}',
@@ -64,7 +50,6 @@ def call_supabase_function(expense_title):
     response_data = response.json()
     return response_data.get("name")
 
-
 def benchmark():
     for data_source, data in test_cases.items():
         correct_count = 0
@@ -72,14 +57,12 @@ def benchmark():
         for expense_title, expected_category in data:
             predicted_category = call_supabase_function(expense_title)
             is_correct = predicted_category == expected_category
-            print(
-                f"Title: '{expense_title}' | Expected: '{expected_category}' | Predicted: '{predicted_category}' | Correct: {is_correct}")
+            print(f"Title: '{expense_title}' | Expected: '{expected_category}' | Predicted: '{predicted_category}' | Correct: {is_correct}")
             if is_correct:
                 correct_count += 1
         total_cases = len(data)
         accuracy = (correct_count / total_cases) * 100
-        print(f"Accuracy on {data_source} questionnaire: {accuracy}%\n\n")
-
+        print(f"\nAccuracy on {data_source}: {accuracy}%")
 
 # Run the benchmark
 benchmark()
