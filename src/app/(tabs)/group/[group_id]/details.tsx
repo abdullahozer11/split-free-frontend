@@ -91,7 +91,7 @@ const GroupDetailsScreen = () => {
   const [visible, setVisible] = useState(false);
   const [isAddingNewName, setIsAddingNewName] = useState(false);
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
-  const [isGroupExiterVisible, setIsGroupExiterVisible] = useState(false);
+  const [isGroupExitterVisible, setIsGroupExitterVisible] = useState(false);
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState("");
 
@@ -205,7 +205,7 @@ const GroupDetailsScreen = () => {
   };
 
   const promptExitGroup = () => {
-    setIsGroupExiterVisible(true);
+    setIsGroupExitterVisible(true);
   };
 
   const handleExitGroup = () => {
@@ -526,9 +526,9 @@ const GroupDetailsScreen = () => {
           </Dialog.Actions>
         </Dialog>
         <Dialog
-          visible={isGroupExiterVisible}
+          visible={isGroupExitterVisible}
           onDismiss={() => {
-            setIsGroupExiterVisible(false);
+            setIsGroupExitterVisible(false);
           }}
         >
           <Dialog.Icon icon="alert" />
@@ -537,7 +537,7 @@ const GroupDetailsScreen = () => {
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setIsGroupExiterVisible(false)}>
+            <Button onPress={() => setIsGroupExitterVisible(false)}>
               Cancel
             </Button>
             <Button onPress={handleExitGroup}>Exit</Button>
