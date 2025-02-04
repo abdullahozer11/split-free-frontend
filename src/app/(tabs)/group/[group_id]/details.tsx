@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, Pressable, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import { Feather } from "@expo/vector-icons";
 import {
   useDeleteGroup,
@@ -15,7 +15,7 @@ import {
 } from "expo-router";
 import { ExpenseItem } from "@/src/components/ExpenseItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import { groupElementsByDay } from "@/src/utils/helpers";
+import {groupElementsByDay, inThisMonth} from "@/src/utils/helpers";
 import {
   TextInput,
   Menu,
@@ -133,6 +133,12 @@ const GroupDetailsScreen = () => {
 
     setUpdatedFriends(newUpdatedFriends);
   }, [friends, pendingInvites, group]);
+
+  const expense_totalM = useMemo(() => {
+    if (!expenses?.length) return 0;
+    const expensesM = expenses.filter((ex) => inThisMonth(ex?.date));
+    return expensesM.reduce((sum, expense) => sum + expense.amount, 0);
+  }, [expenses]);
 
   useExpenseSubscription(groupId);
 
@@ -306,11 +312,19 @@ const GroupDetailsScreen = () => {
             {/*First Section*/}
             <View className="p-5 flex-1">
               <View className="flex-row mx-4 pb-7">
-                <View className="flex-1">
-                  <Text variant="titleLarge">Group spent:</Text>
-                  <Text variant="headlineMedium" className="font-bold">
-                    {group?.expense_total || 0}€
-                  </Text>
+                <View className={"flex-1"}>
+                  <View className="flex-1">
+                    <Text variant="titleLarge">Group spent:</Text>
+                    <Text variant="headlineMedium" className="font-bold">
+                      {group?.expense_total || 0}€
+                    </Text>
+                  </View>
+                  <View className="flex-1">
+                    <Text variant="titleMedium">This month:</Text>
+                    <Text variant="headlineSmall" className="">
+                      {expense_totalM || 0}€
+                    </Text>
+                  </View>
                 </View>
                 <View className="flex-1">
                   <Text variant="titleLarge">Total Receivable:</Text>
