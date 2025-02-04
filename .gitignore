@@ -50,3 +50,5 @@ todo.txt
 package-lock.json
 coverage
 **/__snapshots__
+
+local.properties.sample
