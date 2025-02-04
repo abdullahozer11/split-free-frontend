@@ -169,10 +169,15 @@ const GroupDetailsScreen = () => {
   const handleSettle = async () => {
     await settleGroup(group.id, {
       onSuccess: async () => {
-        console.log("Successfully settled group with id", group.id);
+        // Locally update settled status for all expenses in this group
+        queryClient.setQueryData(["expenses", group.id], (oldData) =>
+          oldData.map(expense => ({...expense, settled: true}))
+        );
+
         setIsDialog2Visible(false);
         await queryClient.invalidateQueries(["groups"]);
         await queryClient.invalidateQueries(["debts"]);
+        await queryClient.invalidateQueries(["expenses", group.id]);
       },
       onError: (error) => {
         console.error("Server error:", error);
