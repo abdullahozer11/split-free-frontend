@@ -90,6 +90,9 @@ export const inThisMonth = (dateS) => {
   // Get today's date
   const today = new Date();
   const date = new Date(dateS);
+  // Set the time to noon to avoid timezone issues
+  today.setUTCHours(12, 0, 0, 0);
+  date.setUTCHours(12, 0, 0, 0);
 
   // Get the month and year of today's date
   const currentMonth = today.getMonth(); // getMonth() returns month index from 0 (January) to 11 (December)
