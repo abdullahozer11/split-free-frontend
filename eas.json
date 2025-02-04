@@ -1,11 +1,15 @@
 {
   "cli": {
-    "version": ">= 9.0.7"
+    "version": ">= 9.0.7",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "base": {
       "env": {
@@ -14,11 +18,15 @@
       }
     },
     "preview": {
+      "android": {
+        "buildType": "apk"
+      },
       "extends": "base",
       "distribution": "internal"
     },
     "production": {
-      "extends": "base"
+      "extends": "base",
+      "autoIncrement": true
     }
   },
   "submit": {
