@@ -1,8 +1,11 @@
-.PHONY: build preview production clean update doctor run logs devices submit prebuild
+.PHONY: build install preview production clean update doctor run logs devices submit prebuild
 
 # EAS Build Commands
 build:
 	eas build
+
+install:
+	npm install
 
 preview:
 	eas build --profile preview --platform android
@@ -23,6 +26,7 @@ update:
 doctor:
 	npx expo install --check
 	npx expo-doctor
+	depcheck
 
 # Run App on Android
 run:
