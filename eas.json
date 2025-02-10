@@ -25,11 +25,7 @@
       "distribution": "internal"
     },
     "production": {
-      "extends": "base",
-      "autoIncrement": true
+      "extends": "base"
     }
-  },
-  "submit": {
-    "production": {}
   }
 }
