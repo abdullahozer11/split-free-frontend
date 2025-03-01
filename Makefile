@@ -1,4 +1,4 @@
-.PHONY: build install preview production clean update doctor run logs devices submit prebuild
+.PHONY: build install preview production clean update doctor run logs devices submit prebuild start
 
 # EAS Build Commands
 build:
@@ -44,3 +44,6 @@ submit:
 
 prebuild:
 	npx expo prebuild --platform android
+
+start:
+	npm start
