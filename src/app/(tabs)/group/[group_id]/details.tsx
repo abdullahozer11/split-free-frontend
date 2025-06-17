@@ -430,26 +430,29 @@ const GroupDetailsScreen = () => {
           </View>
         }
         headerContent={
-          <View className="justify-center items-center">
-            <View className="flex-row justify-between items-center w-full h-[50px] absolute top-5 left-0 bg-transparent">
+          <View className="justify-center items-center px-4">
+            {/* Navigation and Menu Row */}
+            <View className="flex-row justify-between items-center w-full h-[50px] mt-5">
               <TouchableOpacity
                 onPress={() => {
                   navigation.goBack();
                 }}
+                className="w-[50px] justify-center items-start"
               >
-                <Feather name="arrow-left" size={36} color="gold" />
+                <Feather name="arrow-left" size={36} color="gold"/>
               </TouchableOpacity>
-              <View className="flex-row">
+
+              <View className="flex-row w-[100px] justify-end">
                 <Link href={`/(tabs)/group/${groupId}/stats`} className="mr-2">
-                  <Feather name="pie-chart" size={36} color="gold" />
+                  <Feather name="pie-chart" size={36} color="gold"/>
                 </Link>
                 <Menu
                   visible={visible}
                   onDismiss={closeMenu}
-                  contentStyle={{ marginTop: 40, backgroundColor: "white" }}
+                  contentStyle={{marginTop: 40, backgroundColor: "white"}}
                   anchor={
                     <TouchableOpacity onPress={openMenu}>
-                      <Feather name="more-horizontal" size={36} color="gold" />
+                      <Feather name="more-horizontal" size={36} color="gold"/>
                     </TouchableOpacity>
                   }
                 >
@@ -458,7 +461,7 @@ const GroupDetailsScreen = () => {
                       closeMenu();
                       router.push({
                         pathname: "/(tabs)/group/[group_id]/update",
-                        params: { group_id: groupId },
+                        params: {group_id: groupId},
                       });
                     }}
                     title="Edit Group"
@@ -469,7 +472,7 @@ const GroupDetailsScreen = () => {
                       closeMenu();
                     }}
                     title="Settle all expenses"
-                    titleStyle={{ color: "green" }}
+                    titleStyle={{color: "green"}}
                   />
                   <Menu.Item
                     onPress={() => {
@@ -477,7 +480,7 @@ const GroupDetailsScreen = () => {
                       closeMenu();
                     }}
                     title="Invite a person"
-                    titleStyle={{ color: "blue" }}
+                    titleStyle={{color: "blue"}}
                   />
                   {isOwner ? (
                     <Menu.Item
@@ -486,7 +489,7 @@ const GroupDetailsScreen = () => {
                         closeMenu();
                       }}
                       title="Delete Group"
-                      titleStyle={{ color: "red" }}
+                      titleStyle={{color: "red"}}
                     />
                   ) : (
                     <Menu.Item
@@ -495,16 +498,25 @@ const GroupDetailsScreen = () => {
                         closeMenu();
                       }}
                       title="Exit group"
-                      titleStyle={{ color: "red" }}
+                      titleStyle={{color: "red"}}
                     />
                   )}
                 </Menu>
               </View>
             </View>
-            <View />
-            <Text variant="headlineMedium" className="text-white mt-6">
-              {group.title}
-            </Text>
+
+            {/* Group Title - Separate row with proper spacing */}
+            <View className="w-full px-4 mt-4">
+              <Text
+                variant={group.title.length > 20 ? "headlineSmall" : "headlineMedium"}
+                className="text-white text-center"
+                numberOfLines={2}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.8}
+              >
+                {group.title}
+              </Text>
+            </View>
           </View>
         }
       />
