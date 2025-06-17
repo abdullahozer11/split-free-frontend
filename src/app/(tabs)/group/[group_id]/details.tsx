@@ -137,7 +137,7 @@ const GroupDetailsScreen = () => {
   const expense_totalM = useMemo(() => {
     if (!expenses?.length) return 0;
     const expensesM = expenses.filter((ex) => inThisMonth(ex?.date));
-    return expensesM.reduce((sum, expense) => sum + expense.amount, 0);
+    return expensesM.reduce((sum, expense) => sum + expense.amount, 0).toFixed(2);
   }, [expenses]);
 
   useExpenseSubscription(groupId);
