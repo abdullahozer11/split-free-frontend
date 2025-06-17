@@ -327,12 +327,14 @@ const GroupDetailsScreen = () => {
                   </View>
                 </View>
                 <View className="flex-1">
-                  <Text variant="titleLarge">Total Receivable:</Text>
+                  <Text variant="titleLarge">
+                    {totalBalance >= 0 ? "Total Receivable:" : "Total Debt:"}
+                  </Text>
                   <Text
                     variant="headlineMedium"
-                    className="text-green-600 font-bold"
+                    className={`font-bold ${totalBalance >= 0 ? "text-green-600" : "text-red-600"}`}
                   >
-                    {totalBalance || 0}€
+                    {Math.abs(totalBalance || 0)}€
                   </Text>
                 </View>
                 {/*last settlement date*/}
