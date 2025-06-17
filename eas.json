@@ -28,7 +28,7 @@
       "extends": "base",
       "autoIncrement": true,
       "android": {
-        "buildType": "aab"
+        "buildType": "app-bundle"
       }
     }
   }
