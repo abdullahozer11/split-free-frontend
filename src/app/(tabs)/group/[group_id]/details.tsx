@@ -14,6 +14,7 @@ import {
   useRouter,
 } from "expo-router";
 import { ExpenseItem } from "@/src/components/ExpenseItem";
+import { TransferItem } from "@/src/components/TransferItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {groupElementsByDay, inThisMonth} from "@/src/utils/helpers";
 import {
@@ -27,6 +28,7 @@ import {
   Modal,
 } from "react-native-paper";
 import { useExpenseList } from "@/src/api/expenses";
+import { useTransferList } from "@/src/api/transfers";
 import { Debt, Friend2, Member } from "@/src/components/Person";
 import {
   useFriends,
@@ -58,6 +60,11 @@ const GroupDetailsScreen = () => {
     isError: expenseError,
     isLoading: expenseLoading,
   } = useExpenseList(groupId);
+  const {
+    data: transfers,
+    isError: transferError,
+    isLoading: transferLoading,
+  } = useTransferList(groupId);
   const { session } = useAuth();
   const {
     data: friends,
@@ -99,7 +106,40 @@ const GroupDetailsScreen = () => {
   const closeMenu = () => setVisible(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDialog2Visible, setIsDialog2Visible] = useState(false);
-  const groupedExpenses = expenses ? groupElementsByDay(expenses) : [];
+
+  // Merge and group expenses and transfers
+  const groupedTransactions = useMemo(() => {
+    const allTransactions = [];
+
+    // Add expenses with type identifier
+    if (expenses) {
+      expenses.forEach(expense => {
+        allTransactions.push({
+          ...expense,
+          type: 'expense',
+          date: expense.created_at
+        });
+      });
+    }
+
+    // Add transfers with type identifier
+    if (transfers) {
+      transfers.forEach(transfer => {
+        allTransactions.push({
+          ...transfer,
+          type: 'transfer',
+          date: transfer.created_at
+        });
+      });
+    }
+
+    // Sort by created_at (most recent first) - this will mix expenses and transfers
+    allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Group by day using created_at
+    return groupElementsByDay(allTransactions);
+  }, [expenses, transfers]);
+
   const [updatedFriends, setUpdatedFriends] = useState([]);
 
   useEffect(() => {
@@ -145,6 +185,7 @@ const GroupDetailsScreen = () => {
   if (
     groupLoading ||
     expenseLoading ||
+    transferLoading ||
     profileLoading ||
     friendsLoading ||
     profileMemberLoading ||
@@ -156,6 +197,7 @@ const GroupDetailsScreen = () => {
   if (
     groupError ||
     expenseError ||
+    transferError ||
     profileError ||
     friendsError ||
     profileMemberError ||
@@ -184,6 +226,7 @@ const GroupDetailsScreen = () => {
         await queryClient.invalidateQueries(["groups"]);
         await queryClient.invalidateQueries(["debts"]);
         await queryClient.invalidateQueries(["expenses", group.id]);
+        await queryClient.invalidateQueries(["transfers", group.id]);
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -340,27 +383,24 @@ const GroupDetailsScreen = () => {
                 {/*last settlement date*/}
               </View>
               <View>
-                <View className="flex-row items-center mb-2">
-                  <Text variant={"titleLarge"} className="font-semibold">
-                    Expenses
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push({
-                        pathname: "/(tabs)/group/[group_id]/expense/create",
-                        params: { group_id: groupId },
-                      });
-                    }}
-                  >
-                    <Feather name={"plus-circle"} size={18} color={"green"} />
-                  </TouchableOpacity>
-                </View>
+                <Text variant={"titleLarge"} className="mb-4 font-semibold">
+                  Recent Activity
+                </Text>
                 <View>
-                  {Object.keys(groupedExpenses).map((item) => (
+                  {Object.keys(groupedTransactions).map((item) => (
                     <View className="my-4 gap-y-5" key={item}>
                       <Text variant={"titleMedium"}>{item}</Text>
-                      {groupedExpenses[item].map((expense) => (
-                        <ExpenseItem key={expense.id} expense={expense} />
+                      {groupedTransactions[item].map((transaction) => (
+                        transaction.type === 'expense' ? (
+                          <ExpenseItem key={`expense-${transaction.id}`} expense={transaction} />
+                        ) : (
+                          <TransferItem
+                            key={`transfer-${transaction.id}`}
+                            transfer={transaction}
+                            members={group?.members}
+                            currentUserId={session?.user.id}
+                          />
+                        )
                       ))}
                     </View>
                   ))}
@@ -613,12 +653,14 @@ const GroupDetailsScreen = () => {
         </TouchableOpacity>
       </Modal>
       {bigPlusVisible && (
-        <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
-          <Pressable className="absolute bottom-2 right-4 w-[100px] h-[100px]  rounded-full bg-orange-400 justify-center items-center">
-            <Feather name={"plus"} size={36} />
-            <Text variant={"titleMedium"}>Expense</Text>
-          </Pressable>
-        </Link>
+        <View className="absolute bottom-2 right-4 flex-row gap-2">
+          <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
+            <Pressable className="w-[100px] h-[100px] rounded-full bg-orange-400 justify-center items-center">
+              <Feather name={"plus"} size={36} />
+              <Text variant={"titleMedium"}>Expense</Text>
+            </Pressable>
+          </Link>
+        </View>
       )}
     </View>
   );
