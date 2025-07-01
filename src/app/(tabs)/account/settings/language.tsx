@@ -1,5 +1,6 @@
 import { Alert, TouchableOpacity, View } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { Text } from "@/src/components/Translated";
+import { ActivityIndicator } from "react-native-paper";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dropdown } from "react-native-element-dropdown";
@@ -8,15 +9,24 @@ import { useNavigation } from "expo-router";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useProfile, useUpdateProfileSingleField } from "@/src/api/profiles";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const Languages = () => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const [language, setLanguage] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
+  const { settings, updateSettings } = useSettings();
+
   const data = [
     { label: "English", value: "en" },
-    // { label: 'French', value: 'fr' },
+    { label: 'Ελληνικά', value: 'gr' },
+    { label: 'Français', value: 'fr' },
+    { label: 'Türkçe', value: 'tr' },
+    { label: 'Español', value: 'es' },
+    { label: 'Deutsch', value: 'de' },
+    { label: 'Italiano', value: 'it' },
+    { label: 'Русский', value: 'ru' },
   ];
 
   const { setSession, session } = useAuth();
@@ -25,8 +35,21 @@ const Languages = () => {
   const { mutate: updateProfileSF } = useUpdateProfileSingleField();
 
   useEffect(() => {
-    setLanguage(profile?.language);
-  }, [profile?.language]);
+    // Initialize language from profile data
+    if (profile?.language) {
+      setLanguage(profile.language);
+      // Update settings context if profile language is different
+      if (settings.language !== profile.language) {
+        updateSettings({
+          ...settings,
+          language: profile.language
+        });
+      }
+    } else {
+      // If no profile language, use settings language
+      setLanguage(settings.language);
+    }
+  }, [profile?.language, settings.language]);
 
   if (isLoading) {
     return <ActivityIndicator />;
@@ -41,6 +64,14 @@ const Languages = () => {
     const lanTemp = language;
     setIsFocus(false);
     setLanguage(newValue);
+
+    // Update settings context immediately
+    updateSettings({
+      ...settings,
+      language: newValue
+    });
+
+    // Update profile in database
     updateProfileSF(
       {
         id: profile?.id,
@@ -49,11 +80,15 @@ const Languages = () => {
       },
       {
         onSuccess: async () => {
-          // console.log('handleValueChange success');
           await queryClient.invalidateQueries(["profile"]);
         },
         onError: (error) => {
+          // Revert both local state and settings on error
           setLanguage(lanTemp);
+          updateSettings({
+            ...settings,
+            language: lanTemp
+          });
           setIsFocus(true);
           console.error("Server error:", error);
           Alert.alert("Error", "Server error.");

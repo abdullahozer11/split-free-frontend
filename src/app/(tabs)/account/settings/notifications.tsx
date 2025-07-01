@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
+import { Text } from "@/src/components/Translated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, Switch, ActivityIndicator } from "react-native-paper";
+import { Switch, ActivityIndicator } from "react-native-paper";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useProfile, useUpdateProfileSingleField } from "@/src/api/profiles";
 import { Feather } from "@expo/vector-icons";

@@ -1,12 +1,16 @@
 import { Pressable, View } from "react-native";
+import { Text } from "@/src/components/Translated";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { supabase } from "@/src/lib/supabase";
 import { Link, useNavigation } from "expo-router";
-import { Text } from "react-native-paper";
+import { translations } from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const SettingsItem = ({ page, iconName, title, containerColor }) => {
+  const {settings} = useSettings();
+  const int = translations[settings.language] || translations.en;
   return (
     <Link href={`/(tabs)/account/settings/${page}`} asChild>
       <Pressable className="flex-row justify-between items-center p-2">
@@ -17,7 +21,7 @@ const SettingsItem = ({ page, iconName, title, containerColor }) => {
           >
             <Feather name={iconName} size={24} />
           </View>
-          <Text>{title}</Text>
+          <Text>{int[title] || title}</Text>
         </View>
         <Feather name={"chevron-right"} size={28} />
       </Pressable>
@@ -72,7 +76,7 @@ const SettingsScreen = () => {
           page="delete"
           containerColor="red"
           iconName="lock"
-          title="Delete Account"
+          title="DELETE ACCOUNT"
         />
       </View>
       <View className="absolute bottom-0 left-0 right-0 p-4 gap-2 mb-4">

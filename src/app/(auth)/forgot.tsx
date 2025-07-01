@@ -1,8 +1,9 @@
 import { View, Alert, Image } from "react-native";
-import { TextInput } from "react-native-paper";
 import React, { useState, useEffect } from "react";
+import { TextInput } from "@/src/components/Translated";
 import Button from "@/src/components/Button";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
 
 const ForgotPasswordScreen = () => {
@@ -60,7 +61,7 @@ const ForgotPasswordScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <Stack.Screen options={{ title: "Forgot Password" }} />
+      <StackScreen options={{ title: "Forgot Password" }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

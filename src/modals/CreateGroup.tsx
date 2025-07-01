@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  Text,
   View,
-  TextInput,
   Pressable,
   Modal,
   TouchableOpacity,
   Alert,
 } from "react-native";
+import { TextInput, Text } from "@/src/components/Translated";
 import { Feather } from "@expo/vector-icons";
 import Participants from "@/src/modals/CreateGroupParticipants";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -113,7 +112,7 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
               <Feather name="x" size={24} color="black" />
             </TouchableOpacity>
             <Pressable onPress={handleCreateGroup}>
-              <Text className="font-bold text-xl">Done</Text>
+              <Text className="font-bold text-xl">Save</Text>
             </Pressable>
           </View>
           <TextInput

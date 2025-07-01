@@ -5,6 +5,7 @@ import {
   Alert,
   Pressable,
 } from "react-native";
+import {MenuItem, Text, Button, DialogTitle} from "@/src/components/Translated";
 import React, { useEffect, useState } from "react";
 import {
   Link,
@@ -19,17 +20,16 @@ import {
   useSettleExpense,
 } from "@/src/api/expenses";
 import {
-  Text,
   ActivityIndicator,
   Menu,
   Portal,
   Dialog,
-  Button,
 } from "react-native-paper";
 import { Feather } from "@expo/vector-icons";
 import { Participant, Payer } from "@/src/components/Person";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateString } from "@/src/utils/helpers";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const Description = ({ text }) => {
   return (
@@ -51,6 +51,7 @@ const ExpenseDetailsScreen = () => {
   const group_id = parseInt(
     typeof groupIdString === "string" ? groupIdString : groupIdString[0],
   );
+  const {settings} = useSettings();
   const navigation = useNavigation();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -213,14 +214,14 @@ const ExpenseDetailsScreen = () => {
                 }
               >
                 {!expense?.settled && (
-                  <Menu.Item
+                  <MenuItem
                     onPress={() => setIsDialog2Visible(true)}
                     title="Set settled"
                     titleStyle={{ color: "green" }}
                   />
                 )}
                 {!expense?.settled && (
-                  <Menu.Item
+                  <MenuItem
                     onPress={() => {
                       closeMenu();
                       router.push({
@@ -232,7 +233,7 @@ const ExpenseDetailsScreen = () => {
                     title="Edit expense"
                   />
                 )}
-                <Menu.Item
+                <MenuItem
                   onPress={() => {
                     promptDelete();
                     closeMenu();
@@ -250,8 +251,10 @@ const ExpenseDetailsScreen = () => {
                 {expense?.title}
               </Text>
               <Text className="text-sm font-200 text-white">
-                Last modified on{" "}
-                {expense && formatDateString(expense.last_modified)}
+                Last modified on
+              </Text>
+              <Text className="text-sm font-200 text-white">
+                {expense && formatDateString(expense.last_modified, settings.language)}
               </Text>
             </View>
           </View>
@@ -265,7 +268,7 @@ const ExpenseDetailsScreen = () => {
           }}
         >
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>Are you sure to delete this expense?</Dialog.Title>
+          <DialogTitle>Are you sure to delete this expense?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>
@@ -281,7 +284,7 @@ const ExpenseDetailsScreen = () => {
           }}
         >
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>Are you sure to settle this expense?</Dialog.Title>
+          <DialogTitle>Are you sure to settle this expense?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>

@@ -1,5 +1,6 @@
 import { View, TouchableOpacity, ScrollView } from "react-native";
-import { ActivityIndicator, Button, Menu, Text } from "react-native-paper";
+import { MenuItem, Text, Button } from "@/src/components/Translated";
+import { ActivityIndicator, Menu } from "react-native-paper";
 import React, { useMemo, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -14,6 +15,8 @@ import { useProfileMember } from "@/src/api/members/index.ts";
 import { useAuth } from "@/src/providers/AuthProvider.tsx";
 import PieChart from "react-native-pie-chart/src/index.tsx";
 import { inThisMonth } from "@/src/utils/helpers.ts";
+import { translations } from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 enum Selection {
   Month = "This Month",
@@ -31,6 +34,9 @@ const Stats = () => {
 
   const navigation = useNavigation();
   const { session } = useAuth();
+
+  const {settings} = useSettings();
+  const int = translations[settings.language] || translations.en;
 
   const { data: expenses, isError, isLoading } = useExpenseList(groupId);
   const {
@@ -301,7 +307,7 @@ const Stats = () => {
                 }
               >
                 {selected === Selection.Month && (
-                  <Menu.Item
+                  <MenuItem
                     onPress={() => {
                       setSelected(Selection.Global);
                       closeMenu();
@@ -310,12 +316,12 @@ const Stats = () => {
                   />
                 )}
                 {selected === Selection.Global && (
-                  <Menu.Item
+                  <MenuItem
                     onPress={() => {
                       setSelected(Selection.Month);
                       closeMenu();
                     }}
-                    title="This Month"
+                    title="This month"
                   />
                 )}
               </Menu>
@@ -352,7 +358,7 @@ const Stats = () => {
             </View>
           </View>
           <View style={{ gap: 10 }}>
-            <Text variant={"headlineMedium"}>Spending Breakdown</Text>
+            <Text variant={"headlineMedium"}>Spending breakdown</Text>
             <View className="flex-row justify-between items-center">
               {!!series.length && (
                 <PieChart

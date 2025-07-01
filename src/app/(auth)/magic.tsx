@@ -1,8 +1,8 @@
 import { Image, View } from "react-native";
-import { TextInput } from "react-native-paper";
+import { TextInput } from "@/src/components/Translated";
 import React, { useState, useEffect } from "react";
 import Button from "@/src/components/Button";
-import { Stack } from "expo-router";
+import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
 import { makeRedirectUri } from "expo-auth-session";
 
@@ -48,7 +48,7 @@ const MagicScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <Stack.Screen options={{ title: "Magic Link" }} />
+      <StackScreen options={{ title: "Magic Link" }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

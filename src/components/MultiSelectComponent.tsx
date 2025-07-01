@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { Text } from "react-native-paper";
+import { Text } from "@/src/components/Translated";
 import { MultiSelect } from "react-native-element-dropdown";
 import { Feather } from "@expo/vector-icons";
+import { translations } from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
+
 
 const MyMultiSelect = ({ selected, members, onChange }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const {settings} = useSettings();
+  const int = translations[settings.language] || translations.en;
 
   const handleDone = () => {
     setIsDropdownVisible(false);
@@ -37,8 +42,8 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
         data={members}
         labelField="name"
         valueField="id"
-        placeholder={"Select participants"}
-        searchPlaceholder="Search..."
+        placeholder={int["Select participants"]}
+        searchPlaceholder={int["Search..."]}
         value={selected}
         onChange={(item) => {
           onChange(item);

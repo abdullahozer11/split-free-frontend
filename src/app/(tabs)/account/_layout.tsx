@@ -12,7 +12,7 @@ export default function AccountStack() {
         name="settings"
         options={{ headerShown: false, title: "Settings" }}
       />
-      {/*<Stack.Screen name="spending" options={{ headerShown: false, title: 'Spending' }} />*/}
+      {/*<StackScreen name="spending" options={{ headerShown: false, title: 'Spending' }} />*/}
       <Stack.Screen
         name="profile"
         options={{ headerShown: false, title: "Profile" }}

@@ -2,7 +2,8 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ExpenseForm from "@/src/components/ExpenseForm";
 import { useLocalSearchParams } from "expo-router";
-import { Text, ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator } from "react-native-paper";
+import { Text } from "@/src/components/Translated";
 import { useExpense } from "@/src/api/expenses";
 
 export default function UpdateExpense() {

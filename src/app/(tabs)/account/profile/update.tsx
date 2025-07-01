@@ -2,10 +2,10 @@ import {
   Alert,
   Image,
   ScrollView,
-  TextInput,
   TouchableOpacity,
+  View
 } from "react-native";
-import { View, Text } from "@/src/components/Themed";
+import { TextInput, Text } from "@/src/components/Translated";
 import { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -88,7 +88,7 @@ export default function UpdateProfile() {
         </View>
         <View className="mt-4 bg-transparent">
           <View className="bg-transparent mb-2">
-            <Text className="text-sm font-semibold opacity-70">Full Name</Text>
+            <Text className="text-sm font-semibold opacity-70">Full name</Text>
             <TextInput
               className={"bg-white text-black h-12 rounded-md px-4"}
               value={fullName}
@@ -97,7 +97,7 @@ export default function UpdateProfile() {
           </View>
           <View className="bg-transparent mb-2">
             <Text className="text-sm font-semibold opacity-70">
-              Phone Number
+              Phone number
             </Text>
             <TextInput
               className={"bg-white text-black h-12 rounded-md px-4"}

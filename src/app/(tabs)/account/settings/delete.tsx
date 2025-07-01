@@ -1,5 +1,6 @@
 import { View, TouchableOpacity, Alert } from "react-native";
-import { Text, TextInput } from "react-native-paper";
+import { Text } from "@/src/components/Translated";
+import { TextInput } from "@/src/components/Translated";
 import React, { useState } from "react";
 import { useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -19,7 +20,7 @@ const Delete = () => {
     if (verif === verifText) {
       setErrorText("");
     } else {
-      setErrorText("Typed input doesn't match verifier\nDo not use quotations");
+      setErrorText("Typed input does not match verifier. Do not use quotations");
       return;
     }
 
@@ -48,15 +49,15 @@ const Delete = () => {
           DELETE ACCOUNT
         </Text>
         <Text className="text-xl text-gray-600 mb-4">
-          This action is undoable, all data related to the account will be lost
-          forever.
+          This action is undoable, all data related to the account will be lost forever.
         </Text>
         <Text className="text-2xl text-red-600 mb-2">
           Are you sure you want to delete your account?
         </Text>
         <Text className="text-2xl mb-2">
-          Please type, <Text className="font-bold">"{verifText}"</Text>
+          {'Please type,' + ' '}
         </Text>
+        <Text className="font-bold">"<Text className="font-bold">{verifText}</Text>"</Text>
         <TextInput
           value={verif}
           onChangeText={setVerif}

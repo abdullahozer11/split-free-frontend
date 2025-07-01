@@ -4,6 +4,8 @@ import { Redirect, Tabs } from "expo-router";
 import Colors from "@/src/constants/Colors";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { Feather } from "@expo/vector-icons";
+import { translations } from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -16,6 +18,8 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const { session } = useAuth();
+  const {settings} = useSettings();
+  const int = translations[settings.language] || translations.en;
 
   if (!session) {
     return <Redirect href={"/sign-in"} />;
@@ -49,21 +53,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="group"
         options={{
-          title: "Group",
+          title: int["Group"] || "Group",
           tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
         }}
       />
       <Tabs.Screen
         name="friend"
         options={{
-          title: "Friends",
+          title: int["Friends"] || "Friends",
           tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
         }}
       />
       <Tabs.Screen
         name="account"
         options={{
-          title: "Account",
+          title: int["Account"] || "Account",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />

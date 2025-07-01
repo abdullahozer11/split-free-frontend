@@ -5,16 +5,13 @@ import {
   Image,
   Alert,
 } from "react-native";
+import {Button, TextInput, Text, DialogTitle} from "@/src/components/Translated";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {
   ActivityIndicator,
-  Text,
   Card,
-  Paragraph,
-  TextInput,
-  Button,
   Dialog,
   Portal,
 } from "react-native-paper";
@@ -132,10 +129,10 @@ const MemberDetailsScreen = () => {
                     className="w-[160px] h-[160px] rounded-full"
                   />
                 </View>
-                <Paragraph>Group: {member.group.title}</Paragraph>
+                <Text><Text>Group</Text>: {member.group.title}</Text>
                 {!isEditingName && (
                   <View style={{ gap: 5 }} className="flex-row">
-                    <Paragraph>Name: {member.name}</Paragraph>
+                    <Text><Text>Name</Text>: {member.name}</Text>
                     {isEditable && (
                       <TouchableOpacity
                         onPress={() => {
@@ -160,31 +157,31 @@ const MemberDetailsScreen = () => {
                     </Button>
                   </View>
                 )}
-                <Paragraph>
-                  Attached to Profile: {member.profile?.email || "None"}
-                </Paragraph>
-                <Paragraph>
-                  Role: {member.role}{" "}
+                <Text>
+                  <Text>Attached to Profile</Text>: {member.profile?.email || "None"}
+                </Text>
+                <Text>
+                  <Text>Role</Text>: <Text>{member.role}</Text>{" "}
                   {member.role === "owner" ? (
                     <Feather name={"award"} size={18} color={"silver"} />
                   ) : null}
-                </Paragraph>
-                <Paragraph>
-                  Total Balance:{" "}
-                  <Paragraph
+                </Text>
+                <Text>
+                  <Text>Total Balance</Text>:{" "}
+                  <Text
                     style={{
                       color: member.total_balance >= 0 ? "green" : "red",
                     }}
                   >
                     ${member.total_balance.toFixed(2)}
-                  </Paragraph>
-                </Paragraph>
+                  </Text>
+                </Text>
                 {!ownMember &&
                   debt &&
                   (debt.amount >= 0 ? (
-                    <Paragraph>Owes you: €{debt.amount}</Paragraph>
+                    <Text><Text>Owes you</Text>: €{debt.amount}</Text>
                   ) : (
-                    <Paragraph>You owe: €{debt.amount}</Paragraph>
+                    <Text><Text>You owe</Text>: €{debt.amount}</Text>
                   ))}
               </Card.Content>
             </Card>
@@ -210,7 +207,7 @@ const MemberDetailsScreen = () => {
                 {member?.name} {member.id === profileMember?.id && "(me)"}
               </Text>
               <Text className="text-white">
-                Created At: {new Date(member.created_at).toLocaleString()}
+                <Text className="text-white">Created at:</Text>{" " + new Date(member.created_at).toLocaleString()}
               </Text>
             </View>
           </View>
@@ -224,7 +221,7 @@ const MemberDetailsScreen = () => {
           }}
         >
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>Are you sure to delete this member?</Dialog.Title>
+          <DialogTitle>Are you sure to delete this member?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>

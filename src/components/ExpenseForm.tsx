@@ -13,11 +13,9 @@ import { getFormattedDate, formatDate } from "@/src/utils/helpers";
 import {
   ActivityIndicator,
   Avatar,
-  Button,
-  Text,
-  TextInput,
   Tooltip,
 } from "react-native-paper";
+import { Button, TextInput, Text } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
 import { currencyOptions } from "@/src/constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -28,6 +26,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { exp_cats } from "@/src/utils/expense_categories";
 import { supabase } from "@/src/lib/supabase.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { translations } from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const renderCatItem = (item) => {
   return (
@@ -52,11 +52,9 @@ export default function ExpenseForm({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
   const [isLoading, setLoading] = useState();
-  const [lastSelections, setLastSelections] = useState({
-    payers: [],
-    participants: [],
-  });
   const [hasLoadedLastSelections, setHasLoadedLastSelections] = useState(false);
+  const {settings} = useSettings();
+  const int = translations[settings.language] || translations.en;
 
   // Load last selections from AsyncStorage
   useEffect(() => {
@@ -303,6 +301,11 @@ export default function ExpenseForm({
     }));
   };
 
+  // Get the translated category name for display
+  const getDisplayCategoryName = (categoryKey) => {
+    return int[categoryKey] || categoryKey;
+  };
+
   // Show loading indicator while initializing the form
   if (!hasLoadedLastSelections) {
     return <ActivityIndicator />;
@@ -322,7 +325,7 @@ export default function ExpenseForm({
         </TouchableOpacity>
         <TouchableOpacity
           className={
-            "bg-white w-24 h-12 rounded-md justify-center items-center"
+            "bg-white p-1 h-12 rounded-md justify-center items-center"
           }
           onPress={() => {
             onSubmit();
@@ -362,8 +365,8 @@ export default function ExpenseForm({
         </View>
         <View className={"flex-row gap-x-1"}>
           <TextInput
-            label="Enter amount"
-            placeholder="Enter amount"
+            label="Enter Amount"
+            placeholder="Enter Amount"
             value={amount}
             onChangeText={(text) =>
               handleInputChange(
@@ -375,7 +378,7 @@ export default function ExpenseForm({
             className={"flex-1 bg-white"}
           />
           <Dropdown
-            placeholder={"Select currency"}
+            placeholder={int["Select currency"]}
             className={"rounded-md text-xl text-pink-300 bg-white px-2 w-16"}
             data={currencyOptions}
             labelField={"label"}
@@ -410,12 +413,13 @@ export default function ExpenseForm({
             />
             <MyDropdown
               labelField="name"
+              placeholder={int["Select item"]}
               valueField="id"
               data={members}
               onChange={(payer) => {
                 handleInputChange("payers", [payer]);
               }}
-              label={"Who paid"}
+              label={"Who paid?"}
               selected={payers[0]}
             />
           </View>
@@ -432,9 +436,9 @@ export default function ExpenseForm({
           <View className={"flex-row gap-4"}>
             <Dropdown
               data={exp_cats}
-              labelField={"name"}
+              labelField={settings.language}
               valueField={"name"}
-              placeholder={!isFocus ? "Select a category" : "..."}
+              placeholder={!isFocus ? int["Select a category"] : "..."}
               onChange={(item) => {
                 handleInputChange("category", item.name);
                 setIsFocus(false);
@@ -442,6 +446,7 @@ export default function ExpenseForm({
               className={"flex-1 rounded-md text-xl text-pink-300 bg-white p-2"}
               selectedTextStyle={{ marginLeft: 10 }}
               renderItem={renderCatItem}
+              getDisplayText={(item) => getDisplayCategoryName(item.name)}
               value={category}
               dropdownPosition={"top"}
             />

@@ -1,5 +1,5 @@
-import { Image, TouchableOpacity } from "react-native";
-import { View, Text } from "@/src/components/Themed";
+import { View, Image, TouchableOpacity } from "react-native";
+import { Text } from "@/src/components/Translated";
 import { Link, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -48,12 +48,12 @@ export default function ProfileScreen() {
             <Text className="text-lg font-bold">{profile?.email}</Text>
           </View>
           <View className="bg-transparent">
-            <Text className="text-sm font-semibold opacity-70">Full Name</Text>
+            <Text className="text-sm font-semibold opacity-70">Full name</Text>
             <Text className="text-lg font-bold">{profile?.full_name}</Text>
           </View>
           <View className="bg-transparent">
             <Text className="text-sm font-semibold opacity-70">
-              Phone Number
+              Phone number
             </Text>
             <Text className="text-lg font-bold">{profile?.phone_number}</Text>
           </View>

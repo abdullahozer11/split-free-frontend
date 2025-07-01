@@ -1,5 +1,5 @@
 import {View} from "react-native";
-import {Text} from "react-native-paper";
+import { Text } from "@/src/components/Translated";
 import React from "react";
 import {MaterialIcons} from "@expo/vector-icons";
 
@@ -26,8 +26,17 @@ export const TransferItem = ({transfer, members, currentUserId}) => {
     return receiverMember?.name || 'Unknown';
   };
 
+  // Helper function to truncate names with ellipsis
+  const truncateName = (name, maxLength = 12) => {
+    if (name.length <= maxLength) return name;
+    return name.substring(0, maxLength - 3) + '...';
+  };
+
   const isCurrentUserSender = transfer.sender === currentUserId;
   const isCurrentUserReceiver = transfer.receiver === currentUserId;
+
+  const senderName = getSenderName();
+  const receiverName = getReceiverName();
 
   return (
     <View className="bg-white py-3 px-1 pr-4 rounded-lg gap-x-4 items-center mx-1 flex flex-row justify-between mb-2"
@@ -47,26 +56,32 @@ export const TransferItem = ({transfer, members, currentUserId}) => {
       {/* Sender -> Receiver with Arrow */}
       <View className="flex-1 mx-4">
         <View className="flex-row items-center">
-          <Text
-            variant="titleMedium"
-            numberOfLines={1}
-            className={`${isCurrentUserSender ? 'text-red-600 font-bold' : 'text-gray-700'}`}
-          >
-            {getSenderName()}
-          </Text>
+          <View className="flex-shrink max-w-[35%]">
+            <Text
+              variant="titleMedium"
+              numberOfLines={1}
+              className={`${isCurrentUserSender ? 'text-red-600 font-bold' : 'text-gray-700'}`}
+              style={{fontSize: 14}}
+            >
+              {truncateName(senderName)}
+            </Text>
+          </View>
           <MaterialIcons
             name="arrow-forward"
             size={16}
             color="#6b7280"
             style={{marginHorizontal: 8}}
           />
-          <Text
-            variant="titleMedium"
-            numberOfLines={1}
-            className={`${isCurrentUserReceiver ? 'text-green-600 font-bold' : 'text-gray-700'}`}
-          >
-            {getReceiverName()}
-          </Text>
+          <View className="flex-shrink max-w-[35%]">
+            <Text
+              variant="titleMedium"
+              numberOfLines={1}
+              className={`${isCurrentUserReceiver ? 'text-green-600 font-bold' : 'text-gray-700'}`}
+              style={{fontSize: 14}}
+            >
+              {truncateName(receiverName)}
+            </Text>
+          </View>
         </View>
         {transfer.description && (
           <Text variant="bodySmall" className="text-gray-500 mt-1" numberOfLines={1}>

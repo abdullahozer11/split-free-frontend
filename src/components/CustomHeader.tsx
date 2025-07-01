@@ -1,5 +1,5 @@
 import { View, Pressable } from "react-native";
-import { Text } from "react-native-paper";
+import { Text } from "@/src/components/Translated";
 import React from "react";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";

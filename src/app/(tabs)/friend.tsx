@@ -1,14 +1,13 @@
 import { View, ScrollView, TouchableOpacity, Alert } from "react-native";
+import {Text, Button, DialogTitle} from "@/src/components/Translated";
 import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
 import { Friend, NotifLine, SearchProfile } from "@/src/components/Person";
 import {
-  Text,
   ActivityIndicator,
   Searchbar,
   Dialog,
-  Button,
   Portal,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -26,6 +25,8 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { supabase } from "@/src/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFriendRequestSubscription } from "@/src/api/profiles/subscriptions";
+import { translations } from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 export default function FriendScreen() {
   const queryClient = useQueryClient();
@@ -38,6 +39,8 @@ export default function FriendScreen() {
     email: null,
     id: null,
   });
+  const {settings} = useSettings();
+  const int = translations[settings.language] || translations.en;
 
   const { setSession, session } = useAuth();
   const {
@@ -211,7 +214,7 @@ export default function FriendScreen() {
         )}
         <View className="mb-4">
           <Searchbar
-            placeholder="Search"
+            placeholder={int["Search"] || "Search"}
             onChangeText={setSearchQuery}
             value={searchQuery}
             mode="view"
@@ -245,13 +248,13 @@ export default function FriendScreen() {
         <View>
           <View className={"m-15 flex-row justify-between mr-5"}>
             <View className={"items-end"}>
-              <Text className={"text-2xl"}>Total Receivable:</Text>
+              <Text className={"text-2xl"}>Total Receivable</Text>
               <Text className={"text-2xl font-bold text-green-700"}>
                 + €{profile?.total_receivable?.toFixed(2)}
               </Text>
             </View>
             <View className={"items-end"}>
-              <Text className={"text-2xl"}>Total Payable:</Text>
+              <Text className={"text-2xl"}>Total Payable</Text>
               <Text className={"text-2xl font-bold"}>
                 - €{Math.abs(profile?.total_payable.toFixed(2))}
               </Text>
@@ -287,9 +290,14 @@ export default function FriendScreen() {
             }}
           >
             <Dialog.Icon icon="alert" />
-            <Dialog.Title>
-              Are you sure to unfriend {removingFriend.email}?
-            </Dialog.Title>
+            <DialogTitle>
+              <Text>
+                Are you sure to unfriend
+              </Text>
+              <Text>
+                {" " + removingFriend.email}?
+              </Text>
+            </DialogTitle>
             <Dialog.Content>
               <Text variant="bodyMedium">This action cannot be taken back</Text>
             </Dialog.Content>

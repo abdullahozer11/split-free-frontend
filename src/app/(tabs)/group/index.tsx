@@ -1,10 +1,11 @@
 import { View, ScrollView } from "react-native";
+import { TextInput, Text } from "@/src/components/Translated";
 import GroupItem from "@/src/components/GroupItem";
 import React, { useState, useEffect } from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import { useGroupList } from "@/src/api/groups";
-import { Text, ActivityIndicator, TextInput } from "react-native-paper";
+import { ActivityIndicator } from "react-native-paper";
 import {
   useGroupInviteSubscriptions,
   useGroupSubscriptions,

@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
+import { translations } from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const MyDropdown = ({ selected, label, data, onChange }) => {
   const [isFocus, setIsFocus] = useState<boolean>(false);
+  const {settings} = useSettings();
+  const int = translations[settings.language] || translations.en;
 
   return (
     <View className="bg-white border-[0.5px] rounded flex-1">
@@ -25,7 +30,8 @@ const MyDropdown = ({ selected, label, data, onChange }) => {
         maxHeight={300}
         labelField="name"
         valueField="id"
-        searchPlaceholder="Search..."
+        placeholder={int["Select item"]}
+        searchPlaceholder={int["Search..."]}
         value={selected}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}

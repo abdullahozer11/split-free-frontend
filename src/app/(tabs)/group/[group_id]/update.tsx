@@ -3,12 +3,10 @@ import { View, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import {
   ActivityIndicator,
-  Button,
-  TextInput,
-  Text,
   Dialog,
   Portal,
 } from "react-native-paper";
+import {Button, TextInput, Text, DialogTitle} from "@/src/components/Translated";
 import { DeletableMember } from "@/src/components/Person";
 import { useGroup, useUpdateGroup } from "@/src/api/groups";
 import { Feather } from "@expo/vector-icons";
@@ -146,7 +144,6 @@ const UpdateGroup = () => {
         >
           <Feather name={"arrow-left"} size={36} />
         </TouchableOpacity>
-        <Text variant={"headlineLarge"}>Update Group</Text>
         <TouchableOpacity
           className="justify-center items-center"
           onPress={() => {
@@ -155,6 +152,9 @@ const UpdateGroup = () => {
         >
           <Text variant={"headlineMedium"}>Save</Text>
         </TouchableOpacity>
+      </View>
+      <View className="w-full justify-between items-center flex-row px-4 mt-7">
+      <Text variant={"headlineLarge"}>Update Group</Text>
       </View>
       {/* Form for updating group */}
       <View style={{ gap: 10 }} className="justify-center p-5">
@@ -205,9 +205,10 @@ const UpdateGroup = () => {
           }}
         >
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>
-            Are you sure to remove "{removingMemberName}" from group?
-          </Dialog.Title>
+          <DialogTitle>
+            <Text>Are you sure to remove this member from group?</Text>
+            <Text>{removingMemberName}</Text>
+          </DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>

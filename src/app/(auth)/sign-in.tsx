@@ -1,8 +1,10 @@
 import { Image, Alert, View } from "react-native";
-import { Text, TextInput } from "react-native-paper";
+import { Text } from "@/src/components/Translated";
+import { TextInput } from "@/src/components/Translated";
 import React, { useState } from "react";
 import Button from "@/src/components/Button";
-import { Link, Stack } from "expo-router";
+import { StackScreen } from "@/src/components/Translated";
+import { Link } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as Linking from "expo-linking";
@@ -54,7 +56,7 @@ const SignInScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <Stack.Screen options={{ title: "Sign in" }} />
+      <StackScreen options={{ title: "Sign in" }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"
@@ -92,13 +94,13 @@ const SignInScreen = () => {
         href="/sign-up"
         className="self-center font-bold text-blue-500 my-2.5"
       >
-        Create an account
+        Create account
       </Link>
       <Link
         href="/magic"
         className="w-full border p-2.5 rounded-full text-center text-lg text-maroon border-gray-400"
       >
-        Send Magic
+        Send Magic Link
       </Link>
       {/* <GoogleSignIn /> */}
     </View>

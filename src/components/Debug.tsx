@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { TextInput, Button } from "react-native-paper";
+import { TextInput, Button } from "@/src/components/Translated";
 import { View } from "react-native";
 
 const DebugTextInput = () => {

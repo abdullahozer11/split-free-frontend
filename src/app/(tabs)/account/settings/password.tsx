@@ -1,7 +1,9 @@
-import { Image, View, Text, Alert, TouchableOpacity } from "react-native";
+import { Image, View, Alert, TouchableOpacity } from "react-native";
+import { Text } from "@/src/components/Translated";
 import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
-import { ActivityIndicator, TextInput } from "react-native-paper";
+import { ActivityIndicator } from "react-native-paper";
+import { TextInput } from "@/src/components/Translated";
 import Button from "@/src/components/Button";
 import { useNavigation } from "expo-router";
 import { useAuth } from "@/src/providers/AuthProvider";

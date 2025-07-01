@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { Text } from "@/src/components/Translated";
 import React from "react";
 
 const UnderlinedText = ({ text, fontSize, fontWeight }) => {

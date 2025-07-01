@@ -1,8 +1,9 @@
 import { View, Alert, Image } from "react-native";
-import { TextInput, Text } from "react-native-paper";
+import { TextInput, Text } from "@/src/components/Translated";
 import React, { useState, useEffect, useCallback } from "react";
 import Button from "@/src/components/Button";
-import { Link, Stack, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
 import { CheckBox } from "react-native-elements";
 
@@ -94,7 +95,7 @@ const SignUpScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <Stack.Screen options={{ title: "Sign up" }} />
+      <StackScreen options={{ title: "Sign up" }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

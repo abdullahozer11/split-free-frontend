@@ -1,4 +1,5 @@
 import { View, TouchableOpacity, Pressable, Alert } from "react-native";
+import {DialogTitle, MenuItem, Text} from "@/src/components/Translated";
 import React, {useEffect, useMemo, useState} from "react";
 import { Feather } from "@expo/vector-icons";
 import {
@@ -18,15 +19,13 @@ import { TransferItem } from "@/src/components/TransferItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {groupElementsByDay, inThisMonth} from "@/src/utils/helpers";
 import {
-  TextInput,
   Menu,
-  Text,
   Dialog,
-  Button,
   Portal,
   ActivityIndicator,
   Modal,
 } from "react-native-paper";
+import { Button, TextInput } from "@/src/components/Translated";
 import { useExpenseList } from "@/src/api/expenses";
 import { useTransferList } from "@/src/api/transfers";
 import { Debt, Friend2, Member } from "@/src/components/Person";
@@ -41,6 +40,7 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { useInsertMember, useProfileMember } from "@/src/api/members";
 import { useQueryClient } from "@tanstack/react-query";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
+import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const GroupDetailsScreen = () => {
   const { group_id: idString } = useLocalSearchParams();
@@ -93,6 +93,7 @@ const GroupDetailsScreen = () => {
   const { mutate: insertMember } = useInsertMember();
   const { mutate: assignMember } = useAssignMember();
   const { mutate: insertGroupInvitation } = useInsertGroupInvitation();
+  const { settings } = useSettings();
 
   // menu related
   const [visible, setVisible] = useState(false);
@@ -137,7 +138,7 @@ const GroupDetailsScreen = () => {
     allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     // Group by day using created_at
-    return groupElementsByDay(allTransactions);
+    return groupElementsByDay(allTransactions, settings.language);
   }, [expenses, transfers]);
 
   const [updatedFriends, setUpdatedFriends] = useState([]);
@@ -357,13 +358,13 @@ const GroupDetailsScreen = () => {
               <View className="flex-row mx-4 pb-7">
                 <View className={"flex-1"}>
                   <View className="flex-1">
-                    <Text variant="titleLarge">Group spent:</Text>
+                    <Text variant="titleLarge">Group spent</Text>
                     <Text variant="headlineMedium" className="font-bold">
                       {group?.expense_total || 0}€
                     </Text>
                   </View>
                   <View className="flex-1">
-                    <Text variant="titleMedium">This month:</Text>
+                    <Text variant="titleMedium">This month</Text>
                     <Text variant="headlineSmall" className="">
                       {expense_totalM || 0}€
                     </Text>
@@ -371,7 +372,7 @@ const GroupDetailsScreen = () => {
                 </View>
                 <View className="flex-1">
                   <Text variant="titleLarge">
-                    {totalBalance >= 0 ? "Total Receivable:" : "Total Debt:"}
+                    {totalBalance >= 0 ? "Total Receivable" : "Total Debt"}
                   </Text>
                   <Text
                     variant="headlineMedium"
@@ -496,7 +497,7 @@ const GroupDetailsScreen = () => {
                     </TouchableOpacity>
                   }
                 >
-                  <Menu.Item
+                  <MenuItem
                     onPress={() => {
                       closeMenu();
                       router.push({
@@ -504,9 +505,9 @@ const GroupDetailsScreen = () => {
                         params: {group_id: groupId},
                       });
                     }}
-                    title="Edit Group"
+                    title="Edit group"
                   />
-                  <Menu.Item
+                  <MenuItem
                     onPress={() => {
                       promptSettle();
                       closeMenu();
@@ -514,7 +515,7 @@ const GroupDetailsScreen = () => {
                     title="Settle all expenses"
                     titleStyle={{color: "green"}}
                   />
-                  <Menu.Item
+                  <MenuItem
                     onPress={() => {
                       promptInvite();
                       closeMenu();
@@ -523,7 +524,7 @@ const GroupDetailsScreen = () => {
                     titleStyle={{color: "blue"}}
                   />
                   {isOwner ? (
-                    <Menu.Item
+                    <MenuItem
                       onPress={() => {
                         promptDelete();
                         closeMenu();
@@ -532,7 +533,7 @@ const GroupDetailsScreen = () => {
                       titleStyle={{color: "red"}}
                     />
                   ) : (
-                    <Menu.Item
+                    <MenuItem
                       onPress={() => {
                         promptExitGroup();
                         closeMenu();
@@ -568,7 +569,7 @@ const GroupDetailsScreen = () => {
           }}
         >
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>Are you sure to delete this group?</Dialog.Title>
+          <DialogTitle>Are you sure to delete this group?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>
@@ -584,7 +585,7 @@ const GroupDetailsScreen = () => {
           }}
         >
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>Are you sure to settle this group?</Dialog.Title>
+          <DialogTitle>Are you sure to settle this group?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>
@@ -600,7 +601,7 @@ const GroupDetailsScreen = () => {
           }}
         >
           <Dialog.Icon icon="alert" />
-          <Dialog.Title>Are you sure to exit this group?</Dialog.Title>
+          <DialogTitle>Are you sure to exit this group?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>

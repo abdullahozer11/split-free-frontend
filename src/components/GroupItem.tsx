@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, Pressable } from "react-native";
+import { View, TouchableOpacity, Pressable } from "react-native";
+import { Text } from "@/src/components/Translated";
 import React, { useState } from "react";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -30,7 +31,8 @@ const GroupItem = ({ group, onAnchor }) => {
             <View className={"mr-3"}>
               <FontAwesome size={22} name={"user"} color={"#aaa"} />
             </View>
-            <Text className={"text-[#aaa]"}>{group.member_count} Members</Text>
+            <Text className={"text-[#aaa]"}>{group.member_count} </Text>
+            <Text className={"text-[#aaa]"}>Members</Text>
           </View>
         </View>
         <View className={"flex-row justify-between mx-5"}>
@@ -39,13 +41,16 @@ const GroupItem = ({ group, onAnchor }) => {
               <FontAwesome size={22} name={"info"} color={"#aaa"} />
             </View>
             <Text className={"text-[#aaa]"}>
-              {group.expense_count} Expenses
+              {group.expense_count + " "}
+            </Text>
+            <Text className={"text-[#aaa]"}>
+              Expenses
             </Text>
           </View>
           {group.settled ? (
             <Text className={"text-green-500"}>Settled</Text>
           ) : (
-            <Text className={"text-red-500"}>Not Settled</Text>
+            <Text className={"text-red-500"}>Not settled</Text>
           )}
         </View>
       </Pressable>

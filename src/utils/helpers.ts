@@ -1,8 +1,18 @@
-export const groupElementsByDay = (elements) => {
+export const groupElementsByDay = (elements, lang) => {
   const groupedElements = {};
   elements.forEach((activity) => {
     const createdDate = new Date(activity.created_at);
-    const dayKey = createdDate.toLocaleDateString("en-US", {
+    const frmt = {
+      "en": "en-US",
+      "fr": "fr-FR",
+      "de": "de-DE",
+      "es": "es-ES",
+      "tr": "tr-TR",
+      "gr": "el-GR",
+      "ru": "ru-RU",
+      "it": "it-IT",
+    };
+    const dayKey = createdDate.toLocaleDateString(frmt[lang] || "en-US", {
       month: "short",
       day: "2-digit",
       year: "numeric",
@@ -28,10 +38,20 @@ export function formatDate(dateObj) {
   return `${year}-${month}-${day}`;
 }
 
-export function formatDateString(dateString) {
+export function formatDateString(dateString, lang) {
   const date = new Date(dateString);
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  return date.toLocaleDateString("en-US", options);
+  const options = {year: "numeric", month: "long", day: "numeric"};
+  const frmt = {
+    "en": "en-US",
+    "fr": "fr-FR",
+    "de": "de-DE",
+    "es": "es-ES",
+    "tr": "tr-TR",
+    "gr": "el-GR",
+    "ru": "ru-RU",
+    "it": "it-IT",
+  };
+  return date.toLocaleDateString(frmt[lang] || "en-US", options);
 }
 
 export const inThisMonth = (dateS) => {

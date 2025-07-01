@@ -1,8 +1,8 @@
 import { View, Pressable } from "react-native";
-import { Text } from "react-native-paper";
+import { Text } from "@/src/components/Translated";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link } from "@/src/components/Translated";
 import { exp_cats } from "@/src/utils/expense_categories";
 
 export const ExpenseItem = ({ expense }) => {
@@ -39,7 +39,7 @@ export const ExpenseItem = ({ expense }) => {
           </Text>
           {expense?.settled && (
             <Text variant={"titleSmall"} className={"text-green-500"}>
-              settled
+              Settled
             </Text>
           )}
         </View>

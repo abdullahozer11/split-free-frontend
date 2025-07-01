@@ -1,5 +1,6 @@
 import { View, TouchableOpacity, Pressable } from "react-native";
-import { Avatar, Button, Divider, Text } from "react-native-paper";
+import { Text, Button } from "@/src/components/Translated";
+import { Avatar, Divider } from "react-native-paper";
 import React, { useEffect, useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -76,9 +77,7 @@ export const Member = ({ member, assignable, onAssign, myOwnMember }) => {
         </View>
         <View className="flex-row items-center">
           {myOwnMember && (
-            <Text variant={"labelMedium"} color={"green"} className="mr-1">
-              Me
-            </Text>
+            <Text variant={"labelMedium"} color={"green"} className="mr-1">Me</Text>
           )}
           {member.role === "owner" && (
             <Feather name={"award"} size={24} color={"silver"} />
