@@ -118,8 +118,8 @@ android {
         applicationId 'xyz.splitfree'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0.5"
+        versionCode 18
+        versionName "1.0.18"
     }
     signingConfigs {
         debug {

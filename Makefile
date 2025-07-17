@@ -55,7 +55,7 @@ logs:
 	npx react-native log-android
 
 devices:
-	adb devices
+	adb devicese
 
 # Submit to Play Store
 submit:
