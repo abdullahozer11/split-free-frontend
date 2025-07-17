@@ -1,0 +1,2 @@
+# put inside android folder before building locally
+sdk.dir=C:/Users/abdul/AppData/Local/Android/Sdk
