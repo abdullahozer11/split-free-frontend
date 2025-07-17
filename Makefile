@@ -1,24 +1,47 @@
-.PHONY: build install preview production clean update doctor run logs devices submit prebuild start
+.PHONY: build preview production clean update doctor run logs devices submit start bump-version
 
-# EAS Build Commands
+# Development Commands
+start:
+	npx expo start
+
+run:
+	expo run:android
+
+# Version Management
+bump-version:
+	npm run bump-version
+
+# Local Build Commands
+build-debug:
+	cd android && ./gradlew assembleDebug
+
+build-release:
+	npm run build-android
+
+preview: clean bump-version
+	cd android && ./gradlew bundleRelease
+	@echo "✅ Preview build completed: android/app/build/outputs/bundle/release/app-release.aab"
+
+production: clean bump-version
+	cd android && ./gradlew bundleRelease
+	@echo "✅ Production build completed: android/app/build/outputs/bundle/release/app-release.aab"
+
+# Quick build without cleanup (faster for testing)
 build:
-	eas build
+	npm run build-android
 
-install:
-	npm install
-
-preview:
-	eas build --profile preview --platform android
-
-production:
-	eas build --profile production --platform android
+# APK builds (for testing/sharing)
+build-apk:
+	#npm run bump-version
+	cd android && ./gradlew assembleRelease
+	@echo "✅ APK build completed: android/app/build/outputs/apk/release/app-release.apk"
 
 # Cleanup and Prebuild
 clean:
 	expo prebuild --clean
 	cd android && ./gradlew clean && cd ..
 
-# EAS Update Commands
+# EAS Update Commands (still useful for OTA updates)
 update:
 	eas update --branch preview --platform android
 
@@ -26,11 +49,6 @@ update:
 doctor:
 	npx expo install --check
 	npx expo-doctor
-	depcheck
-
-# Run App on Android
-run:
-	expo run:android
 
 # Debugging
 logs:
@@ -39,11 +57,20 @@ logs:
 devices:
 	adb devices
 
+# Submit to Play Store
 submit:
 	eas submit --platform android --profile production
 
-prebuild:
-	npx expo prebuild --platform android
+# Advanced build commands
+build-unsigned:
+	cd android && ./gradlew bundleRelease -x validateSigningRelease
 
-start:
-	npm start
+# Install built APK to connected device
+install:
+	cd android && ./gradlew installRelease
+
+# Full release workflow
+release: clean bump-version production
+	@echo "✅ Full release build completed!"
+	@echo "📱 AAB file: android/app/build/outputs/bundle/release/app-release.aab"
+	@echo "🚀 Ready to upload to Google Play Console"
