@@ -1,26 +1,15 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { Session } from "@supabase/auth-js";
 
-type AuthData = {
-  session: Session | null;
-  loading: boolean;
-};
-
-const AuthContext = createContext<AuthData>({
+const AuthContext = createContext({
   session: null,
   loading: true,
 });
 
-export default function AuthProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+export default function AuthProvider({ children }) {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -38,14 +27,12 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   // Function to update session in context
-  const updateSession = (newSession: Session | null) => {
+  const updateSession = (newSession) => {
     setSession(newSession);
   };
 
   return (
-    <AuthContext.Provider
-      value={{ session, loading, setSession: updateSession }}
-    >
+    <AuthContext.Provider value={{ session, loading, setSession: updateSession }}>
       {children}
     </AuthContext.Provider>
   );

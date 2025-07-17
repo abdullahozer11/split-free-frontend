@@ -50,36 +50,19 @@ const SettingsScreen = () => {
           iconName="globe"
           title="Language"
         />
-        <SettingsItem
-          page="faq"
-          containerColor="orange"
-          iconName="help-circle"
-          title="FAQ"
-        />
-        <SettingsItem
-          page="terms"
-          containerColor="blue"
-          iconName="check"
-          title="Terms of Use"
-        />
+        <SettingsItem page="faq" containerColor="orange" iconName="help-circle" title="FAQ" />
+        <SettingsItem page="terms" containerColor="blue" iconName="check" title="Terms of Use" />
+        <SettingsItem page="themes" containerColor="white" iconName="check" title="Pick a theme" />
         <SettingsItem
           page="password"
           containerColor="yellow"
           iconName="lock"
           title="Change Password"
         />
-        <SettingsItem
-          page="delete"
-          containerColor="red"
-          iconName="lock"
-          title="Delete Account"
-        />
+        <SettingsItem page="delete" containerColor="red" iconName="lock" title="Delete Account" />
       </View>
       <View className="absolute bottom-0 left-0 right-0 p-4 gap-2 mb-4">
-        <Text
-          onPress={handleSignOut}
-          className="text-red-600 text-center text-2xl"
-        >
+        <Text onPress={handleSignOut} className="text-red-600 text-center text-2xl">
           Log out
         </Text>
         <Text className="text-gray-600 text-center">SplitFree 1.0.0</Text>

@@ -1,13 +1,12 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-
 import AuthProvider from "@/src/providers/AuthProvider";
 import QueryProvider from "@/src/providers/QueryProvider";
-import { PaperProvider, useTheme } from "react-native-paper";
+import { ThemeProvider } from "@/src/providers/ThemeProvider";
+import { PaperProvider } from "react-native-paper";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -47,18 +46,11 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const theme = useTheme();
-
-  const customTheme = {
-    ...theme,
-    dark: false,
-  };
-
   return (
-    <ThemeProvider value={DefaultTheme}>
+    <ThemeProvider>
       <AuthProvider>
         <QueryProvider>
-          <PaperProvider theme={customTheme}>
+          <PaperProvider>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />

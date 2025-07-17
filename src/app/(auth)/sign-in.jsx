@@ -7,7 +7,7 @@ import { supabase } from "@/src/lib/supabase";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as Linking from "expo-linking";
 
-const createSessionFromUrl = async (url: string) => {
+const createSessionFromUrl = async (url) => {
   const { params, errorCode } = QueryParams.getQueryParams(url);
 
   if (errorCode) throw new Error(errorCode);
@@ -26,7 +26,7 @@ const createSessionFromUrl = async (url: string) => {
 const SignInScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState < boolean > false;
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -55,10 +55,7 @@ const SignInScreen = () => {
   return (
     <View className="flex-1 justify-center p-5 bg-white">
       <Stack.Screen options={{ title: "Sign in" }} />
-      <Image
-        source={require("@/assets/images/logo.png")}
-        className="h-52 w-52 self-center"
-      />
+      <Image source={require("@/assets/images/logo.png")} className="h-52 w-52 self-center" />
       <View className="space-y-2.5">
         <TextInput
           value={email}
@@ -88,10 +85,7 @@ const SignInScreen = () => {
         onPress={signInWithEmail}
         text={loading ? "Signing in..." : "Sign in"}
       />
-      <Link
-        href="/sign-up"
-        className="self-center font-bold text-blue-500 my-2.5"
-      >
+      <Link href="/sign-up" className="self-center font-bold text-blue-500 my-2.5">
         Create an account
       </Link>
       <Link
