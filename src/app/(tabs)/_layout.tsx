@@ -10,6 +10,7 @@ function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
+  // @ts-ignore
   return <Feather size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
