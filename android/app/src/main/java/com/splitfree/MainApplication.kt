@@ -1,4 +1,4 @@
-package xyz.splitfree
+package com.splitfree
 
 import android.app.Application
 import android.content.res.Configuration
