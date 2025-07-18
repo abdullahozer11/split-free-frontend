@@ -33,6 +33,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
+    "react-native-dotenv": "^3.4.11",
     "react-native-element-dropdown": "^2.10.4",
     "react-native-elements": "^3.4.3",
     "react-native-markdown-display": "^7.0.2",
@@ -48,7 +49,8 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.79",
-    "dotenv": "^16.4.7",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.6.1",
     "eslint-config-expo": "^7.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jest": "^28.6.0",
