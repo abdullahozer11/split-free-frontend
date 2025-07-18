@@ -1,4 +1,4 @@
-package com.splitfree
+package xyz.splitfree
 
 import android.os.Build
 import android.os.Bundle
