@@ -5,10 +5,11 @@ import {useFonts} from "expo-font";
 import {Stack} from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import {useEffect} from "react";
+import { StackScreen } from "@/src/components/Translated";
 
 import AuthProvider from "@/src/providers/AuthProvider";
 import QueryProvider from "@/src/providers/QueryProvider";
-import {PaperProvider} from "react-native-paper";
+import {PaperProvider, useTheme} from "react-native-paper";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -48,12 +49,19 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const theme = useTheme();
+
+  const customTheme = {
+    ...theme,
+    dark: false,
+  };
+
   return (
     <SettingsProvider>
       <ThemeProvider value={DefaultTheme}>
         <AuthProvider>
           <QueryProvider>
-            <PaperProvider>
+            <PaperProvider theme={customTheme}>
               <Stack>
                 <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
                 <Stack.Screen name="(auth)" options={{headerShown: false}}/>
