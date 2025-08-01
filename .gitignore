@@ -90,9 +90,5 @@ yarn-error.*
 # @end expo-cli
 expo-env.d.ts
 
-# Android build artifacts
-android/.gradle
-android/app/build
-android/build
-android/local.properties
-android/*.iml
+android
+ios
