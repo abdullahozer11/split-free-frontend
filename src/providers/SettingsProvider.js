@@ -5,7 +5,14 @@ import { getLocales } from "expo-localization";
 
 const SettingsContext = createContext();
 
-export const useSettings = () => useContext(SettingsContext);
+// In SettingsProvider.js
+export const useSettings = () => {
+  const context = useContext(SettingsContext);
+  if (context === undefined) {
+    throw new Error('useSettings must be used within a SettingsProvider');
+  }
+  return context;
+};
 
 // Get device locale and extract language code
 const getDefaultLanguage = () => {
