@@ -1,47 +1,24 @@
-.PHONY: build preview production clean update doctor run logs devices submit start bump-version
+.PHONY: build preview production clean update doctor run start submit
 
 # Development Commands
 start:
-	npx expo start
+	npx expo start --tunnel
 
 run:
-	expo run:android
+	npx expo run:android
 
-# Version Management
-bump-version:
-	npm run bump-version
-
-# Local Build Commands
-build-debug:
-	cd android && ./gradlew assembleDebug
-
-build-release:
-	npm run build-android
-
-preview: clean bump-version
-	cd android && ./gradlew bundleRelease
-	@echo "✅ Preview build completed: android/app/build/outputs/bundle/release/app-release.aab"
-
-production: clean bump-version
-	cd android && ./gradlew bundleRelease
-	@echo "✅ Production build completed: android/app/build/outputs/bundle/release/app-release.aab"
-
-# Quick build without cleanup (faster for testing)
+# Quick build using EAS (managed workflow)
 build:
-	npm run build-android
+	eas build --platform android --profile development --local
 
-# APK builds (for testing/sharing)
-build-apk:
-	#npm run bump-version
-	cd android && ./gradlew assembleRelease
-	@echo "✅ APK build completed: android/app/build/outputs/apk/release/app-release.apk"
-
-# Cleanup and Prebuild
+# Cleanup
 clean:
-	expo prebuild --clean
-	cd android && ./gradlew clean && cd ..
+	npx expo prebuild --clean
+	rm -rf node_modules
+	rm package-lock.json
+	npm install
 
-# EAS Update Commands (still useful for OTA updates)
+# EAS Update Commands (for OTA updates)
 update:
 	eas update --branch preview --platform android
 
@@ -50,27 +27,25 @@ doctor:
 	npx expo install --check
 	npx expo-doctor
 
-# Debugging
-logs:
-	npx react-native log-android
-
-devices:
-	adb devicese
-
 # Submit to Play Store
 submit:
 	eas submit --platform android --profile production
 
-# Advanced build commands
-build-unsigned:
-	cd android && ./gradlew bundleRelease -x validateSigningRelease
+# Preview build (AAB for testing)
+preview: clean
+	eas build --platform android --profile preview --local
+	@echo "✅ Preview AAB completed"
 
-# Install built APK to connected device
-install:
-	cd android && ./gradlew installRelease
+# Quick build using EAS (managed workflow)
+development:
+	eas build --platform android --profile development --local
 
-# Full release workflow
-release: clean bump-version production
+# Production build (AAB for Play Store)
+production: clean
+	eas build --platform android --profile production --local
+	@echo "✅ Production AAB completed"
+
+# Full release workflow (for production)
+release: clean production
 	@echo "✅ Full release build completed!"
-	@echo "📱 AAB file: android/app/build/outputs/bundle/release/app-release.aab"
 	@echo "🚀 Ready to upload to Google Play Console"
