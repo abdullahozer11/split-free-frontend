@@ -1,0 +1,5 @@
+# edit C:\Users\<YourUsername>\.wslconfig):
+[wsl2]
+memory=20GB
+processors=5
+swap=6GB
