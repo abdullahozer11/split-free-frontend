@@ -5,16 +5,54 @@ export const useGroupList = () => {
   return useQuery({
     queryKey: ["groups"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_groups_summary");
-      if (error) {
-        console.log("useGroupList error", error.message);
-        throw new Error(error.message);
+      try {
+        const { data, error } = await supabase
+          .from("groups")
+          .select(
+            `
+            id,
+            settled,
+            title,
+            expenses:expenses(id),
+            members:members(id)
+          `
+          )
+          .then((result) => {
+            // Transform data to match original function output
+            return {
+              ...result,
+              data: result.data?.map((group) => ({
+                id: group.id,
+                settled: group.settled,
+                title: group.title,
+                expense_count: group.expenses?.length || 0,
+                member_count: group.members?.length || 0,
+              })),
+            };
+          });
+
+        if (error) {
+          console.error("useGroupList query error:", {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+          });
+          throw new Error(`Failed to fetch group summary: ${error.message}`);
+        }
+
+        // console.log('useGroupList success', data);
+        return data;
+      } catch (err) {
+        console.error("useGroupList unexpected error:", {
+          message: err.message,
+          stack: err.stack,
+        });
+        throw new Error(`Unexpected error fetching groups: ${err.message}`);
       }
-      // console.log('useGroupList success', data);
-      return data;
     },
   });
 };
+
 
 export const useGroup = (id: number) => {
   return useQuery({
