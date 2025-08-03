@@ -54,6 +54,10 @@ export const TextInput = ({
   );
 };
 
+// Attach static subcomponents from the original TextInput
+TextInput.Icon = RNTextInput.Icon;
+TextInput.Affix = RNTextInput.Affix;
+
 export const Alert = {
   alert: (title, message, buttons, options) => {
     const { settings } = useSettings();
