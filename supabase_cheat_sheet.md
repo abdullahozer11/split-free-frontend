@@ -55,6 +55,7 @@ These apply to all commands:
 - `supabase db reset [flags]`: Reset local database to clean state (reapplies migrations).
   - Flags: `--linked` (use linked project), `--local` (default).
 - `supabase inspect db vacuum-stats`: Show vacuum statistics for tables.
+- supabase db diff -f change_on_database_explained
 
 ## Migrations
 - `supabase migration list [flags]`: List local and remote migrations.
