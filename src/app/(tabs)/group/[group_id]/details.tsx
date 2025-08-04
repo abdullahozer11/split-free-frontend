@@ -26,7 +26,7 @@ import {
   Modal,
 } from "react-native-paper";
 import { Button, TextInput } from "@/src/components/Translated";
-import { useExpenseList } from "@/src/api/expenses";
+import { useExpenseList, useExpenseTotalThisMonth } from "@/src/api/expenses";
 import { useTransferList } from "@/src/api/transfers";
 import { Debt, Friend2, Member } from "@/src/components/Person";
 import {
@@ -56,14 +56,20 @@ const GroupDetailsScreen = () => {
     isLoading: groupLoading,
   } = useGroup(groupId);
   const {
-    data: expenses,
+    data: expensePages,
     isError: expenseError,
     isLoading: expenseLoading,
+    fetchNextPage: fetchNextExpenses,
+    hasNextPage: hasMoreExpenses,
+    isFetchingNextPage: isFetchingNextExpenses,
   } = useExpenseList(groupId);
   const {
-    data: transfers,
+    data: transferPages,
     isError: transferError,
     isLoading: transferLoading,
+    fetchNextPage: fetchNextTransfers,
+    hasNextPage: hasMoreTransfers,
+    isFetchingNextPage: isFetchingNextTransfers,
   } = useTransferList(groupId);
   const { session } = useAuth();
   const {
@@ -86,6 +92,10 @@ const GroupDetailsScreen = () => {
     isError: profileMemberError,
     isLoading: profileMemberLoading,
   } = useProfileMember(profile?.id, groupId);
+  const {
+    data: expenseTotalM,
+    isLoading: expenseTotalMLoading,
+  } = useExpenseTotalThisMonth(groupId);
   const [totalBalance, setTotalBalance] = useState(0);
   const { mutate: exitGroup } = useExitGroup();
   const { mutate: deleteGroup } = useDeleteGroup();
@@ -113,33 +123,29 @@ const GroupDetailsScreen = () => {
     const allTransactions = [];
 
     // Add expenses with type identifier
-    if (expenses) {
-      expenses.forEach(expense => {
-        allTransactions.push({
-          ...expense,
-          type: 'expense',
-          date: expense.created_at
-        });
+    expensePages?.pages.flat().forEach((expense) => {
+      allTransactions.push({
+        ...expense,
+        type: "expense",
+        date: expense.created_at,
       });
-    }
+    });
 
     // Add transfers with type identifier
-    if (transfers) {
-      transfers.forEach(transfer => {
-        allTransactions.push({
-          ...transfer,
-          type: 'transfer',
-          date: transfer.created_at
-        });
+    transferPages?.pages.flat().forEach((transfer) => {
+      allTransactions.push({
+        ...transfer,
+        type: "transfer",
+        date: transfer.created_at,
       });
-    }
+    });
 
     // Sort by created_at (most recent first) - this will mix expenses and transfers
     allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     // Group by day using created_at
     return groupElementsByDay(allTransactions, settings.language);
-  }, [expenses, transfers]);
+  }, [expensePages, transferPages, settings.language]);
 
   const [updatedFriends, setUpdatedFriends] = useState([]);
 
@@ -175,12 +181,6 @@ const GroupDetailsScreen = () => {
     setUpdatedFriends(newUpdatedFriends);
   }, [friends, pendingInvites, group]);
 
-  const expense_totalM = useMemo(() => {
-    if (!expenses?.length) return 0;
-    const expensesM = expenses.filter((ex) => inThisMonth(ex?.date));
-    return expensesM.reduce((sum, expense) => sum + expense.amount, 0).toFixed(2);
-  }, [expenses]);
-
   useExpenseSubscription(groupId);
 
   if (
@@ -190,7 +190,8 @@ const GroupDetailsScreen = () => {
     profileLoading ||
     friendsLoading ||
     profileMemberLoading ||
-    pInviteLoading
+    pInviteLoading ||
+    expenseTotalMLoading
   ) {
     return <ActivityIndicator />;
   }
@@ -219,9 +220,15 @@ const GroupDetailsScreen = () => {
     await settleGroup(group.id, {
       onSuccess: async () => {
         // Locally update settled status for all expenses in this group
-        queryClient.setQueryData(["expenses", group.id], (oldData) =>
-          oldData.map(expense => ({...expense, settled: true}))
-        );
+        queryClient.setQueryData(["expenses", group.id], (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) =>
+              page.map((expense) => ({ ...expense, settled: true })),
+            ),
+          };
+        });
 
         setIsDialog2Visible(false);
         await queryClient.invalidateQueries(["groups"]);
@@ -366,7 +373,7 @@ const GroupDetailsScreen = () => {
                   <View className="flex-1">
                     <Text variant="titleMedium">This month</Text>
                     <Text variant="headlineSmall" className="">
-                      {expense_totalM || 0}€
+                      {expenseTotalM || 0}€
                     </Text>
                   </View>
                 </View>
@@ -405,6 +412,17 @@ const GroupDetailsScreen = () => {
                       ))}
                     </View>
                   ))}
+                  {(hasMoreExpenses || hasMoreTransfers) && (
+                    <Button
+                      onPress={() => {
+                        if (hasMoreExpenses) fetchNextExpenses();
+                        if (hasMoreTransfers) fetchNextTransfers();
+                      }}
+                      disabled={isFetchingNextExpenses || isFetchingNextTransfers}
+                    >
+                      {isFetchingNextExpenses || isFetchingNextTransfers ? "Loading..." : "Load More"}
+                    </Button>
+                  )}
                 </View>
               </View>
               <View>
@@ -445,7 +463,7 @@ const GroupDetailsScreen = () => {
                       <Feather name={"check"} color={"green"} size={24} />
                     </Pressable>
                     <Pressable
-                      styleclassName="ml-2"
+                      className="ml-2"
                       onPress={() => {
                         setIsAddingNewName(false);
                         setBigPlusVisible(true);

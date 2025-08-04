@@ -1,25 +1,47 @@
 import { supabase } from "@/src/lib/supabase";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
+
+const PAGE_SIZE = 20;
 
 export const useExpenseList = (group_id: number) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["expenses", group_id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("expenses")
-        .select(
-          "id, title, amount, date, created_at, group_id, category, settled, " +
-            "payers:expense_payers(member), participants:expense_participants(member)",
-        )
-        .eq("group_id", group_id)
-        .order("date", { ascending: false })
-        .order("id", { ascending: false });
-      if (error) {
-        console.log("useExpenseList error: ", error.message);
-        throw new Error(error.message);
+    queryFn: async ({ pageParam }) => {
+      try {
+        const page = pageParam ?? 0;
+        const from = page * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+        const { data, error } = await supabase
+          .from("expenses")
+          .select(
+            "id, title, amount, date, created_at, group_id, category, settled, " +
+              "payers:expense_payers(member), participants:expense_participants(member)",
+          )
+          .eq("group_id", group_id)
+          .order("created_at", { ascending: false })
+          .order("id", { ascending: false })
+          .range(from, to);
+        if (error) {
+          console.error("useExpenseList query error:", {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+          });
+          throw new Error(`Failed to fetch expenses: ${error.message}`);
+        }
+        return data;
+      } catch (err) {
+        console.error("useExpenseList unexpected error:", err);
+        throw new Error(`Unexpected error fetching expenses: ${err.message}`);
       }
-      // console.log("Expense data is ", data);
-      return data;
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+      if (lastPage?.length === PAGE_SIZE) {
+        return lastPageParam + 1;
+      }
+      return undefined;
     },
   });
 };
@@ -121,6 +143,38 @@ export const useSettleExpense = () => {
       }
       console.log("useSettleExpense success");
       return;
+    },
+  });
+};
+
+export const useExpenseTotalThisMonth = (group_id: number) => {
+  return useQuery({
+    queryKey: ["expense_total_month", group_id],
+    queryFn: async () => {
+      try {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString().split("T")[0];
+        const { data, error } = await supabase
+          .from("expenses")
+          .select("amount")
+          .eq("group_id", group_id)
+          .gte("date", startOfMonth)
+          .lt("date", endOfMonth);
+        if (error) {
+          console.error("useExpenseTotalThisMonth query error:", {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+          });
+          throw new Error(`Failed to fetch monthly expense total: ${error.message}`);
+        }
+        const total = data.reduce((sum, item) => sum + item.amount, 0).toFixed(2);
+        return total;
+      } catch (err) {
+        console.error("useExpenseTotalThisMonth unexpected error:", err);
+        throw new Error(`Unexpected error fetching monthly expense total: ${err.message}`);
+      }
     },
   });
 };
