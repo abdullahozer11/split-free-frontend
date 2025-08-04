@@ -17,7 +17,6 @@ import {
 } from "react-native-paper";
 import { Button, TextInput, Text } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
-import { currencyOptions } from "@/src/constants";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
@@ -100,7 +99,6 @@ export default function ExpenseForm({
           description: "",
           payers: [],
           participants: [],
-          currency: "EUR",
           amount: "0",
           category: "Other",
           group_id: groupId,
@@ -132,7 +130,6 @@ export default function ExpenseForm({
     description,
     payers,
     participants,
-    currency,
     amount,
     group_id,
     inputDate,
@@ -205,12 +202,11 @@ export default function ExpenseForm({
 
   const onUpdate = async () => {
     // console.log("Updating expense")
-    // console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
+    // console.log(groupId, "//", title,"//", description,"//", amount,"//", inputDate,"//", payers,"//", participants)
     updateExpense(
       {
         id: updatingExpense.id,
         amount: amount,
-        currency: currency,
         date: formatDate(inputDate),
         description: description,
         category: category,
@@ -236,13 +232,12 @@ export default function ExpenseForm({
   };
 
   const onCreate = async () => {
-    // console.log(groupId, "//", title,"//", description,"//", currency,"//", amount,"//", inputDate,"//", payers,"//", participants)
+    // console.log(groupId, "//", title,"//", description,"//", amount,"//", inputDate,"//", payers,"//", participants)
     insertExpense(
       {
         group_id: groupId,
         title: title,
         description: description ? description : null,
-        currency: currency,
         category: category,
         amount: amount,
         date: formatDate(inputDate),
@@ -376,17 +371,6 @@ export default function ExpenseForm({
             }
             keyboardType="numeric"
             className={"flex-1 bg-white"}
-          />
-          <Dropdown
-            placeholder={int["Select currency"]}
-            className={"rounded-md text-xl text-pink-300 bg-white px-2 w-16"}
-            data={currencyOptions}
-            labelField={"label"}
-            valueField={"value"}
-            value={currency}
-            onChange={(cu) => {
-              handleInputChange("currency", cu);
-            }}
           />
           <Pressable
             onPress={() => {

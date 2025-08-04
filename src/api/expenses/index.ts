@@ -53,7 +53,7 @@ export const useExpense = (id: number) => {
       // Fetch expense details
       const { data: expenseData, error: expenseError } = await supabase
         .from("expenses")
-        .select("amount, id, title, settled, currency, description, date, last_modified, group_id, category")
+        .select("amount, id, title, settled, description, date, last_modified, group_id, category")
         .eq("id", id)
         .single();
 
@@ -148,7 +148,6 @@ export const useExpense = (id: number) => {
         id: expenseData.id,
         title: expenseData.title,
         settled: expenseData.settled,
-        currency: expenseData.currency,
         description: expenseData.description,
         date: expenseData.date,
         last_modified: expenseData.last_modified,
@@ -173,7 +172,6 @@ export const useInsertExpense = () => {
         "create_expense",
         {
           amount_input: data.amount,
-          currency_input: data.currency,
           date_input: data.date,
           category_input: data.category,
           description_input: data.description,
@@ -201,7 +199,6 @@ export const useUpdateExpense = () => {
         expense_id: data.id,
         amount_input: data.amount,
         category_input: data.category,
-        currency_input: data.currency,
         date_input: data.date,
         description_input: data.description,
         participants_input: data.participants,
