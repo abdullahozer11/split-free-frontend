@@ -50,13 +50,116 @@ export const useExpense = (id: number) => {
   return useQuery({
     queryKey: ["expense", id],
     queryFn: async () => {
-      const { data: expense, error } = await supabase.rpc("use_expense", {
-        expense_id_input: id,
-      });
-      if (error) {
-        console.log("useExpense error: ", error.message);
-        throw new Error(error.message);
+      // Fetch expense details
+      const { data: expenseData, error: expenseError } = await supabase
+        .from("expenses")
+        .select("amount, id, title, settled, currency, description, date, last_modified, group_id, category")
+        .eq("id", id)
+        .single();
+
+      if (expenseError) {
+        console.log("useExpense expense error: ", expenseError.message);
+        throw new Error(expenseError.message);
       }
+
+      // Fetch payers
+      const { data: payersData, error: payersError } = await supabase
+        .from("expense_payers")
+        .select(`
+          member (
+            id,
+            name,
+            profile (
+              avatar_url
+            )
+          )
+        `)
+        .eq("expense", id);
+
+      if (payersError) {
+        console.log("useExpense payers error: ", payersError.message);
+        throw new Error(payersError.message);
+      }
+
+      const payers = payersData
+        ? payersData.map((item) => ({
+            id: item.member.id,
+            name: item.member.name,
+            avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
+          }))
+        : [];
+
+      // Fetch payer_ids
+      const { data: payerIdsData, error: payerIdsError } = await supabase
+        .from("expense_payers")
+        .select("member")
+        .eq("expense", id);
+
+      if (payerIdsError) {
+        console.log("useExpense payer_ids error: ", payerIdsError.message);
+        throw new Error(payerIdsError.message);
+      }
+
+      const payer_ids = payerIdsData ? payerIdsData.map((d) => d.member) : [];
+
+      // Fetch participants
+      const { data: participantsData, error: participantsError } = await supabase
+        .from("expense_participants")
+        .select(`
+          member (
+            id,
+            name,
+            profile (
+              avatar_url
+            )
+          )
+        `)
+        .eq("expense", id);
+
+      if (participantsError) {
+        console.log("useExpense participants error: ", participantsError.message);
+        throw new Error(participantsError.message);
+      }
+
+      const participants = participantsData
+        ? participantsData.map((item) => ({
+            id: item.member.id,
+            name: item.member.name,
+            avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
+          }))
+        : [];
+
+      // Fetch participant_ids
+      const { data: participantIdsData, error: participantIdsError } = await supabase
+        .from("expense_participants")
+        .select("member")
+        .eq("expense", id);
+
+      if (participantIdsError) {
+        console.log("useExpense participant_ids error: ", participantIdsError.message);
+        throw new Error(participantIdsError.message);
+      }
+
+      const participant_ids = participantIdsData ? participantIdsData.map((d) => d.member) : [];
+
+      // Build the response object
+      const expense = {
+        amount: expenseData.amount,
+        id: expenseData.id,
+        title: expenseData.title,
+        settled: expenseData.settled,
+        currency: expenseData.currency,
+        description: expenseData.description,
+        date: expenseData.date,
+        last_modified: expenseData.last_modified,
+        group_id: expenseData.group_id,
+        category: expenseData.category,
+        payers,
+        participants,
+        payer_ids,
+        participant_ids,
+      };
+
       // console.log("expense is ", expense);
       return expense;
     },
