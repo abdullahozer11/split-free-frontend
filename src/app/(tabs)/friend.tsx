@@ -77,18 +77,85 @@ export default function FriendScreen() {
 
   const handleSearch = async () => {
     setSearchLoading(true);
-    const { data, error } = await supabase.rpc("search_friends", {
-      keyword_input: searchQuery,
-      profile_id_input: session?.user.id,
-      limit_input: 6,
-      offset_input: 0,
-    });
-    if (error) {
-      console.log("Handle Search error is ", error.message);
+
+    const userId = session?.user.id;
+
+    // Fetch matching profiles
+    const {data: profiles, error: profilesError} = await supabase
+      .from("profiles")
+      .select("id, email, avatar_url")
+      .ilike("email", `${searchQuery}%`)
+      .order("email")
+      .limit(6)
+      .range(0, 5);  // offset 0, limit 6
+
+    if (profilesError) {
+      console.log("Handle Search profiles error is ", profilesError.message);
       setSearchLoading(false);
       return;
     }
-    setSearchResults(data);
+
+    if (profiles.length === 0) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
+
+    const profileIds = profiles.map(p => p.id);
+
+    // Fetch user's friends
+    const {data: friendsData, error: friendsError} = await supabase
+      .from("friends")
+      .select("friend")
+      .eq("profile", userId);
+
+    if (friendsError) {
+      console.log("Handle Search friends error is ", friendsError.message);
+      setSearchLoading(false);
+      return;
+    }
+
+    const friendIds = friendsData ? friendsData.map(f => f.friend) : [];
+
+    // Fetch sent requests (receivers)
+    const {data: sentData, error: sentError} = await supabase
+      .from("friend_requests")
+      .select("receiver")
+      .eq("sender", userId);
+
+    if (sentError) {
+      console.log("Handle Search sent error is ", sentError.message);
+      setSearchLoading(false);
+      return;
+    }
+
+    const sentIds = sentData ? sentData.map(s => s.receiver) : [];
+
+    // Fetch received requests (senders)
+    const {data: receivedData, error: receivedError} = await supabase
+      .from("friend_requests")
+      .select("sender")
+      .eq("receiver", userId);
+
+    if (receivedError) {
+      console.log("Handle Search received error is ", receivedError.message);
+      setSearchLoading(false);
+      return;
+    }
+
+    const receivedIds = receivedData ? receivedData.map(r => r.sender) : [];
+
+    // Compute statuses
+    const results = profiles.map(p => ({
+      id: p.id,
+      email: p.email,
+      avatar_url: p.avatar_url,
+      friend_status: friendIds.includes(p.id) ? 'FRIEND' :
+        sentIds.includes(p.id) ? 'SENT' :
+          receivedIds.includes(p.id) ? 'RECEIVED' : 'AVAILABLE'
+    }));
+
+    setSearchResults(results);
     setSearchLoading(false);
   };
 
