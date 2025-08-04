@@ -94,3 +94,5 @@ android
 ios
 
 *.apk
+
+*.sql
