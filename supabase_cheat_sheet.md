@@ -93,5 +93,7 @@ These apply to all commands:
 - `supabase sso [subcommand]`: Manage SSO (e.g., `add`, `list`, `get`).
   - Subcommands: add, get, list, update; Flags: `--metadata-url`, `--domains`, etc.
 - `supabase domains [subcommand]`: Manage custom domains (e.g., `activate`, `create`).
+- apply data_dump to database
+  - PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres < data_dump.sqls
 
 To download this cheat sheet, copy the content into a file named `supabase-cli-cheat-sheet.md` and save it.
