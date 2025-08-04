@@ -1,9 +1,11 @@
-import {View} from "react-native";
+import { View, Pressable } from "react-native";
 import { Text } from "@/src/components/Translated";
 import React from "react";
-import {MaterialIcons} from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Link } from "@/src/components/Translated";
 
-export const TransferItem = ({transfer, members, currentUserId}) => {
+
+export const TransferItem = ({ transfer, members, currentUserId }) => {
   // Find sender and receiver member details
   const senderMember = members?.find(member =>
     member.profile?.id === transfer.sender || member.id === transfer.sender
@@ -39,68 +41,74 @@ export const TransferItem = ({transfer, members, currentUserId}) => {
   const receiverName = getReceiverName();
 
   return (
-    <View className="bg-white py-3 px-1 pr-4 rounded-lg gap-x-4 items-center mx-1 flex flex-row justify-between mb-2"
+    <Link
+      href={`/(tabs)/group/${transfer.group_id}/transfer/${transfer.id}/details`}
+      asChild
     >
-      {/* Money Icon */}
-      <View
-        style={{backgroundColor: '#2563eb'}}
-        className="justify-center items-center h-12 w-12 rounded-lg p-2"
+      <Pressable
+        className="bg-white py-3 px-1 pr-4 rounded-lg gap-x-4 items-center mx-1 flex flex-row justify-between mb-2"
       >
-        <MaterialIcons
-          name={'attach-money'}
-          color={'white'}
-          size={25}
-        />
-      </View>
-
-      {/* Sender -> Receiver with Arrow */}
-      <View className="flex-1 mx-4">
-        <View className="flex-row items-center">
-          <View className="flex-shrink max-w-[35%]">
-            <Text
-              variant="titleMedium"
-              numberOfLines={1}
-              className={`${isCurrentUserSender ? 'text-red-600 font-bold' : 'text-gray-700'}`}
-              style={{fontSize: 14}}
-            >
-              {truncateName(senderName)}
-            </Text>
-          </View>
+        {/* Money Icon */}
+        <View
+          style={{ backgroundColor: '#2563eb' }}
+          className="justify-center items-center h-12 w-12 rounded-lg p-2"
+        >
           <MaterialIcons
-            name="arrow-forward"
-            size={16}
-            color="#6b7280"
-            style={{marginHorizontal: 8}}
+            name={'attach-money'}
+            color={'white'}
+            size={25}
           />
-          <View className="flex-shrink max-w-[35%]">
-            <Text
-              variant="titleMedium"
-              numberOfLines={1}
-              className={`${isCurrentUserReceiver ? 'text-green-600 font-bold' : 'text-gray-700'}`}
-              style={{fontSize: 14}}
-            >
-              {truncateName(receiverName)}
-            </Text>
-          </View>
         </View>
-        {transfer.description && (
-          <Text variant="bodySmall" className="text-gray-500 mt-1" numberOfLines={1}>
-            {transfer.description}
-          </Text>
-        )}
-      </View>
 
-      {/* Amount */}
-      <View>
-        <Text variant="titleSmall" className="text-right">
-          €{transfer.amount?.toFixed(2)}
-        </Text>
-        {transfer?.settled && (
-          <Text variant={"titleSmall"} className={"text-green-500"}>
-            settled
+        {/* Sender -> Receiver with Arrow */}
+        <View className="flex-1 mx-4">
+          <View className="flex-row items-center">
+            <View className="flex-shrink max-w-[35%]">
+              <Text
+                variant="titleMedium"
+                numberOfLines={1}
+                className={`${isCurrentUserSender ? 'text-red-600 font-bold' : 'text-gray-700'}`}
+                style={{ fontSize: 14 }}
+              >
+                {truncateName(senderName)}
+              </Text>
+            </View>
+            <MaterialIcons
+              name="arrow-forward"
+              size={16}
+              color="#6b7280"
+              style={{ marginHorizontal: 8 }}
+            />
+            <View className="flex-shrink max-w-[35%]">
+              <Text
+                variant="titleMedium"
+                numberOfLines={1}
+                className={`${isCurrentUserReceiver ? 'text-green-600 font-bold' : 'text-gray-700'}`}
+                style={{ fontSize: 14 }}
+              >
+                {truncateName(receiverName)}
+              </Text>
+            </View>
+          </View>
+          {transfer.description && (
+            <Text variant="bodySmall" className="text-gray-500 mt-1" numberOfLines={1}>
+              {transfer.description}
+            </Text>
+          )}
+        </View>
+
+        {/* Amount */}
+        <View>
+          <Text variant="titleSmall" className="text-right">
+            €{transfer.amount?.toFixed(2)}
           </Text>
-        )}
-      </View>
-    </View>
+          {transfer?.settled && (
+            <Text variant={"titleSmall"} className={"text-green-500"}>
+              settled
+            </Text>
+          )}
+        </View>
+      </Pressable>
+    </Link>
   );
 };

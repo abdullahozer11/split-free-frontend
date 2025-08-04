@@ -17,6 +17,10 @@ export default function GroupStack() {
         options={{ headerShown: false, title: "Expenses" }}
       />
       <Stack.Screen
+        name="transfer"
+        options={{ headerShown: false, title: "Transfers" }}
+      />
+      <Stack.Screen
         name="member"
         options={{ headerShown: false, title: "Members" }}
       />
