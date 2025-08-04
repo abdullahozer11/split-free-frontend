@@ -36,7 +36,6 @@ yarn-error.*
 .env
 .env.local
 .env.prod
-supabase
 
 # local api calls for test purposes
 rest
