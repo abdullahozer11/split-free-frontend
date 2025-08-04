@@ -5,6 +5,7 @@ import {
   Modal,
   TouchableOpacity,
   Alert,
+  Picker,
 } from "react-native";
 import { TextInput, Text } from "@/src/components/Translated";
 import { Feather } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const CreateGroupModal = ({ isVisible, onClose }) => {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
+  const [currency, setCurrency] = useState("EUR");
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
   const [error, setError] = useState("");
 
@@ -47,6 +49,7 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
 
   const resetFields = () => {
     setTitle("");
+    setCurrency("EUR");
     setMembers([profile?.full_name]);
   };
 
@@ -59,6 +62,7 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
     insertGroup(
       {
         title,
+        currency,
         member_names: members,
       },
       {
@@ -82,6 +86,10 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
     setError("");
     if (!title) {
       setError("Group name cannot be empty");
+      return false;
+    }
+    if (!currency) {
+      setError("Currency cannot be empty");
       return false;
     }
     return true;
@@ -121,6 +129,19 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
             value={title}
             onChangeText={(text) => setTitle(text)}
           />
+          <Picker
+            selectedValue={currency}
+            onValueChange={(itemValue) => setCurrency(itemValue)}
+            style={{ width: '100%', height: 50, marginTop: 10, borderBottomWidth: 1, borderBottomColor: 'gray' }}
+          >
+            {currencyOptions.map((option) => (
+              <Picker.Item
+                label={`${option.label} ${option.value}`}
+                value={option.value}
+                key={option.value}
+              />
+            ))}
+          </Picker>
           <TouchableOpacity
             className="mt-2.5 justify-center items-center rounded-2xl border border-dashed py-2.5 mb-1.5"
             onPress={openParticipantsModal}

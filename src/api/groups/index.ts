@@ -94,6 +94,7 @@ export const useInsertGroup = () => {
       const { data: newGroupID, error } = await supabase.rpc("create_group", {
         member_names_input: data.member_names,
         title_input: data.title,
+        currency_input: data.currency,
       });
       if (error) {
         console.error("useInsertGroup error:", error);
