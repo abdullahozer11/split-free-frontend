@@ -6,7 +6,7 @@ export const generateInvite = async (groupId: number) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // Optional: Expires in 7 days
 
-  const {data, error} = await supabase
+  const {error} = await supabase
     .from('invite_tokens')
     .insert({
       group_id: groupId,
@@ -22,6 +22,6 @@ export const generateInvite = async (groupId: number) => {
   }
 
   // Deep link: Use token only, or include group_id if you want
-  const inviteLink = `splitfree://join?token=${token}`;
+  const inviteLink = `xyz.splitfree://join?token=${token}`;
   return inviteLink; // Use this for QR code or sharing
 };
