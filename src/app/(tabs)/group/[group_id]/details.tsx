@@ -41,6 +41,8 @@ import { useInsertMember, useProfileMember } from "@/src/api/members";
 import { useQueryClient } from "@tanstack/react-query";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { currencyOptions } from "@/src/constants";
+
 
 const GroupDetailsScreen = () => {
   const { group_id: idString } = useLocalSearchParams();
@@ -353,6 +355,9 @@ const GroupDetailsScreen = () => {
 
   const isOwner = session?.user.id === group?.owner;
 
+  const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
+  const currency_label = currencyOption?.label || '$';
+
   return (
     <View className="bg-[#F6F6F6FF] flex-1">
       <CollapsableHeader
@@ -367,13 +372,13 @@ const GroupDetailsScreen = () => {
                   <View className="flex-1">
                     <Text variant="titleLarge">Group spent</Text>
                     <Text variant="headlineMedium" className="font-bold">
-                      {group?.expense_total || 0}€
+                      {group?.expense_total || 0}{currency_label}
                     </Text>
                   </View>
                   <View className="flex-1">
                     <Text variant="titleMedium">This month</Text>
                     <Text variant="headlineSmall" className="">
-                      {expenseTotalM || 0}€
+                      {expenseTotalM || 0}{currency_label}
                     </Text>
                   </View>
                 </View>
@@ -385,7 +390,7 @@ const GroupDetailsScreen = () => {
                     variant="headlineMedium"
                     className={`font-bold ${totalBalance >= 0 ? "text-green-600" : "text-red-600"}`}
                   >
-                    {Math.abs(totalBalance || 0)}€
+                    {Math.abs(totalBalance || 0)}{currency_label}
                   </Text>
                 </View>
                 {/*last settlement date*/}
@@ -400,13 +405,14 @@ const GroupDetailsScreen = () => {
                       <Text variant={"titleMedium"}>{item}</Text>
                       {groupedTransactions[item].map((transaction) => (
                         transaction.type === 'expense' ? (
-                          <ExpenseItem key={`expense-${transaction.id}`} expense={transaction} />
+                          <ExpenseItem key={`expense-${transaction.id}`} expense={transaction} currency_label={currency_label}/>
                         ) : (
                           <TransferItem
                             key={`transfer-${transaction.id}`}
                             transfer={transaction}
                             members={group?.members}
                             currentUserId={session?.user.id}
+                            currency_label={currency_label}
                           />
                         )
                       ))}

@@ -16,6 +16,7 @@ import {
   Portal,
 } from "react-native-paper";
 import { Feather } from "@expo/vector-icons";
+import { useGroup } from "@/src/api/groups";
 import {
   useDeleteMember,
   useMember,
@@ -25,6 +26,8 @@ import {
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useDebt } from "@/src/api/debts";
 import { useQueryClient } from "@tanstack/react-query";
+import { currencyOptions } from "@/src/constants";
+
 
 const MemberDetailsScreen = () => {
   const navigation = useNavigation();
@@ -55,6 +58,11 @@ const MemberDetailsScreen = () => {
     isError: debtError,
     isLoading: debtLoading,
   } = useDebt(memberId, profileMember?.id);
+  const {
+    data: group,
+    isError: groupError,
+    isLoading: groupLoading,
+  } = useGroup(member?.group_id);
 
   const { mutate: updateMemberName } = useUpdateMemberName();
   const { mutate: deleteMember } = useDeleteMember();
@@ -63,11 +71,11 @@ const MemberDetailsScreen = () => {
     setName(member?.name);
   }, [member]);
 
-  if (memberLoading || profileMemberLoading || debtLoading) {
+  if (memberLoading || profileMemberLoading || debtLoading || groupLoading) {
     return <ActivityIndicator />;
   }
 
-  if (memberError || profileMemberError || debtError) {
+  if (memberError || profileMemberError || debtError || groupError) {
     return <Text>Failed to fetch data</Text>;
   }
 
@@ -109,6 +117,9 @@ const MemberDetailsScreen = () => {
       },
     });
   };
+
+  const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
+  const currency_label = currencyOption?.label || '$';
 
   return (
     <SafeAreaView className="flex-1">
@@ -173,15 +184,15 @@ const MemberDetailsScreen = () => {
                       color: member.total_balance >= 0 ? "green" : "red",
                     }}
                   >
-                    ${member.total_balance.toFixed(2)}
+                    {currency_label}{member.total_balance.toFixed(2)}
                   </Text>
                 </Text>
                 {!ownMember &&
                   debt &&
                   (debt.amount >= 0 ? (
-                    <Text><Text>Owes you</Text>: €{debt.amount}</Text>
+                    <Text><Text>Owes you</Text>: {currency_label}{debt.amount}</Text>
                   ) : (
-                    <Text><Text>You owe</Text>: €{debt.amount}</Text>
+                    <Text><Text>You owe</Text>: {currency_label}{debt.amount}</Text>
                   ))}
               </Card.Content>
             </Card>

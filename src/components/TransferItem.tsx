@@ -5,7 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "@/src/components/Translated";
 
 
-export const TransferItem = ({ transfer, members, currentUserId }) => {
+export const TransferItem = ({ transfer, members, currentUserId, currency_label }) => {
   // Find sender and receiver member details
   const senderMember = members?.find(member =>
     member.profile?.id === transfer.sender || member.id === transfer.sender
@@ -100,7 +100,7 @@ export const TransferItem = ({ transfer, members, currentUserId }) => {
         {/* Amount */}
         <View>
           <Text variant="titleSmall" className="text-right">
-            €{transfer.amount?.toFixed(2)}
+            {currency_label}{transfer.amount?.toFixed(2)}
           </Text>
           {transfer?.settled && (
             <Text variant={"titleSmall"} className={"text-green-500"}>

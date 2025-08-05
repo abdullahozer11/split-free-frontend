@@ -5,7 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "@/src/components/Translated";
 import { exp_cats } from "@/src/utils/expense_categories";
 
-export const ExpenseItem = ({ expense }) => {
+export const ExpenseItem = ({ expense, currency_label }) => {
   const exp_cat =
     exp_cats.find((exp) => exp.name === expense.category) ||
     exp_cats.find((exp) => exp.name === "Other");
@@ -35,7 +35,7 @@ export const ExpenseItem = ({ expense }) => {
         </Text>
         <View>
           <Text variant="titleSmall" className="text-right">
-            €{expense.amount}
+            {currency_label}{expense.amount}
           </Text>
           {expense?.settled && (
             <Text variant={"titleSmall"} className={"text-green-500"}>
@@ -48,7 +48,7 @@ export const ExpenseItem = ({ expense }) => {
   );
 };
 
-export const GroupedExpenseItem = ({ total, exp_cat }) => {
+export const GroupedExpenseItem = ({ total, exp_cat, currency_label }) => {
   return (
     <View className="bg-white py-3 px-1 pr-4 rounded-lg gap-x-4 items-center mx-1 flex flex-row justify-between">
       <View
@@ -64,7 +64,7 @@ export const GroupedExpenseItem = ({ total, exp_cat }) => {
       <Text variant="titleMedium" className="flex-1 mx-4" numberOfLines={1}>
         {exp_cat.name}
       </Text>
-      <Text variant="titleSmall">€{total && total?.toFixed(2)}</Text>
+      <Text variant="titleSmall">{currency_label}{total && total?.toFixed(2)}</Text>
     </View>
   );
 };

@@ -61,7 +61,7 @@ export const useGroup = (id: number) => {
       const { data: _Group, error } = await supabase
         .from("groups")
         .select(
-          "id, owner, title, description, expense_total, members(id, name, role, total_balance, profile(id, avatar_url)), debts(id, amount, borrower, lender)",
+          "id, currency, owner, title, description, expense_total, members(id, name, role, total_balance, profile(id, avatar_url)), debts(id, amount, borrower, lender)",
         )
         .eq("id", id)
         .single();

@@ -15,8 +15,9 @@ import { useProfileMember } from "@/src/api/members/index.ts";
 import { useAuth } from "@/src/providers/AuthProvider.tsx";
 import PieChart from "react-native-pie-chart/src/index.tsx";
 import { inThisMonth } from "@/src/utils/helpers.ts";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { currencyOptions } from "@/src/constants";
+import { useGroup } from "@/src/api/groups";
+
 
 enum Selection {
   Month = "This Month",
@@ -28,15 +29,17 @@ const Stats = () => {
   const groupId = parseInt(
     typeof idString === "string" ? idString : idString[0],
   );
+  const {
+    data: group,
+    isError: groupError,
+    isLoading: groupLoading,
+  } = useGroup(groupId);
   const [toggleOnGroup, setToggleOnGroup] = useState(true);
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState(Selection.Global);
 
   const navigation = useNavigation();
   const { session } = useAuth();
-
-  const {settings} = useSettings();
-  const int = translations[settings.language] || translations.en;
 
   const { data: expenses, isError, isLoading } = useExpenseList(groupId);
   const {
@@ -264,13 +267,16 @@ const Stats = () => {
   );
   const lh = categories.length > 10 ? 16 : 20;
 
-  if (isLoading || profileMemberLoading) {
+  if (isLoading || profileMemberLoading || groupLoading) {
     return <ActivityIndicator />;
   }
 
-  if (isError || profileMemberError) {
+  if (isError || profileMemberError || groupError) {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
+
+  const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
+  const currency_label = currencyOption?.label || '$';
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
@@ -348,12 +354,12 @@ const Stats = () => {
           <View className="flex-row justify-between items-center">
             <View>
               <Text variant={"headlineMedium"}>Spent</Text>
-              <Text variant={"headlineSmall"}>€{expenseTotalF.toFixed(2)}</Text>
+              <Text variant={"headlineSmall"}>{currency_label}{expenseTotalF.toFixed(2)}</Text>
             </View>
             <View>
               <Text variant={"headlineMedium"}>You paid for</Text>
               <Text variant={"headlineSmall"} className="text-green-600">
-                + €{payedAmountF.toFixed(2)}
+                + {currency_label}{payedAmountF.toFixed(2)}
               </Text>
             </View>
           </View>
@@ -418,6 +424,7 @@ const Stats = () => {
                   key={category}
                   total={groupedExpensesF[category].total}
                   exp_cat={groupedExpensesF[category].category}
+                  currency_label={currency_label}
                 />
               ))}
             </View>
@@ -428,6 +435,7 @@ const Stats = () => {
               <ExpenseItem
                 key={biggestExpenseF?.id}
                 expense={biggestExpenseF}
+                currency_label={currency_label}
               />
             </View>
           )}
