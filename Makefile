@@ -2,7 +2,7 @@
 
 # Development Commands
 start:
-	npx expo start --tunnel
+	npx expo start
 
 run:
 	npx expo run:android
