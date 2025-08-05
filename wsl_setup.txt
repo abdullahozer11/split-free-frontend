@@ -21,3 +21,9 @@ sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 sdkmanager --version
 adb --version  # If installed via sdkmanager
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
+sudo docker
+sudo docker run hello-world
+
