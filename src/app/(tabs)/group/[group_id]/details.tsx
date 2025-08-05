@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Pressable, Alert } from "react-native";
+import { View, TouchableOpacity, Pressable, Alert, Share } from "react-native";
 import {DialogTitle, MenuItem, Text} from "@/src/components/Translated";
 import React, {useEffect, useMemo, useState} from "react";
 import { Feather } from "@expo/vector-icons";
@@ -42,6 +42,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 import { currencyOptions } from "@/src/constants";
+import QRCode from 'react-native-qrcode-svg';
+import { generateInvite } from "@/src/api/invites";
 
 
 const GroupDetailsScreen = () => {
@@ -111,7 +113,9 @@ const GroupDetailsScreen = () => {
   const [visible, setVisible] = useState(false);
   const [isAddingNewName, setIsAddingNewName] = useState(false);
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
+  const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [isGroupExitterVisible, setIsGroupExitterVisible] = useState(false);
+  const [inviteLink, setInviteLink] = useState('');
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState("");
 
@@ -259,8 +263,14 @@ const GroupDetailsScreen = () => {
     });
   };
 
-  const promptInvite = () => {
-    setIsFriendSelectorVisible(true);
+  const promptInvite = async () => {
+    try {
+      const link = await generateInvite(groupId);
+      setInviteLink(link);
+      setQRCodeVisible(true);
+    } catch (error) {
+      Alert.alert("Error", "Failed to generate invite link.");
+    }
   };
 
   const promptExitGroup = () => {
@@ -676,6 +686,40 @@ const GroupDetailsScreen = () => {
         >
           <Feather name={"x"} size={28} />
         </TouchableOpacity>
+      </Modal>
+      {/* Invite QR Modal */}
+      <Modal
+        visible={QRCodeVisible}
+        onDismiss={() => setQRCodeVisible(false)}
+        contentContainerStyle={{
+          backgroundColor: 'white',
+          padding: 20,
+          margin: 20,
+          borderRadius: 10,
+          alignItems: 'center',
+        }}
+      >
+        <Text variant="titleLarge">Invite to Group</Text>
+        <View className="my-5 items-center">
+          {inviteLink ? (
+            <QRCode value={inviteLink} size={200} />
+          ) : (
+            <ActivityIndicator />
+          )}
+        </View>
+        <Text selectable className="mb-5 text-center">{inviteLink}</Text>
+        <Button
+          onPress={async () => {
+            try {
+              await Share.share({ message: inviteLink });
+            } catch (error) {
+              Alert.alert("Error", "Failed to share link.");
+            }
+          }}
+        >
+          Share Link
+        </Button>
+        <Button onPress={() => setQRCodeVisible(false)}>Close</Button>
       </Modal>
       {bigPlusVisible && (
         <View className="absolute bottom-2 right-4 flex-row gap-2">
