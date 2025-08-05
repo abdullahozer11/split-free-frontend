@@ -1,0 +1,23 @@
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl unzip wget -y
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs
+node --version
+npm --version
+sudo npm install -g eas-cli
+sudo npm install -g expo-cli
+sudo apt install adb -y
+adb --version
+sudo apt install openjdk-17-jdk -y
+mkdir -p ~/Android/cmdline-tools
+cd ~/Android/cmdline-tools
+wget https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
+unzip commandlinetools-linux-13114758_latest.zip
+mv cmdline-tools latest
+export ANDROID_HOME=$HOME/Android
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+sdkmanager --update
+sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+sdkmanager --version
+adb --version  # If installed via sdkmanager
