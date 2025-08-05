@@ -57,13 +57,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="friend"
-        options={{
-          title: int["Friends"] || "Friends",
-          tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
-        }}
-      />
+      {/*<Tabs.Screen*/}
+      {/*  name="friend"*/}
+      {/*  options={{*/}
+      {/*    title: int["Friends"] || "Friends",*/}
+      {/*    tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,*/}
+      {/*  }}*/}
+      {/*/>*/}
       <Tabs.Screen
         name="account"
         options={{
