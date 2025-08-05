@@ -1,0 +1,14 @@
+expo-env-info 1.2.1 environment info:
+    System:
+      OS: Windows 11 10.0.22631
+    Binaries:
+      Node: 22.12.0 - C:\Program Files\nodejs\node.EXE
+      Yarn: 1.22.22 - ~\AppData\Roaming\npm\yarn.CMD
+      npm: 10.8.2 - C:\Program Files\nodejs\npm.CMD
+    IDEs:
+      Android Studio: AI-242.23339.11.2421.12700392
+    npmPackages:
+      expo: ^52.0.23 => 52.0.23
+      react: 18.3.1 => 18.3.1
+      react-native: 0.76.5 => 0.76.5
+    Expo Workflow: managed
