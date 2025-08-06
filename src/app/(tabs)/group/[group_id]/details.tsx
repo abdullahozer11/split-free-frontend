@@ -343,9 +343,23 @@ const GroupDetailsScreen = () => {
   };
 
   const handleNewMember = () => {
+    const trimmedName = newMemberName.trim();
+    if (!trimmedName) {
+      alert("Error", "Name cannot be empty.");
+      return;
+    }
+
+    const existingNames = group.members
+      .map(m => m.name.toLowerCase().trim());
+
+    if (existingNames.includes(trimmedName.toLowerCase())) {
+      alert("Error", "Name already exists in the group.");
+      return;
+    }
+
     insertMember(
       {
-        name: newMemberName,
+        name: trimmedName,
         group_id: groupId,
       },
       {
