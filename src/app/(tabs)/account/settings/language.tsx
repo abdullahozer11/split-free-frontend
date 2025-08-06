@@ -81,7 +81,7 @@ const Languages = () => {
       },
       {
         onSuccess: async () => {
-          await queryClient.invalidateQueries(["profile"]);
+          await queryClient.invalidateQueries(["profile", profile?.id]);
         },
         onError: (error) => {
           // Revert both local state and settings on error

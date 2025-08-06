@@ -20,7 +20,8 @@ export const useUpdateProfile = () => {
 
 export const useProfile = (uid) => {
   return useQuery({
-    queryKey: ["profile"],
+    queryKey: ["profile", uid],  // Include uid in queryKey for proper caching
+    enabled: !!uid,  // Prevent query from running if uid is undefined
     queryFn: async () => {
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -33,7 +34,6 @@ export const useProfile = (uid) => {
       }
       return profile;
     },
-    enabled: !!uid, // Only run query when uid is available
   });
 };
 

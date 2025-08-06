@@ -1,7 +1,7 @@
 import { View, ScrollView } from "react-native";
 import { TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
 import GroupItem from "@/src/components/GroupItem";
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
 import { useGroupList } from "@/src/api/groups";
@@ -36,6 +36,8 @@ const GroupScreen = () => {
   useGroupSubscriptions();
   useGroupInviteSubscriptions(session?.user.id);
   const queryClient = useQueryClient();
+
+  const hasCheckedNameRef = useRef(false);  // Ref to track if name check has run
 
   // New states for name choice modal
   const [nameModalVisible, setNameModalVisible] = useState(false);
@@ -80,7 +82,8 @@ const GroupScreen = () => {
       }
       console.log("profile is ", profile);
       // If profile exists but full_name is null or "Anonymous", prompt for name
-      if (!profile?.full_name || profile.full_name === "Anonymous") {
+      if (!hasCheckedNameRef.current && (!profile?.full_name || profile.full_name === "Anonymous")) {
+        hasCheckedNameRef.current = true;
         setNameModalVisible(true);
       }
     };
@@ -238,9 +241,14 @@ const GroupScreen = () => {
                   if (error) {
                     alert("Failed to update name: " + error.message);
                   } else {
+                    // Optimistic update: Immediately set the new profile data in cache
+                    queryClient.setQueryData(["profile", session?.user.id], (oldProfile) => ({
+                      ...oldProfile,
+                      full_name: chosenName,
+                    }));
                     setNameModalVisible(false);
                     setChosenName(""); // Reset for future use
-                    await queryClient.invalidateQueries(["profile"]);
+                    // No need for invalidateQueries here, as we've updated the cache directly
                   }
                 }
               }}

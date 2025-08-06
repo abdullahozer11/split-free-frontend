@@ -54,7 +54,7 @@ export default function UpdateProfile() {
       {
         onSuccess: async () => {
           navigation.goBack();
-          await queryClient.invalidateQueries(["profile"]);
+          await queryClient.invalidateQueries(["profile", profile?.id]);
         },
         onError: (error) => {
           console.error("Server error:", error);
