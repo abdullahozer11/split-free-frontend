@@ -1,5 +1,11 @@
 export const translations = {
   en: {
+    "(me)": "(me)",
+    "Description": "Description",
+    "Describe your expense": "Describe your expense",
+    "Give additional information": "Give additional information",
+    "Settle": "Settle",
+    "Ok": "Ok",
     "Sign Out": "Sign Out",
     "Quick Access": "Quick Access",
     "Other Groups": "Other Groups",
@@ -203,6 +209,12 @@ export const translations = {
     'Cancel': 'Cancel',
   },
   fr: {
+    "(me)": "(moi)",
+    "Description": "Description",
+    "Describe your expense": "Décrivez votre dépense",
+    "Give additional information": "Donnez des informations supplémentaires",
+    "Settle": "Régler",
+    "Ok": "Ok",
     "Sign Out": "Se déconnecter",
     "Quick Access": "Accès rapide",
     "Other Groups": "Autres groupes",
@@ -406,6 +418,12 @@ export const translations = {
     'Cancel': 'Annuler',
   },
   de: {
+    "(me)": "(ich)",
+    "Description": "Beschreibung",
+    "Describe your expense": "Beschreiben Sie Ihre Ausgabe",
+    "Give additional information": "Zusätzliche Informationen angeben",
+    "Settle": "Ausgleichen",
+    "Ok": "Ok",
     "Sign Out": "Abmelden",
     "Quick Access": "Schnellzugriff",
     "Other Groups": "Andere Gruppen",
@@ -609,6 +627,12 @@ export const translations = {
     'Cancel': 'Abbrechen',
   },
   es: {
+    "(me)": "(yo)",
+    "Description": "Descripción",
+    "Describe your expense": "Describe tu gasto",
+    "Give additional information": "Proporciona información adicional",
+    "Settle": "Liquidar",
+    "Ok": "Ok",
     "Sign Out": "Cerrar sesión",
     "Quick Access": "Acceso rápido",
     "Other Groups": "Otros grupos",
@@ -812,6 +836,12 @@ export const translations = {
     'Cancel': 'Cancelar',
   },
   tr: {
+    "(me)": "(ben)",
+    "Description": "Açıklama",
+    "Describe your expense": "Giderinizi açıklayın",
+    "Give additional information": "Ek bilgi verin",
+    "Settle": "Hesap Kapat",
+    "Ok": "Tamam",
     "Sign Out": "Çıkış Yap",
     "Quick Access": "Hızlı Erişim",
     "Other Groups": "Diğer Gruplar",
@@ -1015,6 +1045,12 @@ export const translations = {
     'Cancel': 'İptal',
   },
   gr: {
+    "(me)": "(εγώ)",
+    "Description": "Περιγραφή",
+    "Describe your expense": "Περιγράψτε το έξοδό σας",
+    "Give additional information": "Δώστε επιπλέον πληροφορίες",
+    "Settle": "Τακτοποίηση",
+    "Ok": "Εντάξει",
     "Sign Out": "Αποσύνδεση",
     "Quick Access": "Γρήγορη πρόσβαση",
     "Other Groups": "Άλλες ομάδες",
@@ -1218,6 +1254,12 @@ export const translations = {
     'Cancel': 'Ακύρωση',
   },
   ru: {
+    "(me)": "(я)",
+    "Description": "Описание",
+    "Describe your expense": "Опишите ваш расход",
+    "Give additional information": "Укажите дополнительную информацию",
+    "Settle": "Уладить",
+    "Ok": "Ок",
     "Sign Out": "Выйти",
     "Quick Access": "Быстрый доступ",
     "Other Groups": "Другие группы",
@@ -1421,6 +1463,12 @@ export const translations = {
     'Cancel': 'Отмена',
   },
   it: {
+    "(me)": "(io)",
+    "Description": "Descrizione",
+    "Describe your expense": "Descrivi la tua spesa",
+    "Give additional information": "Fornisci informazioni aggiuntive",
+    "Settle": "Salda",
+    "Ok": "Ok",
     "Sign Out": "Disconnetti",
     "Quick Access": "Accesso rapido",
     "Other Groups": "Altri gruppi",
@@ -1624,18 +1672,3 @@ export const translations = {
     'Cancel': 'Annulla',
   },
 };
-
-
-const todo = {
-  en: {
-    "(me)": "TODO",
-    "Description": "TODO",
-    "Describe your expense": "TODO",
-    "Give additional information": "TODO",
-    "Settle": "TODO",
-    "Ok": "TODO",
-    "TODO": "TODO",
-    "TODO": "TODO",
-    "TODO": "TODO",
-  }
-}
