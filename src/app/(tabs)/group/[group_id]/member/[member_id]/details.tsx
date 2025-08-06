@@ -19,6 +19,7 @@ import { useGroup } from "@/src/api/groups";
 import {
   useDeleteMember,
   useMember,
+  useMemberList,
   useProfileMember,
   useUpdateMemberName,
 } from "@/src/api/members";
@@ -63,6 +64,11 @@ const MemberDetailsScreen = () => {
     isError: groupError,
     isLoading: groupLoading,
   } = useGroup(member?.group_id);
+  const {
+    data: members,
+    isError: membersError,
+    isLoading: membersLoading,
+  } = useMemberList(member?.group_id);
 
   const { mutate: updateMemberName } = useUpdateMemberName();
   const { mutate: deleteMember } = useDeleteMember();
@@ -71,11 +77,11 @@ const MemberDetailsScreen = () => {
     setName(member?.name);
   }, [member]);
 
-  if (memberLoading || profileMemberLoading || debtLoading || groupLoading) {
+  if (memberLoading || profileMemberLoading || debtLoading || groupLoading || membersLoading) {
     return <ActivityIndicator />;
   }
 
-  if (memberError || profileMemberError || debtError || groupError) {
+  if (memberError || profileMemberError || debtError || groupError || membersError) {
     return <Text>Failed to fetch data</Text>;
   }
 
@@ -83,9 +89,24 @@ const MemberDetailsScreen = () => {
   const isEditable = !member?.profile || ownMember;
 
   const handleNameSubmit = () => {
+    const trimmedName = name?.trim();
+    if (!trimmedName) {
+      alert("Error", "Name cannot be empty.");
+      return;
+    }
+
+    const existingNames = members
+      .filter(m => m.id !== member.id)
+      .map(m => m.name.toLowerCase().trim());
+
+    if (existingNames.includes(trimmedName.toLowerCase())) {
+      alert("Error", "Name already exists in the group.");
+      return;
+    }
+
     updateMemberName(
       {
-        name,
+        name: trimmedName,
         member_id: member.id,
       },
       {
