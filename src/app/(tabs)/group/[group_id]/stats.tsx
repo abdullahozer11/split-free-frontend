@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, ScrollView } from "react-native";
-import { MenuItem, Text, Button } from "@/src/components/Translated";
+import { MenuItem, Text, Button, useTranslations } from "@/src/components/Translated";
 import { ActivityIndicator, Menu } from "react-native-paper";
 import React, { useMemo, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -25,6 +25,7 @@ enum Selection {
 }
 
 const Stats = () => {
+  const {t} = useTranslations();
   const { group_id: idString } = useLocalSearchParams();
   const groupId = parseInt(
     typeof idString === "string" ? idString : idString[0],
@@ -327,7 +328,7 @@ const Stats = () => {
                       setSelected(Selection.Month);
                       closeMenu();
                     }}
-                    title="This month"
+                    title={t("This month")}
                   />
                 )}
               </Menu>

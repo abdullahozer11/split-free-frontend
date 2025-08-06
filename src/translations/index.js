@@ -1624,3 +1624,18 @@ export const translations = {
     'Cancel': 'Annulla',
   },
 };
+
+
+const todo = {
+  en: {
+    "(me)": "TODO",
+    "Description": "TODO",
+    "Describe your expense": "TODO",
+    "Give additional information": "TODO",
+    "Settle": "TODO",
+    "Ok": "TODO",
+    "TODO": "TODO",
+    "TODO": "TODO",
+    "TODO": "TODO",
+  }
+}

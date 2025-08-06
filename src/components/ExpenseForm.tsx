@@ -14,7 +14,7 @@ import {
   Avatar,
   Tooltip,
 } from "react-native-paper";
-import { Button, TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
+import { Button, TextInput, Text, useTranslatedAlert, useTranslations } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
@@ -45,6 +45,7 @@ export default function ExpenseForm({
   groupId,
   updatingExpense,
 }) {
+  const {t} = useTranslations();
   const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -338,7 +339,7 @@ export default function ExpenseForm({
         <View>
           <TextInput
             label="Enter expense title"
-            placeholder="Describe your expense"
+            placeholder={t("Describe your expense")}
             value={title}
             onChangeText={(text) => {
               handleInputChange("title", text);
@@ -349,7 +350,7 @@ export default function ExpenseForm({
         <View>
           <TextInput
             label="Enter expense description (optional)"
-            placeholder="Give additional information"
+            placeholder={t("Give additional information")}
             value={description}
             onChangeText={(text) => {
               handleInputChange("description", text);

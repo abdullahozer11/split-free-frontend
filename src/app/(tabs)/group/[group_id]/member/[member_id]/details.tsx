@@ -236,7 +236,7 @@ const MemberDetailsScreen = () => {
                 variant={"displaySmall"}
                 className="text-white mb-2 mw-[70%]"
               >
-                {member?.name} {member.id === profileMember?.id && "(me)"}
+                {member?.name} {member.id === profileMember?.id && <Text>(me)</Text>}
               </Text>
               <Text className="text-white">
                 <Text className="text-white">Created at:</Text>{" " + new Date(member.created_at).toLocaleString()}
