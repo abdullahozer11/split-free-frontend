@@ -401,7 +401,7 @@ const GroupDetailsScreen = () => {
                     </Text>
                   </View>
                   <View className="flex-1">
-                    <Text variant="titleMedium">This month</Text>
+                    <Text variant="titleMedium">This Month</Text>
                     <Text variant="headlineSmall" className="">
                       {expenseTotalM || 0}{currency_label}
                     </Text>

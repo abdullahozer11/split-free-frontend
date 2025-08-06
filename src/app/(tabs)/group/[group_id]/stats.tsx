@@ -382,7 +382,7 @@ const Stats = () => {
                       setSelected(Selection.Month);
                       closeMenu();
                     }}
-                    title={t("This month")}
+                    title={t("This Month")}
                   />
                 )}
               </Menu>

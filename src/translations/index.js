@@ -1,5 +1,6 @@
 export const translations = {
   en: {
+    "debts": "Debts",
     "(me)": "(me)",
     "Description": "Description",
     "Describe your expense": "Describe your expense",
@@ -209,6 +210,7 @@ export const translations = {
     'Cancel': 'Cancel',
   },
   fr: {
+    "debts": "Dettes",
     "(me)": "(moi)",
     "Description": "Description",
     "Describe your expense": "Décrivez votre dépense",
@@ -418,6 +420,7 @@ export const translations = {
     'Cancel': 'Annuler',
   },
   de: {
+    "debts": "Schulden",
     "(me)": "(ich)",
     "Description": "Beschreibung",
     "Describe your expense": "Beschreiben Sie Ihre Ausgabe",
@@ -627,6 +630,7 @@ export const translations = {
     'Cancel': 'Abbrechen',
   },
   es: {
+    "debts": "Deudas",
     "(me)": "(yo)",
     "Description": "Descripción",
     "Describe your expense": "Describe tu gasto",
@@ -836,6 +840,7 @@ export const translations = {
     'Cancel': 'Cancelar',
   },
   tr: {
+    "debts": "Borçlar",
     "(me)": "(ben)",
     "Description": "Açıklama",
     "Describe your expense": "Giderinizi açıklayın",
@@ -1045,6 +1050,7 @@ export const translations = {
     'Cancel': 'İptal',
   },
   gr: {
+    "debts": "Χρέη",
     "(me)": "(εγώ)",
     "Description": "Περιγραφή",
     "Describe your expense": "Περιγράψτε το έξοδό σας",
@@ -1254,6 +1260,7 @@ export const translations = {
     'Cancel': 'Ακύρωση',
   },
   ru: {
+    "debts": "Долги",
     "(me)": "(я)",
     "Description": "Описание",
     "Describe your expense": "Опишите ваш расход",
@@ -1463,6 +1470,7 @@ export const translations = {
     'Cancel': 'Отмена',
   },
   it: {
+    "debts": "Debiti",
     "(me)": "(io)",
     "Description": "Descrizione",
     "Describe your expense": "Descrivi la tua spesa",
