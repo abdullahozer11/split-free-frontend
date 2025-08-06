@@ -7,8 +7,12 @@ import { supabase } from "@/src/lib/supabase";
 import { Link, useNavigation } from "expo-router";
 import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useQueryClient } from "@tanstack/react-query";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const SettingsItem = ({ page, iconName, title, containerColor }) => {
+const ANCHORED_GROUPS_STORAGE_KEY = "anchoredGroupIds";
+
+const SettingsItem = ({page, iconName, title, containerColor}) => {
   const {settings} = useSettings();
   const int = translations[settings.language] || translations.en;
   return (
@@ -17,13 +21,13 @@ const SettingsItem = ({ page, iconName, title, containerColor }) => {
         <View className="flex-row items-center gap-4">
           <View
             className={`w-14 h-14 rounded-md flex items-center justify-center`}
-            style={{ backgroundColor: containerColor }}
+            style={{backgroundColor: containerColor}}
           >
-            <Feather name={iconName} size={24} />
+            <Feather name={iconName} size={24}/>
           </View>
           <Text>{int[title] || title}</Text>
         </View>
-        <Feather name={"chevron-right"} size={28} />
+        <Feather name={"chevron-right"} size={28}/>
       </Pressable>
     </Link>
   );
@@ -31,10 +35,11 @@ const SettingsItem = ({ page, iconName, title, containerColor }) => {
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
-  const { alert } = useTranslatedAlert();
+  const {alert} = useTranslatedAlert();
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {data: {user}} = await supabase.auth.getUser();
     if (user?.is_anonymous) {
       alert(
         "Warning",
@@ -47,6 +52,18 @@ const SettingsScreen = () => {
           {
             text: "Sign Out",
             onPress: async () => {
+              // Clear ALL React Query caches for anonymous users
+              await queryClient.clear();
+
+              // Clear AsyncStorage data (like anchored groups)
+              try {
+                await AsyncStorage.multiRemove([
+                  ANCHORED_GROUPS_STORAGE_KEY,
+                ]);
+              } catch (error) {
+                console.error("Error clearing AsyncStorage:", error);
+              }
+              // Sign out
               await supabase.auth.signOut();
             },
             style: "destructive",
@@ -61,7 +78,7 @@ const SettingsScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-gray-100 p-4 gap-4">
       <Pressable onPress={() => navigation.goBack()}>
-        <Feather name="chevron-left" size={36} />
+        <Feather name="chevron-left" size={36}/>
       </Pressable>
       <Text className="text-3xl font-semibold">Settings</Text>
       <View className="mt-4">
