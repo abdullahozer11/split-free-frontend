@@ -40,31 +40,19 @@ SplitFree records expenses and splits the costs among participants based on who 
 
 Yes, you can use SplitFree to split personal, professional, and even individual expenses for categorization.
 
----
-
-**How does SplitFree calculate the minimum amount of money transfers needed to balance all charges?**
-
-SplitFree uses a custom algorithm that determines the minimum amount of transfers required to balance all expenses.
-
 ## User Accounts and Security
 
 ---
 
 **Do I need to create an account to use SplitFree?**
 
-Yes, account creation is required. An anonymous usage option will be added in the future.
+No, you can use with anonymous sign-in option. Email sign-up is currently optional.
 
 ---
 
 **How do I create an account?**
 
 You can create an account by installing the app from the Play Store. The opening page will guide you through the user creation process.
-
----
-
-**What information do I need to provide to create an account?**
-
-Currently, you only need to provide an email and password. In the future, social app logins such as Google account login will be added.
 
 ---
 
@@ -104,7 +92,7 @@ You should send an email to the customer support email provided in the "About" s
 
 **Are there any known issues with SplitFree?**
 
-As SplitFree is in the alpha stage, bugs are expected.
+As SplitFree is in the beta stage, bugs exist.
 
 ## Customization and Settings
 
@@ -112,13 +100,13 @@ As SplitFree is in the alpha stage, bugs are expected.
 
 **Can I customize the settings in SplitFree?**
 
-Yes, theme and currency modifications will be added as features in the near future.
+Yes, language and currency options are part of customization.
 
 ---
 
 **How do I change my preferred currency?**
 
-Currency modification will be a feature available soon.
+While creating group you can select a currency for that group.
 
 ## Legal and Licensing
 
