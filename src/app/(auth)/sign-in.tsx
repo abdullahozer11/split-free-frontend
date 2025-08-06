@@ -50,26 +50,6 @@ const SignInScreen = () => {
       setLoading(false);
       return;
     }
-
-    if (session) {
-      // Check if profile exists; insert with full_name: null if missing
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("id, full_name")
-        .eq("id", session.user.id)
-        .maybeSingle();
-
-      if (!existingProfile) {
-        const { error: insertError } = await supabase
-          .from("profiles")
-          .insert({ id: session.user.id, full_name: null, email: null });
-        if (insertError) {
-          alert("Failed to create profile: " + insertError.message);
-          setLoading(false);
-          return;
-        }
-      }
-    }
     setLoading(false);
   }
 
