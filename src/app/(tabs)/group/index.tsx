@@ -16,6 +16,7 @@ import { supabase } from "@/src/lib/supabase";
 import { Modal } from "react-native";
 import Button from "@/src/components/Button";
 import { useQueryClient } from "@tanstack/react-query";
+import { useProfile } from "@/src/api/profiles";
 
 const ANCHORED_GROUPS_STORAGE_KEY = "anchoredGroupIds";
 
@@ -65,50 +66,31 @@ const GroupScreen = () => {
     }
   }, [groups]);
 
+  const {
+    data: profile,
+    isLoading: profileLoading,
+    isError: profileError,
+  } = useProfile(session?.user.id);
+
   // Fetch profile and check full_name
   useEffect(() => {
     const checkProfileName = async () => {
-      if (!session?.user.id) return;
-
-      // Check if profile exists
-      const {data: profile, error} = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", session.user.id)
-        .single();
-
-      if (error) {
-        // If no profile exists (PGRST116 = no rows), insert a new one
-        if (error.code === "PGRST116") {
-          const {error: insertError} = await supabase
-            .from("profiles")
-            .insert({id: session.user.id, full_name: null});
-
-          if (insertError) {
-            console.error("Error inserting new profile:", insertError);
-            setNameModalVisible(true); // Show modal anyway to ensure user sets name
-            return;
-          }
-        } else {
-          console.error("Error fetching profile:", error);
-          setNameModalVisible(true); // Show modal for other errors
-          return;
-        }
+      if (!profile) {
+        return;
       }
-
       // If profile exists but full_name is null or "Anonymous", prompt for name
       if (!profile?.full_name || profile.full_name === "Anonymous") {
         setNameModalVisible(true);
       }
     };
     checkProfileName();
-  }, [session]);
+  }, [profile]);
 
-  if (groupsLoading) {
+  if (groupsLoading || profileLoading) {
     return <ActivityIndicator/>;
   }
 
-  if (groupsError) {
+  if (groupsError || profileError) {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
