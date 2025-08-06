@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import { MenuItem, Text, Button, useTranslations } from "@/src/components/Translated";
 import { ActivityIndicator, Menu } from "react-native-paper";
@@ -42,23 +43,35 @@ const Stats = () => {
   const navigation = useNavigation();
   const { session } = useAuth();
 
-  const { data: expenses, isError, isLoading } = useExpenseList(groupId);
+  const { data, isError, isLoading, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } = useExpenseList(groupId);
   const {
     data: profileMember,
     isError: profileMemberError,
     isLoading: profileMemberLoading,
   } = useProfileMember(session?.user.id, groupId);
 
+  useEffect(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const expenses = useMemo(() => {
+    return data?.pages.flatMap((page) => page || []) || [];
+  }, [data]);
+
   console.log('Fetched data:', {
-    expenses: expenses?.length || 0,
+    expenses: expenses.length,
+    pages: data?.pages.length || 0,
     profileMember: !!profileMember,
     group: !!group,
     isLoading: isLoading || profileMemberLoading || groupLoading,
+    isFetching,
     isError: isError || profileMemberError || groupError
   });
 
   const personalExpenses = useMemo(() => {
-    if (!expenses?.length) return [];
+    if (!expenses.length) return [];
     const filtered = expenses.filter(
       (ex) =>
         ex?.payers?.some((payer) => payer.member === profileMember?.id) ||
@@ -69,14 +82,14 @@ const Stats = () => {
   }, [expenses, profileMember?.id]);
 
   const expensesM = useMemo(() => {
-    if (!expenses?.length) return [];
+    if (!expenses.length) return [];
     const filtered = expenses.filter((ex) => inThisMonth(ex?.date));
     console.log('Computed expensesM (this month):', filtered.length);
     return filtered;
   }, [expenses]);
 
   const personalExpensesM = useMemo(() => {
-    if (!expensesM?.length) return [];
+    if (!expensesM.length) return [];
     const filtered = expensesM.filter(
       (ex) =>
         ex?.payers?.some((payer) => payer.member === profileMember?.id) ||
@@ -87,7 +100,7 @@ const Stats = () => {
   }, [profileMember?.id, expensesM]);
 
   const { groupedExpensesM, groupedExpensesPerM } = useMemo(() => {
-    if (!expensesM?.length)
+    if (!expensesM.length)
       return { groupedExpensesM: [], groupedExpensesPerM: [] };
 
     const grouped = expensesM.reduce((acc, expense) => {
@@ -134,7 +147,7 @@ const Stats = () => {
   }, [expensesM, personalExpensesM]);
 
   const { groupedExpenses, groupedExpensesPer } = useMemo(() => {
-    if (!expenses?.length)
+    if (!expenses.length)
       return { groupedExpenses: [], groupedExpensesPer: [] };
 
     const grouped = expenses.reduce((acc, expense) => {
@@ -181,7 +194,7 @@ const Stats = () => {
   }, [expenses, personalExpenses]);
 
   const { biggestExpense, biggestExpensePer } = useMemo(() => {
-    if (!expenses?.length)
+    if (!expenses.length)
       return { biggestExpense: null, biggestExpensePer: null };
     const max1 = expenses.reduce(
       (max, expense) => (expense.amount > max.amount ? expense : max),
@@ -197,7 +210,7 @@ const Stats = () => {
   }, [personalExpenses, expenses]);
 
   const { biggestExpenseM, biggestExpensePerM } = useMemo(() => {
-    if (!expensesM?.length) return { biggestExpenseM: null, biggestExpensePerM: null };
+    if (!expensesM.length) return { biggestExpenseM: null, biggestExpensePerM: null };
     const max1 = expensesM.reduce(
       (max, expense) => (expense.amount > max.amount ? expense : max),
       expensesM[0],
@@ -212,7 +225,7 @@ const Stats = () => {
   }, [personalExpensesM, expensesM]);
 
   const { expenseTotal, expenseTotalPer, payedAmount } = useMemo(() => {
-    if (!expenses?.length)
+    if (!expenses.length)
       return { expenseTotal: 0, expenseTotalPer: 0, payedAmount: 0 };
     const sum1 = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     const sum2 = personalExpenses.reduce(
@@ -228,7 +241,7 @@ const Stats = () => {
   }, [personalExpenses, profileMember, expenses]);
 
   const { expenseTotalM, expenseTotalPerM, payedAmountM } = useMemo(() => {
-    if (!expensesM?.length)
+    if (!expensesM.length)
       return { expenseTotalM: 0, expenseTotalPerM: 0, payedAmountM: 0 };
     const sum1 = expensesM.reduce((sum, expense) => sum + expense.amount, 0);
     const sum2 = personalExpensesM.reduce(
@@ -305,7 +318,7 @@ const Stats = () => {
     categories: categories.length
   });
 
-  if (isLoading || profileMemberLoading || groupLoading) {
+  if (isLoading || profileMemberLoading || groupLoading || isFetching) {
     console.log('Rendering loading indicator');
     return <ActivityIndicator />;
   }
