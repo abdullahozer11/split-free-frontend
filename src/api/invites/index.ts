@@ -22,6 +22,6 @@ export const generateInvite = async (groupId: number) => {
   }
 
   // Deep link: Use token only, or include group_id if you want
-  const inviteLink = `xyz.splitfree://join?token=${token}`;
+  const inviteLink = `https://split-free-next.vercel.app/join?token=${token}`;
   return inviteLink; // Use this for QR code or sharing
 };
