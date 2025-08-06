@@ -16,6 +16,7 @@
       "**/*"
     ],
     "ios": {
+      "associatedDomains": ["applinks:split-free-next.vercel.app"],
       "supportsTablet": true,
       "userInterfaceStyle": "light",
       "bundleIdentifier": "xyz.splitfree"
@@ -25,6 +26,22 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "split-free-next.vercel.app",
+              "pathPrefix": "/join"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "package": "xyz.splitfree",
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO",
