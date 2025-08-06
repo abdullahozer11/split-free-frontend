@@ -49,31 +49,45 @@ const Stats = () => {
     isLoading: profileMemberLoading,
   } = useProfileMember(session?.user.id, groupId);
 
+  console.log('Fetched data:', {
+    expenses: expenses?.length || 0,
+    profileMember: !!profileMember,
+    group: !!group,
+    isLoading: isLoading || profileMemberLoading || groupLoading,
+    isError: isError || profileMemberError || groupError
+  });
+
   const personalExpenses = useMemo(() => {
-    if (!expenses.length) return [];
-    return expenses.filter(
+    if (!expenses?.length) return [];
+    const filtered = expenses.filter(
       (ex) =>
         ex?.payers?.some((payer) => payer.member === profileMember?.id) ||
         ex?.participants?.some((payer) => payer.member === profileMember?.id),
     );
+    console.log('Computed personalExpenses:', filtered.length);
+    return filtered;
   }, [expenses, profileMember?.id]);
 
   const expensesM = useMemo(() => {
-    if (!expenses.length) return [];
-    return expenses.filter((ex) => inThisMonth(ex?.date));
+    if (!expenses?.length) return [];
+    const filtered = expenses.filter((ex) => inThisMonth(ex?.date));
+    console.log('Computed expensesM (this month):', filtered.length);
+    return filtered;
   }, [expenses]);
 
   const personalExpensesM = useMemo(() => {
-    if (!expensesM.length) return [];
-    return expensesM.filter(
+    if (!expensesM?.length) return [];
+    const filtered = expensesM.filter(
       (ex) =>
         ex?.payers?.some((payer) => payer.member === profileMember?.id) ||
         ex?.participants?.some((payer) => payer.member === profileMember?.id),
     );
+    console.log('Computed personalExpensesM:', filtered.length);
+    return filtered;
   }, [profileMember?.id, expensesM]);
 
   const { groupedExpensesM, groupedExpensesPerM } = useMemo(() => {
-    if (!expensesM.length)
+    if (!expensesM?.length)
       return { groupedExpensesM: [], groupedExpensesPerM: [] };
 
     const grouped = expensesM.reduce((acc, expense) => {
@@ -110,6 +124,9 @@ const Stats = () => {
     );
     const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
 
+    console.log('Computed groupedExpensesM:', Object.keys(sortedGrouped).length);
+    console.log('Computed groupedExpensesPerM:', Object.keys(sortedGrouped2).length);
+
     return {
       groupedExpensesM: sortedGrouped,
       groupedExpensesPerM: sortedGrouped2,
@@ -117,7 +134,7 @@ const Stats = () => {
   }, [expensesM, personalExpensesM]);
 
   const { groupedExpenses, groupedExpensesPer } = useMemo(() => {
-    if (!expenses.length)
+    if (!expenses?.length)
       return { groupedExpenses: [], groupedExpensesPer: [] };
 
     const grouped = expenses.reduce((acc, expense) => {
@@ -154,6 +171,9 @@ const Stats = () => {
     );
     const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
 
+    console.log('Computed groupedExpenses:', Object.keys(sortedGrouped).length);
+    console.log('Computed groupedExpensesPer:', Object.keys(sortedGrouped2).length);
+
     return {
       groupedExpenses: sortedGrouped,
       groupedExpensesPer: sortedGrouped2,
@@ -161,7 +181,7 @@ const Stats = () => {
   }, [expenses, personalExpenses]);
 
   const { biggestExpense, biggestExpensePer } = useMemo(() => {
-    if (!expenses.length)
+    if (!expenses?.length)
       return { biggestExpense: null, biggestExpensePer: null };
     const max1 = expenses.reduce(
       (max, expense) => (expense.amount > max.amount ? expense : max),
@@ -171,11 +191,13 @@ const Stats = () => {
       (max, expense) => (expense.amount > max.amount ? expense : max),
       personalExpenses[0],
     );
+    console.log('Computed biggestExpense:', max1?.id);
+    console.log('Computed biggestExpensePer:', max2?.id);
     return { biggestExpense: max1, biggestExpensePer: max2 };
   }, [personalExpenses, expenses]);
 
   const { biggestExpenseM, biggestExpensePerM } = useMemo(() => {
-    if (!expensesM) return { biggestExpenseM: null, biggestExpensePerM: null };
+    if (!expensesM?.length) return { biggestExpenseM: null, biggestExpensePerM: null };
     const max1 = expensesM.reduce(
       (max, expense) => (expense.amount > max.amount ? expense : max),
       expensesM[0],
@@ -184,11 +206,13 @@ const Stats = () => {
       (max, expense) => (expense.amount > max.amount ? expense : max),
       personalExpensesM[0],
     );
+    console.log('Computed biggestExpenseM:', max1?.id);
+    console.log('Computed biggestExpensePerM:', max2?.id);
     return { biggestExpenseM: max1, biggestExpensePerM: max2 };
   }, [personalExpensesM, expensesM]);
 
   const { expenseTotal, expenseTotalPer, payedAmount } = useMemo(() => {
-    if (!expenses.length)
+    if (!expenses?.length)
       return { expenseTotal: 0, expenseTotalPer: 0, payedAmount: 0 };
     const sum1 = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     const sum2 = personalExpenses.reduce(
@@ -199,11 +223,12 @@ const Stats = () => {
       ex?.payers?.some((payer) => payer.member === profileMember?.id),
     );
     const sum3 = expenses3.reduce((sum, expense) => sum + expense.amount, 0);
+    console.log('Computed totals global:', { expenseTotal: sum1, expenseTotalPer: sum2, payedAmount: sum3 });
     return { expenseTotal: sum1, expenseTotalPer: sum2, payedAmount: sum3 };
   }, [personalExpenses, profileMember, expenses]);
 
   const { expenseTotalM, expenseTotalPerM, payedAmountM } = useMemo(() => {
-    if (!expensesM.length)
+    if (!expensesM?.length)
       return { expenseTotalM: 0, expenseTotalPerM: 0, payedAmountM: 0 };
     const sum1 = expensesM.reduce((sum, expense) => sum + expense.amount, 0);
     const sum2 = personalExpensesM.reduce(
@@ -214,6 +239,7 @@ const Stats = () => {
       ex?.payers?.some((payer) => payer.member === profileMember?.id),
     );
     const sum3 = expenses3.reduce((sum, expense) => sum + expense.amount, 0);
+    console.log('Computed totals month:', { expenseTotalM: sum1, expenseTotalPerM: sum2, payedAmountM: sum3 });
     return { expenseTotalM: sum1, expenseTotalPerM: sum2, payedAmountM: sum3 };
   }, [personalExpensesM, expensesM, profileMember?.id]);
 
@@ -268,16 +294,31 @@ const Stats = () => {
   );
   const lh = categories.length > 10 ? 16 : 20;
 
+  console.log('Final computed values for render:', {
+    toggleOnGroup,
+    selected,
+    expenseTotalF,
+    payedAmountF,
+    groupedExpensesF: Object.keys(groupedExpensesF).length,
+    biggestExpenseF: biggestExpenseF?.id,
+    series: series.length,
+    categories: categories.length
+  });
+
   if (isLoading || profileMemberLoading || groupLoading) {
+    console.log('Rendering loading indicator');
     return <ActivityIndicator />;
   }
 
   if (isError || profileMemberError || groupError) {
+    console.log('Rendering error message');
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
   const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
   const currency_label = currencyOption?.label || '$';
+
+  console.log('Rendering main content');
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
