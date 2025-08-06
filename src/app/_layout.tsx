@@ -66,6 +66,7 @@ function RootLayoutNav() {
                 <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
                 <Stack.Screen name="(auth)" options={{headerShown: false}}/>
                 <Stack.Screen name="(global)" options={{headerShown: false}}/>
+                <Stack.Screen name="join" options={{headerShown: false}}/>
               </Stack>
             </PaperProvider>
           </QueryProvider>
