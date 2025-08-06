@@ -26,21 +26,14 @@ export const useProfile = (uid) => {
         .from("profiles")
         .select("*")
         .eq("id", uid)
-        .maybeSingle();  // Changed to .maybeSingle()
+        .maybeSingle();
       if (error) {
         console.log("useProfile error is ", error.message);
         throw new Error(error.message);
       }
-      if (!profile) {
-        // Default for anon or missing profiles
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user?.is_anonymous) {
-          return { id: uid, full_name: 'Anonymous', email: null };  // Mock profile
-        }
-        throw new Error("Profile not found");
-      }
       return profile;
     },
+    enabled: !!uid, // Only run query when uid is available
   });
 };
 

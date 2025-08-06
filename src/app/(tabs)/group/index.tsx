@@ -78,6 +78,7 @@ const GroupScreen = () => {
       if (!profile) {
         return;
       }
+      console.log("profile is ", profile);
       // If profile exists but full_name is null or "Anonymous", prompt for name
       if (!profile?.full_name || profile.full_name === "Anonymous") {
         setNameModalVisible(true);
