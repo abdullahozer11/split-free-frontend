@@ -20,7 +20,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const ANCHORED_GROUPS_STORAGE_KEY = "anchoredGroupIds";
 
 const GroupScreen = () => {
-  const { alert } = useTranslatedAlert();
+  const {alert} = useTranslatedAlert();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
   const [searchBarVisible, setSearchBarVisible] = useState(false);
@@ -67,50 +67,40 @@ const GroupScreen = () => {
 
   // Fetch profile and check full_name
   useEffect(() => {
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
     const checkProfileName = async () => {
       if (!session?.user.id) return;
 
-      const maxRetries = 3;
-      let lastError = null;
+      // Check if profile exists
+      const {data: profile, error} = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", session.user.id)
+        .single();
 
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        const {data: profile, error} = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", session.user.id)
-          .single();
+      if (error) {
+        // If no profile exists (PGRST116 = no rows), insert a new one
+        if (error.code === "PGRST116") {
+          const {error: insertError} = await supabase
+            .from("profiles")
+            .insert({id: session.user.id, full_name: null});
 
-        if (error) {
-          console.log("Error fetching profile:", error);
-          lastError = error;
-
-          if (attempt < maxRetries) {
-            await sleep(1000); // 1-second delay before retry
-            continue;
+          if (insertError) {
+            console.error("Error inserting new profile:", insertError);
+            setNameModalVisible(true); // Show modal anyway to ensure user sets name
+            return;
           }
         } else {
-          if (!profile?.full_name || profile.full_name === "Anonymous") {
-            setNameModalVisible(true);
-          }
-          return; // Successful fetch, exit
+          console.error("Error fetching profile:", error);
+          setNameModalVisible(true); // Show modal for other errors
+          return;
         }
       }
 
-      // After max retries, if still error, handle gracefully (e.g., assume no profile and show modal)
-      if (lastError) {
-        // Optionally check if it's the specific "no rows" error
-        if (lastError.code === "PGRST116") {
-          setNameModalVisible(true); // Treat as no profile exists
-        } else {
-          // For other errors, perhaps don't show modal or handle differently
-          // For now, we'll show it to ensure user sets name
-          setNameModalVisible(true);
-        }
+      // If profile exists but full_name is null or "Anonymous", prompt for name
+      if (!profile?.full_name || profile.full_name === "Anonymous") {
+        setNameModalVisible(true);
       }
     };
-
     checkProfileName();
   }, [session]);
 
