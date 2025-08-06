@@ -54,7 +54,7 @@ const SignInScreen = () => {
   }
 
   async function debugSupabaseAuth() {
-    supabaseUrl = 'http://192.168.1.151:54321'
+    const supabaseUrl = 'http://192.168.1.151:54321'
     const authUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`; // Use your supabaseUrl var
     console.log('Debug: Attempting fetch to', authUrl);
     console.log('Debug: With email:', email); // Avoid logging password
