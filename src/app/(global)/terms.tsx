@@ -3,7 +3,7 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Markdown from "react-native-markdown-display";
 import { Feather } from "@expo/vector-icons";
-import { termsText } from "@/TermsOfUse";
+import { termsText } from "@/src/international/en/terms";
 import { useNavigation } from "expo-router";
 
 const Terms = () => {
