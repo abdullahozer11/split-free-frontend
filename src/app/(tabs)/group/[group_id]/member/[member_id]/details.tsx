@@ -3,9 +3,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  Alert,
 } from "react-native";
-import {Button, TextInput, Text, DialogTitle} from "@/src/components/Translated";
+import { Button, TextInput, Text, DialogTitle, useTranslatedAlert } from "@/src/components/Translated";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
@@ -30,6 +29,7 @@ import { currencyOptions } from "@/src/constants";
 
 
 const MemberDetailsScreen = () => {
+  const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const { member_id: memberIdString } = useLocalSearchParams();
@@ -97,7 +97,7 @@ const MemberDetailsScreen = () => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -113,7 +113,7 @@ const MemberDetailsScreen = () => {
       },
       onError: (error) => {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       },
     });
   };

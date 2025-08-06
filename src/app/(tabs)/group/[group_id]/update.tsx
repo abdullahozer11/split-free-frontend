@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { View, ScrollView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import {
   ActivityIndicator,
   Dialog,
   Portal,
 } from "react-native-paper";
-import {Button, TextInput, Text, DialogTitle} from "@/src/components/Translated";
+import { Button, TextInput, Text, DialogTitle, useTranslatedAlert } from "@/src/components/Translated";
 import { DeletableMember } from "@/src/components/Person";
 import { useGroup, useUpdateGroup } from "@/src/api/groups";
 import { Feather } from "@expo/vector-icons";
@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
 
 const UpdateGroup = () => {
+  const { alert } = useTranslatedAlert();
   const { group_id: idString } = useLocalSearchParams();
   const groupId = parseInt(
     typeof idString === "string" ? idString : idString[0],
@@ -55,7 +56,7 @@ const UpdateGroup = () => {
   const validateFormData = () => {
     if (!title) {
       console.log("Title is empty");
-      Alert.alert("Title is empty");
+      alert("Title is empty");
       return false;
     }
     return true;
@@ -97,7 +98,7 @@ const UpdateGroup = () => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert(
+          alert(
             "Error",
             "There was an error updating the group. Please try again.",
           );

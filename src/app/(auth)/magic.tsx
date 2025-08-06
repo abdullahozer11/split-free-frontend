@@ -2,9 +2,11 @@ import { Image, View } from "react-native";
 import { TextInput } from "@/src/components/Translated";
 import React, { useState, useEffect } from "react";
 import Button from "@/src/components/Button";
-import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
 import { makeRedirectUri } from "expo-auth-session";
+import { Stack } from "expo-router";
+import { useTranslations } from "@/src/components/Translated";
+
 
 const redirectTo = makeRedirectUri();
 
@@ -13,6 +15,8 @@ const MagicScreen = () => {
   const [loading, setLoading] = useState(false);
   const [buttonText, setButtonText] = useState("Send Magic Link");
   const [countdown, setCountdown] = useState(0);
+
+  const {t} = useTranslations();
 
   useEffect(() => {
     let timer;
@@ -48,7 +52,7 @@ const MagicScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <StackScreen options={{ title: "Magic Link" }} />
+      <Stack.Screen options={{ title: t("Magic Link") }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

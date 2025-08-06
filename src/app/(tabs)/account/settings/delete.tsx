@@ -1,5 +1,5 @@
-import { View, TouchableOpacity, Alert } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { View, TouchableOpacity } from "react-native";
+import { Text, useTranslatedAlert } from "@/src/components/Translated";
 import { TextInput } from "@/src/components/Translated";
 import React, { useState } from "react";
 import { useNavigation } from "expo-router";
@@ -9,6 +9,7 @@ import { supabase } from "@/src/lib/supabase.ts";
 import { useAuth } from "@/src/providers/AuthProvider.tsx";
 
 const Delete = () => {
+  const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const [verif, setVerif] = useState("");
   const [errorText, setErrorText] = useState("");
@@ -28,7 +29,7 @@ const Delete = () => {
 
     if (error) {
       console.error("Server error:", error);
-      Alert.alert(
+      alert(
         "Error",
         "There was an error deleting the account. Please try again.",
       );

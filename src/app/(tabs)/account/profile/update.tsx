@@ -1,11 +1,10 @@
 import {
-  Alert,
   Image,
   ScrollView,
   TouchableOpacity,
   View
 } from "react-native";
-import { TextInput, Text } from "@/src/components/Translated";
+import { TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
 import { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -15,6 +14,7 @@ import { ActivityIndicator } from "react-native-paper";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function UpdateProfile() {
+  const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const [image, setImage] = useState("");
@@ -58,7 +58,7 @@ export default function UpdateProfile() {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );

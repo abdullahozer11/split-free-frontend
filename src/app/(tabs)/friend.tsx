@@ -1,5 +1,5 @@
-import { View, ScrollView, TouchableOpacity, Alert } from "react-native";
-import {Text, Button, DialogTitle} from "@/src/components/Translated";
+import { View, ScrollView, TouchableOpacity } from "react-native";
+import { Text, Button, DialogTitle, useTranslatedAlert } from "@/src/components/Translated";
 import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
@@ -29,6 +29,7 @@ import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 export default function FriendScreen() {
+  const { alert } = useTranslatedAlert();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -176,7 +177,7 @@ export default function FriendScreen() {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -194,7 +195,7 @@ export default function FriendScreen() {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -210,7 +211,7 @@ export default function FriendScreen() {
       },
       onError: (error) => {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       },
     });
   };
@@ -225,7 +226,7 @@ export default function FriendScreen() {
       },
       onError: (error) => {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       },
     });
   };
@@ -240,7 +241,7 @@ export default function FriendScreen() {
       },
       onError: (error) => {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       },
     });
   };

@@ -1,5 +1,5 @@
 import { Pressable, View } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { Text, useTranslatedAlert } from "@/src/components/Translated";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -31,8 +31,31 @@ const SettingsItem = ({ page, iconName, title, containerColor }) => {
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
+  const { alert } = useTranslatedAlert();
+
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.is_anonymous) {
+      alert(
+        "Warning",
+        "You are signed in as an anonymous user. Signing out will result in permanent loss of your local data and is irreversible. Are you sure you want to sign out?", // This key will be translated via t(...)
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Sign Out",
+            onPress: async () => {
+              await supabase.auth.signOut();
+            },
+            style: "destructive",
+          },
+        ]
+      );
+    } else {
+      await supabase.auth.signOut();
+    }
   };
 
   return (

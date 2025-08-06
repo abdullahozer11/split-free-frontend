@@ -2,10 +2,9 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  Alert,
   Pressable,
 } from "react-native";
-import {MenuItem, Text, Button, DialogTitle} from "@/src/components/Translated";
+import { MenuItem, Text, Button, DialogTitle, useTranslatedAlert } from "@/src/components/Translated";
 import React, { useEffect, useState } from "react";
 import {
   Link,
@@ -43,6 +42,7 @@ const Description = ({ text }) => {
 };
 
 const ExpenseDetailsScreen = () => {
+  const { alert } = useTranslatedAlert();
   const { group_id: groupIdString, expense_id: expenseIdString } =
     useLocalSearchParams();
   const id = parseInt(
@@ -106,7 +106,7 @@ const ExpenseDetailsScreen = () => {
       },
       onError: (error) => {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       },
     });
   };
@@ -126,7 +126,7 @@ const ExpenseDetailsScreen = () => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
           setIsDialog2Visible(false);
         },
       },

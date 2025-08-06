@@ -3,7 +3,6 @@ import { useNavigation } from "expo-router";
 import { useMemberList } from "@/src/api/members";
 import { useInsertExpense, useUpdateExpense } from "@/src/api/expenses";
 import {
-  Alert,
   Pressable,
   ScrollView,
   TouchableOpacity,
@@ -15,7 +14,7 @@ import {
   Avatar,
   Tooltip,
 } from "react-native-paper";
-import { Button, TextInput, Text } from "@/src/components/Translated";
+import { Button, TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
@@ -46,6 +45,7 @@ export default function ExpenseForm({
   groupId,
   updatingExpense,
 }) {
+  const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -159,25 +159,25 @@ export default function ExpenseForm({
   const validateData = () => {
     if (!title) {
       console.log("Title is empty");
-      Alert.alert("Title is empty");
+      alert("Title is empty");
       return false;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
       console.log("Amount is not valid");
-      Alert.alert("Amount is not valid");
+      alert("Amount is not valid");
       return false;
     }
 
     if (!payers.length) {
       console.log("Add who paid this expense");
-      Alert.alert("Add who paid this expense");
+      alert("Add who paid this expense");
       return false;
     }
 
     if (!participants.length) {
       console.log("Add at least one participant");
-      Alert.alert("Add at least one participant");
+      alert("Add at least one participant");
       return false;
     }
 
@@ -225,7 +225,7 @@ export default function ExpenseForm({
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -254,7 +254,7 @@ export default function ExpenseForm({
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -263,7 +263,7 @@ export default function ExpenseForm({
   const handleGenerateCat = async () => {
     // check if title is not empty
     if (!title) {
-      Alert.alert("You must enter a title first");
+      alert("You must enter a title first");
       return;
     }
 
@@ -276,7 +276,7 @@ export default function ExpenseForm({
 
     if (error) {
       console.error("Server error:", error);
-      Alert.alert("Error", "Server error.");
+      alert("Error", "Server error.");
       return;
     }
     const exp_cat_names = exp_cats.map((exp_cat) => exp_cat?.name);

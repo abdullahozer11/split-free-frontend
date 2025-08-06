@@ -1,17 +1,22 @@
-import { View, Alert, Image } from "react-native";
-import { TextInput } from "@/src/components/Translated";
+import { View, Image } from "react-native";
+import { TextInput, useTranslatedAlert } from "@/src/components/Translated";
 import React, { useState } from "react";
 import Button from "@/src/components/Button";
 import { useRouter } from "expo-router";
-import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
+import { Stack } from "expo-router";
+import { useTranslations } from "@/src/components/Translated";
+
 
 const ResetPasswordScreen = () => {
+  const { alert } = useTranslatedAlert();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const {t} = useTranslations();
 
   const router = useRouter();
 
@@ -33,12 +38,12 @@ const ResetPasswordScreen = () => {
 
   async function resetPassword() {
     if (!passwordsMatch()) {
-      Alert.alert("Passwords do not match.");
+      alert("Passwords do not match.");
       return;
     }
 
     if (!validatePassword()) {
-      Alert.alert(
+      alert(
         "Password must be at least 8 characters long and contain both letters and numbers.",
       );
       return;
@@ -49,16 +54,16 @@ const ResetPasswordScreen = () => {
     setLoading(false);
 
     if (error) {
-      Alert.alert(error.message);
+      alert(error.message);
     } else {
-      Alert.alert("Password has been reset successfully!");
+      alert("Password has been reset successfully!");
       router.push("/sign-in");
     }
   }
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <StackScreen options={{ title: "Reset Password" }} />
+      <Stack.Screen options={{ title: t("Reset Password") }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-[200px] aspect-square self-center"

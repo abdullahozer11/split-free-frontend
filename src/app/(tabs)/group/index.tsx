@@ -1,5 +1,5 @@
 import { View, ScrollView } from "react-native";
-import { TextInput, Text } from "@/src/components/Translated";
+import { TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
 import GroupItem from "@/src/components/GroupItem";
 import React, { useState, useEffect } from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
@@ -13,12 +13,14 @@ import {
 import { useAuth } from "@/src/providers/AuthProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/src/lib/supabase";
-import { Alert, Modal } from "react-native";
+import { Modal } from "react-native";
 import Button from "@/src/components/Button";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ANCHORED_GROUPS_STORAGE_KEY = "anchoredGroupIds";
 
 const GroupScreen = () => {
+  const { alert } = useTranslatedAlert();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [anchoredGroups, setAnchoredGroups] = useState([]);
   const [searchBarVisible, setSearchBarVisible] = useState(false);
@@ -29,9 +31,10 @@ const GroupScreen = () => {
     isLoading: groupsLoading,
   } = useGroupList();
 
-  const { session } = useAuth();
+  const {session} = useAuth();
   useGroupSubscriptions();
   useGroupInviteSubscriptions(session?.user.id);
+  const queryClient = useQueryClient();
 
   // New states for name choice modal
   const [nameModalVisible, setNameModalVisible] = useState(false);
@@ -64,20 +67,45 @@ const GroupScreen = () => {
 
   // Fetch profile and check full_name
   useEffect(() => {
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     const checkProfileName = async () => {
-      if (session?.user.id) {
-        const { data: profile, error } = await supabase
+      if (!session?.user.id) return;
+
+      const maxRetries = 3;
+      let lastError = null;
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const {data: profile, error} = await supabase
           .from("profiles")
           .select("full_name")
           .eq("id", session.user.id)
           .single();
 
         if (error) {
-          console.error("Error fetching profile:", error);
-          return;
-        }
+          console.log("Error fetching profile:", error);
+          lastError = error;
 
-        if (!profile?.full_name || profile.full_name === "Anonymous") {
+          if (attempt < maxRetries) {
+            await sleep(1000); // 1-second delay before retry
+            continue;
+          }
+        } else {
+          if (!profile?.full_name || profile.full_name === "Anonymous") {
+            setNameModalVisible(true);
+          }
+          return; // Successful fetch, exit
+        }
+      }
+
+      // After max retries, if still error, handle gracefully (e.g., assume no profile and show modal)
+      if (lastError) {
+        // Optionally check if it's the specific "no rows" error
+        if (lastError.code === "PGRST116") {
+          setNameModalVisible(true); // Treat as no profile exists
+        } else {
+          // For other errors, perhaps don't show modal or handle differently
+          // For now, we'll show it to ensure user sets name
           setNameModalVisible(true);
         }
       }
@@ -87,7 +115,7 @@ const GroupScreen = () => {
   }, [session]);
 
   if (groupsLoading) {
-    return <ActivityIndicator />;
+    return <ActivityIndicator/>;
   }
 
   if (groupsError) {
@@ -114,7 +142,7 @@ const GroupScreen = () => {
 
   const handleAnchor = (group, anchored) => {
     // Update the group's anchored state
-    const updatedGroup = { ...group, anchored };
+    const updatedGroup = {...group, anchored};
 
     // Update anchored groups state
     let updatedAnchoredGroups;
@@ -139,7 +167,7 @@ const GroupScreen = () => {
   // Define sections for SectionList
   const sections = [];
   if (anchoredGroups.length > 0) {
-    sections.push({ title: "Quick Access", data: anchoredGroups });
+    sections.push({title: "Quick Access", data: anchoredGroups});
   }
   sections.push({
     title: anchoredGroups.length > 0 ? "Other Groups" : "All Groups",
@@ -162,7 +190,7 @@ const GroupScreen = () => {
           value={queryKey}
           className={"bg-white mx-2"}
           right={
-            <TextInput.Icon icon={"close"} onPress={toggleSearchBarVisible} />
+            <TextInput.Icon icon={"close"} onPress={toggleSearchBarVisible}/>
           }
         />
       )}
@@ -200,7 +228,7 @@ const GroupScreen = () => {
             );
           }
         })}
-        <CreateGroupModal isVisible={isModalVisible} onClose={closeModal} />
+        <CreateGroupModal isVisible={isModalVisible} onClose={closeModal}/>
       </ScrollView>
 
       {/* Modal for forcing name choice */}
@@ -212,13 +240,13 @@ const GroupScreen = () => {
           if (chosenName.trim()) {
             setNameModalVisible(false);
           } else {
-            Alert.alert("Please choose a name to continue.");
+            alert("Please choose a name to continue.");
           }
         }}
       >
         <View className="flex-1 justify-center items-center bg-black/50">
           <View className="bg-white p-5 rounded-lg w-4/5">
-            <Text className="text-lg font-bold mb-2.5">Choose a Name</Text>
+            <Text className="text-lg font-bold mb-2.5">Choose a name</Text>
             <Text className="mb-2.5">Enter a name to identify yourself (required):</Text>
             <TextInput
               value={chosenName}
@@ -230,12 +258,12 @@ const GroupScreen = () => {
               disabled={!chosenName.trim()}
               onPress={async () => {
                 if (chosenName.trim()) {
-                  const { error } = await supabase
+                  const {error} = await supabase
                     .from("profiles")
-                    .update({ full_name: chosenName })
+                    .update({full_name: chosenName})
                     .eq("id", session?.user.id);
                   if (error) {
-                    Alert.alert("Failed to update name: " + error.message);
+                    alert("Failed to update name: " + error.message);
                   } else {
                     setNameModalVisible(false);
                     setChosenName(""); // Reset for future use

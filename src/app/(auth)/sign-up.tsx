@@ -1,13 +1,16 @@
-import { View, Alert, Image } from "react-native";
-import { TextInput, Text } from "@/src/components/Translated";
+import { View, Image } from "react-native";
+import { TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
 import React, { useState, useEffect, useCallback } from "react";
 import Button from "@/src/components/Button";
 import { Link, useRouter } from "expo-router";
-import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
 import { CheckBox } from "react-native-elements";
+import { Stack } from "expo-router";
+import { useTranslations } from "@/src/components/Translated";
+
 
 const SignUpScreen = () => {
+  const { alert } = useTranslatedAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,6 +23,8 @@ const SignUpScreen = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
+  const {t} = useTranslations();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -74,7 +79,7 @@ const SignUpScreen = () => {
 
   async function signUpWithEmail() {
     if (emailError || passwordError || confirmPasswordError) {
-      Alert.alert("Please fix the errors before proceeding.");
+      alert("Please fix the errors before proceeding.");
       return;
     }
 
@@ -82,9 +87,9 @@ const SignUpScreen = () => {
     const { error } = await supabase.auth.signUp({ email, password });
     setLoading(false);
     if (error) {
-      Alert.alert(error.message);
+      alert(error.message);
     } else {
-      Alert.alert("Confirm account via email");
+      alert("Confirm account via email");
       router.push("/sign-in");
     }
   }
@@ -95,7 +100,7 @@ const SignUpScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <StackScreen options={{ title: "Sign up" }} />
+      <Stack.Screen options={{ title: t("Sign up") }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

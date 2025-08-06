@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Alert, FlatList, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, ActivityIndicator, FlatList, TextInput, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { useQueryClient } from "@tanstack/react-query"; // Add if using React Query
+import { useQueryClient } from "@tanstack/react-query";
+import { useTranslatedAlert } from "@/src/components/Translated"; // Add if using React Query
 
 const JoinScreen = () => {
+  const { alert } = useTranslatedAlert();
   const params = useLocalSearchParams<{ token: string }>(); // Get params as object to avoid destructuring issues
   const token = params?.token;
   const router = useRouter();
@@ -21,7 +23,7 @@ const JoinScreen = () => {
     console.log('useEffect triggered with token:', token);
     console.log('Current session in useEffect:', session);
     if (!token) {
-      Alert.alert("Error", "Invalid invite link.");
+      alert("Error", "Invalid invite link.");
       setLoading(false);
       router.replace("/(tabs)"); // Navigate to home tabs
       return;
@@ -82,7 +84,7 @@ const JoinScreen = () => {
       }
 
       if (existingMember) {
-        Alert.alert("Info", "You are already in this group.");
+        alert("Info", "You are already in this group.");
         console.log('Existing member found, navigating to group:', fetchedGroupId);
         console.log('Navigation path:', `/(tabs)/group/${fetchedGroupId}`);
         router.replace(`/(tabs)/group/`);
@@ -106,7 +108,7 @@ const JoinScreen = () => {
       setShowSelection(true);
     } catch (error) {
       console.log('Error in handleFetchUnbound:', error);
-      Alert.alert("Error", error.message);
+      alert("Error", error.message);
       router.replace("/(tabs)"); // Home tabs
     } finally {
       setLoading(false);
@@ -136,12 +138,12 @@ const JoinScreen = () => {
       await queryClient.invalidateQueries(["groups"]);
       await queryClient.invalidateQueries(["members", groupId]);
 
-      Alert.alert("Success", "Successfully joined the group!");
+      alert("Success", "Successfully joined the group!");
       console.log('Navigating after bind to group:', groupId);
       router.replace(`/(tabs)/group/${groupId}`);
     } catch (error) {
       console.log('Error in handleBind:', error);
-      Alert.alert("Error", error.message);
+      alert("Error", error.message);
     } finally {
       setLoading(false);
     }
@@ -150,7 +152,7 @@ const JoinScreen = () => {
   const handleCreate = async () => {
     console.log('Entering handleCreate with newName:', newName, 'groupId:', groupId);
     if (!newName.trim()) {
-      Alert.alert("Error", "Please enter a name.");
+      alert("Error", "Please enter a name.");
       return;
     }
 
@@ -175,12 +177,12 @@ const JoinScreen = () => {
       await queryClient.invalidateQueries(["groups"]);
       await queryClient.invalidateQueries(["members", groupId]);
 
-      Alert.alert("Success", "Successfully joined the group!");
+      alert("Success", "Successfully joined the group!");
       console.log('Navigating after create to group:', groupId);
       router.replace(`/(tabs)/group/${groupId}`);
     } catch (error) {
       console.log('Error in handleCreate:', error);
-      Alert.alert("Error", error.message);
+      alert("Error", error.message);
     } finally {
       setLoading(false);
     }

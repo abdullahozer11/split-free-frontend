@@ -1,12 +1,15 @@
-import { View, Alert, Image } from "react-native";
+import { View, Image } from "react-native";
 import React, { useState, useEffect } from "react";
-import { TextInput } from "@/src/components/Translated";
+import { TextInput, useTranslatedAlert } from "@/src/components/Translated";
 import Button from "@/src/components/Button";
 import { Link, useRouter } from "expo-router";
-import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
+import { Stack } from "expo-router";
+import { useTranslations } from "@/src/components/Translated";
+
 
 const ForgotPasswordScreen = () => {
+  const { alert } = useTranslatedAlert();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [buttonText, setButtonText] = useState("Send Reset Link");
@@ -32,12 +35,12 @@ const ForgotPasswordScreen = () => {
 
   async function resetPassword() {
     if (!email) {
-      Alert.alert("Please enter your email.");
+      alert("Please enter your email.");
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert("Please enter a valid email address.");
+      alert("Please enter a valid email address.");
       return;
     }
 
@@ -48,9 +51,9 @@ const ForgotPasswordScreen = () => {
     setLoading(false);
 
     if (error) {
-      Alert.alert(error.message);
+      alert(error.message);
     } else {
-      Alert.alert(
+      alert(
         "If this email is registered, you will receive a password reset link.",
       );
       setButtonText("Resend Reset Link in 60s");
@@ -59,9 +62,11 @@ const ForgotPasswordScreen = () => {
     }
   }
 
+  const {t} = useTranslations();
+
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <StackScreen options={{ title: "Forgot Password" }} />
+      <Stack.Screen options={{ title: t("Forgot Password") }} />
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

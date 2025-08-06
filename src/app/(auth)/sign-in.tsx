@@ -1,13 +1,13 @@
-import {Image, Alert, View} from "react-native";
-import {Text} from "@/src/components/Translated";
+import {Image, View} from "react-native";
+import { Text, useTranslatedAlert } from "@/src/components/Translated";
 import {TextInput} from "@/src/components/Translated";
 import React, {useState} from "react";
 import Button from "@/src/components/Button";
-import {StackScreen} from "@/src/components/Translated";
 import {Link} from "@/src/components/Translated";
 import {supabase} from "@/src/lib/supabase";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as Linking from "expo-linking";
+import { Stack } from "expo-router";
 
 const createSessionFromUrl = async (url: string) => {
   const {params, errorCode} = QueryParams.getQueryParams(url);
@@ -26,6 +26,7 @@ const createSessionFromUrl = async (url: string) => {
 };
 
 const SignInScreen = () => {
+  const { alert } = useTranslatedAlert();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -45,7 +46,7 @@ const SignInScreen = () => {
     setLoading(true);
     const {data: {session}, error} = await supabase.auth.signInAnonymously();
     if (error) {
-      Alert.alert(error.message);
+      alert(error.message);
       setLoading(false);
       return;
     }
@@ -63,7 +64,7 @@ const SignInScreen = () => {
           .from("profiles")
           .insert({ id: session.user.id, full_name: null, email: null });
         if (insertError) {
-          Alert.alert("Failed to create profile: " + insertError.message);
+          alert("Failed to create profile: " + insertError.message);
           setLoading(false);
           return;
         }
@@ -119,7 +120,7 @@ const SignInScreen = () => {
       password,
     });
     if (error) {
-      Alert.alert(error.message);
+      alert(error.message);
       console.log("signInWithEmail error is ", error.message);
     }
     setLoading(false);
@@ -127,7 +128,7 @@ const SignInScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <StackScreen options={{title: "Sign in"}}/>
+      <Stack.Screen options={{title: "Sign in"}}/>
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

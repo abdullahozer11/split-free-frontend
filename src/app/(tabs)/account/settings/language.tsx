@@ -1,5 +1,5 @@
-import { Alert, TouchableOpacity, View } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { TouchableOpacity, View } from "react-native";
+import { Text, useTranslatedAlert } from "@/src/components/Translated";
 import { ActivityIndicator } from "react-native-paper";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const Languages = () => {
+  const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const [language, setLanguage] = useState(null);
@@ -91,7 +92,7 @@ const Languages = () => {
           });
           setIsFocus(true);
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );

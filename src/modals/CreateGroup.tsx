@@ -4,9 +4,8 @@ import {
   Pressable,
   Modal,
   TouchableOpacity,
-  Alert,
 } from "react-native";
-import { TextInput, Text } from "@/src/components/Translated";
+import { TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
 import { Feather } from "@expo/vector-icons";
 import Participants from "@/src/modals/CreateGroupParticipants";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -18,6 +17,7 @@ import { currencyOptions } from "@/src/constants";
 
 
 const CreateGroupModal = ({ isVisible, onClose }) => {
+  const { alert } = useTranslatedAlert();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [currency, setCurrency] = useState("EUR");
@@ -75,7 +75,7 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert(
+          alert(
             "Error",
             "There was an error saving the group. Please try again.",
           );

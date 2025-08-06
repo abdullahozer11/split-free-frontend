@@ -1,5 +1,5 @@
-import { Image, View, Alert, TouchableOpacity } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { Image, View, TouchableOpacity } from "react-native";
+import { Text, useTranslatedAlert } from "@/src/components/Translated";
 import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
 import { ActivityIndicator } from "react-native-paper";
@@ -10,6 +10,7 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { Feather } from "@expo/vector-icons";
 
 const Password = () => {
+  const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -76,13 +77,13 @@ const Password = () => {
 
   async function changePassword() {
     if (!validatePassword()) {
-      Alert.alert(
+      alert(
         "Password must be at least 8 characters long and contain both letters and numbers.",
       );
       return;
     }
     if (passwordError || confirmPasswordError) {
-      Alert.alert("Please fix the errors before proceeding.");
+      alert("Please fix the errors before proceeding.");
       return;
     }
 
@@ -94,16 +95,16 @@ const Password = () => {
     });
     if (error) {
       console.error("Server error:", error);
-      Alert.alert("Error", "Server error.");
+      alert("Error", "Server error.");
     } else {
       // update new password
       const { error } = await supabase.auth.updateUser({ password });
       setLoading(false);
       if (error) {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       } else {
-        Alert.alert("Password is changed successfully");
+        alert("Password is changed successfully");
         resetFields();
         navigation.goBack();
       }

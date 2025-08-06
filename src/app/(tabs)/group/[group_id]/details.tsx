@@ -1,5 +1,5 @@
-import { View, TouchableOpacity, Pressable, Alert, Share } from "react-native";
-import {DialogTitle, MenuItem, Text} from "@/src/components/Translated";
+import { View, TouchableOpacity, Pressable, Share } from "react-native";
+import { DialogTitle, MenuItem, Text, useTranslatedAlert } from "@/src/components/Translated";
 import React, {useEffect, useMemo, useState} from "react";
 import { Feather } from "@expo/vector-icons";
 import {
@@ -47,6 +47,7 @@ import { generateInvite } from "@/src/api/invites";
 
 
 const GroupDetailsScreen = () => {
+  const { alert } = useTranslatedAlert();
   const { group_id: idString } = useLocalSearchParams();
   const groupId = parseInt(
     typeof idString === "string" ? idString : idString[0],
@@ -244,7 +245,7 @@ const GroupDetailsScreen = () => {
       },
       onError: (error) => {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       },
     });
   };
@@ -258,7 +259,7 @@ const GroupDetailsScreen = () => {
       },
       onError: (error) => {
         console.error("Server error:", error);
-        Alert.alert("Error", "Server error.");
+        alert("Error", "Server error.");
       },
     });
   };
@@ -269,7 +270,7 @@ const GroupDetailsScreen = () => {
       setInviteLink(link);
       setQRCodeVisible(true);
     } catch (error) {
-      Alert.alert("Error", "Failed to generate invite link.");
+      alert("Error", "Failed to generate invite link.");
     }
   };
 
@@ -291,7 +292,7 @@ const GroupDetailsScreen = () => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert(
+          alert(
             "Error",
             "There was an error exiting the group. Please try again.",
           );
@@ -316,7 +317,7 @@ const GroupDetailsScreen = () => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -335,7 +336,7 @@ const GroupDetailsScreen = () => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -357,7 +358,7 @@ const GroupDetailsScreen = () => {
         },
         onError: (error) => {
           console.error("Server error:", error);
-          Alert.alert("Error", "Server error.");
+          alert("Error", "Server error.");
         },
       },
     );
@@ -713,7 +714,7 @@ const GroupDetailsScreen = () => {
             try {
               await Share.share({ message: inviteLink });
             } catch (error) {
-              Alert.alert("Error", "Failed to share link.");
+              alert("Error", "Failed to share link.");
             }
           }}
         >
