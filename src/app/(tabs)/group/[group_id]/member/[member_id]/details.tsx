@@ -27,9 +27,12 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { useDebt } from "@/src/api/debts";
 import { useQueryClient } from "@tanstack/react-query";
 import { currencyOptions } from "@/src/constants";
+import { formatDateString } from "@/src/utils/helpers";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 
 const MemberDetailsScreen = () => {
+  const {settings} = useSettings();
   const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -239,7 +242,7 @@ const MemberDetailsScreen = () => {
                 {member?.name} {member.id === profileMember?.id && <Text>(me)</Text>}
               </Text>
               <Text className="text-white">
-                <Text className="text-white">Created at:</Text>{" " + new Date(member.created_at).toLocaleString()}
+                <Text className="text-white">Created at:</Text>{" " + formatDateString(member.created_at, settings.language)}
               </Text>
             </View>
           </View>

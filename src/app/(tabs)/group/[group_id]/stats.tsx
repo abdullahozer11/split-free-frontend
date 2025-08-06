@@ -486,7 +486,7 @@ const Stats = () => {
           </View>
           {biggestExpenseF && (
             <View style={{ gap: 10 }}>
-              <Text variant={"headlineMedium"}>Largest Spending</Text>
+              <Text variant={"headlineMedium"}>Largest spending</Text>
               <ExpenseItem
                 key={biggestExpenseF?.id}
                 expense={biggestExpenseF}
