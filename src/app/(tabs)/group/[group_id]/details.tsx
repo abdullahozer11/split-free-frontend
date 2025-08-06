@@ -17,7 +17,7 @@ import {
 import { ExpenseItem } from "@/src/components/ExpenseItem";
 import { TransferItem } from "@/src/components/TransferItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {groupElementsByDay, inThisMonth} from "@/src/utils/helpers";
+import {groupElementsByDay} from "@/src/utils/helpers";
 import {
   Menu,
   Dialog,
