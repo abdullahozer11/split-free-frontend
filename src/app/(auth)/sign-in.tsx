@@ -1,23 +1,23 @@
-import { Image, Alert, View } from "react-native";
-import { Text } from "@/src/components/Translated";
-import { TextInput } from "@/src/components/Translated";
-import React, { useState } from "react";
+import {Image, Alert, View} from "react-native";
+import {Text} from "@/src/components/Translated";
+import {TextInput} from "@/src/components/Translated";
+import React, {useState} from "react";
 import Button from "@/src/components/Button";
-import { StackScreen } from "@/src/components/Translated";
-import { Link } from "@/src/components/Translated";
-import { supabase } from "@/src/lib/supabase";
+import {StackScreen} from "@/src/components/Translated";
+import {Link} from "@/src/components/Translated";
+import {supabase} from "@/src/lib/supabase";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as Linking from "expo-linking";
 
 const createSessionFromUrl = async (url: string) => {
-  const { params, errorCode } = QueryParams.getQueryParams(url);
+  const {params, errorCode} = QueryParams.getQueryParams(url);
 
   if (errorCode) throw new Error(errorCode);
-  const { access_token, refresh_token } = params;
+  const {access_token, refresh_token} = params;
 
   if (!access_token) return;
 
-  const { data, error } = await supabase.auth.setSession({
+  const {data, error} = await supabase.auth.setSession({
     access_token,
     refresh_token,
   });
@@ -40,6 +40,37 @@ const SignInScreen = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  async function signInAnonymously() {
+    setLoading(true);
+    const {data: {session}, error} = await supabase.auth.signInAnonymously();
+    if (error) {
+      Alert.alert(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (session) {
+      // Check if profile exists; insert with full_name: null if missing
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (!existingProfile) {
+        const { error: insertError } = await supabase
+          .from("profiles")
+          .insert({ id: session.user.id, full_name: null, email: null });
+        if (insertError) {
+          Alert.alert("Failed to create profile: " + insertError.message);
+          setLoading(false);
+          return;
+        }
+      }
+    }
+    setLoading(false);
+  }
 
   async function debugSupabaseAuth() {
     supabaseUrl = 'http://192.168.1.151:54321'
@@ -83,7 +114,7 @@ const SignInScreen = () => {
 
   async function signInWithEmail() {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
+    const {error} = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -96,7 +127,7 @@ const SignInScreen = () => {
 
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <StackScreen options={{ title: "Sign in" }} />
+      <StackScreen options={{title: "Sign in"}}/>
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"
@@ -129,6 +160,11 @@ const SignInScreen = () => {
         disabled={loading}
         onPress={signInWithEmail}
         text={loading ? "Signing in..." : "Sign in"}
+      />
+      <Button
+        disabled={loading}
+        onPress={signInAnonymously}
+        text={loading ? "Signing in anonymously..." : "Try Anonymously"}
       />
       <Link
         href="/sign-up"
