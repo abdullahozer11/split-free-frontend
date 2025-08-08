@@ -9,6 +9,7 @@ import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 import { useQueryClient } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useAuth} from "@/src/providers/AuthProvider";
 
 const ANCHORED_GROUPS_STORAGE_KEY = "anchoredGroupIds";
 
@@ -37,6 +38,7 @@ const SettingsScreen = () => {
   const navigation = useNavigation();
   const {alert} = useTranslatedAlert();
   const queryClient = useQueryClient();
+  const { session } = useAuth();
 
   const handleSignOut = async () => {
     const {data: {user}} = await supabase.auth.getUser();
@@ -106,12 +108,12 @@ const SettingsScreen = () => {
           iconName="check"
           title="Terms of Use"
         />
-        <SettingsItem
+        {!session?.user?.is_anonymous && <SettingsItem
           page="password"
           containerColor="yellow"
           iconName="lock"
           title="Change Password"
-        />
+        />}
         <SettingsItem
           page="delete"
           containerColor="red"
