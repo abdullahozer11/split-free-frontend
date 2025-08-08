@@ -60,7 +60,7 @@ const AccountScreen = () => {
           <Text className="text-4xl font-medium text-white">
             {profile?.full_name}
           </Text>
-          <Text className="text-md font-light text-white">{profile.email}</Text>
+          <Text className="text-md font-light text-white">{profile?.email}</Text>
         </View>
       </View>
       <View className="bg-white flex-1 p-5">
