@@ -82,12 +82,12 @@ const SettingsScreen = () => {
       </Pressable>
       <Text className="text-3xl font-semibold">Settings</Text>
       <View className="mt-4">
-        <SettingsItem
-          page="notifications"
-          containerColor="blue"
-          iconName="bell"
-          title="Notifications"
-        />
+        {/*<SettingsItem*/}
+        {/*  page="notifications"*/}
+        {/*  containerColor="blue"*/}
+        {/*  iconName="bell"*/}
+        {/*  title="Notifications"*/}
+        {/*/>*/}
         <SettingsItem
           page="language"
           containerColor="darkorange"

@@ -8,7 +8,7 @@ import { useProfile, useUpdateProfileSingleField } from "@/src/api/profiles";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 
-const Notifications = () => {
+const _notifications = () => {
   const navigation = useNavigation();
 
   const [emailNotifications, setEmailNotifications] = useState(false);
@@ -94,4 +94,4 @@ const Notifications = () => {
   );
 };
 
-export default Notifications;
+export default _notifications;
