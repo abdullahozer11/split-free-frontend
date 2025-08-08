@@ -1,8 +1,13 @@
+import os
 import requests
+from dotenv import load_dotenv
 
-# Define the endpoint URL for your Supabase edge function
-SUPABASE_EDGE_FUNCTION_URL = "https://qpummxvizckytrrsiaig.supabase.co/functions/v1/gemini"
-AUTHORIZATION_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdW1teHZpemNreXRycnNpYWlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTI1NjgzMDgsImV4cCI6MjAyODE0NDMwOH0.DYJIU3x0pd5Ub6PDz1vlJCs07O9WFIXokQLD0By8HbQ"
+# Load variables from .env file
+load_dotenv()
+
+# Fetch from .env
+SUPABASE_EDGE_FUNCTION_URL = os.getenv("EXPO_PUBLIC_SUPABASE_URL") + "/functions/v1/gemini"
+AUTHORIZATION_TOKEN = os.getenv("EXPO_PUBLIC_SUPABASE_ANON")
 
 # Define the test cases: each test case is a tuple of (expense_title, expected_category)
 test_cases = {
