@@ -1,0 +1,55 @@
+Supabase Environment Info
+=========================
+Project: split-free-frontend
+
+Supabase CLI Version:
+2.33.9
+
+Local PostgreSQL Version (config.toml):
+# [storage.image_transformation]
+# [storage.buckets.images]
+# allowed_mime_types = ["image/png", "image/jpeg"]
+# objects_path = "./images"
+
+Local PostgreSQL Docker Images:
+public.ecr.aws/supabase/postgres-meta   v0.91.4                  5f3950434ed9   8 days ago     386MB
+public.ecr.aws/supabase/postgres        15.8.1.085               8613ba8eab94   3 months ago   1.96GB
+public.ecr.aws/supabase/postgrest       v12.2.12                 f01a9766293b   9 months ago   17.4MB
+
+Remote PostgreSQL Version:
+Run 'psql -d <your-remote-db-url> -c "SELECT version();"' in terminal or check in Supabase Studio
+Example: psql -d postgresql://postgres:<password>@db.<project-id>.supabase.co:5432/postgres -c "SELECT version();"
+
+Docker Volumes (Database Data):
+DRIVER    VOLUME NAME
+local     supabase_config_split-free-frontend
+local     supabase_db_split-free-frontend
+local     supabase_storage_split-free-frontend
+
+Running Supabase Containers:
+supabase_studio_split-free-frontend public.ecr.aws/supabase/studio:2025.07.28-sha-578b707
+supabase_pg_meta_split-free-frontend public.ecr.aws/supabase/postgres-meta:v0.91.4
+supabase_edge_runtime_split-free-frontend public.ecr.aws/supabase/edge-runtime:v1.68.3
+supabase_storage_split-free-frontend public.ecr.aws/supabase/storage-api:v1.26.0
+supabase_rest_split-free-frontend public.ecr.aws/supabase/postgrest:v12.2.12
+supabase_realtime_split-free-frontend public.ecr.aws/supabase/realtime:v2.41.11
+supabase_inbucket_split-free-frontend public.ecr.aws/supabase/mailpit:v1.22.3
+supabase_auth_split-free-frontend public.ecr.aws/supabase/gotrue:v2.177.0
+supabase_kong_split-free-frontend public.ecr.aws/supabase/kong:2.8.1
+supabase_vector_split-free-frontend public.ecr.aws/supabase/vector:0.28.1-alpine
+supabase_analytics_split-free-frontend public.ecr.aws/supabase/logflare:1.14.2
+supabase_db_split-free-frontend public.ecr.aws/supabase/postgres:15.8.1.085
+
+Supabase Local Status:
+         API URL: http://127.0.0.1:54321
+     GraphQL URL: http://127.0.0.1:54321/graphql/v1
+  S3 Storage URL: http://127.0.0.1:54321/storage/v1/s3
+          DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      Studio URL: http://127.0.0.1:54323
+    Inbucket URL: http://127.0.0.1:54324
+      JWT secret: super-secret-jwt-token-with-at-least-32-characters-long
+        anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+   S3 Access Key: 625729a08b95bf1b7ff351a663f3a23c
+   S3 Secret Key: 850181e4652dd023b7a98c58ae0d2d34bd487ee0cc3254aed6eda37307425907
+       S3 Region: local
