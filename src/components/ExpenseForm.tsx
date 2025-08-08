@@ -276,8 +276,7 @@ export default function ExpenseForm({
     setLoading(false);
 
     if (error) {
-      console.error("Server error:", error);
-      alert("Error", "Server error.");
+      console.log("Server error:", error);
       return;
     }
     const exp_cat_names = exp_cats.map((exp_cat) => exp_cat?.name);
