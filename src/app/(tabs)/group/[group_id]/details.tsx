@@ -28,12 +28,9 @@ import {
 import { Button, TextInput } from "@/src/components/Translated";
 import { useExpenseList, useExpenseTotalThisMonth } from "@/src/api/expenses";
 import { useTransferList } from "@/src/api/transfers";
-import { Debt, Friend2, Member } from "@/src/components/Person";
+import { Debt, Member } from "@/src/components/Person";
 import {
-  useFriends,
   useAssignMember,
-  useInsertGroupInvitation,
-  usePendingGroupInvitesForGroup,
   useProfile,
 } from "@/src/api/profiles";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -78,20 +75,10 @@ const GroupDetailsScreen = () => {
   } = useTransferList(groupId);
   const { session } = useAuth();
   const {
-    data: friends,
-    isError: friendsError,
-    isLoading: friendsLoading,
-  } = useFriends(session?.user.id);
-  const {
     data: profile,
     isError: profileError,
     isLoading: profileLoading,
   } = useProfile(session?.user.id);
-  const {
-    data: pendingInvites,
-    isError: pInviteError,
-    isLoading: pInviteLoading,
-  } = usePendingGroupInvitesForGroup(groupId);
   const {
     data: profileMember,
     isError: profileMemberError,
@@ -107,15 +94,13 @@ const GroupDetailsScreen = () => {
   const { mutate: settleGroup } = useSettleGroup();
   const { mutate: insertMember } = useInsertMember();
   const { mutate: assignMember } = useAssignMember();
-  const { mutate: insertGroupInvitation } = useInsertGroupInvitation();
   const { settings } = useSettings();
 
   // menu related
   const [visible, setVisible] = useState(false);
   const [isAddingNewName, setIsAddingNewName] = useState(false);
-  const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
-  const [isGroupExitterVisible, setIsGroupExitterVisible] = useState(false);
+  const [isGroupExiterVisible, setIsGroupExiterVisible] = useState(false);
   const [inviteLink, setInviteLink] = useState('');
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState("");
@@ -134,7 +119,7 @@ const GroupDetailsScreen = () => {
       allTransactions.push({
         ...expense,
         type: "expense",
-        date: expense.created_at,
+        date: expense?.created_at,
       });
     });
 
@@ -154,8 +139,6 @@ const GroupDetailsScreen = () => {
     return groupElementsByDay(allTransactions, settings.language);
   }, [expensePages, transferPages, settings.language]);
 
-  const [updatedFriends, setUpdatedFriends] = useState([]);
-
   useEffect(() => {
     const _balance =
       group?.members
@@ -164,30 +147,6 @@ const GroupDetailsScreen = () => {
     setTotalBalance(_balance);
   }, [group, profile?.id]);
 
-  useEffect(() => {
-    // Create a list of member ids
-    const memberIds = group?.members?.map((member) => member.profile?.id) || [];
-
-    // Create a list of pending invite ids
-    const pendingInviteIds = pendingInvites?.map(
-      (invite) => invite?.receiver_profile?.id,
-    );
-
-    // Update friends with membership status
-    const newUpdatedFriends = friends?.map((friend) => {
-      const friendId = friend.profile.id;
-      if (memberIds?.includes(friendId)) {
-        return { ...friend, membershipStatus: "member" };
-      } else if (pendingInviteIds?.includes(friendId)) {
-        return { ...friend, membershipStatus: "invited" };
-      } else {
-        return { ...friend, membershipStatus: "available" };
-      }
-    });
-
-    setUpdatedFriends(newUpdatedFriends);
-  }, [friends, pendingInvites, group]);
-
   useExpenseSubscription(groupId);
 
   if (
@@ -195,9 +154,7 @@ const GroupDetailsScreen = () => {
     expenseLoading ||
     transferLoading ||
     profileLoading ||
-    friendsLoading ||
     profileMemberLoading ||
-    pInviteLoading ||
     expenseTotalMLoading
   ) {
     return <ActivityIndicator />;
@@ -208,9 +165,7 @@ const GroupDetailsScreen = () => {
     expenseError ||
     transferError ||
     profileError ||
-    friendsError ||
-    profileMemberError ||
-    pInviteError
+    profileMemberError
   ) {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
@@ -224,10 +179,10 @@ const GroupDetailsScreen = () => {
   };
 
   const handleSettle = async () => {
-    await settleGroup(group.id, {
+    await settleGroup(group?.id, {
       onSuccess: async () => {
         // Locally update settled status for all expenses in this group
-        queryClient.setQueryData(["expenses", group.id], (oldData) => {
+        queryClient.setQueryData(["expenses", group?.id], (oldData) => {
           if (!oldData) return oldData;
           return {
             ...oldData,
@@ -240,8 +195,8 @@ const GroupDetailsScreen = () => {
         setIsDialog2Visible(false);
         await queryClient.invalidateQueries(["groups"]);
         await queryClient.invalidateQueries(["debts"]);
-        await queryClient.invalidateQueries(["expenses", group.id]);
-        await queryClient.invalidateQueries(["transfers", group.id]);
+        await queryClient.invalidateQueries(["expenses", group?.id]);
+        await queryClient.invalidateQueries(["transfers", group?.id]);
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -251,7 +206,7 @@ const GroupDetailsScreen = () => {
   };
 
   const handleDelete = async () => {
-    await deleteGroup(group.id, {
+    await deleteGroup(group?.id, {
       onSuccess: async () => {
         // console.log('Successfully deleted group with id', group.id);
         navigation.goBack();
@@ -275,7 +230,7 @@ const GroupDetailsScreen = () => {
   };
 
   const promptExitGroup = () => {
-    setIsGroupExitterVisible(true);
+    setIsGroupExiterVisible(true);
   };
 
   const handleExitGroup = () => {
@@ -296,28 +251,6 @@ const GroupDetailsScreen = () => {
             "Error",
             "There was an error exiting the group. Please try again.",
           );
-        },
-      },
-    );
-  };
-
-  const handleInvite = (id) => {
-    insertGroupInvitation(
-      {
-        sender: session?.user.id,
-        receiver: id,
-        group_id: groupId,
-        group_name: group.title,
-      },
-      {
-        onSuccess: () => {
-          // console.log('Successfully inserted group invitation');
-          setIsFriendSelectorVisible(false);
-          queryClient.invalidateQueries(["group_invites_for_group"]);
-        },
-        onError: (error) => {
-          console.error("Server error:", error);
-          alert("Error", "Server error.");
         },
       },
     );
@@ -349,10 +282,10 @@ const GroupDetailsScreen = () => {
       return;
     }
 
-    const existingNames = group.members
+    const existingNames = group?.members
       .map(m => m.name.toLowerCase().trim());
 
-    if (existingNames.includes(trimmedName.toLowerCase())) {
+    if (existingNames?.includes(trimmedName.toLowerCase())) {
       alert("Error", "Name already exists in the group.");
       return;
     }
@@ -598,13 +531,13 @@ const GroupDetailsScreen = () => {
             {/* Group Title - Separate row with proper spacing */}
             <View className="w-full px-4 mt-4">
               <Text
-                variant={group.title.length > 20 ? "headlineSmall" : "headlineMedium"}
+                variant={(group?.title?.length && group?.title?.length > 20) ? "headlineSmall" : "headlineMedium"}
                 className="text-white text-center"
                 numberOfLines={2}
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                {group.title}
+                {group?.title}
               </Text>
             </View>
           </View>
@@ -644,9 +577,9 @@ const GroupDetailsScreen = () => {
           </Dialog.Actions>
         </Dialog>
         <Dialog
-          visible={isGroupExitterVisible}
+          visible={isGroupExiterVisible}
           onDismiss={() => {
-            setIsGroupExitterVisible(false);
+            setIsGroupExiterVisible(false);
           }}
         >
           <Dialog.Icon icon="alert" />
@@ -655,53 +588,13 @@ const GroupDetailsScreen = () => {
             <Text variant="bodyMedium">This action cannot be taken back</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setIsGroupExitterVisible(false)}>
+            <Button onPress={() => setIsGroupExiterVisible(false)}>
               Cancel
             </Button>
             <Button onPress={handleExitGroup}>Exit</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
-      {/*Start Friend Selector for invite*/}
-      <Modal
-        visible={isFriendSelectorVisible}
-        onDismiss={() => {
-          setIsFriendSelectorVisible(false);
-        }}
-        contentContainerStyle={{
-          width: "100%",
-          paddingHorizontal: 10,
-          alignSelf: "center",
-          borderRadius: 20,
-        }}
-      >
-        <View className="h-[20px] bg-white" />
-        {updatedFriends &&
-          updatedFriends?.map(
-            ({ profile: { id, email, avatar_url }, membershipStatus }) => (
-              <Friend2
-                key={id}
-                email={email}
-                avatar_url={avatar_url}
-                onInvite={() => handleInvite(id)}
-                status={membershipStatus}
-              />
-            ),
-          )}
-        {!friends.length && (
-          <View className="bg-white h-15 text-center pl-5">
-            <Text variant={"headlineMedium"}>No friend is found</Text>
-          </View>
-        )}
-        <TouchableOpacity
-          className="absolute top-[2px] right-[10px]"
-          onPress={() => {
-            setIsFriendSelectorVisible(false);
-          }}
-        >
-          <Feather name={"x"} size={28} />
-        </TouchableOpacity>
-      </Modal>
       {/* Invite QR Modal */}
       <Modal
         visible={QRCodeVisible}
