@@ -1,4 +1,4 @@
-.PHONY: build preview production clean update doctor run start submit
+.PHONY: build preview production clean update doctor run start submit clean-supabase
 
 # Development Commands
 start:
@@ -49,3 +49,34 @@ production: clean
 release: clean production
 	@echo "✅ Full release build completed!"
 	@echo "🚀 Ready to upload to Google Play Console"
+
+# Supabase cleanup
+clean-supabase:
+	@echo "Supabase Cleanup for split-free-frontend"
+	@echo "======================================="
+	@echo "Stopping Supabase..."
+	supabase stop || true
+	@echo ""
+
+	@echo "Listing Supabase Volumes:"
+	docker volume ls --filter label=com.supabase.cli.project=split-free-frontend || true
+	@echo ""
+
+	@echo "Removing Supabase Volumes..."
+	docker volume rm $$(docker volume ls -q --filter label=com.supabase.cli.project=split-free-frontend) || true
+	@echo ""
+
+	@echo "Listing Supabase Images:"
+	docker images | grep supabase || true
+	@echo ""
+
+	@echo "Removing Supabase Images..."
+	docker rmi $$(docker images | grep supabase | awk '{print $$1":"$$2}' | sort -u) || true
+	@echo ""
+
+	@echo "Verifying supabase/config.toml:"
+	grep 'image' supabase/config.toml || echo "No image specified in config.toml"
+	@echo ""
+
+	@echo "Cleanup complete. Update supabase/config.toml if needed and run 'supabase start'."
+
