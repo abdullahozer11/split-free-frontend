@@ -178,7 +178,7 @@ const GroupScreen = () => {
       nameModalShownRef.current = false; // Allow future checks if needed
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update name. Please try again.");
+      alert("Failed to update name: ", "Please try again.");
     } finally {
       isProcessingNameUpdateRef.current = false;
     }

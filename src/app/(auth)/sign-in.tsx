@@ -1,5 +1,5 @@
 import {Image, View} from "react-native";
-import { Text, useTranslatedAlert } from "@/src/components/Translated";
+import {Text, useTranslatedAlert, useTranslations} from "@/src/components/Translated";
 import {TextInput} from "@/src/components/Translated";
 import React, {useState} from "react";
 import Button from "@/src/components/Button";
@@ -106,9 +106,11 @@ const SignInScreen = () => {
     setLoading(false);
   }
 
+  const { t } = useTranslations();
+
   return (
     <View className="flex-1 justify-center p-5 bg-white">
-      <Stack.Screen options={{title: "Sign in"}}/>
+      <Stack.Screen options={{title: t("Sign in")}}/>
       <Image
         source={require("@/assets/images/logo.png")}
         className="h-52 w-52 self-center"

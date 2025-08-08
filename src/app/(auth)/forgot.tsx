@@ -1,6 +1,6 @@
 import { View, Image } from "react-native";
 import React, { useState, useEffect } from "react";
-import { TextInput, useTranslatedAlert } from "@/src/components/Translated";
+import { Text, TextInput, useTranslatedAlert } from "@/src/components/Translated";
 import Button from "@/src/components/Button";
 import { Link, useRouter } from "expo-router";
 import { supabase } from "@/src/lib/supabase";
@@ -93,7 +93,7 @@ const ForgotPasswordScreen = () => {
         }
       />
       <Link href="/sign-in" className="self-center font-bold text-blue-500">
-        Back to Sign in
+        <Text>Back to sign in</Text>
       </Link>
     </View>
   );

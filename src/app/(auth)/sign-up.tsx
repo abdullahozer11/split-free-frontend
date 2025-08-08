@@ -160,9 +160,9 @@ const SignUpScreen = () => {
       <View className="flex-row items-center">
         <CheckBox checked={acceptance} onPress={toggleAcceptance} />
         <Text>
-          I agree to{" "}
+          <Text>I agree to</Text><Text> </Text>
           <Link href="/(global)/terms" className="underline">
-            terms and conditions
+            <Text>terms and conditions</Text>
           </Link>
         </Text>
       </View>
@@ -172,7 +172,7 @@ const SignUpScreen = () => {
         text={loading ? "Creating account..." : "Create account"}
       />
       <Link href="/sign-in" className="self-center font-bold text-blue-500">
-        Sign in
+        <Text>Sign in</Text>
       </Link>
     </View>
   );
