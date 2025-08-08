@@ -88,8 +88,6 @@ const GroupScreen = () => {
       return;
     }
 
-    console.log("profile is ", profile);
-
     // If profile exists but full_name is null, empty, or "Anonymous", prompt for name
     if (!profile?.full_name || profile.full_name.trim() === "" || profile.full_name === "Anonymous") {
       hasCheckedNameRef.current = true;
