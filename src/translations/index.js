@@ -1,5 +1,6 @@
 export const translations = {
   en: {
+    "FAQ": "FAQ",
     "debts": "Debts",
     "(me)": "(me)",
     "Description": "Description",
@@ -210,6 +211,7 @@ export const translations = {
     'Cancel': 'Cancel',
   },
   fr: {
+    "FAQ": "FAQ",  // Frequently used as-is in French
     "debts": "Dettes",
     "(me)": "(moi)",
     "Description": "Description",
@@ -420,6 +422,7 @@ export const translations = {
     'Cancel': 'Annuler',
   },
   de: {
+    "FAQ": "Häufig gestellte Fragen",
     "debts": "Schulden",
     "(me)": "(ich)",
     "Description": "Beschreibung",
@@ -630,6 +633,7 @@ export const translations = {
     'Cancel': 'Abbrechen',
   },
   es: {
+    "FAQ": "Preguntas frecuentes",
     "debts": "Deudas",
     "(me)": "(yo)",
     "Description": "Descripción",
@@ -840,6 +844,7 @@ export const translations = {
     'Cancel': 'Cancelar',
   },
   tr: {
+    "FAQ": "SSS",  // Sıkça Sorulan Sorular
     "debts": "Borçlar",
     "(me)": "(ben)",
     "Description": "Açıklama",
@@ -1050,6 +1055,7 @@ export const translations = {
     'Cancel': 'İptal',
   },
   gr: {
+    "FAQ": "Συχνές ερωτήσεις",
     "debts": "Χρέη",
     "(me)": "(εγώ)",
     "Description": "Περιγραφή",
@@ -1260,6 +1266,7 @@ export const translations = {
     'Cancel': 'Ακύρωση',
   },
   ru: {
+    "FAQ": "Часто задаваемые вопросы",
     "debts": "Долги",
     "(me)": "(я)",
     "Description": "Описание",
@@ -1470,6 +1477,7 @@ export const translations = {
     'Cancel': 'Отмена',
   },
   it: {
+    "FAQ": "Domande frequenti",
     "debts": "Debiti",
     "(me)": "(io)",
     "Description": "Descrizione",
