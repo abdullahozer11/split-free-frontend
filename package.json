@@ -53,6 +53,7 @@
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.79",
     "cross-env": "^7.0.3",
+    "dotenv-cli": "^10.0.0",
     "eslint-config-expo": "^7.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jest": "^28.6.0",

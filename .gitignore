@@ -97,3 +97,6 @@ ios
 *dump.sql
 
 supabase/seed.sql
+/local
+/preview
+/production
