@@ -1,5 +1,8 @@
 export const translations = {
   en: {
+    "Email is required": "Email is required",
+    "Password is required": "Password is required",
+    "Please enter a valid email": "Please enter a valid email",
     "None": "None",
     "Name cannot be empty.": "Name cannot be empty.",
     "Name already exists in the group.": "Name already exists in the group.",
@@ -21,8 +24,8 @@ export const translations = {
     "Signing in anonymously...": "Signing in anonymously...",
     "Try Anonymously": "Try Anonymously",
     "Error": "Error",
-    "Warning": "TODO",
-    "Success": "TODO",
+    "Warning": "Warning",
+    "Success": "Success",
     "Close": "Close",
     "Share Link": "Share Link",
     "Invite to Group": "Invite to Group",
@@ -218,6 +221,9 @@ export const translations = {
     'Cancel': 'Cancel',
   },
   fr: {
+    "Email is required": "L'e-mail est requis",
+    "Password is required": "Le mot de passe est requis",
+    "Please enter a valid email": "Veuillez entrer une adresse e-mail valide",
     "None": "Aucun",
     "Name cannot be empty.": "Le nom ne peut pas être vide.",
     "Name already exists in the group.": "Le nom existe déjà dans le groupe.",
@@ -436,6 +442,9 @@ export const translations = {
     'Cancel': 'Annuler',
   },
   de: {
+    "Email is required": "E-Mail ist erforderlich",
+    "Password is required": "Passwort ist erforderlich",
+    "Please enter a valid email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
     "None": "Keine",
     "Name cannot be empty.": "Der Name darf nicht leer sein.",
     "Name already exists in the group.": "Der Name existiert bereits in der Gruppe.",
@@ -654,6 +663,9 @@ export const translations = {
     'Cancel': 'Abbrechen',
   },
   es: {
+    "Email is required": "Se requiere correo electrónico",
+    "Password is required": "Se requiere contraseña",
+    "Please enter a valid email": "Por favor, introduce un correo electrónico válido",
     "None": "Ninguno",
     "Name cannot be empty.": "El nombre no puede estar vacío.",
     "Name already exists in the group.": "El nombre ya existe en el grupo.",
@@ -872,6 +884,9 @@ export const translations = {
     'Cancel': 'Cancelar',
   },
   tr: {
+    "Email is required": "E-posta gerekli",
+    "Password is required": "Şifre gerekli",
+    "Please enter a valid email": "Lütfen geçerli bir e-posta girin",
     "None": "Yok",
     "Name cannot be empty.": "İsim boş olamaz.",
     "Name already exists in the group.": "İsim zaten grupta mevcut.",
@@ -1090,6 +1105,9 @@ export const translations = {
     'Cancel': 'İptal',
   },
   gr: {
+    "Email is required": "Απαιτείται email",
+    "Password is required": "Απαιτείται κωδικός πρόσβασης",
+    "Please enter a valid email": "Παρακαλώ εισάγετε ένα έγκυρο email",
     "None": "Κανένα",
     "Name cannot be empty.": "Το όνομα δεν μπορεί να είναι κενό.",
     "Name already exists in the group.": "Το όνομα υπάρχει ήδη στην ομάδα.",
@@ -1308,6 +1326,9 @@ export const translations = {
     'Cancel': 'Ακύρωση',
   },
   ru: {
+    "Email is required": "Требуется электронная почта",
+    "Password is required": "Требуется пароль",
+    "Please enter a valid email": "Пожалуйста, введите действительный адрес электронной почты",
     "None": "Нет",
     "Name cannot be empty.": "Имя не может быть пустым.",
     "Name already exists in the group.": "Имя уже существует в группе.",
@@ -1526,6 +1547,9 @@ export const translations = {
     'Cancel': 'Отмена',
   },
   it: {
+    "Email is required": "L'email è obbligatoria",
+    "Password is required": "La password è obbligatoria",
+    "Please enter a valid email": "Per favore inserisci un'email valida",
     "None": "Nessuno",
     "Name cannot be empty.": "Il nome non può essere vuoto.",
     "Name already exists in the group.": "Il nome esiste già nel gruppo.",
