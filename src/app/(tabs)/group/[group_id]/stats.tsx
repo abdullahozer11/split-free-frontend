@@ -14,11 +14,10 @@ import {
 import { useExpenseList } from "@/src/api/expenses/index.ts";
 import { useProfileMember } from "@/src/api/members/index.ts";
 import { useAuth } from "@/src/providers/AuthProvider.tsx";
-import PieChart from "react-native-pie-chart/src/index.tsx";
+import PieChart from "@/src/components/PieChart";
 import { inThisMonth } from "@/src/utils/helpers.ts";
-import { currencyOptions } from "@/src/constants";
+import { currencyOptions } from "@/src/constants/Currencies";
 import { useGroup } from "@/src/api/groups";
-
 
 enum Selection {
   Month = "This Month",
@@ -441,7 +440,7 @@ const Stats = () => {
                           width: lh,
                           borderRadius: lh / 2,
                           backgroundColor:
-                            groupedExpensesF[category].category.bg_color,
+                          groupedExpensesF[category].category.bg_color,
                         }}
                       />
                       <Text style={{ fontSize: (lh * 2) / 3 }}>{category}</Text>
@@ -462,7 +461,7 @@ const Stats = () => {
                           width: lh,
                           borderRadius: lh / 2,
                           backgroundColor:
-                            groupedExpensesF[category].category.bg_color,
+                          groupedExpensesF[category].category.bg_color,
                         }}
                       />
                       <Text style={{ fontSize: (lh * 2) / 3 }}>{category}</Text>
