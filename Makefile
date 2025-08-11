@@ -16,7 +16,7 @@ clean:
 	npx expo prebuild --clean
 	rm -rf node_modules
 	rm package-lock.json
-	npm install --legacy-peer-deps
+	npm install
 
 # EAS Update Commands (for OTA updates)
 update:
