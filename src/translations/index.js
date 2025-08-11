@@ -1,5 +1,9 @@
 export const translations = {
   en: {
+    "No members found": "No members found",
+    "participant": "participant",
+    "participants": "participants",
+    "selected": "selected",
     "Email is required": "Email is required",
     "Password is required": "Password is required",
     "Please enter a valid email": "Please enter a valid email",
@@ -221,6 +225,10 @@ export const translations = {
     'Cancel': 'Cancel',
   },
   fr: {
+    "No members found": "Aucun membre trouvé",
+    "participant": "participant",
+    "participants": "participants",
+    "selected": "sélectionné",
     "Email is required": "L'e-mail est requis",
     "Password is required": "Le mot de passe est requis",
     "Please enter a valid email": "Veuillez entrer une adresse e-mail valide",
@@ -442,6 +450,10 @@ export const translations = {
     'Cancel': 'Annuler',
   },
   de: {
+    "No members found": "Keine Mitglieder gefunden",
+    "participant": "teilnehmer",
+    "participants": "teilnehmer",
+    "selected": "ausgewählt",
     "Email is required": "E-Mail ist erforderlich",
     "Password is required": "Passwort ist erforderlich",
     "Please enter a valid email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
@@ -663,6 +675,10 @@ export const translations = {
     'Cancel': 'Abbrechen',
   },
   es: {
+    "No members found": "No se encontraron miembros",
+    "participant": "participante",
+    "participants": "participantes",
+    "selected": "seleccionado",
     "Email is required": "Se requiere correo electrónico",
     "Password is required": "Se requiere contraseña",
     "Please enter a valid email": "Por favor, introduce un correo electrónico válido",
@@ -884,6 +900,10 @@ export const translations = {
     'Cancel': 'Cancelar',
   },
   tr: {
+    "No members found": "Üye bulunamadı",
+    "participant": "katılımcı",
+    "participants": "katılımcılar",
+    "selected": "seçilen",
     "Email is required": "E-posta gerekli",
     "Password is required": "Şifre gerekli",
     "Please enter a valid email": "Lütfen geçerli bir e-posta girin",
@@ -1105,6 +1125,10 @@ export const translations = {
     'Cancel': 'İptal',
   },
   gr: {
+    "No members found": "Δεν βρέθηκαν μέλη",
+    "participant": "συμμετέχων",
+    "participants": "συμμετέχοντες",
+    "selected": "επιλεγμένο",
     "Email is required": "Απαιτείται email",
     "Password is required": "Απαιτείται κωδικός πρόσβασης",
     "Please enter a valid email": "Παρακαλώ εισάγετε ένα έγκυρο email",
@@ -1326,6 +1350,10 @@ export const translations = {
     'Cancel': 'Ακύρωση',
   },
   ru: {
+    "No members found": "Члены не найдены",
+    "participant": "участник",
+    "participants": "участники",
+    "selected": "выбранный",
     "Email is required": "Требуется электронная почта",
     "Password is required": "Требуется пароль",
     "Please enter a valid email": "Пожалуйста, введите действительный адрес электронной почты",
@@ -1547,6 +1575,10 @@ export const translations = {
     'Cancel': 'Отмена',
   },
   it: {
+    "No members found": "Nessun membro trovato",
+    "participant": "partecipante",
+    "participants": "partecipanti",
+    "selected": "selezionato",
     "Email is required": "L'email è obbligatoria",
     "Password is required": "La password è obbligatoria",
     "Please enter a valid email": "Per favore inserisci un'email valida",
