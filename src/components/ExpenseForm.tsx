@@ -18,8 +18,7 @@ import {
   useTranslations,
 } from "@/src/components/Translated";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import MyDropdown from "@/src/components/DropdownComponent";
-import MyMultiSelect from "@/src/components/MultiSelectComponent";
+import MultiSelect from "@/src/components/MultiSelect";
 import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { exp_cats } from "@/src/utils/expense_categories";
@@ -423,7 +422,7 @@ export default function ExpenseForm({
               containerClassName="flex-1"
             />
           </View>
-          <MyMultiSelect
+          <MultiSelect
             selected={participants}
             members={members}
             onChange={(participants) =>
