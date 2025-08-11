@@ -38,7 +38,7 @@ import { useInsertMember, useProfileMember } from "@/src/api/members";
 import { useQueryClient } from "@tanstack/react-query";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
-import { currencyOptions } from "@/src/constants";
+import { currencyOptions } from "@/src/constants/Currencies";
 import QRCode from 'react-native-qrcode-svg';
 import { generateInvite } from "@/src/api/invites";
 

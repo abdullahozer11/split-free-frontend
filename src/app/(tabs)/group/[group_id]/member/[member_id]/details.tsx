@@ -26,7 +26,7 @@ import {
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useDebt } from "@/src/api/debts";
 import { useQueryClient } from "@tanstack/react-query";
-import { currencyOptions } from "@/src/constants";
+import { currencyOptions } from "@/src/constants/Currencies";
 import { formatDateString } from "@/src/utils/helpers";
 import { useSettings } from "@/src/providers/SettingsProvider";
 
