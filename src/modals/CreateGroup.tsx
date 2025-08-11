@@ -8,13 +8,13 @@ import {
 import { TextInput, Text, useTranslatedAlert } from "@/src/components/Translated";
 import { Feather } from "@expo/vector-icons";
 import Participants from "@/src/modals/CreateGroupParticipants";
+import CustomDropdown from "@/src/components/CustomDropdown"; // Import the CustomDropdown
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useInsertGroup } from "@/src/api/groups";
 import { useProfile } from "@/src/api/profiles";
 import { ActivityIndicator } from "react-native-paper";
 import { useQueryClient } from "@tanstack/react-query";
-import { currencyOptions } from "@/src/constants";
-
+import { currencyOptions } from "@/src/constants/Currencies";
 
 const CreateGroupModal = ({ isVisible, onClose }) => {
   const { alert } = useTranslatedAlert();
@@ -22,7 +22,6 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
   const [title, setTitle] = useState("");
   const [currency, setCurrency] = useState("EUR");
   const [showParticipantsModal, setShowParticipantsModal] = useState(false);
-  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const [error, setError] = useState("");
 
   const { mutate: insertGroup } = useInsertGroup();
@@ -105,7 +104,11 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
     setShowParticipantsModal(false);
   };
 
-  const currencies = currencyOptions.map(option => option.value);
+  // Transform currencyOptions to work with CustomDropdown format
+  const dropdownCurrencyOptions = currencyOptions.map(option => ({
+    label: option.value, // Use the currency code as both label and value
+    value: option.value
+  }));
 
   return (
     <Modal
@@ -127,29 +130,43 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
               <Text className="font-bold text-xl">Save</Text>
             </Pressable>
           </View>
-          <View className="flex-row items-center border-b border-gray-300">
+
+          <View className="mb-4">
             <TextInput
-              className="flex-1 h-15 bg-white font-normal text-2xl px-2.5"
+              className="h-15 bg-white font-normal text-2xl px-2.5 border-b border-gray-300"
               placeholder="Enter Group Name"
               value={title}
               onChangeText={(text) => setTitle(text)}
             />
-            <TouchableOpacity
-              onPress={() => setShowCurrencyModal(true)}
-              className="px-4"
-            >
-              <Text className="text-2xl font-normal">{currency}</Text>
-            </TouchableOpacity>
           </View>
+
+          <View className="mb-4">
+            <CustomDropdown
+              data={dropdownCurrencyOptions}
+              value={currency}
+              onChange={setCurrency}
+              placeholder="Select Currency"
+              iconName="dollar-sign"
+              containerClassName="w-full"
+              dropdownClassName="flex-row items-center border border-gray-300 rounded-md p-4 h-16 justify-between bg-white"
+              textClassName="text-xl font-normal flex-1 ml-2"
+              modalContentClassName="bg-white rounded-md w-3/5 max-h-[300px] p-4"
+              itemClassName="p-3 border-b border-gray-200 items-center"
+              itemTextClassName="text-lg text-gray-800"
+            />
+          </View>
+
           <TouchableOpacity
             className="mt-2.5 justify-center items-center rounded-2xl border border-dashed py-2.5 mb-1.5"
             onPress={openParticipantsModal}
           >
             <Text className="text-xl font-medium">Add Participants</Text>
           </TouchableOpacity>
+
           <Text className="text-red-500">{error}</Text>
         </View>
       </View>
+
       {showParticipantsModal && (
         <Participants
           isVisible={showParticipantsModal}
@@ -158,32 +175,6 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
           members={members}
         />
       )}
-      <Modal
-        visible={showCurrencyModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowCurrencyModal(false)}
-      >
-        <View
-          className="flex-1 justify-center items-center"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        >
-          <View className="bg-white p-4 rounded-lg w-[60%]">
-            {currencies.map((curr) => (
-              <TouchableOpacity
-                key={curr}
-                onPress={() => {
-                  setCurrency(curr);
-                  setShowCurrencyModal(false);
-                }}
-                className="py-2 items-center"
-              >
-                <Text className="text-lg">{curr}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </Modal>
     </Modal>
   );
 };

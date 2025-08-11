@@ -9,13 +9,14 @@ import {
   View,
 } from "react-native";
 import { getFormattedDate, formatDate } from "@/src/utils/helpers";
+import { ActivityIndicator, Avatar, Tooltip } from "react-native-paper";
 import {
-  ActivityIndicator,
-  Avatar,
-  Tooltip,
-} from "react-native-paper";
-import { Button, TextInput, Text, useTranslatedAlert, useTranslations } from "@/src/components/Translated";
-import { Dropdown } from "react-native-element-dropdown";
+  Button,
+  TextInput,
+  Text,
+  useTranslatedAlert,
+  useTranslations,
+} from "@/src/components/Translated";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
@@ -26,12 +27,13 @@ import { supabase } from "@/src/lib/supabase.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
+import CustomDropdown from "@/src/components/CustomDropdown";
 
 const renderCatItem = (item) => {
   return (
     <View className={"flex-row h-12 px-2 justify-between items-center"}>
-      <Text variant={"titleSmall"}>{item.name}</Text>
-      <MaterialIcons size={24} name={item.icon} />
+      <Text className={"text-sm font-medium"}>{item.label}</Text>
+      <MaterialIcons size={24} name={item.icon} color="black" />
     </View>
   );
 };
@@ -45,15 +47,14 @@ export default function ExpenseForm({
   groupId,
   updatingExpense,
 }) {
-  const {t} = useTranslations();
+  const { t } = useTranslations();
   const { alert } = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [isFocus, setIsFocus] = useState(false);
   const [isLoading, setLoading] = useState();
   const [hasLoadedLastSelections, setHasLoadedLastSelections] = useState(false);
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
   // Load last selections from AsyncStorage
@@ -62,17 +63,23 @@ export default function ExpenseForm({
       try {
         // Only load last selections if we're not updating an existing expense
         if (!updatingExpense) {
-          const payerJson = await AsyncStorage.getItem(getPayerStorageKey(groupId));
-          const participantsJson = await AsyncStorage.getItem(getParticipantsStorageKey(groupId));
+          const payerJson = await AsyncStorage.getItem(
+            getPayerStorageKey(groupId),
+          );
+          const participantsJson = await AsyncStorage.getItem(
+            getParticipantsStorageKey(groupId),
+          );
 
           const lastPayers = payerJson ? JSON.parse(payerJson) : [];
-          const lastParticipants = participantsJson ? JSON.parse(participantsJson) : [];
+          const lastParticipants = participantsJson
+            ? JSON.parse(participantsJson)
+            : [];
 
           // Update form state with last selections
-          setFormState(prev => ({
+          setFormState((prev) => ({
             ...prev,
             payers: lastPayers.length ? lastPayers : [],
-            participants: lastParticipants.length ? lastParticipants : []
+            participants: lastParticipants.length ? lastParticipants : [],
           }));
         }
         setHasLoadedLastSelections(true);
@@ -301,6 +308,18 @@ export default function ExpenseForm({
     return int[categoryKey] || categoryKey;
   };
 
+  // Prepare data for CustomDropdown
+  const categoryData = exp_cats.map((item) => ({
+    label: getDisplayCategoryName(item.name),
+    value: item.name,
+    icon: item.icon,
+  }));
+
+  const payerData = members.map((member) => ({
+    label: member.name,
+    value: member.id,
+  }));
+
   // Show loading indicator while initializing the form
   if (!hasLoadedLastSelections) {
     return <ActivityIndicator />;
@@ -319,9 +338,7 @@ export default function ExpenseForm({
           <Feather className={"font-bold"} name={"arrow-left"} size={32} />
         </TouchableOpacity>
         <TouchableOpacity
-          className={
-            "bg-white p-1 h-12 rounded-md justify-center items-center"
-          }
+          className={"bg-white p-1 h-12 rounded-md justify-center items-center"}
           onPress={() => {
             onSubmit();
           }}
@@ -395,16 +412,15 @@ export default function ExpenseForm({
               size={48}
               source={require("@/assets/images/blank-profile.png")}
             />
-            <MyDropdown
-              labelField="name"
-              placeholder={int["Select item"]}
-              valueField="id"
-              data={members}
-              onChange={(payer) => {
-                handleInputChange("payers", [payer]);
-              }}
+            <CustomDropdown
+              data={payerData}
               label={"Who paid?"}
-              selected={payers[0]}
+              value={payers[0]}
+              onChange={(newValue) => {
+                handleInputChange("payers", [newValue]);
+              }}
+              placeholder={int["Select item"]}
+              containerClassName="flex-1"
             />
           </View>
           <MyMultiSelect
@@ -418,21 +434,15 @@ export default function ExpenseForm({
             Pick expense category or use AI to generate
           </Text>
           <View className={"flex-row gap-4"}>
-            <Dropdown
-              data={exp_cats}
-              labelField={settings.language}
-              valueField={"name"}
-              placeholder={!isFocus ? int["Select a category"] : "..."}
-              onChange={(item) => {
-                handleInputChange("category", item.name);
-                setIsFocus(false);
-              }}
-              className={"flex-1 rounded-md text-xl text-pink-300 bg-white p-2"}
-              selectedTextStyle={{ marginLeft: 10 }}
-              renderItem={renderCatItem}
-              getDisplayText={(item) => getDisplayCategoryName(item.name)}
+            <CustomDropdown
+              data={categoryData}
               value={category}
-              dropdownPosition={"top"}
+              onChange={(newValue) => {
+                handleInputChange("category", newValue);
+              }}
+              placeholder={int["Select a category"]}
+              containerClassName="flex-1 bg-white mt-4"
+              renderItem={renderCatItem}
             />
             <Tooltip title="Auto generate">
               <Button
