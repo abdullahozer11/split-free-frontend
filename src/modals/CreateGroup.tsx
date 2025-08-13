@@ -146,7 +146,6 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
               value={currency}
               onChange={setCurrency}
               placeholder="Select Currency"
-              iconName="dollar-sign"
               containerClassName="w-full"
               dropdownClassName="flex-row items-center border border-gray-300 rounded-md p-4 h-16 justify-between bg-white"
               textClassName="text-xl font-normal flex-1 ml-2"
