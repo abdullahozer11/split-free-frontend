@@ -1,7 +1,6 @@
 {
   "expo": {
     "scheme": "xyz.splitfree",
-    "name": "SplitFree",
     "slug": "split-free-frontend",
     "version": "1.0.5",
     "orientation": "portrait",
@@ -18,8 +17,7 @@
     "ios": {
       "associatedDomains": ["applinks:split-free-next.vercel.app"],
       "supportsTablet": true,
-      "userInterfaceStyle": "light",
-      "bundleIdentifier": "xyz.splitfree"
+      "userInterfaceStyle": "light"
     },
     "android": {
       "adaptiveIcon": {
