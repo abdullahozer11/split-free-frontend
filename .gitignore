@@ -100,3 +100,6 @@ supabase/seed.sql
 /local
 /preview
 /production
+/.env.development
+/.env.preview
+/.env.production
