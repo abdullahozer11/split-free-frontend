@@ -1,11 +1,8 @@
-.PHONY: build preview production clean update doctor run start submit clean-supabase
+.PHONY: build preview production clean doctor start submit clean-supabase
 
 # Development Commands
 start:
 	npx expo start
-
-run:
-	npx expo run:android
 
 # Quick build using EAS (managed workflow)
 build:
@@ -18,10 +15,6 @@ clean:
 	rm package-lock.json
 	npm install
 
-# EAS Update Commands (for OTA updates)
-update:
-	eas update --branch preview --platform android
-
 # Project Health Checks
 doctor:
 	npx expo install --check
@@ -32,17 +25,17 @@ submit:
 	eas submit --platform android --profile production
 
 # Preview build (AAB for testing)
-preview: clean
-	eas build --platform android --profile preview --local
+preview:
+	npx dotenv-cli -e .env.preview -- eas build --platform android --profile preview --local
 	@echo "✅ Preview AAB completed"
 
 # Quick build using EAS (managed workflow)
 development:
-	eas build --platform android --profile development --local
+	npx dotenv-cli -e .env.development -- eas build --platform android --profile development --local
 
 # Production build (AAB for Play Store)
-production: clean
-	eas build --platform android --profile production --local
+production:
+	npx dotenv-cli -e .env.production -- eas build --platform android --profile production --local
 	@echo "✅ Production AAB completed"
 
 # Full release workflow (for production)
@@ -79,4 +72,3 @@ clean-supabase:
 	@echo ""
 
 	@echo "Cleanup complete. Update supabase/config.toml if needed and run 'supabase start'."
-
