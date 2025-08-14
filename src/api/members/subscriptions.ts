@@ -19,6 +19,7 @@ export const useMemberSubscription = (group_id) => {
         (payload) => {
           // console.log('Change received!', payload);
           queryClient.invalidateQueries(["members", group_id]);
+          queryClient.invalidateQueries(["group", group_id]);
         },
       )
       .subscribe();
