@@ -19,6 +19,7 @@ export const useExpenseSubscription = (group_id) => {
         (payload) => {
           // console.log('Change received!', payload);
           queryClient.invalidateQueries(["expenses", group_id]);
+          queryClient.invalidateQueries(["group", group_id]);
           queryClient.invalidateQueries(["groups"]);
         },
       )
