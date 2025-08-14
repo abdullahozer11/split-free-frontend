@@ -41,6 +41,7 @@ import { useSettings } from "@/src/providers/SettingsProvider.js";
 import { currencyOptions } from "@/src/constants/Currencies";
 import QRCode from 'react-native-qrcode-svg';
 import { generateInvite } from "@/src/api/invites";
+import {useMemberSubscription} from "@/src/api/members/subscriptions";
 
 
 const GroupDetailsScreen = () => {
@@ -276,6 +277,7 @@ const GroupDetailsScreen = () => {
   }, [group, profile?.id]);
 
   useExpenseSubscription(groupId);
+  useMemberSubscription(groupId);
 
   // Enhanced loading check with logging
   const isLoading = groupLoading || expenseLoading || transferLoading || profileLoading || profileMemberLoading || expenseTotalMLoading;
