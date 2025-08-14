@@ -4,43 +4,86 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslatedAlert } from "@/src/components/Translated"; // Add if using React Query
+import { useTranslatedAlert } from "@/src/components/Translated";
 
 const JoinScreen = () => {
   const { alert } = useTranslatedAlert();
-  const params = useLocalSearchParams<{ token: string }>(); // Get params as object to avoid destructuring issues
+  const params = useLocalSearchParams<{ token: string }>();
   const token = params?.token;
   const router = useRouter();
-  const { session } = useAuth(); // Get current user session
-  const queryClient = useQueryClient(); // Optional: For invalidating queries
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(true);
   const [showSelection, setShowSelection] = useState(false);
   const [unboundMembers, setUnboundMembers] = useState([]);
   const [newName, setNewName] = useState("");
-  const [groupId, setGroupId] = useState(null); // Store groupId for later use
+  const [groupId, setGroupId] = useState(null);
 
   useEffect(() => {
-    console.log('useEffect triggered with token:', token);
-    console.log('Current session in useEffect:', session);
     if (!token) {
       alert("Error", "Invalid invite link.");
       setLoading(false);
-      router.replace("/(tabs)"); // Navigate to home tabs
+      router.replace("/(tabs)");
       return;
     }
 
-    handleFetchUnbound(token);
+    handleValidateAndFetchUnbound(token);
   }, [token, session]);
 
-  const handleFetchUnbound = async (token: string) => {
-    console.log('Entering handleFetchUnbound with token:', token);
-    console.log('Current session:', session);
+  const validateToken = async (token: string) => {
+    try {
+      const { data: invite, error } = await supabase
+        .from('invite_tokens')
+        .select('group_id, used, expires_at')
+        .eq('token', token)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') { // No rows found
+          throw new Error("Invalid invite link.");
+        }
+        throw new Error("Error validating invite link.");
+      }
+
+      if (!invite) {
+        throw new Error("Invalid invite link.");
+      }
+
+      if (invite.used) {
+        throw new Error("This invite has already been used.");
+      }
+
+      if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
+        throw new Error("This invite has expired.");
+      }
+
+      return invite.group_id;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const checkExistingMembership = async (groupId: number, userId: string) => {
+    const { data: existingMember, error } = await supabase
+      .from('members')
+      .select('id')
+      .eq('group_id', groupId)
+      .eq('profile', userId)
+      .limit(1)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error("Error checking membership.");
+    }
+
+    return !!existingMember;
+  };
+
+  const handleValidateAndFetchUnbound = async (token: string) => {
     setLoading(true);
 
     // Check if authenticated and user exists
     if (!session || !session.user) {
-      console.log('No session or user, redirecting to sign-in');
-      // Not logged in: Redirect to login screen, pass pending token via params
       router.push({
         pathname: "/(auth)/sign-in",
         params: { pendingToken: token },
@@ -50,88 +93,59 @@ const JoinScreen = () => {
     }
 
     try {
-      console.log('Fetching invite for token:', token);
-      // First, fetch the group_id from the invite token
-      const { data: invite, error: inviteError } = await supabase
-        .from('invite_tokens')
-        .select('group_id')
-        .eq('token', token)
-        .single();
+      // Validate token and get group ID
+      const fetchedGroupId = await validateToken(token);
+      setGroupId(fetchedGroupId);
 
-      console.log('Invite data:', invite, 'Invite error:', inviteError);
+      // Check if user is already a member
+      const isExistingMember = await checkExistingMembership(fetchedGroupId, session.user.id);
 
-      if (inviteError || !invite) {
-        throw new Error(inviteError?.message || "Invalid invite token.");
-      }
-
-      const fetchedGroupId = invite.group_id;
-      console.log('Fetched groupId:', fetchedGroupId);
-
-      console.log('Checking membership for user:', session.user.id, 'in group:', fetchedGroupId);
-      // Check if the user is already a member of this group
-      const { data: existingMember, error: memberError } = await supabase
-        .from('members')
-        .select('id')
-        .eq('group_id', fetchedGroupId)
-        .eq('profile', session.user.id)
-        .limit(1)
-        .single();
-
-      console.log('Existing member data:', existingMember, 'Member error:', memberError);
-
-      if (memberError && memberError?.code !== 'PGRST116') { // Ignore 'no rows' error
-        throw new Error(memberError?.message || "Error checking membership.");
-      }
-
-      if (existingMember) {
+      if (isExistingMember) {
         alert("Info", "You are already in this group.");
-        console.log('Existing member found, navigating to group:', fetchedGroupId);
-        console.log('Navigation path:', `/(tabs)/group/${fetchedGroupId}`);
         router.replace(`/(tabs)/group/`);
         return;
       }
 
-      console.log('Fetching unbound members for token:', token);
       // Fetch unbound members via RPC
       const { data: unbound, error: unboundError } = await supabase
         .rpc("get_unbound_members_for_token", { p_token: token });
 
-      console.log('Unbound members data:', unbound, 'Unbound error:', unboundError);
-
       if (unboundError) {
-        throw new Error(unboundError.message || "Error fetching unbound members.");
+        throw new Error("Error fetching available members.");
       }
 
       setUnboundMembers(unbound || []);
-      setGroupId(fetchedGroupId);
-
       setShowSelection(true);
     } catch (error) {
-      console.log('Error in handleFetchUnbound:', error);
       alert("Error", error.message);
-      router.replace("/(tabs)"); // Home tabs
+      router.replace("/(tabs)");
     } finally {
       setLoading(false);
     }
   };
 
   const handleBind = async (memberId: string) => {
-    console.log('Entering handleBind with memberId:', memberId, 'groupId:', groupId);
     setLoading(true);
 
     try {
       const { data, error } = await supabase
         .rpc("join_group_with_token", { p_token: token, p_member_id: memberId });
 
-      console.log('Bind RPC data:', data, 'Error:', error);
-
       if (error) {
-        throw new Error(error.message || "Error binding to member.");
+        // Handle specific database errors gracefully
+        if (error.message.includes('already been used or expired')) {
+          throw new Error("This invite has expired or been used by someone else.");
+        } else if (error.message.includes('already a member')) {
+          throw new Error("You are already a member of this group.");
+        } else if (error.message.includes('Invalid member ID')) {
+          throw new Error("This member is no longer available.");
+        } else {
+          throw new Error("Unable to join group. Please try again.");
+        }
       }
 
-      // Use the stored groupId
       if (!groupId) {
-        throw new Error("Group ID not available.");
+        throw new Error("Group information unavailable.");
       }
 
       // Invalidate queries
@@ -139,10 +153,8 @@ const JoinScreen = () => {
       await queryClient.invalidateQueries(["members", groupId]);
 
       alert("Success", "Successfully joined the group!");
-      console.log('Navigating after bind to group:', groupId);
       router.replace(`/(tabs)/group/${groupId}`);
     } catch (error) {
-      console.log('Error in handleBind:', error);
       alert("Error", error.message);
     } finally {
       setLoading(false);
@@ -150,7 +162,6 @@ const JoinScreen = () => {
   };
 
   const handleCreate = async () => {
-    console.log('Entering handleCreate with newName:', newName, 'groupId:', groupId);
     if (!newName.trim()) {
       alert("Error", "Please enter a name.");
       return;
@@ -162,15 +173,19 @@ const JoinScreen = () => {
       const { data, error } = await supabase
         .rpc("join_group_with_token", { p_token: token, p_new_name: newName.trim() });
 
-      console.log('Create RPC data:', data, 'Error:', error);
-
       if (error) {
-        throw new Error(error.message || "Error creating new member.");
+        // Handle specific database errors gracefully
+        if (error.message.includes('already been used or expired')) {
+          throw new Error("This invite has expired or been used by someone else.");
+        } else if (error.message.includes('already a member')) {
+          throw new Error("You are already a member of this group.");
+        } else {
+          throw new Error("Unable to join group. Please try again.");
+        }
       }
 
-      // Use the stored groupId
       if (!groupId) {
-        throw new Error("Group ID not available.");
+        throw new Error("Group information unavailable.");
       }
 
       // Invalidate queries
@@ -178,10 +193,8 @@ const JoinScreen = () => {
       await queryClient.invalidateQueries(["members", groupId]);
 
       alert("Success", "Successfully joined the group!");
-      console.log('Navigating after create to group:', groupId);
       router.replace('/(tabs)/group');
     } catch (error) {
-      console.log('Error in handleCreate:', error);
       alert("Error", error.message);
     } finally {
       setLoading(false);
