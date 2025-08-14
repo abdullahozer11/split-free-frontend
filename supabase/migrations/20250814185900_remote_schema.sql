@@ -113,107 +113,140 @@ CREATE TYPE "public"."balance_info" AS (
 ALTER TYPE "public"."balance_info" OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "algo"."calculate_debts_per_expenses"("group_id_input" bigint) RETURNS "void"
+CREATE OR REPLACE FUNCTION "algo"."calculate_debts_per_expenses"("group_id_input" bigint, "expense_id_input" bigint DEFAULT NULL::bigint) RETURNS SETOF integer
     LANGUAGE "plpgsql"
-    AS $$DECLARE
-  rec RECORD;
+    AS $$
+DECLARE
+    rec RECORD;
+    old_rec RECORD;
+    expense_filter TEXT := '';
+    affected_members integer[] := '{}';
 BEGIN
-  -- clean up old debts_per_expense
-  DELETE FROM debts_per_expense WHERE group_id = group_id_input;
+    -- Collect old affected members and targeted delete in incremental mode
+    IF expense_id_input IS NOT NULL THEN
+        -- Collect unique old lenders/borrowers before delete
+        FOR old_rec IN
+            SELECT DISTINCT lender AS member FROM debts_per_expense WHERE group_id = group_id_input AND expense = expense_id_input
+            UNION
+            SELECT DISTINCT borrower AS member FROM debts_per_expense WHERE group_id = group_id_input AND expense = expense_id_input
+        LOOP
+            IF NOT old_rec.member = ANY(affected_members) THEN
+                affected_members := affected_members || old_rec.member;
+            END IF;
+        END LOOP;
 
-  FOR rec IN (
-    SELECT 
-      e.id AS expense_id, 
-      epr.member AS participant, 
-      epy.member AS payer, 
-      (e.amount / (SELECT COUNT(*) 
-                  FROM expense_participants ep 
-                  WHERE ep.expense = e.id))::NUMERIC(10,2) AS debt_per_expense_amount
-    FROM expense_participants epr
-    JOIN expenses AS e ON e.id = epr.expense
-    LEFT JOIN expense_payers AS epy ON epy.expense = epr.expense
-    WHERE epr.member != epy.member AND e.settled != true and epr.group_id = group_id_input
-  ) LOOP
-    INSERT INTO debts_per_expense (group_id, lender, borrower, expense, amount)
-    VALUES (group_id_input, rec.payer, rec.participant, rec.expense_id, rec.debt_per_expense_amount);
-  END LOOP;
+        DELETE FROM debts_per_expense WHERE group_id = group_id_input AND expense = expense_id_input;
+        expense_filter := ' AND e.id = ' || expense_id_input;
+    ELSE
+        DELETE FROM debts_per_expense WHERE group_id = group_id_input;
+    END IF;
 
+    -- Build the query dynamically for the loop (targeted or full)
+    FOR rec IN EXECUTE '
+        SELECT 
+            e.id AS expense_id, 
+            epr.member AS participant, 
+            epy.member AS payer, 
+            (e.amount / (SELECT COUNT(*)
+                        FROM expense_participants ep
+                        WHERE ep.expense = e.id) / (SELECT COUNT(*) FROM expense_payers epy2 WHERE epy2.expense = e.id))::NUMERIC(10,2) AS debt_per_expense_amount
+        FROM expense_participants epr
+        JOIN expenses AS e ON e.id = epr.expense
+        JOIN expense_payers AS epy ON epy.expense = epr.expense
+        WHERE epr.member != epy.member AND e.settled != true AND epr.group_id = ' || group_id_input || expense_filter
+    LOOP
+        INSERT INTO debts_per_expense (group_id, lender, borrower, expense, amount)
+        VALUES (group_id_input, rec.payer, rec.participant, rec.expense_id, rec.debt_per_expense_amount);
+
+        -- Collect unique new payers/participants
+        IF NOT rec.payer = ANY(affected_members) THEN
+            affected_members := affected_members || rec.payer;
+        END IF;
+        IF NOT rec.participant = ANY(affected_members) THEN
+            affected_members := affected_members || rec.participant;
+        END IF;
+    END LOOP;
+
+    -- Return the unique set of affected members
+    RETURN QUERY SELECT DISTINCT unnest(affected_members);
 END;$$;
 
 
-ALTER FUNCTION "algo"."calculate_debts_per_expenses"("group_id_input" bigint) OWNER TO "postgres";
+ALTER FUNCTION "algo"."calculate_debts_per_expenses"("group_id_input" bigint, "expense_id_input" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "algo"."calculate_group_member_balances"("group_id_input" bigint) RETURNS "void"
+CREATE OR REPLACE FUNCTION "algo"."calculate_group_member_balances"("group_id_input" bigint, "affected_members" integer[] DEFAULT NULL::integer[]) RETURNS "void"
     LANGUAGE "plpgsql"
-    AS $$DECLARE
-  _amount FLOAT;
-  lender_balance FLOAT;
-  borrower_balance FLOAT;
-  member RECORD;
+    AS $$
+DECLARE
+    _amount FLOAT;
+    lender_balance FLOAT;
+    borrower_balance FLOAT;
+    member RECORD;
 BEGIN
-  -- Step 1: Aggregate lent and borrowed amounts by each member
-  FOR member IN
-    SELECT id
-    FROM members
-    WHERE group_id = group_id_input
-  LOOP
-    -- Step 2: Coalesce borrowed amount
-    SELECT COALESCE(SUM(amount), 0) INTO borrower_balance
-    FROM debts
-    WHERE group_id = group_id_input
-      AND borrower = member.id;
+    -- Loop over relevant members (all or affected)
+    FOR member IN
+        SELECT id
+        FROM members
+        WHERE group_id = group_id_input
+          AND (id = ANY(affected_members) OR affected_members IS NULL)
+    LOOP
+        -- Coalesce borrowed amount
+        SELECT COALESCE(SUM(amount), 0) INTO borrower_balance
+        FROM debts
+        WHERE group_id = group_id_input
+          AND borrower = member.id;
 
-    -- Step 3: Coalesce lent amount
-    SELECT COALESCE(SUM(amount), 0) INTO lender_balance
-    FROM debts
-    WHERE group_id = group_id_input
-      AND lender = member.id;
+        -- Coalesce lent amount
+        SELECT COALESCE(SUM(amount), 0) INTO lender_balance
+        FROM debts
+        WHERE group_id = group_id_input
+          AND lender = member.id;
 
-    _amount := lender_balance - borrower_balance;
+        _amount := lender_balance - borrower_balance;
 
-    -- Step 4: Insert the balance into total_balance column in members table
-    update members 
-    set total_balance = _amount 
-    where id = member.id;
-
-  END LOOP;
+        -- Update the balance in members table
+        UPDATE members
+        SET total_balance = _amount
+        WHERE id = member.id;
+    END LOOP;
 END;$$;
 
 
-ALTER FUNCTION "algo"."calculate_group_member_balances"("group_id_input" bigint) OWNER TO "postgres";
+ALTER FUNCTION "algo"."calculate_group_member_balances"("group_id_input" bigint, "affected_members" integer[]) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "algo"."calculate_group_member_debts"("group_id_input" bigint) RETURNS "void"
+CREATE OR REPLACE FUNCTION "algo"."calculate_group_member_debts"("group_id_input" bigint, "affected_members" integer[] DEFAULT NULL::integer[]) RETURNS "void"
     LANGUAGE "plpgsql"
-    AS $$begin
-    -- delete old debts
-    DELETE from debts
-    WHERE group_id = group_id_input;
+    AS $$
+BEGIN
+    -- delete old debts for affected pairs
+    DELETE FROM debts
+    WHERE group_id = group_id_input
+      AND (lender = ANY(affected_members) OR borrower = ANY(affected_members) OR affected_members IS NULL);
 
-    -- insert new debts
-    INSERT INTO debts (group_id, lender, borrower, currency, amount)
+    -- insert new debts for affected pairs
+    INSERT INTO debts (group_id, lender, borrower, amount)
     SELECT group_id,
            lender,
            borrower,
-           currency,
            SUM(amount) AS amount
     FROM debts_per_expense
     WHERE group_id = group_id_input
+      AND (lender = ANY(affected_members) OR borrower = ANY(affected_members) OR affected_members IS NULL)
     GROUP BY lender,
              borrower,
-             currency,
              group_id;
-             
-end;$$;
+END;$$;
 
 
-ALTER FUNCTION "algo"."calculate_group_member_debts"("group_id_input" bigint) OWNER TO "postgres";
+ALTER FUNCTION "algo"."calculate_group_member_debts"("group_id_input" bigint, "affected_members" integer[]) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "algo"."calculate_group_profile_balance"("group_id_input" bigint) RETURNS "void"
+CREATE OR REPLACE FUNCTION "algo"."calculate_group_profile_balance"("group_id_input" bigint, "affected_members" integer[] DEFAULT NULL::integer[]) RETURNS "void"
     LANGUAGE "plpgsql"
-    AS $$BEGIN
+    AS $$
+BEGIN
     -- Update the total_balance column and calculate total_receivable and total_payable
     UPDATE profiles
     SET 
@@ -230,17 +263,21 @@ CREATE OR REPLACE FUNCTION "algo"."calculate_group_profile_balance"("group_id_in
             profiles p
         LEFT JOIN members m ON p.id = m.profile
         WHERE
-            p.id in (select profile from members where members.group_id = group_id_input)
+            p.id IN (
+                SELECT DISTINCT profile
+                FROM members
+                WHERE group_id = group_id_input
+                  AND (id = ANY(affected_members) OR affected_members IS NULL)
+            )
         GROUP BY
             p.id
     ) AS subquery
     WHERE
         profiles.id = subquery.id;
-
 END;$$;
 
 
-ALTER FUNCTION "algo"."calculate_group_profile_balance"("group_id_input" bigint) OWNER TO "postgres";
+ALTER FUNCTION "algo"."calculate_group_profile_balance"("group_id_input" bigint, "affected_members" integer[]) OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "algo"."calculate_group_total_expense"("group_id_input" bigint) RETURNS "void"
@@ -262,63 +299,44 @@ END;$$;
 ALTER FUNCTION "algo"."calculate_group_total_expense"("group_id_input" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "algo"."calculate_new_debts_simple"("group_id_input" bigint) RETURNS "void"
+CREATE OR REPLACE FUNCTION "algo"."post_expense"("group_id_input" bigint, "expense_id_input" bigint DEFAULT NULL::bigint) RETURNS "void"
     LANGUAGE "plpgsql"
-    AS $$BEGIN
-  -- delete old debts
-  DELETE from debts_simple
-  WHERE group_id = group_id_input;
+    AS $$DECLARE
+    affected_members integer[];
+BEGIN
+    -- Capture affected members from calculate_debts_per_expenses
+    SELECT ARRAY(SELECT * FROM algo.calculate_debts_per_expenses(group_id_input, expense_id_input)) INTO affected_members;
 
-  -- insert new debts
-  INSERT INTO debts_simple (group_id, lender, currency, borrower, amount)
-  SELECT group_id,
-         lender,
-         currency,
-         borrower,
-         SUM(amount) AS amount
-  FROM debts_for_expense
-  WHERE group_id = group_id_input
-  GROUP BY lender,
-           currency,
-           group_id,
-           borrower;
+    PERFORM algo.calculate_group_member_debts(group_id_input, affected_members);
+    PERFORM algo.reconcile_debts(group_id_input, affected_members);
+    PERFORM algo.calculate_group_member_balances(group_id_input, affected_members);
+    PERFORM algo.calculate_group_total_expense(group_id_input);
+    PERFORM algo.update_group_settled_status(group_id_input);
 END;$$;
 
 
-ALTER FUNCTION "algo"."calculate_new_debts_simple"("group_id_input" bigint) OWNER TO "postgres";
+ALTER FUNCTION "algo"."post_expense"("group_id_input" bigint, "expense_id_input" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "algo"."post_expense"("group_id_input" bigint) RETURNS "void"
+CREATE OR REPLACE FUNCTION "algo"."reconcile_debts"("group_id_input" bigint, "affected_members" integer[] DEFAULT NULL::integer[]) RETURNS "void"
     LANGUAGE "plpgsql"
-    AS $$begin
-  perform algo.calculate_debts_per_expenses(group_id_input);
-  perform algo.calculate_group_member_debts(group_id_input);
-  perform algo.reconcile_debts(group_id_input);
-  perform algo.calculate_group_member_balances(group_id_input);
-  perform algo.calculate_group_total_expense(group_id_input);
-  perform algo.calculate_group_profile_balance(group_id_input);
-  perform algo.update_group_settled_status(group_id_input);
-end;$$;
-
-
-ALTER FUNCTION "algo"."post_expense"("group_id_input" bigint) OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "algo"."reconcile_debts"("group_id_input" bigint) RETURNS "void"
-    LANGUAGE "plpgsql"
-    AS $$DECLARE
+    AS $$
+DECLARE
     rec RECORD;
     reciprocal_debt RECORD;
 BEGIN
-    -- Create a temporary table to hold the debts for reconciliation
+    -- Create a temporary table to hold the relevant debts for reconciliation
     CREATE TEMP TABLE temp_debts AS
-    SELECT * FROM debts WHERE group_id = group_id_input;
+    SELECT *
+    FROM debts
+    WHERE group_id = group_id_input
+      AND (lender = ANY(affected_members) OR borrower = ANY(affected_members) OR affected_members IS NULL);
 
-    -- Reconcile debts
+    -- Reconcile debts within the filtered set
     FOR rec IN
         SELECT * FROM temp_debts
     LOOP
-        -- Find the reciprocal debt
+        -- Find the reciprocal debt within the filtered set
         SELECT id, amount INTO reciprocal_debt
         FROM temp_debts
         WHERE group_id = group_id_input
@@ -332,6 +350,9 @@ BEGIN
             ELSIF rec.amount > reciprocal_debt.amount THEN
                 UPDATE debts SET amount = rec.amount - reciprocal_debt.amount WHERE id = rec.id;
                 DELETE FROM debts WHERE id = reciprocal_debt.id;
+            ELSIF rec.amount < reciprocal_debt.amount THEN
+                UPDATE debts SET amount = reciprocal_debt.amount - rec.amount WHERE id = reciprocal_debt.id;
+                DELETE FROM debts WHERE id = rec.id;
             END IF;
         END IF;
     END LOOP;
@@ -341,7 +362,7 @@ BEGIN
 END;$$;
 
 
-ALTER FUNCTION "algo"."reconcile_debts"("group_id_input" bigint) OWNER TO "postgres";
+ALTER FUNCTION "algo"."reconcile_debts"("group_id_input" bigint, "affected_members" integer[]) OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "algo"."update_group_settled_status"("_group_id_input" bigint) RETURNS "void"
@@ -382,9 +403,10 @@ $$;
 ALTER FUNCTION "public"."accept_friend_request"("sender_uid" "uuid") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."create_expense"("group_id_input" integer, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text" DEFAULT ''::"text", "amount_input" real DEFAULT 0.0, "currency_input" "text" DEFAULT 'EUR'::"text", "date_input" timestamp without time zone DEFAULT "now"(), "proof_input" "text" DEFAULT ''::"text", "category_input" "text" DEFAULT 'SHOPPING'::"text") RETURNS integer
+CREATE OR REPLACE FUNCTION "public"."create_expense"("group_id_input" bigint, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text" DEFAULT ''::"text", "amount_input" real DEFAULT 0.0, "date_input" timestamp without time zone DEFAULT "now"(), "proof_input" "text" DEFAULT ''::"text", "category_input" "text" DEFAULT 'SHOPPING'::"text") RETURNS bigint
     LANGUAGE "plpgsql"
-    AS $$DECLARE
+    AS $$
+DECLARE
     expense_id BIGINT;
     payers_length INT;
     participants_length INT;
@@ -395,13 +417,12 @@ BEGIN
 
     -- Insert row into expenses table with COALESCE for default values
     INSERT INTO expenses (
-        group_id, title, amount, description, currency, date, proof, category
+        group_id, title, amount, description, date, proof, category
     ) VALUES (
         group_id_input,
         title_input,
         amount_input::NUMERIC(10,2),
         description_input,
-        currency_input,
         date_input,
         proof_input,
         category_input
@@ -424,48 +445,48 @@ BEGIN
         END LOOP;
     END IF;
 
-    -- Call the post_expense function
-    PERFORM algo.post_expense(group_id_input);
+    -- Call the post_expense function, passing the new expense_id
+    PERFORM algo.post_expense(group_id_input, expense_id);
 
     -- Finally, return the newly created expense row id
     RETURN expense_id;
 END;$$;
 
 
-ALTER FUNCTION "public"."create_expense"("group_id_input" integer, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "currency_input" "text", "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") OWNER TO "postgres";
+ALTER FUNCTION "public"."create_expense"("group_id_input" bigint, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[]) RETURNS bigint
-    LANGUAGE "plpgsql"
-    AS $$
-DECLARE
-    group_id BIGINT;
-BEGIN
+CREATE OR REPLACE FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[], "currency_input" "text") RETURNS bigint
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$ 
+DECLARE 
+    group_id BIGINT; 
+BEGIN 
     -- Insert row into groups table
-    INSERT INTO groups(title, owner)
-    VALUES (title_input, auth.uid())
+    INSERT INTO groups(title, owner, currency) 
+    VALUES (title_input, auth.uid(), currency_input) 
     RETURNING id INTO group_id;
 
     -- Insert members one by one and link to the group created
-    FOR i IN 1..array_length(member_names_input, 1) LOOP
-        IF i = 1 THEN
+    FOR i IN 1..array_length(member_names_input, 1) LOOP 
+        IF i = 1 THEN 
             -- first item is the owner different logic applies here
-            INSERT INTO members (name, group_id, profile, role)
+            INSERT INTO members (name, group_id, profile, role) 
             VALUES (member_names_input[i], group_id, auth.uid(), 'owner');
-        ELSE
+        ELSE 
             -- For other list items, insert them into the members table
-            INSERT INTO members (name, group_id)
+            INSERT INTO members (name, group_id) 
             VALUES (member_names_input[i], group_id);
-        END IF;
+        END IF; 
     END LOOP;
 
     -- Finally, return the newly created group row id
-    RETURN group_id;
-END;
+    RETURN group_id; 
+END; 
 $$;
 
 
-ALTER FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[]) OWNER TO "postgres";
+ALTER FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[], "currency_input" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."deleteuser"() RETURNS "void"
@@ -481,25 +502,12 @@ ALTER FUNCTION "public"."deleteuser"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."exit_group"("_profile_id" "uuid", "_group_id" bigint) RETURNS "void"
     LANGUAGE "plpgsql"
     AS $$
-DECLARE
-    _invited BOOLEAN;
 BEGIN
-    SELECT EXISTS (
-        SELECT 1
-        FROM group_invitations
-        WHERE receiver = _profile_id
-          AND group_id = _group_id
-    ) INTO _invited;
-
-    IF _invited THEN
-        DELETE FROM group_invitations
-        WHERE receiver = _profile_id
-          AND group_id = _group_id;
-    ELSE
-        DELETE FROM members
-        WHERE profile = _profile_id
-          AND group_id = _group_id;
-    END IF;
+    UPDATE members
+    SET profile = NULL
+    WHERE profile = _profile_id
+        AND group_id = _group_id;
+    
 END;
 $$;
 
@@ -531,6 +539,115 @@ END;$$;
 
 
 ALTER FUNCTION "public"."get_groups_summary"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."get_unbound_members_for_token"("p_token" "text") RETURNS TABLE("id" integer, "name" "text")
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+DECLARE
+  v_invite record;
+BEGIN
+  -- Validate token
+  SELECT * INTO v_invite
+  FROM invite_tokens
+  WHERE token = p_token;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Invalid invite link.';
+  END IF;
+
+  IF v_invite.used OR (v_invite.expires_at IS NOT NULL AND v_invite.expires_at < NOW()) THEN
+    RAISE EXCEPTION 'This invite has already been used or expired.';
+  END IF;
+
+  -- Return unbound members
+  RETURN QUERY
+  SELECT m.id::integer, m.name::text
+  FROM members m
+  WHERE m.group_id = v_invite.group_id
+  AND m.profile IS NULL;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."get_unbound_members_for_token"("p_token" "text") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."join_group_with_token"("p_token" "text", "p_member_id" integer DEFAULT NULL::integer, "p_new_name" "text" DEFAULT NULL::"text") RETURNS integer
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+DECLARE
+    v_invite   record;
+    v_user_id  uuid := auth.uid();
+    v_group_id integer;
+BEGIN
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'User must be authenticated.';
+    END IF;
+
+    -- Validate token
+    SELECT *
+    INTO v_invite
+    FROM invite_tokens
+    WHERE token = p_token;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Invalid invite link.';
+    END IF;
+
+    IF v_invite.used OR (v_invite.expires_at IS NOT NULL AND v_invite.expires_at < NOW()) THEN
+        RAISE EXCEPTION 'This invite has already been used or expired.';
+    END IF;
+
+    v_group_id := v_invite.group_id;
+
+    -- Check if already a member
+    PERFORM 1
+    FROM members
+    WHERE group_id = v_group_id
+      AND profile = v_user_id; -- No cast needed since profile is uuid
+    IF FOUND THEN
+        RAISE EXCEPTION 'You are already a member of this group.';
+    END IF;
+
+    IF p_member_id IS NOT NULL AND p_new_name IS NOT NULL THEN
+        RAISE EXCEPTION 'Provide either member_id or new_name, not both.';
+    END IF;
+
+    IF p_member_id IS NULL AND p_new_name IS NULL THEN
+        RAISE EXCEPTION 'Provide member_id or new_name.';
+    END IF;
+
+    IF p_member_id IS NOT NULL THEN
+        -- Bind to existing member
+        UPDATE members
+        SET profile = v_user_id
+        WHERE id = p_member_id
+          AND group_id = v_group_id
+          AND profile IS NULL;
+
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'Invalid member ID or already bound.';
+        END IF;
+    ELSE
+        -- Create new member
+        INSERT INTO members (name, group_id, profile, role)
+        VALUES (p_new_name, v_group_id, v_user_id, 'member');
+    END IF;
+
+    -- Mark token as used
+    UPDATE invite_tokens
+    SET used = true
+    WHERE token = p_token;
+
+    RETURN v_group_id;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."join_group_with_token"("p_token" "text", "p_member_id" integer, "p_new_name" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."search_friends"("keyword_input" "text", "profile_id_input" "uuid", "limit_input" integer DEFAULT 10, "offset_input" integer DEFAULT 0) RETURNS TABLE("id" "uuid", "email" "text", "avatar_url" "text", "friend_status" "text")
@@ -578,8 +695,7 @@ ALTER FUNCTION "public"."self_assign_to"("_member_id" bigint, "_group_id" bigint
 
 CREATE OR REPLACE FUNCTION "public"."settle_expense"("expense_id" bigint, "_group_id" bigint) RETURNS "void"
     LANGUAGE "plpgsql"
-    AS $$
-DECLARE
+    AS $$DECLARE
     debt_record RECORD;
 BEGIN
     -- Create transfer records from debts_per_expense for this specific expense
@@ -604,7 +720,7 @@ BEGIN
     WHERE id = expense_id;
 
     -- Perform post expense to recalculate ideal debts
-    PERFORM algo.post_expense(_group_id);
+    PERFORM algo.post_expense(_group_id, expense_id);
 
     -- Check if all expenses in the group are settled
     IF NOT EXISTS (
@@ -623,57 +739,9 @@ END;$$;
 ALTER FUNCTION "public"."settle_expense"("expense_id" bigint, "_group_id" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."settle_expense2"("expense_id" bigint, "_group_id" bigint) RETURNS "void"
-    LANGUAGE "plpgsql"
-    AS $$
-DECLARE
-    debt_record RECORD;
-BEGIN
-    -- Create transfer records from debts_per_expense for this specific expense
-    FOR debt_record IN
-        SELECT borrower, lender, amount
-        FROM debts_per_expense
-        WHERE expense = expense_id
-    LOOP
-        INSERT INTO transfers (created_at, sender, receiver, amount, group_id)
-        VALUES (
-            NOW(),
-            debt_record.borrower,
-            debt_record.lender,
-            debt_record.amount,
-            _group_id
-        );
-    END LOOP;
-
-    -- Update the 'settled' field in the 'expenses' table
-    UPDATE expenses
-    SET settled = TRUE
-    WHERE id = expense_id;
-
-    -- Perform post expense to recalculate ideal debts
-    PERFORM algo.post_expense(_group_id);
-
-    -- Check if all expenses in the group are settled
-    IF NOT EXISTS (
-        SELECT 1
-        FROM expenses
-        WHERE group_id = _group_id AND settled = FALSE
-    ) THEN
-        -- If all expenses are settled, update the group as settled
-        UPDATE groups
-        SET settled = TRUE
-        WHERE id = _group_id;
-    END IF;
-END;$$;
-
-
-ALTER FUNCTION "public"."settle_expense2"("expense_id" bigint, "_group_id" bigint) OWNER TO "postgres";
-
-
 CREATE OR REPLACE FUNCTION "public"."settle_group"("_id" bigint) RETURNS "void"
     LANGUAGE "plpgsql"
-    AS $$
-DECLARE
+    AS $$DECLARE
     debt_record RECORD;
 BEGIN
     -- Create transfer records from debts table for this group
@@ -692,85 +760,88 @@ BEGIN
         );
     END LOOP;
 
-    -- Update the 'settled' field in the 'expenses' table
+    -- Update only unsettled expenses
     UPDATE expenses
     SET settled = TRUE
-    WHERE group_id = _id;
+    WHERE group_id = _id AND settled IS DISTINCT FROM TRUE;
 
-    -- Set group status to settled
+    -- Update group only if not already settled
     UPDATE groups
     SET settled = TRUE
-    WHERE id = _id;
+    WHERE id = _id AND settled IS DISTINCT FROM TRUE;
 
-    -- Perform post expense to recalculate ideal debts
-    PERFORM algo.post_expense(_id);
+    -- Reset total_balance for all members in the group
+    UPDATE members
+    SET total_balance = 0
+    WHERE group_id = _id AND total_balance IS DISTINCT FROM 0;
+
+    -- Delete old debt records
+    DELETE FROM debts WHERE group_id = _id;
+    DELETE FROM debts_per_expense WHERE group_id = _id;
 END;$$;
 
 
 ALTER FUNCTION "public"."settle_group"("_id" bigint) OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."settle_group2"("_id" bigint) RETURNS "void"
-    LANGUAGE "plpgsql"
-    AS $$
-DECLARE
-    debt_record RECORD;
-BEGIN
-    -- Create transfer records from debts table for this group
-    FOR debt_record IN
-        SELECT borrower, lender, amount
-        FROM debts
-        WHERE group_id = _id
-    LOOP
-        INSERT INTO transfers (created_at, sender, receiver, amount, group_id)
-        VALUES (
-            NOW(),
-            debt_record.borrower,
-            debt_record.lender,
-            debt_record.amount,
-            _id
-        );
-    END LOOP;
-
-    -- Update the 'settled' field in the 'expenses' table
-    UPDATE expenses
-    SET settled = TRUE
-    WHERE group_id = _id;
-
-    -- Set group status to settled
-    UPDATE groups
-    SET settled = TRUE
-    WHERE id = _id;
-
-    -- Perform post expense to recalculate ideal debts
-    PERFORM algo.post_expense(_id);
-END;$$;
-
-
-ALTER FUNCTION "public"."settle_group2"("_id" bigint) OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."update_expense"("expense_id" integer, "title_input" "text" DEFAULT NULL::"text", "description_input" "text" DEFAULT NULL::"text", "amount_input" real DEFAULT NULL::real, "date_input" timestamp without time zone DEFAULT NULL::timestamp without time zone, "currency_input" "text" DEFAULT NULL::"text", "proof_input" "text" DEFAULT NULL::"text", "payers_input" integer[] DEFAULT NULL::integer[], "participants_input" integer[] DEFAULT NULL::integer[], "category_input" "text" DEFAULT NULL::"text") RETURNS "void"
+CREATE OR REPLACE FUNCTION "public"."update_expense"("expense_id" bigint, "title_input" "text" DEFAULT NULL::"text", "description_input" "text" DEFAULT NULL::"text", "amount_input" real DEFAULT NULL::real, "date_input" timestamp without time zone DEFAULT NULL::timestamp without time zone, "proof_input" "text" DEFAULT NULL::"text", "payers_input" integer[] DEFAULT NULL::integer[], "participants_input" integer[] DEFAULT NULL::integer[], "category_input" "text" DEFAULT NULL::"text") RETURNS "void"
     LANGUAGE "plpgsql"
     AS $$DECLARE
+    old_expense expenses%ROWTYPE;
+    old_payers integer[];
+    old_participants integer[];
+    sorted_new_payers integer[];
+    sorted_new_participants integer[];
     _group_id BIGINT;
     payers_length INT;
     participants_length INT;
+    need_post BOOLEAN := FALSE;
 BEGIN
-    -- Get the lengths of the input arrays
-    payers_length := array_length(payers_input, 1);
-    participants_length := array_length(participants_input, 1);
-
-    SELECT group_id INTO _group_id
+    -- Fetch the old expense row
+    SELECT * INTO old_expense
     FROM expenses
     WHERE id = expense_id;
 
-    -- Update only the provided fields
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Expense not found.';
+    END IF;
+
+    _group_id := old_expense.group_id;
+
+    -- Fetch old payers as sorted array
+    SELECT COALESCE(ARRAY(SELECT member FROM expense_payers WHERE expense = expense_id ORDER BY member), '{}') INTO old_payers;
+
+    -- Fetch old participants as sorted array
+    SELECT COALESCE(ARRAY(SELECT member FROM expense_participants WHERE expense = expense_id ORDER BY member), '{}') INTO old_participants;
+
+    -- Check for changes that require post_expense
+    IF amount_input IS NOT NULL AND amount_input::NUMERIC(10,2) != old_expense.amount THEN
+        need_post := TRUE;
+    END IF;
+
+    IF payers_input IS NOT NULL THEN
+        sorted_new_payers := ARRAY(SELECT unnest(payers_input) ORDER BY 1);
+        IF sorted_new_payers != old_payers THEN
+            need_post := TRUE;
+        END IF;
+    END IF;
+
+    IF participants_input IS NOT NULL THEN
+        sorted_new_participants := ARRAY(SELECT unnest(participants_input) ORDER BY 1);
+        IF sorted_new_participants != old_participants THEN
+            need_post := TRUE;
+        END IF;
+    END IF;
+
+    -- Get the lengths of the input arrays (for loops later)
+    payers_length := array_length(payers_input, 1);
+    participants_length := array_length(participants_input, 1);
+
+    -- Update only the provided fields in expenses
     UPDATE expenses
     SET title = COALESCE(title_input, title),
         description = COALESCE(description_input, description),
         amount = COALESCE(amount_input::NUMERIC(10,2), amount),
-        currency = COALESCE(currency_input, currency),
         category = COALESCE(category_input, category),
         date = COALESCE(date_input, date),
         proof = COALESCE(proof_input, proof)
@@ -808,47 +879,50 @@ BEGIN
         END LOOP;
     END IF;
 
-    PERFORM algo.post_expense(_group_id);
+    -- Call post_expense only if necessary
+    IF need_post THEN
+        PERFORM algo.post_expense(_group_id, expense_id);
+    END IF;
 
 END;$$;
 
 
-ALTER FUNCTION "public"."update_expense"("expense_id" integer, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "currency_input" "text", "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") OWNER TO "postgres";
+ALTER FUNCTION "public"."update_expense"("expense_id" bigint, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[]) RETURNS "void"
-    LANGUAGE "plpgsql"
-    AS $$
-BEGIN
-    -- Update groups row
-    UPDATE groups
-        SET title = title_input,
-            description = description_input
-        WHERE id = group_id_input;
+CREATE OR REPLACE FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[], "currency_input" "text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$ 
+BEGIN 
+    -- Update groups row, including currency 
+    UPDATE groups 
+        SET title = title_input, 
+            description = description_input, 
+            currency = currency_input 
+        WHERE id = group_id_input; 
 
-    -- Remove members who are not in the list
-    DELETE FROM members
-    WHERE group_id = group_id_input
-    AND name NOT IN (SELECT unnest(member_names_input));
+    -- Remove members who are not in the list 
+    DELETE FROM members 
+    WHERE group_id = group_id_input 
+    AND name NOT IN (SELECT unnest(member_names_input)); 
 
-    -- Add members
-    FOR i IN 1..array_length(member_names_input, 1) LOOP
-        IF NOT EXISTS (SELECT 1 FROM members WHERE members.name = member_names_input[i]) THEN
-            INSERT INTO members (name, group_id) 
-            VALUES (member_names_input[i], group_id_input);
-        END IF;
-    END LOOP;
-END;
+    -- Add members 
+    FOR i IN 1..array_length(member_names_input, 1) LOOP 
+        IF NOT EXISTS (SELECT 1 FROM members WHERE members.name = member_names_input[i]) THEN 
+            INSERT INTO members (name, group_id)  
+            VALUES (member_names_input[i], group_id_input); 
+        END IF; 
+    END LOOP; 
+END; 
 $$;
 
 
-ALTER FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[]) OWNER TO "postgres";
+ALTER FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[], "currency_input" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."use_expense"("expense_id_input" bigint) RETURNS "jsonb"
     LANGUAGE "plpgsql"
-    AS $$
-BEGIN
+    AS $$BEGIN
     RETURN (
         SELECT
             jsonb_build_object(
@@ -856,7 +930,6 @@ BEGIN
                 'id', expenses.id,
                 'title', expenses.title,
                 'settled', expenses.settled,
-                'currency', expenses.currency,
                 'description', expenses.description,
                 'date', expenses.date,
                 'last_modified', expenses.last_modified,
@@ -912,15 +985,13 @@ BEGIN
             expenses.id,
             expenses.title,
             expenses.settled,
-            expenses.currency,
             expenses.description,
             expenses.date,
             expenses.last_modified,
             expenses.group_id,
             expenses.category
     );
-END;
-$$;
+END;$$;
 
 
 ALTER FUNCTION "public"."use_expense"("expense_id_input" bigint) OWNER TO "postgres";
@@ -1027,7 +1098,6 @@ CREATE OR REPLACE FUNCTION "utils"."is_member_of"("_person_id" "uuid", "_group_i
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$DECLARE
     _is_member BOOLEAN;
-    _is_invited BOOLEAN;
 BEGIN
     -- Check if the person is a member of the group
     SELECT EXISTS (
@@ -1037,35 +1107,12 @@ BEGIN
           AND mb.profile = _person_id
     ) INTO _is_member;
 
-    -- Check if the person is invited to the group
-    _is_invited := utils.is_person_invited(_person_id, _group_id);
-
-    -- Return true if the person is either a member or invited
-    RETURN _is_member OR _is_invited;
+    
+    RETURN _is_member;
 END;$$;
 
 
 ALTER FUNCTION "utils"."is_member_of"("_person_id" "uuid", "_group_id" bigint) OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "utils"."is_person_invited"("_person_id" "uuid", "_group_id" bigint) RETURNS boolean
-    LANGUAGE "plpgsql"
-    AS $$DECLARE 
-  _person_invited bool;
-BEGIN
-  -- Check if person is invited
-  SELECT EXISTS (
-    SELECT 1
-    FROM group_invitations
-    WHERE receiver = _person_id AND group_id = _group_id
-  ) INTO _person_invited;
-
-  -- Return the boolean
-  RETURN _person_invited;
-END;$$;
-
-
-ALTER FUNCTION "utils"."is_person_invited"("_person_id" "uuid", "_group_id" bigint) OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "utils"."post_expense_for_all"() RETURNS "void"
@@ -1095,7 +1142,6 @@ CREATE TABLE IF NOT EXISTS "public"."debts" (
     "id" bigint NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "amount" real DEFAULT '0'::real NOT NULL,
-    "currency" "text" DEFAULT 'EUR'::"text" NOT NULL,
     "borrower" bigint NOT NULL,
     "lender" bigint NOT NULL,
     "group_id" bigint NOT NULL
@@ -1121,7 +1167,6 @@ CREATE TABLE IF NOT EXISTS "public"."expenses" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "amount" real DEFAULT '0'::real NOT NULL,
     "title" "text" NOT NULL,
-    "currency" "text" DEFAULT 'EUR'::"text" NOT NULL,
     "description" "text",
     "date" timestamp without time zone DEFAULT "now"() NOT NULL,
     "group_id" bigint NOT NULL,
@@ -1153,7 +1198,8 @@ CREATE TABLE IF NOT EXISTS "public"."groups" (
     "description" "text",
     "owner" "uuid" NOT NULL,
     "expense_total" real DEFAULT '0'::real NOT NULL,
-    "settled" boolean DEFAULT true NOT NULL
+    "settled" boolean DEFAULT true NOT NULL,
+    "currency" "text" DEFAULT 'EUR'::"text"
 );
 
 
@@ -1215,7 +1261,6 @@ CREATE TABLE IF NOT EXISTS "public"."debts_per_expense" (
     "amount" double precision NOT NULL,
     "lender" bigint NOT NULL,
     "borrower" bigint NOT NULL,
-    "currency" "text" DEFAULT 'EUR'::"text" NOT NULL,
     "group_id" bigint NOT NULL,
     "expense" bigint NOT NULL
 );
@@ -1226,31 +1271,6 @@ ALTER TABLE "public"."debts_per_expense" OWNER TO "postgres";
 
 ALTER TABLE "public"."debts_per_expense" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
     SEQUENCE NAME "public"."debts_per_expense_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
-
-CREATE TABLE IF NOT EXISTS "public"."debts_simple" (
-    "id" bigint NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "amount" real DEFAULT '0'::real NOT NULL,
-    "currency" "text" DEFAULT 'EUR'::"text" NOT NULL,
-    "borrower" bigint NOT NULL,
-    "lender" bigint NOT NULL,
-    "group_id" bigint NOT NULL
-);
-
-
-ALTER TABLE "public"."debts_simple" OWNER TO "postgres";
-
-
-ALTER TABLE "public"."debts_simple" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
-    SEQUENCE NAME "public"."debts_simple_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1364,32 +1384,17 @@ ALTER TABLE "public"."friends" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDE
 
 
 
-CREATE TABLE IF NOT EXISTS "public"."group_invitations" (
-    "id" bigint NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "sender" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "receiver" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+CREATE TABLE IF NOT EXISTS "public"."invite_tokens" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "group_id" bigint NOT NULL,
-    "group_name" "text"
+    "token" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "used" boolean DEFAULT false,
+    "expires_at" timestamp with time zone
 );
 
 
-ALTER TABLE "public"."group_invitations" OWNER TO "postgres";
-
-
-COMMENT ON TABLE "public"."group_invitations" IS 'invite people to access groups';
-
-
-
-ALTER TABLE "public"."group_invitations" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
-    SEQUENCE NAME "public"."group_invitations_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
+ALTER TABLE "public"."invite_tokens" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."profiles" (
@@ -1406,16 +1411,11 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "receive_emails" boolean DEFAULT true,
     "receive_popups" boolean DEFAULT true,
     "language" "text" DEFAULT 'en'::"text",
-    "currency" "text" DEFAULT 'euro'::"text" NOT NULL,
-    CONSTRAINT "profiles_currency_check" CHECK (("length"("currency") < 12))
+    "created_at" timestamp with time zone DEFAULT "now"()
 );
 
 
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
-
-
-COMMENT ON COLUMN "public"."profiles"."currency" IS 'currency option for a profile';
-
 
 
 CREATE TABLE IF NOT EXISTS "public"."transfers" (
@@ -1476,11 +1476,6 @@ ALTER TABLE ONLY "public"."debts_per_expense"
 
 
 
-ALTER TABLE ONLY "public"."debts_simple"
-    ADD CONSTRAINT "debts_simple_pkey" PRIMARY KEY ("id");
-
-
-
 ALTER TABLE ONLY "public"."expense_participants"
     ADD CONSTRAINT "expense_participants_pkey" PRIMARY KEY ("id");
 
@@ -1501,8 +1496,13 @@ ALTER TABLE ONLY "public"."friends"
 
 
 
-ALTER TABLE ONLY "public"."group_invitations"
-    ADD CONSTRAINT "group_invitations_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."invite_tokens"
+    ADD CONSTRAINT "invite_tokens_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."invite_tokens"
+    ADD CONSTRAINT "invite_tokens_token_key" UNIQUE ("token");
 
 
 
@@ -1600,18 +1600,8 @@ ALTER TABLE ONLY "public"."friends"
 
 
 
-ALTER TABLE ONLY "public"."group_invitations"
-    ADD CONSTRAINT "group_invitations_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."group_invitations"
-    ADD CONSTRAINT "group_invitations_receiver_fkey" FOREIGN KEY ("receiver") REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."group_invitations"
-    ADD CONSTRAINT "group_invitations_sender_fkey" FOREIGN KEY ("sender") REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."invite_tokens"
+    ADD CONSTRAINT "invite_tokens_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("id") ON DELETE CASCADE;
 
 
 
@@ -1642,21 +1632,6 @@ ALTER TABLE ONLY "public"."members"
 
 ALTER TABLE ONLY "public"."debts_per_expense"
     ADD CONSTRAINT "public_debts_for_expense_expense_fkey" FOREIGN KEY ("expense") REFERENCES "public"."expenses"("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."debts_simple"
-    ADD CONSTRAINT "public_debts_simple_borrower_fkey" FOREIGN KEY ("borrower") REFERENCES "public"."members"("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."debts_simple"
-    ADD CONSTRAINT "public_debts_simple_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "public"."groups"("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-
-ALTER TABLE ONLY "public"."debts_simple"
-    ADD CONSTRAINT "public_debts_simple_lender_fkey" FOREIGN KEY ("lender") REFERENCES "public"."members"("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 
@@ -1696,7 +1671,7 @@ CREATE POLICY "access if included in request" ON "public"."friend_requests" FOR 
 
 
 
-CREATE POLICY "all" ON "public"."debts_simple" TO "authenticated", "anon" USING ("utils"."is_member_of"("auth"."uid"(), "group_id"));
+CREATE POLICY "authAndAnonAccessInvites" ON "public"."invite_tokens" TO "authenticated", "anon" USING (true) WITH CHECK (true);
 
 
 
@@ -1708,9 +1683,6 @@ ALTER TABLE "public"."debts" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."debts_per_expense" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."debts_simple" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."expense_participants" ENABLE ROW LEVEL SECURITY;
@@ -1736,14 +1708,14 @@ CREATE POLICY "group owner can delete group" ON "public"."groups" FOR DELETE TO 
 
 
 
-ALTER TABLE "public"."group_invitations" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."groups" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "insert" ON "public"."debts_simple" FOR INSERT TO "authenticated", "anon" WITH CHECK ("utils"."is_member_of"("auth"."uid"(), "group_id"));
+CREATE POLICY "groups_select" ON "public"."groups" FOR SELECT USING ("utils"."is_member_of"("auth"."uid"(), "id"));
 
+
+
+ALTER TABLE "public"."invite_tokens" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."members" ENABLE ROW LEVEL SECURITY;
@@ -1756,31 +1728,7 @@ CREATE POLICY "only_update_status" ON "public"."friend_requests" FOR UPDATE TO "
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "select_groups_policy" ON "public"."groups" FOR SELECT TO "authenticated", "anon" USING ((("id" IN ( SELECT "members"."group_id"
-   FROM "public"."members"
-  WHERE ("members"."profile" = "auth"."uid"()))) OR ("owner" = "auth"."uid"()) OR (EXISTS ( SELECT 1
-   FROM "public"."group_invitations" "gi"
-  WHERE (("gi"."receiver" = "auth"."uid"()) AND ("gi"."group_id" = "groups"."id"))))));
-
-
-
-CREATE POLICY "sender can insert" ON "public"."group_invitations" FOR INSERT TO "authenticated", "anon" WITH CHECK (("sender" = "auth"."uid"()));
-
-
-
-CREATE POLICY "sender or receiver can access" ON "public"."group_invitations" FOR SELECT TO "authenticated", "anon" USING ((("sender" = "auth"."uid"()) OR ("receiver" = "auth"."uid"())));
-
-
-
-CREATE POLICY "sender or receiver can delete" ON "public"."group_invitations" FOR DELETE TO "authenticated", "anon" USING ((("sender" = "auth"."uid"()) OR ("receiver" = "auth"."uid"())));
-
-
-
 ALTER TABLE "public"."transfers" ENABLE ROW LEVEL SECURITY;
-
-
-CREATE POLICY "update" ON "public"."debts_simple" FOR UPDATE TO "authenticated", "anon" USING (true) WITH CHECK ("utils"."is_member_of"("auth"."uid"(), "group_id"));
-
 
 
 CREATE POLICY "user can create a member for his groups" ON "public"."members" FOR INSERT TO "authenticated", "anon" WITH CHECK ("utils"."is_member_of"("auth"."uid"(), "group_id"));
@@ -1791,7 +1739,7 @@ CREATE POLICY "user can create friend for himself" ON "public"."friends" FOR INS
 
 
 
-CREATE POLICY "user can create group for himself" ON "public"."groups" FOR INSERT TO "authenticated", "anon" WITH CHECK (("owner" = "auth"."uid"()));
+CREATE POLICY "user can create group for himself" ON "public"."groups" FOR INSERT TO "authenticated", "anon" WITH CHECK (true);
 
 
 
@@ -2426,15 +2374,15 @@ GRANT ALL ON FUNCTION "public"."accept_friend_request"("sender_uid" "uuid") TO "
 
 
 
-GRANT ALL ON FUNCTION "public"."create_expense"("group_id_input" integer, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "currency_input" "text", "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") TO "anon";
-GRANT ALL ON FUNCTION "public"."create_expense"("group_id_input" integer, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "currency_input" "text", "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."create_expense"("group_id_input" integer, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "currency_input" "text", "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."create_expense"("group_id_input" bigint, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."create_expense"("group_id_input" bigint, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."create_expense"("group_id_input" bigint, "title_input" "text", "payers_input" integer[], "participants_input" integer[], "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "category_input" "text") TO "service_role";
 
 
 
-GRANT ALL ON FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[]) TO "anon";
-GRANT ALL ON FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[]) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[]) TO "service_role";
+GRANT ALL ON FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[], "currency_input" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[], "currency_input" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."create_group"("title_input" "text", "member_names_input" "text"[], "currency_input" "text") TO "service_role";
 
 
 
@@ -2456,6 +2404,18 @@ GRANT ALL ON FUNCTION "public"."get_groups_summary"() TO "service_role";
 
 
 
+GRANT ALL ON FUNCTION "public"."get_unbound_members_for_token"("p_token" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_unbound_members_for_token"("p_token" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_unbound_members_for_token"("p_token" "text") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."join_group_with_token"("p_token" "text", "p_member_id" integer, "p_new_name" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."join_group_with_token"("p_token" "text", "p_member_id" integer, "p_new_name" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."join_group_with_token"("p_token" "text", "p_member_id" integer, "p_new_name" "text") TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."search_friends"("keyword_input" "text", "profile_id_input" "uuid", "limit_input" integer, "offset_input" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."search_friends"("keyword_input" "text", "profile_id_input" "uuid", "limit_input" integer, "offset_input" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."search_friends"("keyword_input" "text", "profile_id_input" "uuid", "limit_input" integer, "offset_input" integer) TO "service_role";
@@ -2474,33 +2434,21 @@ GRANT ALL ON FUNCTION "public"."settle_expense"("expense_id" bigint, "_group_id"
 
 
 
-GRANT ALL ON FUNCTION "public"."settle_expense2"("expense_id" bigint, "_group_id" bigint) TO "anon";
-GRANT ALL ON FUNCTION "public"."settle_expense2"("expense_id" bigint, "_group_id" bigint) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."settle_expense2"("expense_id" bigint, "_group_id" bigint) TO "service_role";
-
-
-
 GRANT ALL ON FUNCTION "public"."settle_group"("_id" bigint) TO "anon";
 GRANT ALL ON FUNCTION "public"."settle_group"("_id" bigint) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."settle_group"("_id" bigint) TO "service_role";
 
 
 
-GRANT ALL ON FUNCTION "public"."settle_group2"("_id" bigint) TO "anon";
-GRANT ALL ON FUNCTION "public"."settle_group2"("_id" bigint) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."settle_group2"("_id" bigint) TO "service_role";
+GRANT ALL ON FUNCTION "public"."update_expense"("expense_id" bigint, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."update_expense"("expense_id" bigint, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_expense"("expense_id" bigint, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") TO "service_role";
 
 
 
-GRANT ALL ON FUNCTION "public"."update_expense"("expense_id" integer, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "currency_input" "text", "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") TO "anon";
-GRANT ALL ON FUNCTION "public"."update_expense"("expense_id" integer, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "currency_input" "text", "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."update_expense"("expense_id" integer, "title_input" "text", "description_input" "text", "amount_input" real, "date_input" timestamp without time zone, "currency_input" "text", "proof_input" "text", "payers_input" integer[], "participants_input" integer[], "category_input" "text") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[]) TO "anon";
-GRANT ALL ON FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[]) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[]) TO "service_role";
+GRANT ALL ON FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[], "currency_input" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[], "currency_input" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_group"("group_id_input" integer, "title_input" "text", "description_input" "text", "member_names_input" "text"[], "currency_input" "text") TO "service_role";
 
 
 
@@ -2543,12 +2491,6 @@ GRANT ALL ON FUNCTION "utils"."is_group_owner"("_person_id" "uuid", "_group_id" 
 GRANT ALL ON FUNCTION "utils"."is_member_of"("_person_id" "uuid", "_group_id" bigint) TO "anon";
 GRANT ALL ON FUNCTION "utils"."is_member_of"("_person_id" "uuid", "_group_id" bigint) TO "authenticated";
 GRANT ALL ON FUNCTION "utils"."is_member_of"("_person_id" "uuid", "_group_id" bigint) TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "utils"."is_person_invited"("_person_id" "uuid", "_group_id" bigint) TO "anon";
-GRANT ALL ON FUNCTION "utils"."is_person_invited"("_person_id" "uuid", "_group_id" bigint) TO "authenticated";
-GRANT ALL ON FUNCTION "utils"."is_person_invited"("_person_id" "uuid", "_group_id" bigint) TO "service_role";
 
 
 
@@ -2648,18 +2590,6 @@ GRANT ALL ON SEQUENCE "public"."debts_per_expense_id_seq" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."debts_simple" TO "anon";
-GRANT ALL ON TABLE "public"."debts_simple" TO "authenticated";
-GRANT ALL ON TABLE "public"."debts_simple" TO "service_role";
-
-
-
-GRANT ALL ON SEQUENCE "public"."debts_simple_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."debts_simple_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."debts_simple_id_seq" TO "service_role";
-
-
-
 GRANT ALL ON TABLE "public"."expense_participants" TO "anon";
 GRANT ALL ON TABLE "public"."expense_participants" TO "authenticated";
 GRANT ALL ON TABLE "public"."expense_participants" TO "service_role";
@@ -2708,15 +2638,9 @@ GRANT ALL ON SEQUENCE "public"."friends_id_seq" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."group_invitations" TO "anon";
-GRANT ALL ON TABLE "public"."group_invitations" TO "authenticated";
-GRANT ALL ON TABLE "public"."group_invitations" TO "service_role";
-
-
-
-GRANT ALL ON SEQUENCE "public"."group_invitations_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."group_invitations_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."group_invitations_id_seq" TO "service_role";
+GRANT ALL ON TABLE "public"."invite_tokens" TO "anon";
+GRANT ALL ON TABLE "public"."invite_tokens" TO "authenticated";
+GRANT ALL ON TABLE "public"."invite_tokens" TO "service_role";
 
 
 
@@ -2744,30 +2668,30 @@ GRANT ALL ON SEQUENCE "public"."transfers_id_seq" TO "service_role";
 
 
 
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "postgres";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "anon";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "authenticated";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "service_role";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "service_role";
 
 
 
 
 
 
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "postgres";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "anon";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "authenticated";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "service_role";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "service_role";
 
 
 
 
 
 
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "postgres";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "anon";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "authenticated";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "service_role";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "service_role";
 
 
 
