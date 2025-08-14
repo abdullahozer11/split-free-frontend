@@ -1,7 +1,7 @@
-import { View, TouchableOpacity, Pressable, Share } from "react-native";
-import { DialogTitle, MenuItem, Text, useTranslatedAlert } from "@/src/components/Translated";
+import {View, TouchableOpacity, Pressable, Share} from "react-native";
+import {DialogTitle, MenuItem, Text, useTranslatedAlert} from "@/src/components/Translated";
 import React, {useEffect, useMemo, useState} from "react";
-import { Feather } from "@expo/vector-icons";
+import {Feather} from "@expo/vector-icons";
 import {
   useDeleteGroup,
   useExitGroup,
@@ -14,8 +14,8 @@ import {
   useNavigation,
   useRouter,
 } from "expo-router";
-import { ExpenseItem } from "@/src/components/ExpenseItem";
-import { TransferItem } from "@/src/components/TransferItem";
+import {ExpenseItem} from "@/src/components/ExpenseItem";
+import {TransferItem} from "@/src/components/TransferItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
 import {groupElementsByDay} from "@/src/utils/helpers";
 import {
@@ -25,30 +25,30 @@ import {
   ActivityIndicator,
   Modal,
 } from "react-native-paper";
-import { Button, TextInput } from "@/src/components/Translated";
-import { useExpenseList, useExpenseTotalThisMonth } from "@/src/api/expenses";
-import { useTransferList } from "@/src/api/transfers";
-import { Debt, Member } from "@/src/components/Person";
+import {Button, TextInput} from "@/src/components/Translated";
+import {useExpenseList, useExpenseTotalThisMonth} from "@/src/api/expenses";
+import {useTransferList} from "@/src/api/transfers";
+import {Debt, Member} from "@/src/components/Person";
 import {
   useAssignMember,
   useProfile,
 } from "@/src/api/profiles";
-import { useAuth } from "@/src/providers/AuthProvider";
-import { useInsertMember, useProfileMember } from "@/src/api/members";
-import { useQueryClient } from "@tanstack/react-query";
-import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
-import { currencyOptions } from "@/src/constants/Currencies";
+import {useAuth} from "@/src/providers/AuthProvider";
+import {useInsertMember, useProfileMember} from "@/src/api/members";
+import {useQueryClient} from "@tanstack/react-query";
+import {useExpenseSubscription} from "@/src/api/expenses/subscriptions";
+import {useSettings} from "@/src/providers/SettingsProvider.js";
+import {currencyOptions} from "@/src/constants/Currencies";
 import QRCode from 'react-native-qrcode-svg';
-import { generateInvite } from "@/src/api/invites";
+import {generateInvite} from "@/src/api/invites";
 import {useMemberSubscription} from "@/src/api/members/subscriptions";
 
 
 const GroupDetailsScreen = () => {
   console.log('🚀 GroupDetailsScreen: Component rendering');
 
-  const { alert } = useTranslatedAlert();
-  const { group_id: idString } = useLocalSearchParams();
+  const {alert} = useTranslatedAlert();
+  const {group_id: idString} = useLocalSearchParams();
 
   console.log('🔍 Debug - idString:', idString);
 
@@ -59,7 +59,7 @@ const GroupDetailsScreen = () => {
   console.log('🔍 Debug - groupId:', groupId);
 
   if (isNaN(groupId)) {
-    console.error('❌ Error: Invalid groupId', { idString, groupId });
+    console.error('❌ Error: Invalid groupId', {idString, groupId});
     return <Text variant={"displayLarge"}>Invalid Group ID</Text>;
   }
 
@@ -112,7 +112,7 @@ const GroupDetailsScreen = () => {
     pagesCount: transferPages?.pages?.length || 0
   });
 
-  const { session } = useAuth();
+  const {session} = useAuth();
 
   console.log('🔍 Debug - session:', {
     session: session ? 'exists' : 'null/undefined',
@@ -150,12 +150,12 @@ const GroupDetailsScreen = () => {
   } = useExpenseTotalThisMonth(groupId);
 
   const [totalBalance, setTotalBalance] = useState(0);
-  const { mutate: exitGroup } = useExitGroup();
-  const { mutate: deleteGroup } = useDeleteGroup();
-  const { mutate: settleGroup } = useSettleGroup();
-  const { mutate: insertMember } = useInsertMember();
-  const { mutate: assignMember } = useAssignMember();
-  const { settings } = useSettings();
+  const {mutate: exitGroup} = useExitGroup();
+  const {mutate: deleteGroup} = useDeleteGroup();
+  const {mutate: settleGroup} = useSettleGroup();
+  const {mutate: insertMember} = useInsertMember();
+  const {mutate: assignMember} = useAssignMember();
+  const {settings} = useSettings();
 
   console.log('🔍 Debug - settings:', {
     settings: settings ? 'exists' : 'null/undefined',
@@ -168,6 +168,7 @@ const GroupDetailsScreen = () => {
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [isGroupExiterVisible, setIsGroupExiterVisible] = useState(false);
   const [inviteLink, setInviteLink] = useState('');
+  const [isGeneratingInvite, setIsGeneratingInvite] = useState(false);
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState("");
 
@@ -293,7 +294,7 @@ const GroupDetailsScreen = () => {
       profileMemberLoading,
       expenseTotalMLoading
     });
-    return <ActivityIndicator />;
+    return <ActivityIndicator/>;
   }
 
   // Enhanced error check with logging
@@ -339,7 +340,7 @@ const GroupDetailsScreen = () => {
             return {
               ...oldData,
               pages: oldData.pages.map((page) =>
-                page.map((expense) => ({ ...expense, settled: true })),
+                page.map((expense) => ({...expense, settled: true})),
               ),
             };
           });
@@ -390,6 +391,7 @@ const GroupDetailsScreen = () => {
 
   const promptInvite = async () => {
     console.log('📧 Generating invite for group:', groupId);
+    setIsGeneratingInvite(true);
 
     try {
       const link = await generateInvite(groupId);
@@ -399,8 +401,27 @@ const GroupDetailsScreen = () => {
     } catch (error) {
       console.error('❌ Invite generation error:', error);
       alert("Error", "Failed to generate invite link.");
+    } finally {
+      setIsGeneratingInvite(false);
     }
   };
+
+  const refreshInviteQR = async () => {
+    console.log('🔄 Refreshing invite QR for group:', groupId);
+    setIsGeneratingInvite(true);
+
+    try {
+      const link = await generateInvite(groupId);
+      console.log('✅ Invite refreshed:', link ? 'success' : 'empty');
+      setInviteLink(link);
+    } catch (error) {
+      console.error('❌ Invite refresh error:', error);
+      alert("Error", "Failed to refresh invite link.");
+    } finally {
+      setIsGeneratingInvite(false);
+    }
+  };
+
 
   const promptExitGroup = () => {
     console.log('🚪 Prompting exit group');
@@ -514,12 +535,12 @@ const GroupDetailsScreen = () => {
 
   // Safe property access with logging
   const isOwner = session?.user?.id === group?.owner;
-  console.log('👑 Owner check:', { isOwner, sessionUserId: session?.user?.id, groupOwner: group?.owner });
+  console.log('👑 Owner check:', {isOwner, sessionUserId: session?.user?.id, groupOwner: group?.owner});
 
   const currencyOption = currencyOptions?.find(opt => opt?.value === group?.currency);
   const currency_label = currencyOption?.label || '$';
 
-  console.log('💱 Currency:', { currency: group?.currency, label: currency_label });
+  console.log('💱 Currency:', {currency: group?.currency, label: currency_label});
 
   // Final safety check before render
   if (!group) {
@@ -576,7 +597,8 @@ const GroupDetailsScreen = () => {
                       <Text variant={"titleMedium"}>{item}</Text>
                       {(groupedTransactions[item] || []).map((transaction) => (
                         transaction?.type === 'expense' ? (
-                          <ExpenseItem key={`expense-${transaction.id}`} expense={transaction} currency_label={currency_label}/>
+                          <ExpenseItem key={`expense-${transaction.id}`} expense={transaction}
+                                       currency_label={currency_label}/>
                         ) : (
                           <TransferItem
                             key={`transfer-${transaction.id}`}
@@ -613,7 +635,7 @@ const GroupDetailsScreen = () => {
                       setBigPlusVisible(false);
                     }}
                   >
-                    <Feather name={"plus-circle"} size={18} color={"green"} />
+                    <Feather name={"plus-circle"} size={18} color={"green"}/>
                   </TouchableOpacity>
                 </View>
                 {group?.members && Array.isArray(group.members) &&
@@ -639,7 +661,7 @@ const GroupDetailsScreen = () => {
                       className="flex-1 bg-white"
                     />
                     <Pressable className="ml-2" onPress={handleNewMember}>
-                      <Feather name={"check"} color={"green"} size={24} />
+                      <Feather name={"check"} color={"green"} size={24}/>
                     </Pressable>
                     <Pressable
                       className="ml-2"
@@ -648,7 +670,7 @@ const GroupDetailsScreen = () => {
                         setBigPlusVisible(true);
                       }}
                     >
-                      <Feather name={"x"} size={24} />
+                      <Feather name={"x"} size={24}/>
                     </Pressable>
                   </View>
                 )}
@@ -662,7 +684,7 @@ const GroupDetailsScreen = () => {
                 {group?.debts && Array.isArray(group.debts) &&
                   group.debts.map((debt) => (
                     debt ? (
-                      <Debt key={debt.id} debt={debt} members={group?.members || []} />
+                      <Debt key={debt.id} debt={debt} members={group?.members || []}/>
                     ) : null
                   ))}
               </View>
@@ -767,7 +789,7 @@ const GroupDetailsScreen = () => {
             setIsDialogVisible(false);
           }}
         >
-          <Dialog.Icon icon="alert" />
+          <Dialog.Icon icon="alert"/>
           <DialogTitle>Are you sure to delete this group?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
@@ -783,7 +805,7 @@ const GroupDetailsScreen = () => {
             setIsDialog2Visible(false);
           }}
         >
-          <Dialog.Icon icon="alert" />
+          <Dialog.Icon icon="alert"/>
           <DialogTitle>Are you sure to settle this group?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
@@ -799,7 +821,7 @@ const GroupDetailsScreen = () => {
             setIsGroupExiterVisible(false);
           }}
         >
-          <Dialog.Icon icon="alert" />
+          <Dialog.Icon icon="alert"/>
           <DialogTitle>Are you sure to exit this group?</DialogTitle>
           <Dialog.Content>
             <Text variant="bodyMedium">This action cannot be taken back</Text>
@@ -824,34 +846,68 @@ const GroupDetailsScreen = () => {
           alignItems: 'center',
         }}
       >
-        <Text variant="titleLarge">Invite to Group</Text>
+        <Text variant="titleLarge" className="mb-4">Invite to Group</Text>
+
         <View className="my-5 items-center">
-          {inviteLink ? (
-            <QRCode value={inviteLink} size={200} />
+          {inviteLink && !isGeneratingInvite ? (
+            <QRCode value={inviteLink} size={200}/>
           ) : (
-            <ActivityIndicator />
+            <View className="w-[200px] h-[200px] justify-center items-center border-2 border-gray-200 rounded">
+              <ActivityIndicator size="large"/>
+              <Text variant="bodySmall" className="mt-2">
+                {isGeneratingInvite ? 'Generating...' : 'Loading...'}
+              </Text>
+            </View>
           )}
         </View>
-        <Text selectable className="mb-5 text-center">{inviteLink}</Text>
+
+        {inviteLink && (
+          <Text selectable className="mb-5 text-center text-xs text-gray-600">
+            {inviteLink}
+          </Text>
+        )}
+
+        <View className="flex-row gap-3 mb-3">
+          <Button
+            mode="contained"
+            onPress={async () => {
+              if (!inviteLink) return;
+              try {
+                await Share.share({message: inviteLink});
+              } catch (error) {
+                console.error('❌ Share error:', error);
+                alert("Error", "Failed to share link.");
+              }
+            }}
+            disabled={!inviteLink || isGeneratingInvite}
+            className="flex-1"
+          >
+            Share Link
+          </Button>
+
+          <Button
+            mode="outlined"
+            onPress={refreshInviteQR}
+            disabled={isGeneratingInvite}
+            className="flex-1"
+          >
+            {isGeneratingInvite ? 'Refreshing...' : 'Refresh QR'}
+          </Button>
+        </View>
+
         <Button
-          onPress={async () => {
-            try {
-              await Share.share({ message: inviteLink });
-            } catch (error) {
-              console.error('❌ Share error:', error);
-              alert("Error", "Failed to share link.");
-            }
-          }}
+          mode="text"
+          onPress={() => setQRCodeVisible(false)}
+          className="mt-2"
         >
-          Share Link
+          Close
         </Button>
-        <Button onPress={() => setQRCodeVisible(false)}>Close</Button>
       </Modal>
       {bigPlusVisible && (
         <View className="absolute bottom-2 right-4 flex-row gap-2">
           <Link href={`/(tabs)/group/${groupId}/expense/create`} asChild>
             <Pressable className="w-[100px] h-[100px] rounded-full bg-orange-400 justify-center items-center">
-              <Feather name={"plus"} size={36} />
+              <Feather name={"plus"} size={36}/>
               <Text variant={"titleMedium"}>Expense</Text>
             </Pressable>
           </Link>
