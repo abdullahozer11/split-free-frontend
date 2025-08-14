@@ -1,26 +1,25 @@
-import { supabase } from "@/src/lib/supabase";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import {supabase} from "@/src/lib/supabase";
+import {useInfiniteQuery, useMutation, useQuery} from "@tanstack/react-query";
 
 const PAGE_SIZE = 20;
 
 export const useExpenseList = (group_id: number) => {
   return useInfiniteQuery({
     queryKey: ["expenses", group_id],
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({pageParam}) => {
       try {
         const page = pageParam ?? 0;
         const from = page * PAGE_SIZE;
         const to = from + PAGE_SIZE - 1;
-        const { data, error } = await supabase
+        const {data, error} = await supabase
           .from("expenses")
           .select(
             "id, title, amount, date, created_at, group_id, category, settled, " +
-              "payers:expense_payers(member), participants:expense_participants(member)",
+            "payers:expense_payers(member), participants:expense_participants(member)",
           )
           .eq("group_id", group_id)
-          .order("created_at", { ascending: false })
-          .order("id", { ascending: false })
+          .order("created_at", {ascending: false})
+          .order("id", {ascending: false})
           .range(from, to);
         if (error) {
           console.error("useExpenseList query error:", {
@@ -51,7 +50,7 @@ export const useExpense = (id: number) => {
     queryKey: ["expense", id],
     queryFn: async () => {
       // Fetch expense details
-      const { data: expenseData, error: expenseError } = await supabase
+      const {data: expenseData, error: expenseError} = await supabase
         .from("expenses")
         .select("amount, id, title, settled, description, date, last_modified, group_id, category")
         .eq("id", id)
@@ -63,7 +62,7 @@ export const useExpense = (id: number) => {
       }
 
       // Fetch payers
-      const { data: payersData, error: payersError } = await supabase
+      const {data: payersData, error: payersError} = await supabase
         .from("expense_payers")
         .select(`
           member (
@@ -83,14 +82,14 @@ export const useExpense = (id: number) => {
 
       const payers = payersData
         ? payersData.map((item) => ({
-            id: item.member.id,
-            name: item.member.name,
-            avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
-          }))
+          id: item.member.id,
+          name: item.member.name,
+          avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
+        }))
         : [];
 
       // Fetch payer_ids
-      const { data: payerIdsData, error: payerIdsError } = await supabase
+      const {data: payerIdsData, error: payerIdsError} = await supabase
         .from("expense_payers")
         .select("member")
         .eq("expense", id);
@@ -103,7 +102,7 @@ export const useExpense = (id: number) => {
       const payer_ids = payerIdsData ? payerIdsData.map((d) => d.member) : [];
 
       // Fetch participants
-      const { data: participantsData, error: participantsError } = await supabase
+      const {data: participantsData, error: participantsError} = await supabase
         .from("expense_participants")
         .select(`
           member (
@@ -123,14 +122,14 @@ export const useExpense = (id: number) => {
 
       const participants = participantsData
         ? participantsData.map((item) => ({
-            id: item.member.id,
-            name: item.member.name,
-            avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
-          }))
+          id: item.member.id,
+          name: item.member.name,
+          avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
+        }))
         : [];
 
       // Fetch participant_ids
-      const { data: participantIdsData, error: participantIdsError } = await supabase
+      const {data: participantIdsData, error: participantIdsError} = await supabase
         .from("expense_participants")
         .select("member")
         .eq("expense", id);
@@ -143,7 +142,8 @@ export const useExpense = (id: number) => {
       const participant_ids = participantIdsData ? participantIdsData.map((d) => d.member) : [];
 
       // Build the response object
-      const expense = {
+      // console.log("expense is ", expense);
+      return {
         amount: expenseData.amount,
         id: expenseData.id,
         title: expenseData.title,
@@ -158,9 +158,6 @@ export const useExpense = (id: number) => {
         payer_ids,
         participant_ids,
       };
-
-      // console.log("expense is ", expense);
-      return expense;
     },
   });
 };
@@ -170,7 +167,7 @@ export const useInsertExpense = () => {
     async mutationFn(data) {
       console.log('Participants being sent:', data.participants);
 
-      const { data: newExpenseID, error } = await supabase.rpc(
+      const {data: newExpenseID, error} = await supabase.rpc(
         "create_expense",
         {
           amount_input: data.amount,
@@ -197,7 +194,7 @@ export const useInsertExpense = () => {
 export const useUpdateExpense = () => {
   return useMutation({
     async mutationFn(data) {
-      const { error } = await supabase.rpc("update_expense", {
+      const {error} = await supabase.rpc("update_expense", {
         expense_id: data.id,
         amount_input: data.amount,
         category_input: data.category,
@@ -221,7 +218,7 @@ export const useUpdateExpense = () => {
 export const useDeleteExpense = () => {
   return useMutation({
     async mutationFn(id: bigint) {
-      const { error } = await supabase.from("expenses").delete().eq("id", id);
+      const {error} = await supabase.from("expenses").delete().eq("id", id);
       if (error) {
         console.error("useDeleteExpense error: ", error.message);
         throw new Error(error.message);
@@ -235,7 +232,7 @@ export const useDeleteExpense = () => {
 export const useSettleExpense = () => {
   return useMutation({
     async mutationFn(expense) {
-      const { error } = await supabase.rpc("settle_expense", {
+      const {error} = await supabase.rpc("settle_expense", {
         expense_id: expense.id,
         _group_id: expense.group_id,
       });
@@ -257,7 +254,7 @@ export const useExpenseTotalThisMonth = (group_id: number) => {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
         const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString().split("T")[0];
-        const { data, error } = await supabase
+        const {data, error} = await supabase
           .from("expenses")
           .select("amount")
           .eq("group_id", group_id)
@@ -271,8 +268,7 @@ export const useExpenseTotalThisMonth = (group_id: number) => {
           });
           throw new Error(`Failed to fetch monthly expense total: ${error.message}`);
         }
-        const total = data.reduce((sum, item) => sum + item.amount, 0).toFixed(2);
-        return total;
+        return data.reduce((sum, item) => sum + item.amount, 0).toFixed(2);
       } catch (err) {
         console.error("useExpenseTotalThisMonth unexpected error:", err);
         throw new Error(`Unexpected error fetching monthly expense total: ${err.message}`);
