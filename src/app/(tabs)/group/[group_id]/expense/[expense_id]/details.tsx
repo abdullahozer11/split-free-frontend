@@ -123,6 +123,7 @@ const ExpenseDetailsScreen = () => {
           setIsDialog2Visible(false);
           await queryClient.invalidateQueries(["groups"]);
           await queryClient.invalidateQueries(["debts"]);
+          await queryClient.invalidateQueries(["expense", expense?.id]);
         },
         onError: (error) => {
           console.error("Server error:", error);
