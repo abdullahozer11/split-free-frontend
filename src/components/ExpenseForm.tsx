@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {useNavigation} from "expo-router";
 import {useMemberList} from "@/src/api/members";
 import {useInsertExpense, useUpdateExpense} from "@/src/api/expenses";
@@ -26,6 +26,7 @@ import {supabase} from "@/src/lib/supabase.ts";
 import {translations} from "@/src/translations";
 import {useSettings} from "@/src/providers/SettingsProvider.js";
 import CustomDropdown from "@/src/components/CustomDropdown";
+import { useAuth } from "@/src/providers/AuthProvider";
 
 const renderCatItem = (item) => {
   return (
@@ -49,6 +50,7 @@ export default function ExpenseForm({
   const [isLoading, setLoading] = useState();
   const {settings} = useSettings();
   const int = translations[settings.language] || translations.en;
+  const { session } = useAuth();
 
   const [formState, setFormState] = useState(
     updatingExpense
@@ -81,6 +83,14 @@ export default function ExpenseForm({
     isError: membersError,
     isLoading: membersLoading,
   } = useMemberList(groupId);
+
+  useEffect(() => {
+    if (!members || membersLoading || !session || isUpdating || formState.payers.length > 0) return;
+    const currentMember = members.find(member => member.profile === session.user.id);
+    if (currentMember) {
+      setFormState(prev => ({...prev, payers: [currentMember.id]}));
+    }
+  }, [members, membersLoading, session, isUpdating, formState.payers]);
 
   if (membersLoading) {
     return <ActivityIndicator/>;
