@@ -279,6 +279,8 @@ const GroupDetailsScreen = () => {
   useExpenseSubscription(groupId);
   useMemberSubscription(groupId);
 
+  console.log("group?.members", group?.members);
+
   // Enhanced loading check with logging
   const isLoading = groupLoading || expenseLoading || transferLoading || profileLoading || profileMemberLoading || expenseTotalMLoading;
 

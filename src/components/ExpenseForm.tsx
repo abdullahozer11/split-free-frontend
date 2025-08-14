@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useNavigation } from "expo-router";
-import { useMemberList } from "@/src/api/members";
-import { useInsertExpense, useUpdateExpense } from "@/src/api/expenses";
+import React, {useState, useEffect} from "react";
+import {useNavigation} from "expo-router";
+import {useMemberList} from "@/src/api/members";
+import {useInsertExpense, useUpdateExpense} from "@/src/api/expenses";
 import {
   Pressable,
   ScrollView,
   TouchableOpacity,
   View,
 } from "react-native";
-import { getFormattedDate, formatDate } from "@/src/utils/helpers";
-import { ActivityIndicator, Avatar, Tooltip } from "react-native-paper";
+import {getFormattedDate, formatDate} from "@/src/utils/helpers";
+import {ActivityIndicator, Avatar, Tooltip} from "react-native-paper";
 import {
   Button,
   TextInput,
@@ -19,20 +19,20 @@ import {
 } from "@/src/components/Translated";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MultiSelect from "@/src/components/MultiSelect";
-import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
-import { useQueryClient } from "@tanstack/react-query";
-import { exp_cats } from "@/src/utils/expense_categories";
-import { supabase } from "@/src/lib/supabase.ts";
+import {Feather, FontAwesome6, MaterialIcons} from "@expo/vector-icons";
+import {useQueryClient} from "@tanstack/react-query";
+import {exp_cats} from "@/src/utils/expense_categories";
+import {supabase} from "@/src/lib/supabase.ts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import {translations} from "@/src/translations";
+import {useSettings} from "@/src/providers/SettingsProvider.js";
 import CustomDropdown from "@/src/components/CustomDropdown";
 
 const renderCatItem = (item) => {
   return (
     <View className={"flex-row h-12 px-2 justify-between items-center"}>
       <Text className={"text-sm font-medium"}>{item.label}</Text>
-      <MaterialIcons size={24} name={item.icon} color="black" />
+      <MaterialIcons size={24} name={item.icon} color="black"/>
     </View>
   );
 };
@@ -42,45 +42,50 @@ const getPayerStorageKey = (groupId) => `lastPayer_${groupId}`;
 const getParticipantsStorageKey = (groupId) => `lastParticipants_${groupId}`;
 
 export default function ExpenseForm({
-  title: headerTitle,
-  groupId,
-  updatingExpense,
-}) {
-  const { t } = useTranslations();
-  const { alert } = useTranslatedAlert();
+                                      title: headerTitle,
+                                      groupId,
+                                      updatingExpense,
+                                    }) {
+  const {t} = useTranslations();
+  const {alert} = useTranslatedAlert();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isLoading, setLoading] = useState();
   const [hasLoadedLastSelections, setHasLoadedLastSelections] = useState(false);
-  const { settings } = useSettings();
+  const {settings} = useSettings();
   const int = translations[settings.language] || translations.en;
 
   // Load last selections from AsyncStorage
   useEffect(() => {
     const loadLastSelections = async () => {
       try {
-        // Only load last selections if we're not updating an existing expense
-        if (!updatingExpense) {
-          const payerJson = await AsyncStorage.getItem(
-            getPayerStorageKey(groupId),
-          );
-          const participantsJson = await AsyncStorage.getItem(
-            getParticipantsStorageKey(groupId),
-          );
+        // Wait for members to be loaded first
+        if (!members || !updatingExpense) return;
 
-          const lastPayers = payerJson ? JSON.parse(payerJson) : [];
-          const lastParticipants = participantsJson
-            ? JSON.parse(participantsJson)
-            : [];
+        const payerJson = await AsyncStorage.getItem(
+          getPayerStorageKey(groupId),
+        );
+        const participantsJson = await AsyncStorage.getItem(
+          getParticipantsStorageKey(groupId),
+        );
 
-          // Update form state with last selections
-          setFormState((prev) => ({
-            ...prev,
-            payers: lastPayers.length ? lastPayers : [],
-            participants: lastParticipants.length ? lastParticipants : [],
-          }));
-        }
+        const lastPayers = payerJson ? JSON.parse(payerJson) : [];
+        const lastParticipants = participantsJson
+          ? JSON.parse(participantsJson)
+          : [];
+
+        // Filter to only include members that still exist
+        const currentMemberIds = members.map(m => m.id);
+        const validLastPayers = lastPayers.filter(id => currentMemberIds.includes(id));
+        const validLastParticipants = lastParticipants.filter(id => currentMemberIds.includes(id));
+
+        setFormState((prev) => ({
+          ...prev,
+          payers: validLastPayers,
+          participants: validLastParticipants,
+        }));
+
         setHasLoadedLastSelections(true);
       } catch (error) {
         console.error("Error loading last selections:", error);
@@ -88,35 +93,37 @@ export default function ExpenseForm({
       }
     };
 
-    loadLastSelections();
-  }, [groupId, updatingExpense]);
+    if (members && !membersLoading) {
+      loadLastSelections();
+    }
+  }, [groupId, updatingExpense, members, membersLoading]);
 
   const [formState, setFormState] = useState(
     updatingExpense
       ? {
-          ...updatingExpense,
-          id: updatingExpense.id,
-          amount: updatingExpense.amount.toString(),
-          payers: updatingExpense.payer_ids,
-          participants: updatingExpense.participant_ids,
-          inputDate: new Date(updatingExpense.date),
-        }
+        ...updatingExpense,
+        id: updatingExpense.id,
+        amount: updatingExpense.amount.toString(),
+        payers: updatingExpense.payer_ids,
+        participants: updatingExpense.participant_ids,
+        inputDate: new Date(updatingExpense.date),
+      }
       : {
-          title: "",
-          description: "",
-          payers: [],
-          participants: [],
-          amount: "0",
-          category: "Other",
-          group_id: groupId,
-          inputDate: new Date(),
-        },
+        title: "",
+        description: "",
+        payers: [],
+        participants: [],
+        amount: "0",
+        category: "Other",
+        group_id: groupId,
+        inputDate: new Date(),
+      },
   );
 
   const isUpdating = !!updatingExpense;
 
-  const { mutate: insertExpense } = useInsertExpense();
-  const { mutate: updateExpense } = useUpdateExpense();
+  const {mutate: insertExpense} = useInsertExpense();
+  const {mutate: updateExpense} = useUpdateExpense();
   const {
     data: members,
     isError: membersError,
@@ -124,7 +131,7 @@ export default function ExpenseForm({
   } = useMemberList(groupId);
 
   if (membersLoading) {
-    return <ActivityIndicator />;
+    return <ActivityIndicator/>;
   }
 
   if (membersError) {
@@ -276,8 +283,8 @@ export default function ExpenseForm({
 
     setLoading(true);
     // make a call to the edge function
-    const { data, error } = await supabase.functions.invoke("gemini", {
-      body: JSON.stringify({ title: title }),
+    const {data, error} = await supabase.functions.invoke("gemini", {
+      body: JSON.stringify({title: title}),
     });
     setLoading(false);
 
@@ -321,7 +328,7 @@ export default function ExpenseForm({
 
   // Show loading indicator while initializing the form
   if (!hasLoadedLastSelections) {
-    return <ActivityIndicator />;
+    return <ActivityIndicator/>;
   }
 
   return (
@@ -334,7 +341,7 @@ export default function ExpenseForm({
             navigation.goBack();
           }}
         >
-          <Feather className={"font-bold"} name={"arrow-left"} size={32} />
+          <Feather className={"font-bold"} name={"arrow-left"} size={32}/>
         </TouchableOpacity>
         <TouchableOpacity
           className={"bg-white p-1 h-12 rounded-md justify-center items-center"}
@@ -405,8 +412,8 @@ export default function ExpenseForm({
             />
           )}
         </View>
-        <View style={{ gap: 10 }}>
-          <View style={{ gap: 10 }} className={"flex-row items-center"}>
+        <View style={{gap: 10}}>
+          <View style={{gap: 10}} className={"flex-row items-center"}>
             <Avatar.Image
               size={48}
               source={require("@/assets/images/blank-profile.png")}
@@ -450,7 +457,7 @@ export default function ExpenseForm({
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <ActivityIndicator />
+                  <ActivityIndicator/>
                 ) : (
                   <FontAwesome6
                     name={"wand-magic-sparkles"}

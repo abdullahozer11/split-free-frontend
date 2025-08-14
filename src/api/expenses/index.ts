@@ -168,6 +168,8 @@ export const useExpense = (id: number) => {
 export const useInsertExpense = () => {
   return useMutation({
     async mutationFn(data) {
+      console.log('Participants being sent:', data.participants);
+
       const { data: newExpenseID, error } = await supabase.rpc(
         "create_expense",
         {

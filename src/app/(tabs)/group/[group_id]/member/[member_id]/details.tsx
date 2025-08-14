@@ -130,14 +130,30 @@ const MemberDetailsScreen = () => {
   const handleDelete = () => {
     deleteMember(member?.id, {
       onSuccess: async () => {
-        // console.log("Successfully deleted member");
         navigation.goBack();
         await queryClient.invalidateQueries(["members", member?.group_id]);
         await queryClient.invalidateQueries(["expense"]);
       },
       onError: (error) => {
-        console.error("Server error:", error);
-        alert("Error", "Server error.");
+        console.error("Delete member error:", error);
+        const errorMessage = error?.message || "An unknown error occurred";
+        if (errorMessage.includes("involved in") && errorMessage.includes("expense")) {
+          alert(
+            "Cannot Delete Member",
+            `${member?.name || 'This member'} is still involved in one or more unsettled expenses. Please remove or settle them from all expenses before deleting.`,
+          );
+        } else if (errorMessage.includes("network") || errorMessage.includes("connection")) {
+          // Network error
+          alert(
+            "Connection Error",
+            "Please check your internet connection and try again.",
+          );
+        } else {
+          alert(
+            "Error",
+            `Failed to delete ${member?.name || 'member'}: ${errorMessage}`,
+          );
+        }
       },
     });
   };

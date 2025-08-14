@@ -95,14 +95,46 @@ export const useInsertMember = () => {
 export const useDeleteMember = () => {
   return useMutation({
     async mutationFn(memberId) {
+      // First, check if member is involved in any expenses
+      const { data: expenses, error: expenseError } = await supabase
+        .from("expenses")
+        .select(
+          "id, payers:expense_payers(member), participants:expense_participants(member)"
+        )
+        .eq("settled", false);
+
+      if (expenseError) {
+        console.log("useDeleteMember expense check error: ", expenseError);
+        throw new Error(`Failed to check member dependencies: ${expenseError.message}`);
+      }
+
+      // If member is found in any expenses, prevent deletion
+      if (expenses && expenses.length > 0) {
+        const memberExpenses = expenses.filter(expense => {
+          const isInPayers = expense.payers?.some(payer => payer.member === memberId);
+          const isInParticipants = expense.participants?.some(participant => participant.member === memberId);
+          return isInPayers || isInParticipants;
+        });
+
+        if (memberExpenses.length > 0) {
+          const expenseIds = memberExpenses.map(expense => expense.id).join(", ");
+          throw new Error(
+            `Cannot delete member: they are involved in ${memberExpenses.length} unsettled expense(s) (IDs: ${expenseIds}). Please remove or settle them from all expenses first.`
+          );
+        }
+      }
+
+      // If no dependencies found, proceed with deletion
       const { error } = await supabase
         .from("members")
         .delete()
         .eq("id", memberId);
+
       if (error) {
         console.log("useDeleteMember error: ", error);
         throw new Error(error.message);
       }
+
       // console.log("useDeleteMember success");
     },
   });
