@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import {useNavigation} from "expo-router";
 import {useMemberList} from "@/src/api/members";
 import {useInsertExpense, useUpdateExpense} from "@/src/api/expenses";
@@ -23,7 +23,6 @@ import {Feather, FontAwesome6, MaterialIcons} from "@expo/vector-icons";
 import {useQueryClient} from "@tanstack/react-query";
 import {exp_cats} from "@/src/utils/expense_categories";
 import {supabase} from "@/src/lib/supabase.ts";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {translations} from "@/src/translations";
 import {useSettings} from "@/src/providers/SettingsProvider.js";
 import CustomDropdown from "@/src/components/CustomDropdown";
@@ -37,10 +36,6 @@ const renderCatItem = (item) => {
   );
 };
 
-// Keys for AsyncStorage
-const getPayerStorageKey = (groupId) => `lastPayer_${groupId}`;
-const getParticipantsStorageKey = (groupId) => `lastParticipants_${groupId}`;
-
 export default function ExpenseForm({
                                       title: headerTitle,
                                       groupId,
@@ -52,51 +47,8 @@ export default function ExpenseForm({
   const queryClient = useQueryClient();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isLoading, setLoading] = useState();
-  const [hasLoadedLastSelections, setHasLoadedLastSelections] = useState(false);
   const {settings} = useSettings();
   const int = translations[settings.language] || translations.en;
-
-  // Load last selections from AsyncStorage
-  useEffect(() => {
-    const loadLastSelections = async () => {
-      try {
-        // Wait for members to be loaded first
-        if (!members || !updatingExpense) return;
-
-        const payerJson = await AsyncStorage.getItem(
-          getPayerStorageKey(groupId),
-        );
-        const participantsJson = await AsyncStorage.getItem(
-          getParticipantsStorageKey(groupId),
-        );
-
-        const lastPayers = payerJson ? JSON.parse(payerJson) : [];
-        const lastParticipants = participantsJson
-          ? JSON.parse(participantsJson)
-          : [];
-
-        // Filter to only include members that still exist
-        const currentMemberIds = members.map(m => m.id);
-        const validLastPayers = lastPayers.filter(id => currentMemberIds.includes(id));
-        const validLastParticipants = lastParticipants.filter(id => currentMemberIds.includes(id));
-
-        setFormState((prev) => ({
-          ...prev,
-          payers: validLastPayers,
-          participants: validLastParticipants,
-        }));
-
-        setHasLoadedLastSelections(true);
-      } catch (error) {
-        console.error("Error loading last selections:", error);
-        setHasLoadedLastSelections(true);
-      }
-    };
-
-    if (members && !membersLoading) {
-      loadLastSelections();
-    }
-  }, [groupId, updatingExpense, members, membersLoading]);
 
   const [formState, setFormState] = useState(
     updatingExpense
@@ -150,16 +102,6 @@ export default function ExpenseForm({
     category,
   } = formState;
 
-  // Save selections to AsyncStorage when they change
-  const saveLastSelections = async (payers, participants) => {
-    try {
-      await AsyncStorage.setItem(getPayerStorageKey(groupId), JSON.stringify(payers));
-      await AsyncStorage.setItem(getParticipantsStorageKey(groupId), JSON.stringify(participants));
-    } catch (error) {
-      console.error("Error saving last selections:", error);
-    }
-  };
-
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
       const date = selectedDate;
@@ -203,9 +145,6 @@ export default function ExpenseForm({
       console.log("Validation failed");
       return;
     }
-
-    // Save the current selections for future use
-    saveLastSelections(payers, participants);
 
     if (isUpdating) {
       await onUpdate();
@@ -325,11 +264,6 @@ export default function ExpenseForm({
     label: member.name,
     value: member.id,
   }));
-
-  // Show loading indicator while initializing the form
-  if (!hasLoadedLastSelections) {
-    return <ActivityIndicator/>;
-  }
 
   return (
     <ScrollView className={"flex-1"}>
