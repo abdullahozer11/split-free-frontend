@@ -7,7 +7,6 @@ import CustomHeader from "@/src/components/CustomHeader";
 import { useGroupList } from "@/src/api/groups";
 import { ActivityIndicator } from "react-native-paper";
 import {
-  useGroupInviteSubscriptions,
   useGroupSubscriptions,
 } from "@/src/api/groups/subscriptions";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -34,7 +33,6 @@ const GroupScreen = () => {
 
   const {session} = useAuth();
   useGroupSubscriptions();
-  useGroupInviteSubscriptions(session?.user.id);
   const queryClient = useQueryClient();
 
   // Enhanced refs to prevent dual modal issues
