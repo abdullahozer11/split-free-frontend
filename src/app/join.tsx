@@ -153,7 +153,7 @@ const JoinScreen = () => {
       await queryClient.invalidateQueries(["members", groupId]);
 
       alert("Success", "Successfully joined the group!");
-      router.replace(`/(tabs)/group/${groupId}`);
+      router.replace('/(tabs)/group');
     } catch (error) {
       alert("Error", error.message);
     } finally {
