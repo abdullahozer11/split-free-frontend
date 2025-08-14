@@ -140,7 +140,7 @@ const MemberDetailsScreen = () => {
         if (errorMessage.includes("involved in") && errorMessage.includes("expense")) {
           alert(
             "Cannot Delete Member",
-            `${member?.name || 'This member'} is still involved in one or more unsettled expenses. Please remove or settle them from all expenses before deleting.`,
+            "This member is still involved in one or more unsettled expenses. Please remove or settle them from all expenses before deleting.",
           );
         } else if (errorMessage.includes("network") || errorMessage.includes("connection")) {
           // Network error
@@ -151,7 +151,7 @@ const MemberDetailsScreen = () => {
         } else {
           alert(
             "Error",
-            `Failed to delete ${member?.name || 'member'}: ${errorMessage}`,
+            "Failed to delete member",
           );
         }
       },
