@@ -179,7 +179,7 @@ const JoinScreen = () => {
 
       alert("Success", "Successfully joined the group!");
       console.log('Navigating after create to group:', groupId);
-      router.replace(`/(tabs)/group/${groupId}`);
+      router.replace('/(tabs)/group');
     } catch (error) {
       console.log('Error in handleCreate:', error);
       alert("Error", error.message);

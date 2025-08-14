@@ -44,19 +44,41 @@ import { generateInvite } from "@/src/api/invites";
 
 
 const GroupDetailsScreen = () => {
+  console.log('🚀 GroupDetailsScreen: Component rendering');
+
   const { alert } = useTranslatedAlert();
   const { group_id: idString } = useLocalSearchParams();
+
+  console.log('🔍 Debug - idString:', idString);
+
   const groupId = parseInt(
-    typeof idString === "string" ? idString : idString[0],
+    typeof idString === "string" ? idString : idString?.[0],
   );
+
+  console.log('🔍 Debug - groupId:', groupId);
+
+  if (isNaN(groupId)) {
+    console.error('❌ Error: Invalid groupId', { idString, groupId });
+    return <Text variant={"displayLarge"}>Invalid Group ID</Text>;
+  }
+
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const router = useRouter();
+
   const {
     data: group,
     isError: groupError,
     isLoading: groupLoading,
   } = useGroup(groupId);
+
+  console.log('🔍 Debug - group data:', {
+    group: group ? 'exists' : 'null/undefined',
+    groupError,
+    groupLoading,
+    groupKeys: group ? Object.keys(group) : 'N/A'
+  });
+
   const {
     data: expensePages,
     isError: expenseError,
@@ -65,6 +87,14 @@ const GroupDetailsScreen = () => {
     hasNextPage: hasMoreExpenses,
     isFetchingNextPage: isFetchingNextExpenses,
   } = useExpenseList(groupId);
+
+  console.log('🔍 Debug - expensePages:', {
+    expensePages: expensePages ? 'exists' : 'null/undefined',
+    expenseError,
+    expenseLoading,
+    pagesCount: expensePages?.pages?.length || 0
+  });
+
   const {
     data: transferPages,
     isError: transferError,
@@ -73,21 +103,51 @@ const GroupDetailsScreen = () => {
     hasNextPage: hasMoreTransfers,
     isFetchingNextPage: isFetchingNextTransfers,
   } = useTransferList(groupId);
+
+  console.log('🔍 Debug - transferPages:', {
+    transferPages: transferPages ? 'exists' : 'null/undefined',
+    transferError,
+    transferLoading,
+    pagesCount: transferPages?.pages?.length || 0
+  });
+
   const { session } = useAuth();
+
+  console.log('🔍 Debug - session:', {
+    session: session ? 'exists' : 'null/undefined',
+    userId: session?.user?.id || 'N/A'
+  });
+
   const {
     data: profile,
     isError: profileError,
     isLoading: profileLoading,
-  } = useProfile(session?.user.id);
+  } = useProfile(session?.user?.id);
+
+  console.log('🔍 Debug - profile:', {
+    profile: profile ? 'exists' : 'null/undefined',
+    profileError,
+    profileLoading,
+    profileId: profile?.id || 'N/A'
+  });
+
   const {
     data: profileMember,
     isError: profileMemberError,
     isLoading: profileMemberLoading,
   } = useProfileMember(profile?.id, groupId);
+
+  console.log('🔍 Debug - profileMember:', {
+    profileMember: profileMember ? 'exists' : 'null/undefined',
+    profileMemberError,
+    profileMemberLoading
+  });
+
   const {
     data: expenseTotalM,
     isLoading: expenseTotalMLoading,
   } = useExpenseTotalThisMonth(groupId);
+
   const [totalBalance, setTotalBalance] = useState(0);
   const { mutate: exitGroup } = useExitGroup();
   const { mutate: deleteGroup } = useDeleteGroup();
@@ -95,6 +155,11 @@ const GroupDetailsScreen = () => {
   const { mutate: insertMember } = useInsertMember();
   const { mutate: assignMember } = useAssignMember();
   const { settings } = useSettings();
+
+  console.log('🔍 Debug - settings:', {
+    settings: settings ? 'exists' : 'null/undefined',
+    language: settings?.language || 'N/A'
+  });
 
   // menu related
   const [visible, setVisible] = useState(false);
@@ -112,141 +177,254 @@ const GroupDetailsScreen = () => {
 
   // Merge and group expenses and transfers
   const groupedTransactions = useMemo(() => {
-    const allTransactions = [];
+    console.log('🔄 Computing groupedTransactions...');
 
-    // Add expenses with type identifier
-    expensePages?.pages.flat().forEach((expense) => {
-      allTransactions.push({
-        ...expense,
-        type: "expense",
-        date: expense?.created_at,
+    try {
+      const allTransactions = [];
+
+      // Add expenses with type identifier - with null checks
+      if (expensePages?.pages) {
+        console.log('📊 Processing expenses:', expensePages.pages.length, 'pages');
+        expensePages.pages.flat().forEach((expense, index) => {
+          if (expense) {
+            allTransactions.push({
+              ...expense,
+              type: "expense",
+              date: expense?.created_at,
+            });
+          } else {
+            console.warn('⚠️ Null expense at index:', index);
+          }
+        });
+      } else {
+        console.log('📊 No expense pages available');
+      }
+
+      // Add transfers with type identifier - with null checks
+      if (transferPages?.pages) {
+        console.log('💸 Processing transfers:', transferPages.pages.length, 'pages');
+        transferPages.pages.flat().forEach((transfer, index) => {
+          if (transfer) {
+            allTransactions.push({
+              ...transfer,
+              type: "transfer",
+              date: transfer.created_at,
+            });
+          } else {
+            console.warn('⚠️ Null transfer at index:', index);
+          }
+        });
+      } else {
+        console.log('💸 No transfer pages available');
+      }
+
+      console.log('📋 Total transactions:', allTransactions.length);
+
+      // Sort by created_at (most recent first) - this will mix expenses and transfers
+      allTransactions.sort((a, b) => {
+        const dateA = new Date(a.created_at);
+        const dateB = new Date(b.created_at);
+        return dateB - dateA;
       });
-    });
 
-    // Add transfers with type identifier
-    transferPages?.pages.flat().forEach((transfer) => {
-      allTransactions.push({
-        ...transfer,
-        type: "transfer",
-        date: transfer.created_at,
-      });
-    });
+      // Group by day using created_at - with null checks
+      if (!settings?.language) {
+        console.warn('⚠️ Settings language not available, using default');
+        return groupElementsByDay(allTransactions, 'en');
+      }
 
-    // Sort by created_at (most recent first) - this will mix expenses and transfers
-    allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      const grouped = groupElementsByDay(allTransactions, settings.language);
+      console.log('📅 Grouped transactions keys:', Object.keys(grouped || {}));
 
-    // Group by day using created_at
-    return groupElementsByDay(allTransactions, settings.language);
-  }, [expensePages, transferPages, settings.language]);
+      return grouped;
+    } catch (error) {
+      console.error('❌ Error in groupedTransactions:', error);
+      return {};
+    }
+  }, [expensePages, transferPages, settings?.language]);
 
   useEffect(() => {
-    const _balance =
-      group?.members
-        .find((mb) => mb.profile && mb.profile.id === profile?.id)
-        ?.total_balance?.toFixed(2) || null;
-    setTotalBalance(_balance);
+    console.log('🔄 Computing totalBalance...');
+
+    try {
+      if (!group?.members || !Array.isArray(group.members)) {
+        console.log('⚠️ Group members not available or not array');
+        setTotalBalance(0);
+        return;
+      }
+
+      if (!profile?.id) {
+        console.log('⚠️ Profile ID not available');
+        setTotalBalance(0);
+        return;
+      }
+
+      console.log('👥 Searching in', group.members.length, 'members for profile ID:', profile.id);
+
+      const memberBalance = group.members
+        .find((mb) => mb?.profile && mb.profile.id === profile.id)
+        ?.total_balance;
+
+      console.log('💰 Found member balance:', memberBalance);
+
+      const _balance = memberBalance ? memberBalance.toFixed(2) : 0;
+      setTotalBalance(_balance);
+    } catch (error) {
+      console.error('❌ Error computing totalBalance:', error);
+      setTotalBalance(0);
+    }
   }, [group, profile?.id]);
 
   useExpenseSubscription(groupId);
 
-  if (
-    groupLoading ||
-    expenseLoading ||
-    transferLoading ||
-    profileLoading ||
-    profileMemberLoading ||
-    expenseTotalMLoading
-  ) {
+  // Enhanced loading check with logging
+  const isLoading = groupLoading || expenseLoading || transferLoading || profileLoading || profileMemberLoading || expenseTotalMLoading;
+
+  if (isLoading) {
+    console.log('⏳ Still loading:', {
+      groupLoading,
+      expenseLoading,
+      transferLoading,
+      profileLoading,
+      profileMemberLoading,
+      expenseTotalMLoading
+    });
     return <ActivityIndicator />;
   }
 
-  if (
-    groupError ||
-    expenseError ||
-    transferError ||
-    profileError ||
-    profileMemberError
-  ) {
+  // Enhanced error check with logging
+  const hasError = groupError || expenseError || transferError || profileError || profileMemberError;
+
+  if (hasError) {
+    console.error('❌ Errors detected:', {
+      groupError,
+      expenseError,
+      transferError,
+      profileError,
+      profileMemberError
+    });
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
   const promptDelete = () => {
+    console.log('🗑️ Prompting delete');
     setIsDialogVisible(true);
   };
 
   const promptSettle = () => {
+    console.log('💰 Prompting settle');
     setIsDialog2Visible(true);
   };
 
   const handleSettle = async () => {
-    await settleGroup(group?.id, {
-      onSuccess: async () => {
-        // Locally update settled status for all expenses in this group
-        queryClient.setQueryData(["expenses", group?.id], (oldData) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) =>
-              page.map((expense) => ({ ...expense, settled: true })),
-            ),
-          };
-        });
+    console.log('💰 Handling settle for group:', group?.id);
 
-        setIsDialog2Visible(false);
-        await queryClient.invalidateQueries(["groups"]);
-        await queryClient.invalidateQueries(["debts"]);
-        await queryClient.invalidateQueries(["expenses", group?.id]);
-        await queryClient.invalidateQueries(["transfers", group?.id]);
-      },
-      onError: (error) => {
-        console.error("Server error:", error);
-        alert("Error", "Server error.");
-      },
-    });
+    if (!group?.id) {
+      console.error('❌ No group ID for settle');
+      alert("Error", "Group not found.");
+      return;
+    }
+
+    try {
+      await settleGroup(group.id, {
+        onSuccess: async () => {
+          console.log('✅ Settle successful');
+          // Locally update settled status for all expenses in this group
+          queryClient.setQueryData(["expenses", group.id], (oldData) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) =>
+                page.map((expense) => ({ ...expense, settled: true })),
+              ),
+            };
+          });
+
+          setIsDialog2Visible(false);
+          await queryClient.invalidateQueries(["groups"]);
+          await queryClient.invalidateQueries(["debts"]);
+          await queryClient.invalidateQueries(["expenses", group.id]);
+          await queryClient.invalidateQueries(["transfers", group.id]);
+        },
+        onError: (error) => {
+          console.error('❌ Settle error:', error);
+          alert("Error", "Server error.");
+        },
+      });
+    } catch (error) {
+      console.error('❌ Settle exception:', error);
+      alert("Error", "Unexpected error occurred.");
+    }
   };
 
   const handleDelete = async () => {
-    await deleteGroup(group?.id, {
-      onSuccess: async () => {
-        // console.log('Successfully deleted group with id', group.id);
-        navigation.goBack();
-        await queryClient.invalidateQueries(["groups"]);
-      },
-      onError: (error) => {
-        console.error("Server error:", error);
-        alert("Error", "Server error.");
-      },
-    });
+    console.log('🗑️ Handling delete for group:', group?.id);
+
+    if (!group?.id) {
+      console.error('❌ No group ID for delete');
+      alert("Error", "Group not found.");
+      return;
+    }
+
+    try {
+      await deleteGroup(group.id, {
+        onSuccess: async () => {
+          console.log('✅ Delete successful');
+          navigation.goBack();
+          await queryClient.invalidateQueries(["groups"]);
+        },
+        onError: (error) => {
+          console.error('❌ Delete error:', error);
+          alert("Error", "Server error.");
+        },
+      });
+    } catch (error) {
+      console.error('❌ Delete exception:', error);
+      alert("Error", "Unexpected error occurred.");
+    }
   };
 
   const promptInvite = async () => {
+    console.log('📧 Generating invite for group:', groupId);
+
     try {
       const link = await generateInvite(groupId);
+      console.log('✅ Invite generated:', link ? 'success' : 'empty');
       setInviteLink(link);
       setQRCodeVisible(true);
     } catch (error) {
+      console.error('❌ Invite generation error:', error);
       alert("Error", "Failed to generate invite link.");
     }
   };
 
   const promptExitGroup = () => {
+    console.log('🚪 Prompting exit group');
     setIsGroupExiterVisible(true);
   };
 
   const handleExitGroup = () => {
+    console.log('🚪 Handling exit group');
+
+    if (!session?.user?.id || !groupId) {
+      console.error('❌ Missing session or group ID for exit');
+      alert("Error", "Unable to exit group.");
+      return;
+    }
+
     exitGroup(
       {
-        _profile_id: session?.user.id,
+        _profile_id: session.user.id,
         _group_id: groupId,
       },
       {
         onSuccess: async () => {
-          // console.log("Group exited successfully");
+          console.log('✅ Exit successful');
           navigation.goBack();
           await queryClient.invalidateQueries(["groups"]);
         },
         onError: (error) => {
-          console.error("Server error:", error);
+          console.error('❌ Exit error:', error);
           alert(
             "Error",
             "There was an error exiting the group. Please try again.",
@@ -257,6 +435,14 @@ const GroupDetailsScreen = () => {
   };
 
   const handleAssign = (memberId) => {
+    console.log('👤 Handling assign member:', memberId);
+
+    if (!memberId || !groupId) {
+      console.error('❌ Missing member ID or group ID for assign');
+      alert("Error", "Invalid member or group.");
+      return;
+    }
+
     assignMember(
       {
         _member_id: memberId,
@@ -264,11 +450,11 @@ const GroupDetailsScreen = () => {
       },
       {
         onSuccess: async () => {
-          // console.log('Member assign is dealt with success');
+          console.log('✅ Assign successful');
           await queryClient.invalidateQueries(["members", groupId]);
         },
         onError: (error) => {
-          console.error("Server error:", error);
+          console.error('❌ Assign error:', error);
           alert("Error", "Server error.");
         },
       },
@@ -276,16 +462,27 @@ const GroupDetailsScreen = () => {
   };
 
   const handleNewMember = () => {
+    console.log('👤 Handling new member:', newMemberName);
+
     const trimmedName = newMemberName.trim();
     if (!trimmedName) {
+      console.log('⚠️ Empty member name');
       alert("Error", "Name cannot be empty.");
       return;
     }
 
-    const existingNames = group?.members
+    if (!group?.members || !Array.isArray(group.members)) {
+      console.error('❌ Group members not available for name check');
+      alert("Error", "Unable to validate member name.");
+      return;
+    }
+
+    const existingNames = group.members
+      .filter(m => m?.name) // Filter out null/undefined names
       .map(m => m.name.toLowerCase().trim());
 
-    if (existingNames?.includes(trimmedName.toLowerCase())) {
+    if (existingNames.includes(trimmedName.toLowerCase())) {
+      console.log('⚠️ Member name already exists');
       alert("Error", "Name already exists in the group.");
       return;
     }
@@ -297,24 +494,36 @@ const GroupDetailsScreen = () => {
       },
       {
         onSuccess: async () => {
-          // console.log('New member addition is dealt with success');
+          console.log('✅ New member added successfully');
           setNewMemberName("");
           setIsAddingNewName(false);
           setBigPlusVisible(true);
           await queryClient.invalidateQueries(["members", groupId]);
         },
         onError: (error) => {
-          console.error("Server error:", error);
+          console.error('❌ New member error:', error);
           alert("Error", "Server error.");
         },
       },
     );
   };
 
-  const isOwner = session?.user.id === group?.owner;
+  // Safe property access with logging
+  const isOwner = session?.user?.id === group?.owner;
+  console.log('👑 Owner check:', { isOwner, sessionUserId: session?.user?.id, groupOwner: group?.owner });
 
-  const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
+  const currencyOption = currencyOptions?.find(opt => opt?.value === group?.currency);
   const currency_label = currencyOption?.label || '$';
+
+  console.log('💱 Currency:', { currency: group?.currency, label: currency_label });
+
+  // Final safety check before render
+  if (!group) {
+    console.error('❌ Group data is null/undefined at render time');
+    return <Text variant={"displayLarge"}>Group not found</Text>;
+  }
+
+  console.log('✅ Rendering component with valid data');
 
   return (
     <View className="bg-[#F6F6F6FF] flex-1">
@@ -358,18 +567,18 @@ const GroupDetailsScreen = () => {
                   Recent Activity
                 </Text>
                 <View>
-                  {Object.keys(groupedTransactions).map((item) => (
+                  {Object.keys(groupedTransactions || {}).map((item) => (
                     <View className="my-4 gap-y-5" key={item}>
                       <Text variant={"titleMedium"}>{item}</Text>
-                      {groupedTransactions[item].map((transaction) => (
-                        transaction.type === 'expense' ? (
+                      {(groupedTransactions[item] || []).map((transaction) => (
+                        transaction?.type === 'expense' ? (
                           <ExpenseItem key={`expense-${transaction.id}`} expense={transaction} currency_label={currency_label}/>
                         ) : (
                           <TransferItem
                             key={`transfer-${transaction.id}`}
                             transfer={transaction}
-                            members={group?.members}
-                            currentUserId={session?.user.id}
+                            members={group?.members || []}
+                            currentUserId={session?.user?.id}
                             currency_label={currency_label}
                           />
                         )
@@ -403,17 +612,19 @@ const GroupDetailsScreen = () => {
                     <Feather name={"plus-circle"} size={18} color={"green"} />
                   </TouchableOpacity>
                 </View>
-                {group?.members &&
-                  group?.members?.map((member) => (
-                    <Member
-                      key={member.name}
-                      member={member}
-                      myOwnMember={member.id === profileMember?.id}
-                      assignable={!profileMember && !member.profile}
-                      onAssign={() => {
-                        handleAssign(member.id);
-                      }}
-                    />
+                {group?.members && Array.isArray(group.members) &&
+                  group.members.map((member) => (
+                    member ? (
+                      <Member
+                        key={member.name || member.id}
+                        member={member}
+                        myOwnMember={member.id === profileMember?.id}
+                        assignable={!profileMember && !member.profile}
+                        onAssign={() => {
+                          handleAssign(member.id);
+                        }}
+                      />
+                    ) : null
                   ))}
                 {isAddingNewName && (
                   <View className="flex-row items-center">
@@ -439,14 +650,16 @@ const GroupDetailsScreen = () => {
                 )}
               </View>
               <View className="pb-[120px] mt-3">
-                {group?.debts.length !== 0 && (
+                {group?.debts && Array.isArray(group.debts) && group.debts.length !== 0 && (
                   <Text variant={"titleLarge"} className="mb-3 font-semibold">
                     Debts
                   </Text>
                 )}
-                {group?.debts &&
-                  group?.debts?.map((debt) => (
-                    <Debt key={debt.id} debt={debt} members={group?.members} />
+                {group?.debts && Array.isArray(group.debts) &&
+                  group.debts.map((debt) => (
+                    debt ? (
+                      <Debt key={debt.id} debt={debt} members={group?.members || []} />
+                    ) : null
                   ))}
               </View>
             </View>
@@ -531,13 +744,13 @@ const GroupDetailsScreen = () => {
             {/* Group Title - Separate row with proper spacing */}
             <View className="w-full px-4 mt-4">
               <Text
-                variant={(group?.title?.length && group?.title?.length > 20) ? "headlineSmall" : "headlineMedium"}
+                variant={(group?.title?.length && group.title.length > 20) ? "headlineSmall" : "headlineMedium"}
                 className="text-white text-center"
                 numberOfLines={2}
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                {group?.title}
+                {group?.title || 'Unnamed Group'}
               </Text>
             </View>
           </View>
@@ -621,6 +834,7 @@ const GroupDetailsScreen = () => {
             try {
               await Share.share({ message: inviteLink });
             } catch (error) {
+              console.error('❌ Share error:', error);
               alert("Error", "Failed to share link.");
             }
           }}
