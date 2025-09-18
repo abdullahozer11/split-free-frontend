@@ -93,6 +93,7 @@ android
 ios
 
 *.apk
+*.aab
 
 *dump.sql
 
