@@ -104,3 +104,5 @@ supabase/seed.sql
 /.env.development
 /.env.preview
 /.env.production
+
+data_dump*
