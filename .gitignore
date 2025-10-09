@@ -106,3 +106,4 @@ supabase/seed.sql
 /.env.production
 
 data_dump*
+.secret
