@@ -1,5 +1,5 @@
 import { Pressable, View } from "react-native";
-import { Text, useTranslatedAlert } from "@/src/components/Translated";
+import { Button, Text, useTranslatedAlert } from "@/src/components/Translated";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -122,12 +122,12 @@ const SettingsScreen = () => {
         />
       </View>
       <View className="absolute bottom-0 left-0 right-0 p-4 gap-2 mb-4">
-        <Text
+        <Button
           onPress={handleSignOut}
           className="text-red-600 text-center text-2xl"
         >
           Log out
-        </Text>
+        </Button>
         <Text className="text-gray-600 text-center">SplitFree 1.0.0</Text>
       </View>
     </SafeAreaView>
