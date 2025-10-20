@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 
 const GOOGLE_API_KEY = Deno.env.get("GOOGLE_API_KEY");
-const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_API_KEY}`;
+const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GOOGLE_API_KEY}`;
 
 async function generateContent(prompt: string) {
   const systemInstruction = "You are an expense classifier. Your possible options are " +
