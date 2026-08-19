@@ -9,6 +9,9 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 
 ```text
 /workspaces/split-free-frontend/
+├── .github/                       # GitHub Actions CI
+│   └── workflows/
+│       └── pr-checks.yml          # Installs deps and runs Jest on PRs targeting master
 ├── __tests__/                     # Test suite (unit, integration, mock storage adapters)
 │   ├── App.test.js                # Root layout snapshot
 │   ├── InMemoryStorageAdapter.js  # Auth storage stub for tests
