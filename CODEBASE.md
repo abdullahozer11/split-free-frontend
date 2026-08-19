@@ -17,6 +17,17 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ├── .prettierrc.json               # Prettier options shared with ESLint
 ├── .prettierignore                # Prettier exclusions (lockfile, generated types, docs)
 ├── _typos.toml                    # Typo-check exclusions for generated and localized files
+├── cheat-sheets/                  # CLI command references (Expo, Supabase, Docker, WSL)
+│   ├── README.md                  # Index of command sheets
+│   ├── docker.md
+│   ├── expo.md
+│   ├── supabase.md
+│   ├── wsl.md
+│   └── wsl-setup.txt              # One-shot Ubuntu/WSL bootstrap notes
+├── docs/                          # Project overview and architecture diagram
+│   ├── README.md                  # Tech stack write-up
+│   ├── tech-stack-overview.svg    # Layered client / backend / delivery diagram
+│   └── environment.txt            # Sample expo-env-info snapshot
 ├── __tests__/                     # Test suite (unit, integration, mock storage adapters)
 │   ├── App.test.js                # Root layout snapshot
 │   ├── InMemoryStorageAdapter.js  # Auth storage stub for tests

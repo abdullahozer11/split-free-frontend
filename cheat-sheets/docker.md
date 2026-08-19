@@ -1,4 +1,4 @@
-# Docker Cheat Sheet (docker_cheat_sheet.md)
+# Docker Cheat Sheet
 
 This cheat sheet covers essential Docker commands for managing containers, images, volumes, networks, and system resources. Useful for troubleshooting issues like unhealthy containers, stale volumes, or resource cleanup in setups like Supabase local development.
 

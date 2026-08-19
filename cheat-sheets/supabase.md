@@ -97,4 +97,4 @@ These apply to all commands:
 - apply data_dump to database
   - PGPASSWORD=postgres psql -h localhost -p 54322 -U postgres -d postgres < data_dump.sqls
 
-To download this cheat sheet, copy the content into a file named `supabase-cli-cheat-sheet.md` and save it.
+For the rest of the developer notes, see the other sheets in this folder.

@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="820" viewBox="0 0 920 820" role="img" aria-labelledby="title desc">
+  <title id="title">SplitFree tech stack overview</title>
+  <desc id="desc">Clients on Expo and React Native talk to Supabase for auth, Postgres, and realtime. Edge functions call Gemini and OpenAI. Quality gates and EAS sit alongside the stack.</desc>
+
+  <defs>
+    <linearGradient id="page" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFDFB"/>
+      <stop offset="1" stop-color="#F6EDEA"/>
+    </linearGradient>
+    <linearGradient id="headerBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FCC157"/>
+      <stop offset="1" stop-color="#F3D48A"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#1C1917" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="920" height="820" rx="28" fill="url(#page)"/>
+  <rect x="0" y="0" width="920" height="8" fill="url(#headerBar)"/>
+
+  <!-- Brand mark -->
+  <g transform="translate(36 28)" fill="none" stroke="#1C1917" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 22 L26 8 L44 22"/>
+    <path d="M44 34 L26 48 L8 34"/>
+  </g>
+
+  <text x="96" y="48" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="26" font-weight="700" fill="#1C1917">SplitFree tech stack</text>
+  <text x="96" y="72" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="13" fill="#78716C">Expo React Native client · Supabase backend · EAS delivery</text>
+
+  <!-- Clients -->
+  <text x="460" y="118" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6" fill="#A16207">CLIENTS</text>
+
+  <g filter="url(#cardShadow)">
+    <rect x="148" y="132" width="180" height="64" rx="16" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <rect x="370" y="132" width="180" height="64" rx="16" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <rect x="592" y="132" width="180" height="64" rx="16" fill="#FFFFFF" stroke="#E7E5E4"/>
+  </g>
+  <text x="238" y="170" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1C1917">iOS</text>
+  <text x="460" y="170" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1C1917">Android</text>
+  <text x="682" y="170" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600" fill="#1C1917">Web</text>
+
+  <!-- Connectors from clients to app -->
+  <path d="M238 196 V214 H460 V226" fill="none" stroke="#D6D3D1" stroke-width="2"/>
+  <path d="M460 196 V226" fill="none" stroke="#D6D3D1" stroke-width="2"/>
+  <path d="M682 196 V214 H460 V226" fill="none" stroke="#D6D3D1" stroke-width="2"/>
+  <polygon points="460,236 454,226 466,226" fill="#D6D3D1"/>
+
+  <!-- Application card -->
+  <g filter="url(#cardShadow)">
+    <rect x="80" y="240" width="760" height="214" rx="22" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <rect x="80" y="240" width="10" height="214" rx="5" fill="#FCC157"/>
+  </g>
+  <text x="110" y="272" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6" fill="#A16207">APPLICATION</text>
+  <text x="110" y="298" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700" fill="#1C1917">Expo SDK 51 · React Native 0.74</text>
+  <text x="110" y="322" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#57534E">File-based routing, NativeWind styling, and React Query cache driven by live subscriptions.</text>
+
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1C1917">
+    <rect x="110" y="344" width="150" height="40" rx="10" fill="#FFF8E8" stroke="#F3D48A"/>
+    <text x="185" y="369" text-anchor="middle">TypeScript</text>
+    <rect x="272" y="344" width="150" height="40" rx="10" fill="#FFF8E8" stroke="#F3D48A"/>
+    <text x="347" y="369" text-anchor="middle">Expo Router</text>
+    <rect x="434" y="344" width="150" height="40" rx="10" fill="#FFF8E8" stroke="#F3D48A"/>
+    <text x="509" y="369" text-anchor="middle">NativeWind</text>
+    <rect x="596" y="344" width="210" height="40" rx="10" fill="#FFF8E8" stroke="#F3D48A"/>
+    <text x="701" y="369" text-anchor="middle">React Native Paper</text>
+
+    <rect x="110" y="396" width="180" height="40" rx="10" fill="#F5F5F4" stroke="#E7E5E4"/>
+    <text x="200" y="421" text-anchor="middle">TanStack Query</text>
+    <rect x="302" y="396" width="200" height="40" rx="10" fill="#F5F5F4" stroke="#E7E5E4"/>
+    <text x="402" y="421" text-anchor="middle">Expo SecureStore</text>
+    <rect x="514" y="396" width="292" height="40" rx="10" fill="#F5F5F4" stroke="#E7E5E4"/>
+    <text x="660" y="421" text-anchor="middle">AsyncStorage settings</text>
+  </g>
+
+  <path d="M460 454 V478" fill="none" stroke="#D6D3D1" stroke-width="2"/>
+  <polygon points="460,488 454,478 466,478" fill="#D6D3D1"/>
+
+  <!-- Backend card -->
+  <g filter="url(#cardShadow)">
+    <rect x="80" y="492" width="760" height="178" rx="22" fill="#1C1917"/>
+  </g>
+  <text x="110" y="524" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6" fill="#FCC157">BACKEND</text>
+  <text x="110" y="550" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700" fill="#FAFAF9">Supabase</text>
+  <text x="110" y="574" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#A8A29E">Auth, Postgres RPCs, realtime cache invalidation, and Deno edge functions.</text>
+
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#FAFAF9">
+    <rect x="110" y="594" width="120" height="38" rx="10" fill="#292524" stroke="#44403C"/>
+    <text x="170" y="618" text-anchor="middle">Auth</text>
+    <rect x="242" y="594" width="140" height="38" rx="10" fill="#292524" stroke="#44403C"/>
+    <text x="312" y="618" text-anchor="middle">PostgreSQL</text>
+    <rect x="394" y="594" width="130" height="38" rx="10" fill="#292524" stroke="#44403C"/>
+    <text x="459" y="618" text-anchor="middle">Realtime</text>
+    <rect x="536" y="594" width="270" height="38" rx="10" fill="#292524" stroke="#44403C"/>
+    <text x="671" y="618" text-anchor="middle">Edge Functions (Deno)</text>
+  </g>
+
+  <text x="110" y="654" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#A8A29E">AI functions</text>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1C1917">
+    <rect x="200" y="636" width="110" height="32" rx="8" fill="#FCC157"/>
+    <text x="255" y="657" text-anchor="middle">Gemini</text>
+    <rect x="322" y="636" width="110" height="32" rx="8" fill="#FCC157"/>
+    <text x="377" y="657" text-anchor="middle">OpenAI</text>
+  </g>
+
+  <!-- Quality and delivery -->
+  <text x="460" y="708" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6" fill="#A16207">QUALITY AND DELIVERY</text>
+
+  <g filter="url(#cardShadow)" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1C1917">
+    <rect x="80" y="724" width="136" height="48" rx="14" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <text x="148" y="753" text-anchor="middle">Jest</text>
+    <rect x="228" y="724" width="136" height="48" rx="14" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <text x="296" y="753" text-anchor="middle">ESLint</text>
+    <rect x="376" y="724" width="136" height="48" rx="14" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <text x="444" y="753" text-anchor="middle">Prettier</text>
+    <rect x="524" y="724" width="168" height="48" rx="14" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <text x="608" y="753" text-anchor="middle">GitHub Actions</text>
+    <rect x="704" y="724" width="136" height="48" rx="14" fill="#FFFFFF" stroke="#E7E5E4"/>
+    <text x="772" y="753" text-anchor="middle">EAS</text>
+  </g>
+
+  <text x="460" y="800" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#78716C">See CODEBASE.md for the source map and cheat-sheets/ for CLI commands.</text>
+</svg>
