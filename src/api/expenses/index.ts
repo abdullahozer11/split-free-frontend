@@ -4,6 +4,34 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 const PAGE_SIZE = 20;
 
+export const useLatestExpense = (group_id: number, enabled = true) => {
+  return useQuery({
+    queryKey: ["expenses", group_id, "latest"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("expenses")
+        .select(
+          "id, created_at, payers:expense_payers(member), participants:expense_participants(member)",
+        )
+        .eq("group_id", group_id)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) {
+        console.error("useLatestExpense query error:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw new Error(`Failed to fetch latest expense: ${error.message}`);
+      }
+      return data;
+    },
+    enabled: !!group_id && enabled,
+  });
+};
+
 export const useExpenseList = (group_id: number) => {
   return useInfiniteQuery({
     queryKey: ["expenses", group_id],

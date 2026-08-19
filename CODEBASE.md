@@ -10,6 +10,10 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ```text
 /workspaces/split-free-frontend/
 ├── __tests__/                     # Test suite (unit, integration, mock storage adapters)
+│   ├── App.test.js                # Root layout snapshot
+│   ├── InMemoryStorageAdapter.js  # Auth storage stub for tests
+│   ├── usecase/                   # End-to-end supabase flow coverage
+│   └── utils/                     # Pure helper unit tests (expense form defaults)
 ├── ai/                            # Python benchmarking scripts for AI evaluation
 ├── assets/                        # Static typography and branding graphics
 ├── src/                           # Application core source code
@@ -42,6 +46,9 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │   ├── providers/                 # React Context providers managing Auth, React Query, and App settings
 │   ├── translations/              # Static multi-language translation databases (JSON mapping key-to-locale values)
 │   └── utils/                     # Utility libraries and helper methods (currency parsing, category definitions)
+│       ├── expense_categories.ts
+│       ├── expenseFormDefaults.ts # New-expense buyer/participant defaults from latest expense
+│       └── helpers.ts
 └── supabase/                      # Local and cloud Supabase backend configuration
     ├── config.toml                # Supabase system configuration
     ├── functions/                 # Backend edge functions (Deno-based Gemini and OpenAI APIs)
