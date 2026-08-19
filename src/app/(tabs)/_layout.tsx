@@ -18,7 +18,7 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const { session } = useAuth();
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
   if (!session) {

@@ -7,7 +7,7 @@ import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const MyDropdown = ({ selected, label, data, onChange }) => {
   const [isFocus, setIsFocus] = useState<boolean>(false);
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
   return (

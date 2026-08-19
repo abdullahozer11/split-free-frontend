@@ -1,0 +1,13 @@
+node_modules
+android
+ios
+coverage
+.expo
+dist
+web-build
+supabase
+package-lock.json
+src/database.types.ts
+ai
+assets
+*.md

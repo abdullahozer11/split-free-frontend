@@ -64,7 +64,7 @@ describe("mergeActivityWithFrontier", () => {
     expect(result.shouldFetchTransfers).toBe(true);
   });
 
-  it("uses the more recent of the two oldests when both streams have more pages", () => {
+  it("uses the more recent of the two oldest when both streams have more pages", () => {
     const result = mergeActivityWithFrontier({
       expenses: [
         expense(5, "2026-08-10T12:00:00.000Z"),

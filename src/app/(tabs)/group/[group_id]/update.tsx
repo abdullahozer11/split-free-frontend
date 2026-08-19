@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import { ActivityIndicator, Dialog, Portal } from "react-native-paper";
 import {
-  ActivityIndicator,
-  Dialog,
-  Portal,
-} from "react-native-paper";
-import {Button, TextInput, Text, DialogTitle} from "@/src/components/Translated";
+  Button,
+  TextInput,
+  Text,
+  DialogTitle,
+} from "@/src/components/Translated";
 import { DeletableMember } from "@/src/components/Person";
 import { useGroup, useUpdateGroup } from "@/src/api/groups";
 import { Feather } from "@expo/vector-icons";
@@ -154,7 +155,7 @@ const UpdateGroup = () => {
         </TouchableOpacity>
       </View>
       <View className="w-full justify-between items-center flex-row px-4 mt-7">
-      <Text variant={"headlineLarge"}>Update Group</Text>
+        <Text variant={"headlineLarge"}>Update Group</Text>
       </View>
       {/* Form for updating group */}
       <View style={{ gap: 10 }} className="justify-center p-5">

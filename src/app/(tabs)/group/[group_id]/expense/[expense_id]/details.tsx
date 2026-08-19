@@ -5,7 +5,12 @@ import {
   Alert,
   Pressable,
 } from "react-native";
-import {MenuItem, Text, Button, DialogTitle} from "@/src/components/Translated";
+import {
+  MenuItem,
+  Text,
+  Button,
+  DialogTitle,
+} from "@/src/components/Translated";
 import React, { useEffect, useState } from "react";
 import {
   Link,
@@ -13,18 +18,13 @@ import {
   useNavigation,
   useRouter,
 } from "expo-router";
-import CollapsableHeader from "@/src/components/CollapsableHeader";
+import CollapsibleHeader from "@/src/components/CollapsibleHeader";
 import {
   useDeleteExpense,
   useExpense,
   useSettleExpense,
 } from "@/src/api/expenses";
-import {
-  ActivityIndicator,
-  Menu,
-  Portal,
-  Dialog,
-} from "react-native-paper";
+import { ActivityIndicator, Menu, Portal, Dialog } from "react-native-paper";
 import { Feather } from "@expo/vector-icons";
 import { Participant, Payer } from "@/src/components/Person";
 import { useQueryClient } from "@tanstack/react-query";
@@ -51,7 +51,7 @@ const ExpenseDetailsScreen = () => {
   const group_id = parseInt(
     typeof groupIdString === "string" ? groupIdString : groupIdString[0],
   );
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const navigation = useNavigation();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -135,7 +135,7 @@ const ExpenseDetailsScreen = () => {
 
   return (
     <SafeAreaView className="flex-1">
-      <CollapsableHeader
+      <CollapsibleHeader
         H_MAX_HEIGHT={200}
         H_MIN_HEIGHT={52}
         content={
@@ -254,7 +254,8 @@ const ExpenseDetailsScreen = () => {
                 Last modified on
               </Text>
               <Text className="text-sm font-200 text-white">
-                {expense && formatDateString(expense.last_modified, settings.language)}
+                {expense &&
+                  formatDateString(expense.last_modified, settings.language)}
               </Text>
             </View>
           </View>

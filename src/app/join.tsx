@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Alert, FlatList, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -18,8 +26,8 @@ const JoinScreen = () => {
   const [groupId, setGroupId] = useState(null); // Store groupId for later use
 
   useEffect(() => {
-    console.log('useEffect triggered with token:', token);
-    console.log('Current session in useEffect:', session);
+    console.log("useEffect triggered with token:", token);
+    console.log("Current session in useEffect:", session);
     if (!token) {
       Alert.alert("Error", "Invalid invite link.");
       setLoading(false);
@@ -31,13 +39,13 @@ const JoinScreen = () => {
   }, [token, session]);
 
   const handleFetchUnbound = async (token: string) => {
-    console.log('Entering handleFetchUnbound with token:', token);
-    console.log('Current session:', session);
+    console.log("Entering handleFetchUnbound with token:", token);
+    console.log("Current session:", session);
     setLoading(true);
 
     // Check if authenticated and user exists
     if (!session || !session.user) {
-      console.log('No session or user, redirecting to sign-in');
+      console.log("No session or user, redirecting to sign-in");
       // Not logged in: Redirect to login screen, pass pending token via params
       router.push({
         pathname: "/(auth)/sign-in",
@@ -48,56 +56,79 @@ const JoinScreen = () => {
     }
 
     try {
-      console.log('Fetching invite for token:', token);
+      console.log("Fetching invite for token:", token);
       // First, fetch the group_id from the invite token
       const { data: invite, error: inviteError } = await supabase
-        .from('invite_tokens')
-        .select('group_id')
-        .eq('token', token)
+        .from("invite_tokens")
+        .select("group_id")
+        .eq("token", token)
         .single();
 
-      console.log('Invite data:', invite, 'Invite error:', inviteError);
+      console.log("Invite data:", invite, "Invite error:", inviteError);
 
       if (inviteError || !invite) {
         throw new Error(inviteError?.message || "Invalid invite token.");
       }
 
       const fetchedGroupId = invite.group_id;
-      console.log('Fetched groupId:', fetchedGroupId);
+      console.log("Fetched groupId:", fetchedGroupId);
 
-      console.log('Checking membership for user:', session.user.id, 'in group:', fetchedGroupId);
+      console.log(
+        "Checking membership for user:",
+        session.user.id,
+        "in group:",
+        fetchedGroupId,
+      );
       // Check if the user is already a member of this group
       const { data: existingMember, error: memberError } = await supabase
-        .from('members')
-        .select('id')
-        .eq('group_id', fetchedGroupId)
-        .eq('profile', session.user.id)
+        .from("members")
+        .select("id")
+        .eq("group_id", fetchedGroupId)
+        .eq("profile", session.user.id)
         .limit(1)
         .single();
 
-      console.log('Existing member data:', existingMember, 'Member error:', memberError);
+      console.log(
+        "Existing member data:",
+        existingMember,
+        "Member error:",
+        memberError,
+      );
 
-      if (memberError && memberError?.code !== 'PGRST116') { // Ignore 'no rows' error
+      if (memberError && memberError?.code !== "PGRST116") {
+        // Ignore 'no rows' error
         throw new Error(memberError?.message || "Error checking membership.");
       }
 
       if (existingMember) {
         Alert.alert("Info", "You are already in this group.");
-        console.log('Existing member found, navigating to group:', fetchedGroupId);
-        console.log('Navigation path:', `/(tabs)/group/${fetchedGroupId}`);
+        console.log(
+          "Existing member found, navigating to group:",
+          fetchedGroupId,
+        );
+        console.log("Navigation path:", `/(tabs)/group/${fetchedGroupId}`);
         router.replace(`/(tabs)/group/`);
         return;
       }
 
-      console.log('Fetching unbound members for token:', token);
+      console.log("Fetching unbound members for token:", token);
       // Fetch unbound members via RPC
-      const { data: unbound, error: unboundError } = await supabase
-        .rpc("get_unbound_members_for_token", { p_token: token });
+      const { data: unbound, error: unboundError } = await supabase.rpc(
+        "get_unbound_members_for_token",
+        { p_token: token },
+      );
 
-      console.log('Unbound members data:', unbound, 'Unbound error:', unboundError);
+      console.log(
+        "Unbound members data:",
+        unbound,
+        "Unbound error:",
+        unboundError,
+      );
 
       if (unboundError) {
-        throw new Error(unboundError.message || "Error fetching unbound members.");
+        throw new Error(
+          unboundError.message || "Error fetching unbound members.",
+        );
       }
 
       setUnboundMembers(unbound || []);
@@ -105,7 +136,7 @@ const JoinScreen = () => {
 
       setShowSelection(true);
     } catch (error) {
-      console.log('Error in handleFetchUnbound:', error);
+      console.log("Error in handleFetchUnbound:", error);
       Alert.alert("Error", error.message);
       router.replace("/(tabs)"); // Home tabs
     } finally {
@@ -114,14 +145,21 @@ const JoinScreen = () => {
   };
 
   const handleBind = async (memberId: string) => {
-    console.log('Entering handleBind with memberId:', memberId, 'groupId:', groupId);
+    console.log(
+      "Entering handleBind with memberId:",
+      memberId,
+      "groupId:",
+      groupId,
+    );
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .rpc("join_group_with_token", { p_token: token, p_member_id: memberId });
+      const { data, error } = await supabase.rpc("join_group_with_token", {
+        p_token: token,
+        p_member_id: memberId,
+      });
 
-      console.log('Bind RPC data:', data, 'Error:', error);
+      console.log("Bind RPC data:", data, "Error:", error);
 
       if (error) {
         throw new Error(error.message || "Error binding to member.");
@@ -137,10 +175,10 @@ const JoinScreen = () => {
       await queryClient.invalidateQueries(["members", groupId]);
 
       Alert.alert("Success", "Successfully joined the group!");
-      console.log('Navigating after bind to group:', groupId);
+      console.log("Navigating after bind to group:", groupId);
       router.replace(`/(tabs)/group/${groupId}`);
     } catch (error) {
-      console.log('Error in handleBind:', error);
+      console.log("Error in handleBind:", error);
       Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
@@ -148,7 +186,12 @@ const JoinScreen = () => {
   };
 
   const handleCreate = async () => {
-    console.log('Entering handleCreate with newName:', newName, 'groupId:', groupId);
+    console.log(
+      "Entering handleCreate with newName:",
+      newName,
+      "groupId:",
+      groupId,
+    );
     if (!newName.trim()) {
       Alert.alert("Error", "Please enter a name.");
       return;
@@ -157,10 +200,12 @@ const JoinScreen = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .rpc("join_group_with_token", { p_token: token, p_new_name: newName.trim() });
+      const { data, error } = await supabase.rpc("join_group_with_token", {
+        p_token: token,
+        p_new_name: newName.trim(),
+      });
 
-      console.log('Create RPC data:', data, 'Error:', error);
+      console.log("Create RPC data:", data, "Error:", error);
 
       if (error) {
         throw new Error(error.message || "Error creating new member.");
@@ -176,10 +221,10 @@ const JoinScreen = () => {
       await queryClient.invalidateQueries(["members", groupId]);
 
       Alert.alert("Success", "Successfully joined the group!");
-      console.log('Navigating after create to group:', groupId);
+      console.log("Navigating after create to group:", groupId);
       router.replace(`/(tabs)/group/${groupId}`);
     } catch (error) {
-      console.log('Error in handleCreate:', error);
+      console.log("Error in handleCreate:", error);
       Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
@@ -197,10 +242,14 @@ const JoinScreen = () => {
   if (showSelection) {
     return (
       <View className="flex-1 justify-center items-center p-6 bg-white">
-        <Text className="text-2xl font-bold mb-6 text-center mt-20">Join Group</Text>
+        <Text className="text-2xl font-bold mb-6 text-center mt-20">
+          Join Group
+        </Text>
         {unboundMembers.length > 0 ? (
           <>
-            <Text className="text-lg mb-4 text-center">Select an existing unbound member to join as:</Text>
+            <Text className="text-lg mb-4 text-center">
+              Select an existing unbound member to join as:
+            </Text>
             <FlatList
               data={unboundMembers}
               keyExtractor={(item) => item.id.toString()}
@@ -216,9 +265,13 @@ const JoinScreen = () => {
             />
           </>
         ) : (
-          <Text className="text-lg mb-6 text-center">No unbound members available. Create a new one below.</Text>
+          <Text className="text-lg mb-6 text-center">
+            No unbound members available. Create a new one below.
+          </Text>
         )}
-        <Text className="text-lg mt-6 mb-3 text-center">Or create a new member:</Text>
+        <Text className="text-lg mt-6 mb-3 text-center">
+          Or create a new member:
+        </Text>
         <TextInput
           value={newName}
           onChangeText={setNewName}
@@ -229,7 +282,9 @@ const JoinScreen = () => {
           onPress={handleCreate}
           className="bg-blue-500 p-4 rounded-lg w-full max-w-md"
         >
-          <Text className="text-white text-lg font-semibold text-center">Create and Join</Text>
+          <Text className="text-white text-lg font-semibold text-center">
+            Create and Join
+          </Text>
         </TouchableOpacity>
       </View>
     );

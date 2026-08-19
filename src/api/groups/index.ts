@@ -15,7 +15,7 @@ export const useGroupList = () => {
             title,
             expenses:expenses(id),
             members:members(id)
-          `
+          `,
           )
           .then((result) => {
             // Transform data to match original function output
@@ -52,7 +52,6 @@ export const useGroupList = () => {
     },
   });
 };
-
 
 export const useGroup = (id: number) => {
   return useQuery({

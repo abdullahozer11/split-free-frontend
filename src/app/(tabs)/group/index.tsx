@@ -34,14 +34,16 @@ const GroupScreen = () => {
   useEffect(() => {
     const loadAnchoredGroupIds = async () => {
       try {
-        const anchoredGroupIdsJson = await AsyncStorage.getItem(ANCHORED_GROUPS_STORAGE_KEY);
+        const anchoredGroupIdsJson = await AsyncStorage.getItem(
+          ANCHORED_GROUPS_STORAGE_KEY,
+        );
         if (anchoredGroupIdsJson) {
           const anchoredGroupIds = JSON.parse(anchoredGroupIdsJson);
           // Wait for groups to be loaded before setting anchored groups
           if (groups) {
-            const anchoredGroupsData = groups.filter(group =>
-              anchoredGroupIds.includes(group.id)
-            ).map(group => ({...group, anchored: true}));
+            const anchoredGroupsData = groups
+              .filter((group) => anchoredGroupIds.includes(group.id))
+              .map((group) => ({ ...group, anchored: true }));
             setAnchoredGroups(anchoredGroupsData);
           }
         }
@@ -75,7 +77,10 @@ const GroupScreen = () => {
   // Save anchored group IDs to AsyncStorage
   const saveAnchoredGroupIds = async (groupIds) => {
     try {
-      await AsyncStorage.setItem(ANCHORED_GROUPS_STORAGE_KEY, JSON.stringify(groupIds));
+      await AsyncStorage.setItem(
+        ANCHORED_GROUPS_STORAGE_KEY,
+        JSON.stringify(groupIds),
+      );
     } catch (error) {
       console.error("Error saving anchored group IDs:", error);
     }
@@ -96,7 +101,7 @@ const GroupScreen = () => {
     setAnchoredGroups(updatedAnchoredGroups);
 
     // Save the updated anchored group IDs to AsyncStorage
-    const anchoredGroupIds = updatedAnchoredGroups.map(g => g.id);
+    const anchoredGroupIds = updatedAnchoredGroups.map((g) => g.id);
     saveAnchoredGroupIds(anchoredGroupIds);
   };
 

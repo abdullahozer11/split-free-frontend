@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "expo-router";
 import { useMemberList } from "@/src/api/members";
-import { useInsertExpense, useLatestExpense, useUpdateExpense } from "@/src/api/expenses";
+import {
+  useInsertExpense,
+  useLatestExpense,
+  useUpdateExpense,
+} from "@/src/api/expenses";
 import {
   Alert,
   Pressable,
@@ -10,11 +14,7 @@ import {
   View,
 } from "react-native";
 import { getFormattedDate, formatDate } from "@/src/utils/helpers";
-import {
-  ActivityIndicator,
-  Avatar,
-  Tooltip,
-} from "react-native-paper";
+import { ActivityIndicator, Avatar, Tooltip } from "react-native-paper";
 import { Button, TextInput, Text } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -49,7 +49,7 @@ export default function ExpenseForm({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
   const [isLoading, setLoading] = useState();
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
   const isUpdating = !!updatingExpense;
   const [hasAppliedDefaults, setHasAppliedDefaults] = useState(isUpdating);
@@ -312,9 +312,7 @@ export default function ExpenseForm({
           <Feather className={"font-bold"} name={"arrow-left"} size={32} />
         </TouchableOpacity>
         <TouchableOpacity
-          className={
-            "bg-white p-1 h-12 rounded-md justify-center items-center"
-          }
+          className={"bg-white p-1 h-12 rounded-md justify-center items-center"}
           onPress={() => {
             onSubmit();
           }}

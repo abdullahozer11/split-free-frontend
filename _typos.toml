@@ -1,0 +1,12 @@
+[files]
+extend-exclude = [
+  "package-lock.json",
+  "src/database.types.ts",
+  "src/translations/**",
+  "src/utils/expense_categories.ts",
+  "supabase/**",
+  "android/**",
+  "ios/**",
+  "coverage/**",
+  "assets/**",
+]

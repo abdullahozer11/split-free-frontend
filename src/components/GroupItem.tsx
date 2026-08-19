@@ -40,12 +40,8 @@ const GroupItem = ({ group, onAnchor }) => {
             <View className={"mr-5"}>
               <FontAwesome size={22} name={"info"} color={"#aaa"} />
             </View>
-            <Text className={"text-[#aaa]"}>
-              {group.expense_count + " "}
-            </Text>
-            <Text className={"text-[#aaa]"}>
-              Expenses
-            </Text>
+            <Text className={"text-[#aaa]"}>{group.expense_count + " "}</Text>
+            <Text className={"text-[#aaa]"}>Expenses</Text>
           </View>
           {group.settled ? (
             <Text className={"text-green-500"}>Settled</Text>

@@ -1,10 +1,4 @@
-import {
-  Alert,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Alert, Image, ScrollView, TouchableOpacity, View } from "react-native";
 import { TextInput, Text } from "@/src/components/Translated";
 import { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";

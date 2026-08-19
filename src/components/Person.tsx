@@ -77,7 +77,9 @@ export const Member = ({ member, assignable, onAssign, myOwnMember }) => {
         </View>
         <View className="flex-row items-center">
           {myOwnMember && (
-            <Text variant={"labelMedium"} color={"green"} className="mr-1">Me</Text>
+            <Text variant={"labelMedium"} color={"green"} className="mr-1">
+              Me
+            </Text>
           )}
           {member.role === "owner" && (
             <Feather name={"award"} size={24} color={"silver"} />

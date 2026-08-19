@@ -6,8 +6,8 @@ export const generateInvite = async (groupId: number) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7); // Optional: Expires in 7 days
 
-  const {error} = await supabase
-    .from('invite_tokens')
+  const { error } = await supabase
+    .from("invite_tokens")
     .insert({
       group_id: groupId,
       token,
@@ -17,7 +17,7 @@ export const generateInvite = async (groupId: number) => {
     .single();
 
   if (error) {
-    console.error('Error generating invite:', error);
+    console.error("Error generating invite:", error);
     throw error;
   }
 

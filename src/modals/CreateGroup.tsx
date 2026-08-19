@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Pressable,
-  Modal,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Pressable, Modal, TouchableOpacity, Alert } from "react-native";
 import { TextInput, Text } from "@/src/components/Translated";
 import { Feather } from "@expo/vector-icons";
 import Participants from "@/src/modals/CreateGroupParticipants";
@@ -15,7 +9,6 @@ import { useProfile } from "@/src/api/profiles";
 import { ActivityIndicator } from "react-native-paper";
 import { useQueryClient } from "@tanstack/react-query";
 import { currencyOptions } from "@/src/constants";
-
 
 const CreateGroupModal = ({ isVisible, onClose }) => {
   const queryClient = useQueryClient();
@@ -105,7 +98,7 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
     setShowParticipantsModal(false);
   };
 
-  const currencies = currencyOptions.map(option => option.value);
+  const currencies = currencyOptions.map((option) => option.value);
 
   return (
     <Modal

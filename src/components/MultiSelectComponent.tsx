@@ -6,10 +6,9 @@ import { Feather } from "@expo/vector-icons";
 import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 
-
 const MyMultiSelect = ({ selected, members, onChange }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
   const handleDone = () => {

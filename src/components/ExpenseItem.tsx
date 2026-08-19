@@ -35,7 +35,8 @@ export const ExpenseItem = ({ expense, currency_label }) => {
         </Text>
         <View>
           <Text variant="titleSmall" className="text-right">
-            {currency_label}{expense.amount}
+            {currency_label}
+            {expense.amount}
           </Text>
           {expense?.settled && (
             <Text variant={"titleSmall"} className={"text-green-500"}>
@@ -64,7 +65,10 @@ export const GroupedExpenseItem = ({ total, exp_cat, currency_label }) => {
       <Text variant="titleMedium" className="flex-1 mx-4" numberOfLines={1}>
         {exp_cat.name}
       </Text>
-      <Text variant="titleSmall">{currency_label}{total && total?.toFixed(2)}</Text>
+      <Text variant="titleSmall">
+        {currency_label}
+        {total && total?.toFixed(2)}
+      </Text>
     </View>
   );
 };
