@@ -41,7 +41,6 @@ yarn-error.*
 rest
 todo.txt
 
-package-lock.json
 coverage
 **/__snapshots__
 
