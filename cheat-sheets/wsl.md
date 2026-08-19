@@ -1,4 +1,4 @@
-# WSL Cheat Sheet (wsl_cheat_sheet.md)
+# WSL Cheat Sheet
 
 This cheat sheet covers Windows Subsystem for Linux (WSL) commands for managing distributions, resources, and troubleshooting. Useful if running Docker on Windows (as Docker Desktop uses WSL backend) or dealing with Supabase CLI issues on Windows.
 

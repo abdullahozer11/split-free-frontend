@@ -11,6 +11,14 @@ Welcome to the **SplitFree** app! This app is designed to help you split expense
 
 <img src="https://i.ibb.co/BC1st9k/Split-Free.png" alt="SplitFree Logo" width="300"/>
 
+## Documentation
+
+- [Project overview and tech stack](./docs/README.md)
+- [Cheat sheets](./cheat-sheets/README.md) (Expo, Supabase, Docker, WSL)
+- [Codebase map](./CODEBASE.md)
+
+![SplitFree tech stack](./docs/tech-stack-overview.svg)
+
 ## Getting Started
 
 Follow these steps to get started with the SplitFree app:
