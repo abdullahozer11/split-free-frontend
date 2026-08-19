@@ -17,7 +17,10 @@ import {
 import { ExpenseItem } from "@/src/components/ExpenseItem";
 import { TransferItem } from "@/src/components/TransferItem";
 import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {groupElementsByDay, inThisMonth} from "@/src/utils/helpers";
+import {
+  groupElementsByDay,
+  mergeActivityWithFrontier,
+} from "@/src/utils/helpers";
 import {
   Menu,
   Dialog,
@@ -124,34 +127,32 @@ const GroupDetailsScreen = () => {
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDialog2Visible, setIsDialog2Visible] = useState(false);
 
-  // Merge and group expenses and transfers
-  const groupedTransactions = useMemo(() => {
-    const allTransactions = [];
-
-    // Add expenses with type identifier
-    expensePages?.pages.flat().forEach((expense) => {
-      allTransactions.push({
-        ...expense,
-        type: "expense",
-        date: expense.created_at,
-      });
-    });
-
-    // Add transfers with type identifier
-    transferPages?.pages.flat().forEach((transfer) => {
-      allTransactions.push({
-        ...transfer,
-        type: "transfer",
-        date: transfer.created_at,
-      });
-    });
-
-    // Sort by created_at (most recent first) - this will mix expenses and transfers
-    allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-    // Group by day using created_at
-    return groupElementsByDay(allTransactions, settings.language);
-  }, [expensePages, transferPages, settings.language]);
+  const expenses = useMemo(
+    () => expensePages?.pages.flat() ?? [],
+    [expensePages],
+  );
+  const transfers = useMemo(
+    () => transferPages?.pages.flat() ?? [],
+    [transferPages],
+  );
+  const {
+    items: visibleTransactions,
+    shouldFetchExpenses,
+    shouldFetchTransfers,
+  } = useMemo(
+    () =>
+      mergeActivityWithFrontier({
+        expenses,
+        transfers,
+        hasMoreExpenses: Boolean(hasMoreExpenses),
+        hasMoreTransfers: Boolean(hasMoreTransfers),
+      }),
+    [expenses, transfers, hasMoreExpenses, hasMoreTransfers],
+  );
+  const groupedTransactions = useMemo(
+    () => groupElementsByDay(visibleTransactions, settings.language),
+    [visibleTransactions, settings.language],
+  );
 
   const [updatedFriends, setUpdatedFriends] = useState([]);
 
@@ -428,11 +429,11 @@ const GroupDetailsScreen = () => {
                       ))}
                     </View>
                   ))}
-                  {(hasMoreExpenses || hasMoreTransfers) && (
+                  {(shouldFetchExpenses || shouldFetchTransfers) && (
                     <Button
                       onPress={() => {
-                        if (hasMoreExpenses) fetchNextExpenses();
-                        if (hasMoreTransfers) fetchNextTransfers();
+                        if (shouldFetchExpenses) fetchNextExpenses();
+                        if (shouldFetchTransfers) fetchNextTransfers();
                       }}
                       disabled={isFetchingNextExpenses || isFetchingNextTransfers}
                     >

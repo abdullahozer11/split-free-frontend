@@ -25,6 +25,93 @@ export const groupElementsByDay = (elements, lang) => {
   return groupedElements;
 };
 
+const timestampOf = (value) => {
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? null : time;
+};
+
+const oldestTimestamp = (items) => {
+  let oldest = null;
+  items.forEach((item) => {
+    const time = timestampOf(item?.created_at);
+    if (time == null) {
+      return;
+    }
+    if (oldest == null || time < oldest) {
+      oldest = time;
+    }
+  });
+  return oldest;
+};
+
+// Merge independently paginated expenses and transfers, but only emit items
+// down to the other stream's loaded frontier. Older settlements stay hidden
+// until expenses have been fetched far enough back to interleave them.
+export const mergeActivityWithFrontier = ({
+  expenses = [],
+  transfers = [],
+  hasMoreExpenses = false,
+  hasMoreTransfers = false,
+} = {}) => {
+  const expenseItems = expenses.map((expense) => ({
+    ...expense,
+    type: "expense",
+  }));
+  const transferItems = transfers.map((transfer) => ({
+    ...transfer,
+    type: "transfer",
+  }));
+
+  const items = [...expenseItems, ...transferItems].sort((a, b) => {
+    const delta = timestampOf(b.created_at) - timestampOf(a.created_at);
+    if (delta) {
+      return delta;
+    }
+    return (b.id ?? 0) - (a.id ?? 0);
+  });
+
+  const oldestExpense = oldestTimestamp(expenses);
+  const oldestTransfer = oldestTimestamp(transfers);
+
+  const cutoffCandidates = [];
+  if (hasMoreExpenses && oldestExpense != null) {
+    cutoffCandidates.push(oldestExpense);
+  }
+  if (hasMoreTransfers && oldestTransfer != null) {
+    cutoffCandidates.push(oldestTransfer);
+  }
+  const cutoff = cutoffCandidates.length ? Math.max(...cutoffCandidates) : null;
+
+  const visibleItems =
+    cutoff == null
+      ? items
+      : items.filter((item) => {
+          const time = timestampOf(item.created_at);
+          return time != null && time >= cutoff;
+        });
+
+  const shouldFetchExpenses = Boolean(
+    hasMoreExpenses &&
+    (oldestTransfer == null ||
+      !hasMoreTransfers ||
+      oldestExpense == null ||
+      oldestExpense >= oldestTransfer),
+  );
+  const shouldFetchTransfers = Boolean(
+    hasMoreTransfers &&
+    (oldestExpense == null ||
+      !hasMoreExpenses ||
+      oldestTransfer == null ||
+      oldestTransfer >= oldestExpense),
+  );
+
+  return {
+    items: visibleItems,
+    shouldFetchExpenses,
+    shouldFetchTransfers,
+  };
+};
+
 // Generate a formatted date
 export function getFormattedDate(date) {
   const options = { day: "numeric", month: "short", year: "numeric" };
