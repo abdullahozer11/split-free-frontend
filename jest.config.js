@@ -1,5 +1,13 @@
 module.exports = {
   preset: "jest-expo",
+  // Only collect files named *.test / *.spec. Helpers under __tests__/ and the
+  // live Supabase usecase (complete_flow.js) are not a PR gate.
+  testMatch: ["**/__tests__/**/*.(test|spec).[jt]s?(x)"],
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    // Root layout snapshot needs React Native native-module mocks.
+    "<rootDir>/__tests__/App.test.js",
+  ],
   transformIgnorePatterns: [
     "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)",
   ],
