@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigation } from "expo-router";
 import { useMemberList } from "@/src/api/members";
-import { useInsertExpense, useUpdateExpense } from "@/src/api/expenses";
+import { useInsertExpense, useLatestExpense, useUpdateExpense } from "@/src/api/expenses";
 import {
   Alert,
   Pressable,
@@ -24,9 +24,10 @@ import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { exp_cats } from "@/src/utils/expense_categories";
 import { supabase } from "@/src/lib/supabase.ts";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useAuth } from "@/src/providers/AuthProvider";
+import { resolveExpenseFormDefaults } from "@/src/utils/expenseFormDefaults";
 
 const renderCatItem = (item) => {
   return (
@@ -37,10 +38,6 @@ const renderCatItem = (item) => {
   );
 };
 
-// Keys for AsyncStorage
-const getPayerStorageKey = (groupId) => `lastPayer_${groupId}`;
-const getParticipantsStorageKey = (groupId) => `lastParticipants_${groupId}`;
-
 export default function ExpenseForm({
   title: headerTitle,
   groupId,
@@ -48,41 +45,14 @@ export default function ExpenseForm({
 }) {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
+  const { session, loading: authLoading } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
   const [isLoading, setLoading] = useState();
-  const [hasLoadedLastSelections, setHasLoadedLastSelections] = useState(false);
   const {settings} = useSettings();
   const int = translations[settings.language] || translations.en;
-
-  // Load last selections from AsyncStorage
-  useEffect(() => {
-    const loadLastSelections = async () => {
-      try {
-        // Only load last selections if we're not updating an existing expense
-        if (!updatingExpense) {
-          const payerJson = await AsyncStorage.getItem(getPayerStorageKey(groupId));
-          const participantsJson = await AsyncStorage.getItem(getParticipantsStorageKey(groupId));
-
-          const lastPayers = payerJson ? JSON.parse(payerJson) : [];
-          const lastParticipants = participantsJson ? JSON.parse(participantsJson) : [];
-
-          // Update form state with last selections
-          setFormState(prev => ({
-            ...prev,
-            payers: lastPayers.length ? lastPayers : [],
-            participants: lastParticipants.length ? lastParticipants : []
-          }));
-        }
-        setHasLoadedLastSelections(true);
-      } catch (error) {
-        console.error("Error loading last selections:", error);
-        setHasLoadedLastSelections(true);
-      }
-    };
-
-    loadLastSelections();
-  }, [groupId, updatingExpense]);
+  const isUpdating = !!updatingExpense;
+  const [hasAppliedDefaults, setHasAppliedDefaults] = useState(isUpdating);
 
   const [formState, setFormState] = useState(
     updatingExpense
@@ -106,8 +76,6 @@ export default function ExpenseForm({
         },
   );
 
-  const isUpdating = !!updatingExpense;
-
   const { mutate: insertExpense } = useInsertExpense();
   const { mutate: updateExpense } = useUpdateExpense();
   const {
@@ -115,8 +83,51 @@ export default function ExpenseForm({
     isError: membersError,
     isLoading: membersLoading,
   } = useMemberList(groupId);
+  const {
+    data: latestExpense,
+    isError: latestExpenseError,
+    isLoading: latestExpenseLoading,
+  } = useLatestExpense(groupId, !isUpdating);
 
-  if (membersLoading) {
+  useEffect(() => {
+    if (isUpdating || hasAppliedDefaults) {
+      return;
+    }
+    if (authLoading || membersLoading) {
+      return;
+    }
+    if (latestExpenseLoading && !latestExpenseError) {
+      return;
+    }
+
+    const currentMember = members?.find(
+      (member) => member.profile === session?.user?.id,
+    );
+    const { payers, participants } = resolveExpenseFormDefaults({
+      latestExpense: latestExpenseError ? null : latestExpense,
+      members,
+      currentMemberId: currentMember?.id ?? null,
+    });
+
+    setFormState((prev) => ({
+      ...prev,
+      payers,
+      participants,
+    }));
+    setHasAppliedDefaults(true);
+  }, [
+    isUpdating,
+    hasAppliedDefaults,
+    authLoading,
+    membersLoading,
+    latestExpenseLoading,
+    latestExpenseError,
+    latestExpense,
+    members,
+    session?.user?.id,
+  ]);
+
+  if (membersLoading || (!isUpdating && !hasAppliedDefaults)) {
     return <ActivityIndicator />;
   }
 
@@ -135,16 +146,6 @@ export default function ExpenseForm({
     inputDate,
     category,
   } = formState;
-
-  // Save selections to AsyncStorage when they change
-  const saveLastSelections = async (payers, participants) => {
-    try {
-      await AsyncStorage.setItem(getPayerStorageKey(groupId), JSON.stringify(payers));
-      await AsyncStorage.setItem(getParticipantsStorageKey(groupId), JSON.stringify(participants));
-    } catch (error) {
-      console.error("Error saving last selections:", error);
-    }
-  };
 
   const onDateChange = (event, selectedDate) => {
     if (event.type === "set") {
@@ -189,9 +190,6 @@ export default function ExpenseForm({
       console.log("Validation failed");
       return;
     }
-
-    // Save the current selections for future use
-    saveLastSelections(payers, participants);
 
     if (isUpdating) {
       await onUpdate();
@@ -300,11 +298,6 @@ export default function ExpenseForm({
   const getDisplayCategoryName = (categoryKey) => {
     return int[categoryKey] || categoryKey;
   };
-
-  // Show loading indicator while initializing the form
-  if (!hasLoadedLastSelections) {
-    return <ActivityIndicator />;
-  }
 
   return (
     <ScrollView className={"flex-1"}>
