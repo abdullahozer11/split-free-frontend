@@ -11,7 +11,12 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 /workspaces/split-free-frontend/
 ├── .github/                       # GitHub Actions CI
 │   └── workflows/
-│       └── pr-checks.yml          # Installs deps and runs Jest on PRs targeting master
+│       └── pr-checks.yml          # Jest, ESLint, Prettier, and typos on PRs targeting master
+├── .eslintrc.js                   # ESLint config (expo + prettier + jest)
+├── .eslintignore                  # ESLint exclusions (generated code, native, supabase)
+├── .prettierrc.json               # Prettier options shared with ESLint
+├── .prettierignore                # Prettier exclusions (lockfile, generated types, docs)
+├── _typos.toml                    # Typo-check exclusions for generated and localized files
 ├── __tests__/                     # Test suite (unit, integration, mock storage adapters)
 │   ├── App.test.js                # Root layout snapshot
 │   ├── InMemoryStorageAdapter.js  # Auth storage stub for tests
@@ -83,3 +88,4 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 4. **Offline Persistence:** Settings, locale configurations, and custom indicators (e.g. anchored group lists) are saved to offline local storage using `@react-native-async-storage/async-storage`.
 5. **Secure Authentication Persistence:** Credentials and session profiles are stored in Expo's standard `SecureStore` using a custom secure adapter `ExpoSecureStoreAdapter` inside `src/lib/supabase.ts` that removes raw metadata properties prior to storage for improved performance and token economy.
 6. **Styling and Theme Integration:** Styling utilizes **NativeWind** (Tailwind CSS for React Native) to ensure responsiveness and standard formatting across Android, iOS, and Web build platforms.
+7. **PR quality gates:** Pull requests targeting `master` must pass Jest (`npm test`), ESLint (`npm run lint`), Prettier (`npm run format:check`), and `typos`. Format locally with `npm run format`.

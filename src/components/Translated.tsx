@@ -11,7 +11,6 @@ import { Link as ERLink, Stack as ERStack } from "expo-router";
 import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 
-
 export const Text = ({ children, ...textProps }) => {
   const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
@@ -20,11 +19,7 @@ export const Text = ({ children, ...textProps }) => {
   // Otherwise, use children as fallback
   const displayText = int[children] || children;
 
-  return (
-    <RNText {...textProps}>
-      {displayText}
-    </RNText>
-  );
+  return <RNText {...textProps}>{displayText}</RNText>;
 };
 
 export const TextInput = ({
@@ -38,10 +33,14 @@ export const TextInput = ({
   const int = translations[settings.language] || translations.en;
 
   // Translate label, placeholder, error, and helperText if they exist
-  const translatedLabel = label ? (int[label] || label) : undefined;
-  const translatedPlaceholder = placeholder ? (int[placeholder] || placeholder) : undefined;
-  const translatedError = error ? (int[error] || error) : undefined;
-  const translatedHelperText = helperText ? (int[helperText] || helperText) : undefined;
+  const translatedLabel = label ? int[label] || label : undefined;
+  const translatedPlaceholder = placeholder
+    ? int[placeholder] || placeholder
+    : undefined;
+  const translatedError = error ? int[error] || error : undefined;
+  const translatedHelperText = helperText
+    ? int[helperText] || helperText
+    : undefined;
 
   return (
     <RNTextInput
@@ -60,42 +59,51 @@ TextInput.Affix = RNTextInput.Affix;
 
 export const Alert = {
   alert: (title, message, buttons, options) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- RN Alert wrapper, not a component
     const { settings } = useSettings();
     const int = translations[settings.language] || translations.en;
 
     // Translate title and message
-    const translatedTitle = title ? (int[title] || title) : title;
-    const translatedMessage = message ? (int[message] || message) : message;
+    const translatedTitle = title ? int[title] || title : title;
+    const translatedMessage = message ? int[message] || message : message;
 
     // Translate button texts if buttons array is provided
-    const translatedButtons = buttons?.map(button => ({
+    const translatedButtons = buttons?.map((button) => ({
       ...button,
-      text: button.text ? (int[button.text] || button.text) : button.text
+      text: button.text ? int[button.text] || button.text : button.text,
     }));
 
     return RNAlert.alert(
       translatedTitle,
       translatedMessage,
       translatedButtons,
-      options
+      options,
     );
   },
 
-  prompt: (title, message, callbackOrButtons, type, defaultValue, keyboardType) => {
+  prompt: (
+    title,
+    message,
+    callbackOrButtons,
+    type,
+    defaultValue,
+    keyboardType,
+  ) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks -- RN Alert wrapper, not a component
     const { settings } = useSettings();
     const int = translations[settings.language] || translations.en;
 
     // Translate title and message
-    const translatedTitle = title ? (int[title] || title) : title;
-    const translatedMessage = message ? (int[message] || message) : message;
+    const translatedTitle = title ? int[title] || title : title;
+    const translatedMessage = message ? int[message] || message : message;
 
     // Handle different parameter combinations for prompt
     let translatedButtons;
     if (Array.isArray(callbackOrButtons)) {
       // If second parameter is buttons array, translate button texts
-      translatedButtons = callbackOrButtons.map(button => ({
+      translatedButtons = callbackOrButtons.map((button) => ({
         ...button,
-        text: button.text ? (int[button.text] || button.text) : button.text
+        text: button.text ? int[button.text] || button.text : button.text,
       }));
     }
 
@@ -105,9 +113,9 @@ export const Alert = {
       translatedButtons || callbackOrButtons,
       type,
       defaultValue,
-      keyboardType
+      keyboardType,
     );
-  }
+  },
 };
 
 // Hook for accessing translations directly in components
@@ -125,17 +133,11 @@ export const Link = ({ children, ...props }) => {
   const int = translations[settings.language] || translations.en;
 
   // Translate children if it's a string and translation exists
-  const translatedChildren = typeof children === 'string'
-    ? (int[children] || children)
-    : children;
+  const translatedChildren =
+    typeof children === "string" ? int[children] || children : children;
 
-  return (
-    <ERLink {...props}>
-      {translatedChildren}
-    </ERLink>
-  );
+  return <ERLink {...props}>{translatedChildren}</ERLink>;
 };
-
 
 export const StackScreen = ({ options, ...props }) => {
   const { settings } = useSettings();
@@ -143,26 +145,32 @@ export const StackScreen = ({ options, ...props }) => {
 
   // Helper function to recursively translate options
   const translateOptions = (opts) => {
-    if (!opts || typeof opts !== 'object') return opts;
+    if (!opts || typeof opts !== "object") return opts;
 
     const translated = { ...opts };
 
     // Translate common option properties
-    if (translated.title && typeof translated.title === 'string') {
+    if (translated.title && typeof translated.title === "string") {
       translated.title = int[translated.title] || translated.title;
     }
 
-    if (translated.headerTitle && typeof translated.headerTitle === 'string') {
-      translated.headerTitle = int[translated.headerTitle] || translated.headerTitle;
+    if (translated.headerTitle && typeof translated.headerTitle === "string") {
+      translated.headerTitle =
+        int[translated.headerTitle] || translated.headerTitle;
     }
 
-    if (translated.headerBackTitle && typeof translated.headerBackTitle === 'string') {
-      translated.headerBackTitle = int[translated.headerBackTitle] || translated.headerBackTitle;
+    if (
+      translated.headerBackTitle &&
+      typeof translated.headerBackTitle === "string"
+    ) {
+      translated.headerBackTitle =
+        int[translated.headerBackTitle] || translated.headerBackTitle;
     }
 
     // Translate tabBarLabel for tab screens
-    if (translated.tabBarLabel && typeof translated.tabBarLabel === 'string') {
-      translated.tabBarLabel = int[translated.tabBarLabel] || translated.tabBarLabel;
+    if (translated.tabBarLabel && typeof translated.tabBarLabel === "string") {
+      translated.tabBarLabel =
+        int[translated.tabBarLabel] || translated.tabBarLabel;
     }
 
     return translated;
@@ -173,20 +181,14 @@ export const StackScreen = ({ options, ...props }) => {
   return <ERStack.Screen {...props} options={translatedOptions} />;
 };
 
-
 export const MenuItem = ({ title, ...menuItemProps }) => {
   const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
   // Translate the title if it exists
-  const translatedTitle = title ? (int[title] || title) : title;
+  const translatedTitle = title ? int[title] || title : title;
 
-  return (
-    <RNMenu.Item
-      {...menuItemProps}
-      title={translatedTitle}
-    />
-  );
+  return <RNMenu.Item {...menuItemProps} title={translatedTitle} />;
 };
 
 export const Button = ({ children, ...buttonProps }) => {
@@ -194,30 +196,19 @@ export const Button = ({ children, ...buttonProps }) => {
   const int = translations[settings.language] || translations.en;
 
   // Translate children if it's a string and translation exists
-  const translatedChildren = typeof children === 'string'
-    ? (int[children] || children)
-    : children;
+  const translatedChildren =
+    typeof children === "string" ? int[children] || children : children;
 
-  return (
-    <RNButton {...buttonProps}>
-      {translatedChildren}
-    </RNButton>
-  );
+  return <RNButton {...buttonProps}>{translatedChildren}</RNButton>;
 };
-
 
 export const DialogTitle = ({ children, ...titleProps }) => {
   const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
   // Translate children if it's a string and translation exists
-  const translatedChildren = typeof children === 'string'
-    ? (int[children] || children)
-    : children;
+  const translatedChildren =
+    typeof children === "string" ? int[children] || children : children;
 
-  return (
-    <RNDialog.Title {...titleProps}>
-      {translatedChildren}
-    </RNDialog.Title>
-  );
+  return <RNDialog.Title {...titleProps}>{translatedChildren}</RNDialog.Title>;
 };

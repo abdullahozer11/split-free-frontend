@@ -11,14 +11,16 @@ import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const Card = ({ iconName, title, page }) => {
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
   return (
     <Link href={`/(tabs)/account/${page}`} asChild>
       <Pressable className="flex-1 mx-1 rounded-md border-2 border-gray-400 items-center bg-white justify-between py-5">
         <View />
         <Feather name={iconName} size={24} color="black" />
-        <Text className="text-lg font-semibold text-black">{int[title] || title}</Text>
+        <Text className="text-lg font-semibold text-black">
+          {int[title] || title}
+        </Text>
       </Pressable>
     </Link>
   );

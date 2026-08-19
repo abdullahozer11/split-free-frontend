@@ -11,8 +11,7 @@
         "buildType": "apk"
       }
     },
-    "base": {
-    },
+    "base": {},
     "preview": {
       "extends": "base",
       "android": {

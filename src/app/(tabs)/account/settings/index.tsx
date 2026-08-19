@@ -9,7 +9,7 @@ import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 
 const SettingsItem = ({ page, iconName, title, containerColor }) => {
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
   return (
     <Link href={`/(tabs)/account/settings/${page}`} asChild>

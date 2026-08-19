@@ -1,9 +1,4 @@
-import {
-  View,
-  Modal,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import { View, Modal, Image, TouchableOpacity } from "react-native";
 import { TextInput, Text } from "@/src/components/Translated";
 import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";

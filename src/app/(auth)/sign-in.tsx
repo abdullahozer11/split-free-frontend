@@ -42,27 +42,30 @@ const SignInScreen = () => {
   };
 
   async function debugSupabaseAuth() {
-    supabaseUrl = 'http://192.168.1.151:54321'
+    supabaseUrl = "http://192.168.1.151:54321";
     const authUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`; // Use your supabaseUrl var
-    console.log('Debug: Attempting fetch to', authUrl);
-    console.log('Debug: With email:', email); // Avoid logging password
+    console.log("Debug: Attempting fetch to", authUrl);
+    console.log("Debug: With email:", email); // Avoid logging password
 
     try {
       const response = await fetch(authUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'YOUR_SUPABASE_ANON_KEY',
-          'Authorization': `Bearer YOUR_SUPABASE_ANON_KEY`, // Optional, but include if required
+          "Content-Type": "application/json",
+          apikey: "YOUR_SUPABASE_ANON_KEY",
+          Authorization: `Bearer YOUR_SUPABASE_ANON_KEY`, // Optional, but include if required
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({ email, password }),
       });
 
-      console.log('Debug: Response status:', response.status);
-      console.log('Debug: Response headers:', JSON.stringify(Object.fromEntries(response.headers), null, 2));
+      console.log("Debug: Response status:", response.status);
+      console.log(
+        "Debug: Response headers:",
+        JSON.stringify(Object.fromEntries(response.headers), null, 2),
+      );
 
       const rawText = await response.text(); // Always get text first
-      console.log('Debug: Raw response body:', rawText); // This reveals HTML/errors like '<html>...'
+      console.log("Debug: Raw response body:", rawText); // This reveals HTML/errors like '<html>...'
 
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}: ${rawText}`);
@@ -70,14 +73,14 @@ const SignInScreen = () => {
 
       try {
         const json = JSON.parse(rawText);
-        console.log('Debug: Parsed JSON:', JSON.stringify(json, null, 2));
+        console.log("Debug: Parsed JSON:", JSON.stringify(json, null, 2));
         // If successful, handle session here
       } catch (parseErr) {
-        console.error('Debug: JSON parse failed:', parseErr.message);
+        console.error("Debug: JSON parse failed:", parseErr.message);
       }
     } catch (fetchErr) {
-      console.error('Debug: Fetch error:', fetchErr.name, fetchErr.message);
-      console.error('Debug: Full fetch error stack:', fetchErr.stack);
+      console.error("Debug: Fetch error:", fetchErr.name, fetchErr.message);
+      console.error("Debug: Full fetch error stack:", fetchErr.stack);
     }
   }
 

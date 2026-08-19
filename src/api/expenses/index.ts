@@ -81,7 +81,9 @@ export const useExpense = (id: number) => {
       // Fetch expense details
       const { data: expenseData, error: expenseError } = await supabase
         .from("expenses")
-        .select("amount, id, title, settled, description, date, last_modified, group_id, category")
+        .select(
+          "amount, id, title, settled, description, date, last_modified, group_id, category",
+        )
         .eq("id", id)
         .single();
 
@@ -93,7 +95,8 @@ export const useExpense = (id: number) => {
       // Fetch payers
       const { data: payersData, error: payersError } = await supabase
         .from("expense_payers")
-        .select(`
+        .select(
+          `
           member (
             id,
             name,
@@ -101,7 +104,8 @@ export const useExpense = (id: number) => {
               avatar_url
             )
           )
-        `)
+        `,
+        )
         .eq("expense", id);
 
       if (payersError) {
@@ -113,7 +117,9 @@ export const useExpense = (id: number) => {
         ? payersData.map((item) => ({
             id: item.member.id,
             name: item.member.name,
-            avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
+            avatar_url: item.member.profile
+              ? item.member.profile.avatar_url
+              : null,
           }))
         : [];
 
@@ -131,9 +137,11 @@ export const useExpense = (id: number) => {
       const payer_ids = payerIdsData ? payerIdsData.map((d) => d.member) : [];
 
       // Fetch participants
-      const { data: participantsData, error: participantsError } = await supabase
-        .from("expense_participants")
-        .select(`
+      const { data: participantsData, error: participantsError } =
+        await supabase
+          .from("expense_participants")
+          .select(
+            `
           member (
             id,
             name,
@@ -141,11 +149,15 @@ export const useExpense = (id: number) => {
               avatar_url
             )
           )
-        `)
-        .eq("expense", id);
+        `,
+          )
+          .eq("expense", id);
 
       if (participantsError) {
-        console.log("useExpense participants error: ", participantsError.message);
+        console.log(
+          "useExpense participants error: ",
+          participantsError.message,
+        );
         throw new Error(participantsError.message);
       }
 
@@ -153,22 +165,30 @@ export const useExpense = (id: number) => {
         ? participantsData.map((item) => ({
             id: item.member.id,
             name: item.member.name,
-            avatar_url: item.member.profile ? item.member.profile.avatar_url : null,
+            avatar_url: item.member.profile
+              ? item.member.profile.avatar_url
+              : null,
           }))
         : [];
 
       // Fetch participant_ids
-      const { data: participantIdsData, error: participantIdsError } = await supabase
-        .from("expense_participants")
-        .select("member")
-        .eq("expense", id);
+      const { data: participantIdsData, error: participantIdsError } =
+        await supabase
+          .from("expense_participants")
+          .select("member")
+          .eq("expense", id);
 
       if (participantIdsError) {
-        console.log("useExpense participant_ids error: ", participantIdsError.message);
+        console.log(
+          "useExpense participant_ids error: ",
+          participantIdsError.message,
+        );
         throw new Error(participantIdsError.message);
       }
 
-      const participant_ids = participantIdsData ? participantIdsData.map((d) => d.member) : [];
+      const participant_ids = participantIdsData
+        ? participantIdsData.map((d) => d.member)
+        : [];
 
       // Build the response object
       const expense = {
@@ -281,8 +301,12 @@ export const useExpenseTotalThisMonth = (group_id: number) => {
     queryFn: async () => {
       try {
         const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString().split("T")[0];
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+          .toISOString()
+          .split("T")[0];
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+          .toISOString()
+          .split("T")[0];
         const { data, error } = await supabase
           .from("expenses")
           .select("amount")
@@ -295,13 +319,19 @@ export const useExpenseTotalThisMonth = (group_id: number) => {
             details: error.details,
             hint: error.hint,
           });
-          throw new Error(`Failed to fetch monthly expense total: ${error.message}`);
+          throw new Error(
+            `Failed to fetch monthly expense total: ${error.message}`,
+          );
         }
-        const total = data.reduce((sum, item) => sum + item.amount, 0).toFixed(2);
+        const total = data
+          .reduce((sum, item) => sum + item.amount, 0)
+          .toFixed(2);
         return total;
       } catch (err) {
         console.error("useExpenseTotalThisMonth unexpected error:", err);
-        throw new Error(`Unexpected error fetching monthly expense total: ${err.message}`);
+        throw new Error(
+          `Unexpected error fetching monthly expense total: ${err.message}`,
+        );
       }
     },
   });

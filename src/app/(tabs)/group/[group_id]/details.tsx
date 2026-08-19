@@ -1,6 +1,6 @@
 import { View, TouchableOpacity, Pressable, Alert, Share } from "react-native";
-import {DialogTitle, MenuItem, Text} from "@/src/components/Translated";
-import React, {useEffect, useMemo, useState} from "react";
+import { DialogTitle, MenuItem, Text } from "@/src/components/Translated";
+import React, { useEffect, useMemo, useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import {
   useDeleteGroup,
@@ -16,7 +16,7 @@ import {
 } from "expo-router";
 import { ExpenseItem } from "@/src/components/ExpenseItem";
 import { TransferItem } from "@/src/components/TransferItem";
-import CollapsableHeader from "@/src/components/CollapsableHeader";
+import CollapsibleHeader from "@/src/components/CollapsibleHeader";
 import {
   groupElementsByDay,
   mergeActivityWithFrontier,
@@ -45,9 +45,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
 import { currencyOptions } from "@/src/constants";
-import QRCode from 'react-native-qrcode-svg';
+import QRCode from "react-native-qrcode-svg";
 import { generateInvite } from "@/src/api/invites";
-
 
 const GroupDetailsScreen = () => {
   const { group_id: idString } = useLocalSearchParams();
@@ -99,10 +98,8 @@ const GroupDetailsScreen = () => {
     isError: profileMemberError,
     isLoading: profileMemberLoading,
   } = useProfileMember(profile?.id, groupId);
-  const {
-    data: expenseTotalM,
-    isLoading: expenseTotalMLoading,
-  } = useExpenseTotalThisMonth(groupId);
+  const { data: expenseTotalM, isLoading: expenseTotalMLoading } =
+    useExpenseTotalThisMonth(groupId);
   const [totalBalance, setTotalBalance] = useState(0);
   const { mutate: exitGroup } = useExitGroup();
   const { mutate: deleteGroup } = useDeleteGroup();
@@ -118,7 +115,7 @@ const GroupDetailsScreen = () => {
   const [isFriendSelectorVisible, setIsFriendSelectorVisible] = useState(false);
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [isGroupExitterVisible, setIsGroupExitterVisible] = useState(false);
-  const [inviteLink, setInviteLink] = useState('');
+  const [inviteLink, setInviteLink] = useState("");
   const [bigPlusVisible, setBigPlusVisible] = useState(true);
   const [newMemberName, setNewMemberName] = useState("");
 
@@ -366,12 +363,14 @@ const GroupDetailsScreen = () => {
 
   const isOwner = session?.user.id === group?.owner;
 
-  const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
-  const currency_label = currencyOption?.label || '$';
+  const currencyOption = currencyOptions.find(
+    (opt) => opt.value === group?.currency,
+  );
+  const currency_label = currencyOption?.label || "$";
 
   return (
     <View className="bg-[#F6F6F6FF] flex-1">
-      <CollapsableHeader
+      <CollapsibleHeader
         H_MIN_HEIGHT={150}
         H_MAX_HEIGHT={240}
         content={
@@ -383,13 +382,15 @@ const GroupDetailsScreen = () => {
                   <View className="flex-1">
                     <Text variant="titleLarge">Group spent</Text>
                     <Text variant="headlineMedium" className="font-bold">
-                      {group?.expense_total || 0}{currency_label}
+                      {group?.expense_total || 0}
+                      {currency_label}
                     </Text>
                   </View>
                   <View className="flex-1">
                     <Text variant="titleMedium">This month</Text>
                     <Text variant="headlineSmall" className="">
-                      {expenseTotalM || 0}{currency_label}
+                      {expenseTotalM || 0}
+                      {currency_label}
                     </Text>
                   </View>
                 </View>
@@ -401,7 +402,8 @@ const GroupDetailsScreen = () => {
                     variant="headlineMedium"
                     className={`font-bold ${totalBalance >= 0 ? "text-green-600" : "text-red-600"}`}
                   >
-                    {Math.abs(totalBalance || 0)}{currency_label}
+                    {Math.abs(totalBalance || 0)}
+                    {currency_label}
                   </Text>
                 </View>
                 {/*last settlement date*/}
@@ -414,9 +416,13 @@ const GroupDetailsScreen = () => {
                   {Object.keys(groupedTransactions).map((item) => (
                     <View className="my-4 gap-y-5" key={item}>
                       <Text variant={"titleMedium"}>{item}</Text>
-                      {groupedTransactions[item].map((transaction) => (
-                        transaction.type === 'expense' ? (
-                          <ExpenseItem key={`expense-${transaction.id}`} expense={transaction} currency_label={currency_label}/>
+                      {groupedTransactions[item].map((transaction) =>
+                        transaction.type === "expense" ? (
+                          <ExpenseItem
+                            key={`expense-${transaction.id}`}
+                            expense={transaction}
+                            currency_label={currency_label}
+                          />
                         ) : (
                           <TransferItem
                             key={`transfer-${transaction.id}`}
@@ -425,8 +431,8 @@ const GroupDetailsScreen = () => {
                             currentUserId={session?.user.id}
                             currency_label={currency_label}
                           />
-                        )
-                      ))}
+                        ),
+                      )}
                     </View>
                   ))}
                   {(shouldFetchExpenses || shouldFetchTransfers) && (
@@ -435,9 +441,13 @@ const GroupDetailsScreen = () => {
                         if (shouldFetchExpenses) fetchNextExpenses();
                         if (shouldFetchTransfers) fetchNextTransfers();
                       }}
-                      disabled={isFetchingNextExpenses || isFetchingNextTransfers}
+                      disabled={
+                        isFetchingNextExpenses || isFetchingNextTransfers
+                      }
                     >
-                      {isFetchingNextExpenses || isFetchingNextTransfers ? "Loading..." : "Load More"}
+                      {isFetchingNextExpenses || isFetchingNextTransfers
+                        ? "Loading..."
+                        : "Load More"}
                     </Button>
                   )}
                 </View>
@@ -515,20 +525,20 @@ const GroupDetailsScreen = () => {
                 }}
                 className="w-[50px] justify-center items-start"
               >
-                <Feather name="arrow-left" size={36} color="gold"/>
+                <Feather name="arrow-left" size={36} color="gold" />
               </TouchableOpacity>
 
               <View className="flex-row w-[100px] justify-end">
                 <Link href={`/(tabs)/group/${groupId}/stats`} className="mr-2">
-                  <Feather name="pie-chart" size={36} color="gold"/>
+                  <Feather name="pie-chart" size={36} color="gold" />
                 </Link>
                 <Menu
                   visible={visible}
                   onDismiss={closeMenu}
-                  contentStyle={{marginTop: 40, backgroundColor: "white"}}
+                  contentStyle={{ marginTop: 40, backgroundColor: "white" }}
                   anchor={
                     <TouchableOpacity onPress={openMenu}>
-                      <Feather name="more-horizontal" size={36} color="gold"/>
+                      <Feather name="more-horizontal" size={36} color="gold" />
                     </TouchableOpacity>
                   }
                 >
@@ -537,7 +547,7 @@ const GroupDetailsScreen = () => {
                       closeMenu();
                       router.push({
                         pathname: "/(tabs)/group/[group_id]/update",
-                        params: {group_id: groupId},
+                        params: { group_id: groupId },
                       });
                     }}
                     title="Edit group"
@@ -548,7 +558,7 @@ const GroupDetailsScreen = () => {
                       closeMenu();
                     }}
                     title="Settle all expenses"
-                    titleStyle={{color: "green"}}
+                    titleStyle={{ color: "green" }}
                   />
                   <MenuItem
                     onPress={() => {
@@ -556,7 +566,7 @@ const GroupDetailsScreen = () => {
                       closeMenu();
                     }}
                     title="Invite a person"
-                    titleStyle={{color: "blue"}}
+                    titleStyle={{ color: "blue" }}
                   />
                   {isOwner ? (
                     <MenuItem
@@ -565,7 +575,7 @@ const GroupDetailsScreen = () => {
                         closeMenu();
                       }}
                       title="Delete Group"
-                      titleStyle={{color: "red"}}
+                      titleStyle={{ color: "red" }}
                     />
                   ) : (
                     <MenuItem
@@ -574,7 +584,7 @@ const GroupDetailsScreen = () => {
                         closeMenu();
                       }}
                       title="Exit group"
-                      titleStyle={{color: "red"}}
+                      titleStyle={{ color: "red" }}
                     />
                   )}
                 </Menu>
@@ -584,7 +594,9 @@ const GroupDetailsScreen = () => {
             {/* Group Title - Separate row with proper spacing */}
             <View className="w-full px-4 mt-4">
               <Text
-                variant={group.title.length > 20 ? "headlineSmall" : "headlineMedium"}
+                variant={
+                  group.title.length > 20 ? "headlineSmall" : "headlineMedium"
+                }
                 className="text-white text-center"
                 numberOfLines={2}
                 adjustsFontSizeToFit={true}
@@ -693,11 +705,11 @@ const GroupDetailsScreen = () => {
         visible={QRCodeVisible}
         onDismiss={() => setQRCodeVisible(false)}
         contentContainerStyle={{
-          backgroundColor: 'white',
+          backgroundColor: "white",
           padding: 20,
           margin: 20,
           borderRadius: 10,
-          alignItems: 'center',
+          alignItems: "center",
         }}
       >
         <Text variant="titleLarge">Invite to Group</Text>
@@ -708,7 +720,9 @@ const GroupDetailsScreen = () => {
             <ActivityIndicator />
           )}
         </View>
-        <Text selectable className="mb-5 text-center">{inviteLink}</Text>
+        <Text selectable className="mb-5 text-center">
+          {inviteLink}
+        </Text>
         <Button
           onPress={async () => {
             try {

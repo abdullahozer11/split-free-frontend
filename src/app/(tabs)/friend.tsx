@@ -1,5 +1,5 @@
 import { View, ScrollView, TouchableOpacity, Alert } from "react-native";
-import {Text, Button, DialogTitle} from "@/src/components/Translated";
+import { Text, Button, DialogTitle } from "@/src/components/Translated";
 import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
@@ -39,7 +39,7 @@ export default function FriendScreen() {
     email: null,
     id: null,
   });
-  const {settings} = useSettings();
+  const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
   const { setSession, session } = useAuth();
@@ -81,13 +81,13 @@ export default function FriendScreen() {
     const userId = session?.user.id;
 
     // Fetch matching profiles
-    const {data: profiles, error: profilesError} = await supabase
+    const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select("id, email, avatar_url")
       .ilike("email", `${searchQuery}%`)
       .order("email")
       .limit(6)
-      .range(0, 5);  // offset 0, limit 6
+      .range(0, 5); // offset 0, limit 6
 
     if (profilesError) {
       console.log("Handle Search profiles error is ", profilesError.message);
@@ -101,10 +101,10 @@ export default function FriendScreen() {
       return;
     }
 
-    const profileIds = profiles.map(p => p.id);
+    const profileIds = profiles.map((p) => p.id);
 
     // Fetch user's friends
-    const {data: friendsData, error: friendsError} = await supabase
+    const { data: friendsData, error: friendsError } = await supabase
       .from("friends")
       .select("friend")
       .eq("profile", userId);
@@ -115,10 +115,10 @@ export default function FriendScreen() {
       return;
     }
 
-    const friendIds = friendsData ? friendsData.map(f => f.friend) : [];
+    const friendIds = friendsData ? friendsData.map((f) => f.friend) : [];
 
     // Fetch sent requests (receivers)
-    const {data: sentData, error: sentError} = await supabase
+    const { data: sentData, error: sentError } = await supabase
       .from("friend_requests")
       .select("receiver")
       .eq("sender", userId);
@@ -129,10 +129,10 @@ export default function FriendScreen() {
       return;
     }
 
-    const sentIds = sentData ? sentData.map(s => s.receiver) : [];
+    const sentIds = sentData ? sentData.map((s) => s.receiver) : [];
 
     // Fetch received requests (senders)
-    const {data: receivedData, error: receivedError} = await supabase
+    const { data: receivedData, error: receivedError } = await supabase
       .from("friend_requests")
       .select("sender")
       .eq("receiver", userId);
@@ -143,16 +143,20 @@ export default function FriendScreen() {
       return;
     }
 
-    const receivedIds = receivedData ? receivedData.map(r => r.sender) : [];
+    const receivedIds = receivedData ? receivedData.map((r) => r.sender) : [];
 
     // Compute statuses
-    const results = profiles.map(p => ({
+    const results = profiles.map((p) => ({
       id: p.id,
       email: p.email,
       avatar_url: p.avatar_url,
-      friend_status: friendIds.includes(p.id) ? 'FRIEND' :
-        sentIds.includes(p.id) ? 'SENT' :
-          receivedIds.includes(p.id) ? 'RECEIVED' : 'AVAILABLE'
+      friend_status: friendIds.includes(p.id)
+        ? "FRIEND"
+        : sentIds.includes(p.id)
+          ? "SENT"
+          : receivedIds.includes(p.id)
+            ? "RECEIVED"
+            : "AVAILABLE",
     }));
 
     setSearchResults(results);
@@ -358,12 +362,8 @@ export default function FriendScreen() {
           >
             <Dialog.Icon icon="alert" />
             <DialogTitle>
-              <Text>
-                Are you sure to unfriend
-              </Text>
-              <Text>
-                {" " + removingFriend.email}?
-              </Text>
+              <Text>Are you sure to unfriend</Text>
+              <Text>{" " + removingFriend.email}?</Text>
             </DialogTitle>
             <Dialog.Content>
               <Text variant="bodyMedium">This action cannot be taken back</Text>

@@ -20,13 +20,13 @@ const Languages = () => {
 
   const data = [
     { label: "English", value: "en" },
-    { label: 'Ελληνικά', value: 'gr' },
-    { label: 'Français', value: 'fr' },
-    { label: 'Türkçe', value: 'tr' },
-    { label: 'Español', value: 'es' },
-    { label: 'Deutsch', value: 'de' },
-    { label: 'Italiano', value: 'it' },
-    { label: 'Русский', value: 'ru' },
+    { label: "Ελληνικά", value: "gr" },
+    { label: "Français", value: "fr" },
+    { label: "Türkçe", value: "tr" },
+    { label: "Español", value: "es" },
+    { label: "Deutsch", value: "de" },
+    { label: "Italiano", value: "it" },
+    { label: "Русский", value: "ru" },
   ];
 
   const { setSession, session } = useAuth();
@@ -42,7 +42,7 @@ const Languages = () => {
       if (settings.language !== profile.language) {
         updateSettings({
           ...settings,
-          language: profile.language
+          language: profile.language,
         });
       }
     } else {
@@ -68,7 +68,7 @@ const Languages = () => {
     // Update settings context immediately
     updateSettings({
       ...settings,
-      language: newValue
+      language: newValue,
     });
 
     // Update profile in database
@@ -87,7 +87,7 @@ const Languages = () => {
           setLanguage(lanTemp);
           updateSettings({
             ...settings,
-            language: lanTemp
+            language: lanTemp,
           });
           setIsFocus(true);
           console.error("Server error:", error);

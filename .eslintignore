@@ -1,7 +1,10 @@
-
 /.expo
 
 node_modules
 
 android
+ios
 supabase
+coverage
+src/database.types.ts
+index.js

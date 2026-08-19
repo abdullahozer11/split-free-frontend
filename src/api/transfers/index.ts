@@ -43,19 +43,20 @@ export const useTransferList = (group_id: number) => {
   });
 };
 
-
 export const useTransfer = (id: number) => {
   return useQuery({
     queryKey: ["transfer", id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("transfers")
-        .select(`
+        .select(
+          `
           created_at,
           amount,
           sender: sender (name),
           receiver: receiver (name)
-        `)
+        `,
+        )
         .eq("id", id)
         .single();
 

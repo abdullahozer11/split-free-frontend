@@ -5,16 +5,16 @@ import {
   Image,
   Alert,
 } from "react-native";
-import {Button, TextInput, Text, DialogTitle} from "@/src/components/Translated";
+import {
+  Button,
+  TextInput,
+  Text,
+  DialogTitle,
+} from "@/src/components/Translated";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import CollapsableHeader from "@/src/components/CollapsableHeader";
-import {
-  ActivityIndicator,
-  Card,
-  Dialog,
-  Portal,
-} from "react-native-paper";
+import CollapsibleHeader from "@/src/components/CollapsibleHeader";
+import { ActivityIndicator, Card, Dialog, Portal } from "react-native-paper";
 import { Feather } from "@expo/vector-icons";
 import { useGroup } from "@/src/api/groups";
 import {
@@ -27,7 +27,6 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { useDebt } from "@/src/api/debts";
 import { useQueryClient } from "@tanstack/react-query";
 import { currencyOptions } from "@/src/constants";
-
 
 const MemberDetailsScreen = () => {
   const navigation = useNavigation();
@@ -118,12 +117,14 @@ const MemberDetailsScreen = () => {
     });
   };
 
-  const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
-  const currency_label = currencyOption?.label || '$';
+  const currencyOption = currencyOptions.find(
+    (opt) => opt.value === group?.currency,
+  );
+  const currency_label = currencyOption?.label || "$";
 
   return (
     <SafeAreaView className="flex-1">
-      <CollapsableHeader
+      <CollapsibleHeader
         H_MAX_HEIGHT={200}
         H_MIN_HEIGHT={52}
         content={
@@ -140,10 +141,14 @@ const MemberDetailsScreen = () => {
                     className="w-[160px] h-[160px] rounded-full"
                   />
                 </View>
-                <Text><Text>Group</Text>: {member.group.title}</Text>
+                <Text>
+                  <Text>Group</Text>: {member.group.title}
+                </Text>
                 {!isEditingName && (
                   <View style={{ gap: 5 }} className="flex-row">
-                    <Text><Text>Name</Text>: {member.name}</Text>
+                    <Text>
+                      <Text>Name</Text>: {member.name}
+                    </Text>
                     {isEditable && (
                       <TouchableOpacity
                         onPress={() => {
@@ -169,7 +174,8 @@ const MemberDetailsScreen = () => {
                   </View>
                 )}
                 <Text>
-                  <Text>Attached to Profile</Text>: {member.profile?.email || "None"}
+                  <Text>Attached to Profile</Text>:{" "}
+                  {member.profile?.email || "None"}
                 </Text>
                 <Text>
                   <Text>Role</Text>: <Text>{member.role}</Text>{" "}
@@ -184,15 +190,22 @@ const MemberDetailsScreen = () => {
                       color: member.total_balance >= 0 ? "green" : "red",
                     }}
                   >
-                    {currency_label}{member.total_balance.toFixed(2)}
+                    {currency_label}
+                    {member.total_balance.toFixed(2)}
                   </Text>
                 </Text>
                 {!ownMember &&
                   debt &&
                   (debt.amount >= 0 ? (
-                    <Text><Text>Owes you</Text>: {currency_label}{debt.amount}</Text>
+                    <Text>
+                      <Text>Owes you</Text>: {currency_label}
+                      {debt.amount}
+                    </Text>
                   ) : (
-                    <Text><Text>You owe</Text>: {currency_label}{debt.amount}</Text>
+                    <Text>
+                      <Text>You owe</Text>: {currency_label}
+                      {debt.amount}
+                    </Text>
                   ))}
               </Card.Content>
             </Card>
@@ -218,7 +231,8 @@ const MemberDetailsScreen = () => {
                 {member?.name} {member.id === profileMember?.id && "(me)"}
               </Text>
               <Text className="text-white">
-                <Text className="text-white">Created at:</Text>{" " + new Date(member.created_at).toLocaleString()}
+                <Text className="text-white">Created at:</Text>
+                {" " + new Date(member.created_at).toLocaleString()}
               </Text>
             </View>
           </View>

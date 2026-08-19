@@ -12,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "associatedDomains": ["applinks:split-free-next.vercel.app"],
       "supportsTablet": true,
@@ -36,10 +34,7 @@
               "pathPrefix": "/join"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
       "package": "xyz.splitfree",
@@ -79,10 +74,7 @@
       "router": {
         "origin": false
       },
-      "googleOauthScopes": [
-        "profile",
-        "email"
-      ],
+      "googleOauthScopes": ["profile", "email"],
       "eas": {
         "projectId": "eb5b67a4-daf3-42fb-b228-01e0e572a88a"
       }

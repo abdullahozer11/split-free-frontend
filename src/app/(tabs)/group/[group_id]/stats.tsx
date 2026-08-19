@@ -18,7 +18,6 @@ import { inThisMonth } from "@/src/utils/helpers.ts";
 import { currencyOptions } from "@/src/constants";
 import { useGroup } from "@/src/api/groups";
 
-
 enum Selection {
   Month = "This Month",
   Global = "Global",
@@ -186,9 +185,9 @@ const Stats = () => {
     return { biggestExpenseM: max1, biggestExpensePerM: max2 };
   }, [personalExpensesM, expensesM]);
 
-  const { expenseTotal, expenseTotalPer, payedAmount } = useMemo(() => {
+  const { expenseTotal, expenseTotalPer, paidAmount } = useMemo(() => {
     if (!expenses.length)
-      return { expenseTotal: 0, expenseTotalPer: 0, payedAmount: 0 };
+      return { expenseTotal: 0, expenseTotalPer: 0, paidAmount: 0 };
     const sum1 = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     const sum2 = personalExpenses.reduce(
       (sum, expense) => sum + expense.amount,
@@ -198,12 +197,12 @@ const Stats = () => {
       ex?.payers?.some((payer) => payer.member === profileMember?.id),
     );
     const sum3 = expenses3.reduce((sum, expense) => sum + expense.amount, 0);
-    return { expenseTotal: sum1, expenseTotalPer: sum2, payedAmount: sum3 };
+    return { expenseTotal: sum1, expenseTotalPer: sum2, paidAmount: sum3 };
   }, [personalExpenses, profileMember, expenses]);
 
-  const { expenseTotalM, expenseTotalPerM, payedAmountM } = useMemo(() => {
+  const { expenseTotalM, expenseTotalPerM, paidAmountM } = useMemo(() => {
     if (!expensesM.length)
-      return { expenseTotalM: 0, expenseTotalPerM: 0, payedAmountM: 0 };
+      return { expenseTotalM: 0, expenseTotalPerM: 0, paidAmountM: 0 };
     const sum1 = expensesM.reduce((sum, expense) => sum + expense.amount, 0);
     const sum2 = personalExpensesM.reduce(
       (sum, expense) => sum + expense.amount,
@@ -213,7 +212,7 @@ const Stats = () => {
       ex?.payers?.some((payer) => payer.member === profileMember?.id),
     );
     const sum3 = expenses3.reduce((sum, expense) => sum + expense.amount, 0);
-    return { expenseTotalM: sum1, expenseTotalPerM: sum2, payedAmountM: sum3 };
+    return { expenseTotalM: sum1, expenseTotalPerM: sum2, paidAmountM: sum3 };
   }, [personalExpensesM, expensesM, profileMember?.id]);
 
   const openMenu = () => {
@@ -231,8 +230,7 @@ const Stats = () => {
       ? expenseTotalPer
       : expenseTotalPerM;
 
-  const payedAmountF =
-    selected === Selection.Global ? payedAmount : payedAmountM;
+  const paidAmountF = selected === Selection.Global ? paidAmount : paidAmountM;
 
   const groupedExpensesF = toggleOnGroup
     ? selected === Selection.Global
@@ -275,8 +273,10 @@ const Stats = () => {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
-  const currencyOption = currencyOptions.find(opt => opt.value === group?.currency);
-  const currency_label = currencyOption?.label || '$';
+  const currencyOption = currencyOptions.find(
+    (opt) => opt.value === group?.currency,
+  );
+  const currency_label = currencyOption?.label || "$";
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
@@ -354,12 +354,16 @@ const Stats = () => {
           <View className="flex-row justify-between items-center">
             <View>
               <Text variant={"headlineMedium"}>Spent</Text>
-              <Text variant={"headlineSmall"}>{currency_label}{expenseTotalF.toFixed(2)}</Text>
+              <Text variant={"headlineSmall"}>
+                {currency_label}
+                {expenseTotalF.toFixed(2)}
+              </Text>
             </View>
             <View>
               <Text variant={"headlineMedium"}>You paid for</Text>
               <Text variant={"headlineSmall"} className="text-green-600">
-                + {currency_label}{payedAmountF.toFixed(2)}
+                + {currency_label}
+                {paidAmountF.toFixed(2)}
               </Text>
             </View>
           </View>

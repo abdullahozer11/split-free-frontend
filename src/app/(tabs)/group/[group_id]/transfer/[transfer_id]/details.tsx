@@ -2,7 +2,7 @@ import { View, SafeAreaView } from "react-native";
 import { Text } from "@/src/components/Translated";
 import React from "react";
 import { useLocalSearchParams } from "expo-router";
-import CollapsableHeader from "@/src/components/CollapsableHeader";
+import CollapsibleHeader from "@/src/components/CollapsibleHeader";
 import { useTransfer } from "@/src/api/transfers";
 import { ActivityIndicator } from "react-native-paper";
 import { formatDateString } from "@/src/utils/helpers";
@@ -40,7 +40,9 @@ const TransferDetailsScreen = () => {
   const { group_id: groupIdString, transfer_id: transferIdString } =
     useLocalSearchParams();
   const id = parseInt(
-    typeof transferIdString === "string" ? transferIdString : transferIdString[0]
+    typeof transferIdString === "string"
+      ? transferIdString
+      : transferIdString[0],
   );
   const { settings } = useSettings();
 
@@ -68,7 +70,7 @@ const TransferDetailsScreen = () => {
 
   return (
     <SafeAreaView className="flex-1">
-      <CollapsableHeader
+      <CollapsibleHeader
         H_MAX_HEIGHT={200}
         H_MIN_HEIGHT={52}
         content={
@@ -96,7 +98,8 @@ const TransferDetailsScreen = () => {
                 Transferred on
               </Text>
               <Text className="text-sm font-200 text-white">
-                {transfer && formatDateString(transfer.created_at, settings.language)}
+                {transfer &&
+                  formatDateString(transfer.created_at, settings.language)}
               </Text>
             </View>
           </View>

@@ -3,14 +3,14 @@ export const groupElementsByDay = (elements, lang) => {
   elements.forEach((activity) => {
     const createdDate = new Date(activity.created_at);
     const frmt = {
-      "en": "en-US",
-      "fr": "fr-FR",
-      "de": "de-DE",
-      "es": "es-ES",
-      "tr": "tr-TR",
-      "gr": "el-GR",
-      "ru": "ru-RU",
-      "it": "it-IT",
+      en: "en-US",
+      fr: "fr-FR",
+      de: "de-DE",
+      es: "es-ES",
+      tr: "tr-TR",
+      gr: "el-GR",
+      ru: "ru-RU",
+      it: "it-IT",
     };
     const dayKey = createdDate.toLocaleDateString(frmt[lang] || "en-US", {
       month: "short",
@@ -127,16 +127,16 @@ export function formatDate(dateObj) {
 
 export function formatDateString(dateString, lang) {
   const date = new Date(dateString);
-  const options = {year: "numeric", month: "long", day: "numeric"};
+  const options = { year: "numeric", month: "long", day: "numeric" };
   const frmt = {
-    "en": "en-US",
-    "fr": "fr-FR",
-    "de": "de-DE",
-    "es": "es-ES",
-    "tr": "tr-TR",
-    "gr": "el-GR",
-    "ru": "ru-RU",
-    "it": "it-IT",
+    en: "en-US",
+    fr: "fr-FR",
+    de: "de-DE",
+    es: "es-ES",
+    tr: "tr-TR",
+    gr: "el-GR",
+    ru: "ru-RU",
+    it: "it-IT",
   };
   return date.toLocaleDateString(frmt[lang] || "en-US", options);
 }
