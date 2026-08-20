@@ -26,7 +26,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { formatDateString } from "@/src/utils/helpers";
 import { useSettings } from "@/src/providers/SettingsProvider";
 
-const Description = ({ text }) => {
+const Description = ({ text }: { text: string }) => {
   return (
     <View className="bg-white rounded-[10px] p-4">
       <Text variant={"labelLarge"} className="underline">
@@ -55,7 +55,7 @@ const ExpenseDetailsScreen = () => {
   const [visible, setVisible] = React.useState(false);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
-  const [amountPerParticipant, setAmountPerParticipant] = useState(0);
+  const [amountPerParticipant, setAmountPerParticipant] = useState("0");
 
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isDialog2Visible, setIsDialog2Visible] = useState(false);
@@ -70,8 +70,9 @@ const ExpenseDetailsScreen = () => {
   const { mutate: settleExpense } = useSettleExpense();
 
   useEffect(() => {
+    const participantCount = expense?.participants?.length || 1;
     setAmountPerParticipant(
-      ((expense?.amount ?? 0) / expense?.participants?.length).toFixed(2),
+      ((expense?.amount ?? 0) / participantCount).toFixed(2),
     );
   }, [expense]);
 
@@ -91,13 +92,18 @@ const ExpenseDetailsScreen = () => {
   // console.log('last modified date is ', formatDateString(expense.last_modified));
 
   const handleDelete = () => {
+    if (expense?.id == null) {
+      return;
+    }
     console.log("deleting expense");
-    deleteExpense(expense?.id, {
+    deleteExpense(expense.id, {
       onSuccess: async () => {
         // console.log("Successfully deleted expense: ", expense.id);
         navigation.goBack();
-        await queryClient.invalidateQueries(["group", group_id]);
-        await queryClient.invalidateQueries(["expenses", group_id]);
+        await queryClient.invalidateQueries({ queryKey: ["group", group_id] });
+        await queryClient.invalidateQueries({
+          queryKey: ["expenses", group_id],
+        });
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -107,17 +113,19 @@ const ExpenseDetailsScreen = () => {
   };
 
   const handleSettle = () => {
+    if (expense?.id == null || expense.group_id == null) {
+      return;
+    }
     settleExpense(
       {
-        id: expense?.id,
-        group_id: expense?.group_id,
-        settled: true,
+        id: expense.id,
+        group_id: expense.group_id,
       },
       {
         onSuccess: async () => {
           setIsDialog2Visible(false);
-          await queryClient.invalidateQueries(["groups"]);
-          await queryClient.invalidateQueries(["debts"]);
+          await queryClient.invalidateQueries({ queryKey: ["groups"] });
+          await queryClient.invalidateQueries({ queryKey: ["debts"] });
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -250,8 +258,9 @@ const ExpenseDetailsScreen = () => {
                 Last modified on
               </Text>
               <Text className="text-sm font-200" style={{ color: "#FFFFFF" }}>
-                {expense &&
-                  formatDateString(expense.last_modified, settings.language)}
+                {expense?.last_modified
+                  ? formatDateString(expense.last_modified, settings.language)
+                  : ""}
               </Text>
             </View>
           </View>
