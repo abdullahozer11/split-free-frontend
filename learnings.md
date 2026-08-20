@@ -1,5 +1,13 @@
 # Learnings
 
+## Local Supabase complete_flow in CI
+
+- `complete_flow` is the product contract (group RPC, expense create/update/delete, debt math, settle). Gate it with `npm run test:supabase` against **local** `supabase start`, never the hosted project. `jest.config.js` must not inject `EXPO_PUBLIC_SUPABASE_*` hosted defaults.
+- `create_group` requires `currency_input`. `create_expense` does not take `currency_input` (dropped in the efficiency migration); extra RPC args yield `PGRST202`.
+- `auth.getSession()` returns `{ session: null }`, not `data: null`. `deleteuser` does not clear the client session; assert a later password sign-in fails.
+- Look up members by `name`, not array index. `config.toml` seed path must exist (`supabase/seed.sql`) or `supabase start` / `db reset` fails.
+- `handle_new_user()` existed in the dumped schema without a trigger on `auth.users`. Local sign-up then skips `public.profiles` and `create_group` fails with `public_groups_owner_fkey`. Attach `on_auth_user_created`.
+
 ## CI typecheck scope
 
 - Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and helpers (implicit `any`, untyped Paper wrappers). Do not gate PRs on `tsconfig.json` until those files are typed.

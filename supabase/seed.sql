@@ -1,0 +1,1 @@
+-- No seed rows. Integration tests create their own users, groups, and expenses.

@@ -13,6 +13,7 @@ module.exports = defineConfig([
       "**/*.(test|spec).[jt]s?(x)",
       "jest.setup.js",
       "jest.config.js",
+      "jest.supabase.config.js",
     ],
   },
   {
@@ -45,6 +46,7 @@ module.exports = defineConfig([
       "metro.config.js",
       "tailwind.config.js",
       "jest.config.js",
+      "jest.supabase.config.js",
       "jest.setup.js",
       "eslint.config.js",
     ],
