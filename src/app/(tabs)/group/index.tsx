@@ -1,6 +1,6 @@
 import { View, ScrollView } from "react-native";
 import { TextInput, Text } from "@/src/components/Translated";
-import GroupItem from "@/src/components/GroupItem";
+import GroupItem, { type GroupListItem } from "@/src/components/GroupItem";
 import React, { useState, useEffect } from "react";
 import CreateGroupModal from "@/src/modals/CreateGroup";
 import CustomHeader from "@/src/components/CustomHeader";
@@ -15,9 +15,26 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ANCHORED_GROUPS_STORAGE_KEY = "anchoredGroupIds";
 
+type GroupSection = {
+  title: string;
+  data: GroupListItem[];
+};
+
+const parseAnchoredGroupIds = (value: string): number[] => {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed.filter((id): id is number => typeof id === "number");
+  } catch {
+    return [];
+  }
+};
+
 const GroupScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [anchoredGroups, setAnchoredGroups] = useState([]);
+  const [anchoredGroups, setAnchoredGroups] = useState<GroupListItem[]>([]);
   const [searchBarVisible, setSearchBarVisible] = useState(false);
   const [queryKey, setQueryKey] = useState("");
   const {
@@ -38,8 +55,7 @@ const GroupScreen = () => {
           ANCHORED_GROUPS_STORAGE_KEY,
         );
         if (anchoredGroupIdsJson) {
-          const anchoredGroupIds = JSON.parse(anchoredGroupIdsJson);
-          // Wait for groups to be loaded before setting anchored groups
+          const anchoredGroupIds = parseAnchoredGroupIds(anchoredGroupIdsJson);
           if (groups) {
             const anchoredGroupsData = groups
               .filter((group) => anchoredGroupIds.includes(group.id))
@@ -74,8 +90,7 @@ const GroupScreen = () => {
     setIsModalVisible(false);
   };
 
-  // Save anchored group IDs to AsyncStorage
-  const saveAnchoredGroupIds = async (groupIds) => {
+  const saveAnchoredGroupIds = async (groupIds: number[]) => {
     try {
       await AsyncStorage.setItem(
         ANCHORED_GROUPS_STORAGE_KEY,
@@ -86,12 +101,10 @@ const GroupScreen = () => {
     }
   };
 
-  const handleAnchor = (group, anchored) => {
-    // Update the group's anchored state
+  const handleAnchor = (group: GroupListItem, anchored: boolean) => {
     const updatedGroup = { ...group, anchored };
 
-    // Update anchored groups state
-    let updatedAnchoredGroups;
+    let updatedAnchoredGroups: GroupListItem[];
     if (anchored) {
       updatedAnchoredGroups = [...anchoredGroups, updatedGroup];
     } else {
@@ -100,12 +113,11 @@ const GroupScreen = () => {
 
     setAnchoredGroups(updatedAnchoredGroups);
 
-    // Save the updated anchored group IDs to AsyncStorage
     const anchoredGroupIds = updatedAnchoredGroups.map((g) => g.id);
     saveAnchoredGroupIds(anchoredGroupIds);
   };
 
-  const matchesQuery = (group) =>
+  const matchesQuery = (group: GroupListItem) =>
     group.title.toLowerCase().includes(queryKey.toLowerCase());
 
   const filteredGroups = groups?.filter(matchesQuery) ?? [];
@@ -114,7 +126,7 @@ const GroupScreen = () => {
     (g) => !anchoredGroups.some((ag) => ag.id === g.id),
   );
 
-  const sections = [];
+  const sections: GroupSection[] = [];
   if (filteredAnchoredGroups.length > 0) {
     sections.push({ title: "Quick Access", data: filteredAnchoredGroups });
   }

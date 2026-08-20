@@ -11,19 +11,26 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/src/lib/supabase";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { useQueryClient } from "@tanstack/react-query"; // Add if using React Query
+import { useQueryClient } from "@tanstack/react-query";
+import type { Database } from "@/src/database.types";
+
+type UnboundMember =
+  Database["public"]["Functions"]["get_unbound_members_for_token"]["Returns"][number];
+
+const unknownErrorMessage = (err: unknown) =>
+  err instanceof Error ? err.message : String(err);
 
 const JoinScreen = () => {
-  const params = useLocalSearchParams<{ token: string }>(); // Get params as object to avoid destructuring issues
+  const params = useLocalSearchParams<{ token: string }>();
   const token = params?.token;
   const router = useRouter();
-  const { session } = useAuth(); // Get current user session
-  const queryClient = useQueryClient(); // Optional: For invalidating queries
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(true);
   const [showSelection, setShowSelection] = useState(false);
-  const [unboundMembers, setUnboundMembers] = useState([]);
+  const [unboundMembers, setUnboundMembers] = useState<UnboundMember[]>([]);
   const [newName, setNewName] = useState("");
-  const [groupId, setGroupId] = useState(null); // Store groupId for later use
+  const [groupId, setGroupId] = useState<number | null>(null);
 
   useEffect(() => {
     console.log("useEffect triggered with token:", token);
@@ -31,37 +38,35 @@ const JoinScreen = () => {
     if (!token) {
       Alert.alert("Error", "Invalid invite link.");
       setLoading(false);
-      router.replace("/(tabs)"); // Navigate to home tabs
+      router.replace("/(tabs)/group");
       return;
     }
 
     handleFetchUnbound(token);
   }, [token, session]);
 
-  const handleFetchUnbound = async (token: string) => {
-    console.log("Entering handleFetchUnbound with token:", token);
+  const handleFetchUnbound = async (inviteToken: string) => {
+    console.log("Entering handleFetchUnbound with token:", inviteToken);
     console.log("Current session:", session);
     setLoading(true);
 
     // Check if authenticated and user exists
     if (!session || !session.user) {
       console.log("No session or user, redirecting to sign-in");
-      // Not logged in: Redirect to login screen, pass pending token via params
       router.push({
         pathname: "/(auth)/sign-in",
-        params: { pendingToken: token },
+        params: { pendingToken: inviteToken },
       });
       setLoading(false);
       return;
     }
 
     try {
-      console.log("Fetching invite for token:", token);
-      // First, fetch the group_id from the invite token
+      console.log("Fetching invite for token:", inviteToken);
       const { data: invite, error: inviteError } = await supabase
         .from("invite_tokens")
         .select("group_id")
-        .eq("token", token)
+        .eq("token", inviteToken)
         .single();
 
       console.log("Invite data:", invite, "Invite error:", inviteError);
@@ -79,7 +84,6 @@ const JoinScreen = () => {
         "in group:",
         fetchedGroupId,
       );
-      // Check if the user is already a member of this group
       const { data: existingMember, error: memberError } = await supabase
         .from("members")
         .select("id")
@@ -96,7 +100,6 @@ const JoinScreen = () => {
       );
 
       if (memberError && memberError?.code !== "PGRST116") {
-        // Ignore 'no rows' error
         throw new Error(memberError?.message || "Error checking membership.");
       }
 
@@ -106,16 +109,17 @@ const JoinScreen = () => {
           "Existing member found, navigating to group:",
           fetchedGroupId,
         );
-        console.log("Navigation path:", `/(tabs)/group/${fetchedGroupId}`);
-        router.replace(`/(tabs)/group/`);
+        router.replace({
+          pathname: "/(tabs)/group/[group_id]/details",
+          params: { group_id: fetchedGroupId },
+        });
         return;
       }
 
-      console.log("Fetching unbound members for token:", token);
-      // Fetch unbound members via RPC
+      console.log("Fetching unbound members for token:", inviteToken);
       const { data: unbound, error: unboundError } = await supabase.rpc(
         "get_unbound_members_for_token",
-        { p_token: token },
+        { p_token: inviteToken },
       );
 
       console.log(
@@ -137,8 +141,8 @@ const JoinScreen = () => {
       setShowSelection(true);
     } catch (error) {
       console.log("Error in handleFetchUnbound:", error);
-      Alert.alert("Error", error.message);
-      router.replace("/(tabs)"); // Home tabs
+      Alert.alert("Error", unknownErrorMessage(error));
+      router.replace("/(tabs)/group");
     } finally {
       setLoading(false);
     }
@@ -151,6 +155,10 @@ const JoinScreen = () => {
       "groupId:",
       groupId,
     );
+    if (!token) {
+      Alert.alert("Error", "Invalid invite link.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -165,21 +173,22 @@ const JoinScreen = () => {
         throw new Error(error.message || "Error binding to member.");
       }
 
-      // Use the stored groupId
       if (!groupId) {
         throw new Error("Group ID not available.");
       }
 
-      // Invalidate queries
-      await queryClient.invalidateQueries(["groups"]);
-      await queryClient.invalidateQueries(["members", groupId]);
+      await queryClient.invalidateQueries({ queryKey: ["groups"] });
+      await queryClient.invalidateQueries({ queryKey: ["members", groupId] });
 
       Alert.alert("Success", "Successfully joined the group!");
       console.log("Navigating after bind to group:", groupId);
-      router.replace(`/(tabs)/group/${groupId}`);
+      router.replace({
+        pathname: "/(tabs)/group/[group_id]/details",
+        params: { group_id: groupId },
+      });
     } catch (error) {
       console.log("Error in handleBind:", error);
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", unknownErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -194,6 +203,10 @@ const JoinScreen = () => {
     );
     if (!newName.trim()) {
       Alert.alert("Error", "Please enter a name.");
+      return;
+    }
+    if (!token) {
+      Alert.alert("Error", "Invalid invite link.");
       return;
     }
 
@@ -211,21 +224,22 @@ const JoinScreen = () => {
         throw new Error(error.message || "Error creating new member.");
       }
 
-      // Use the stored groupId
       if (!groupId) {
         throw new Error("Group ID not available.");
       }
 
-      // Invalidate queries
-      await queryClient.invalidateQueries(["groups"]);
-      await queryClient.invalidateQueries(["members", groupId]);
+      await queryClient.invalidateQueries({ queryKey: ["groups"] });
+      await queryClient.invalidateQueries({ queryKey: ["members", groupId] });
 
       Alert.alert("Success", "Successfully joined the group!");
       console.log("Navigating after create to group:", groupId);
-      router.replace(`/(tabs)/group/${groupId}`);
+      router.replace({
+        pathname: "/(tabs)/group/[group_id]/details",
+        params: { group_id: groupId },
+      });
     } catch (error) {
       console.log("Error in handleCreate:", error);
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", unknownErrorMessage(error));
     } finally {
       setLoading(false);
     }
