@@ -38,3 +38,9 @@
 - NativeWind v2 (`nativewind/babel` as a plugin, no CSS file) does not work on SDK 54. The working path is NativeWind **v4.2.x** + Tailwind **3.4.17**, Metro `withNativeWind`, `global.css` imported from `src/app/_layout.tsx`, and `react-native-reanimated` **v4** plus `react-native-worklets`.
 - Expo Router 6 depends on React Navigation **7**. Leaving `@react-navigation/native` at v6 as a direct dependency can hoist the wrong version.
 - SDK 54 minimum Node is **20.19.4**. New Architecture is the default; JSC is gone.
+
+## Paper Text on dark headers
+
+- `react-native-paper` `Text` sets `color` from `theme.colors.onSurface` (dark in the light theme). NativeWind `className="text-white"` on the `Translated` wrapper does not override that style.
+- On black collapsible headers, pass `style={{ color: "#FFFFFF" }}` so the title stays readable.
+- `CollapsibleHeader` used `p-10` plus `overflow-hidden`. That padding consumed most of the min height and clipped the group name; keep padding in the header content and pin the title with `flex-1 justify-end` so collapse shrinks the spacer, not the title.
