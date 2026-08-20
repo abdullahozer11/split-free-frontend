@@ -3,6 +3,17 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import type { Database } from "@/src/database.types";
 
 type UpdateGroupArgs = Database["public"]["Functions"]["update_group"]["Args"];
+type CreateGroupArgs = Database["public"]["Functions"]["create_group"]["Args"];
+type ExitGroupArgs = Database["public"]["Functions"]["exit_group"]["Args"];
+
+type InsertGroupInput = {
+  member_names: CreateGroupArgs["member_names_input"];
+  title: CreateGroupArgs["title_input"];
+  currency: CreateGroupArgs["currency_input"];
+};
+
+const unknownErrorMessage = (err: unknown) =>
+  err instanceof Error ? err.message : String(err);
 
 export const useGroupList = () => {
   return useQuery({
@@ -46,11 +57,14 @@ export const useGroupList = () => {
         // console.log('useGroupList success', data);
         return data;
       } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
         console.error("useGroupList unexpected error:", {
-          message: err.message,
-          stack: err.stack,
+          message: error.message,
+          stack: error.stack,
         });
-        throw new Error(`Unexpected error fetching groups: ${err.message}`);
+        throw new Error(
+          `Unexpected error fetching groups: ${unknownErrorMessage(err)}`,
+        );
       }
     },
   });
@@ -78,7 +92,7 @@ export const useGroup = (id: number) => {
 
 export const useDeleteGroup = () => {
   return useMutation({
-    async mutationFn(id) {
+    async mutationFn(id: number) {
       const { error } = await supabase.from("groups").delete().eq("id", id);
       if (error) {
         console.error("useDeleteGroup error:", error);
@@ -92,7 +106,7 @@ export const useDeleteGroup = () => {
 
 export const useInsertGroup = () => {
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(data: InsertGroupInput) {
       const { data: newGroupID, error } = await supabase.rpc("create_group", {
         member_names_input: data.member_names,
         title_input: data.title,
@@ -122,7 +136,7 @@ export const useUpdateGroup = () => {
 
 export const useSettleGroup = () => {
   return useMutation({
-    async mutationFn(id) {
+    async mutationFn(id: number) {
       const { error } = await supabase.rpc("settle_group", { _id: id });
       if (error) {
         console.error("useSettleGroup error: ", error.message);
@@ -136,7 +150,7 @@ export const useSettleGroup = () => {
 
 export const useExitGroup = () => {
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(data: ExitGroupArgs) {
       const { error } = await supabase.rpc("exit_group", data);
       if (error) {
         console.error("useExitGroup error:", error);

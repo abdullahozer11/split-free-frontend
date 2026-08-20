@@ -1,5 +1,11 @@
 # Learnings
 
+## CI typecheck scope
+
+- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and helpers (implicit `any`, untyped Paper wrappers). Do not gate PRs on `tsconfig.json` until those files are typed.
+- `npm run typecheck` uses `tsconfig.typecheck.json` for `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, and `expenseFormDefaults`. Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- GitHub Actions Node must match `engines.node` (`>=20.19.4`). Pin via `.nvmrc` (`20.19.4`), not `node-version: 20`.
+
 ## Supabase agent skills
 
 - Installed at project scope with `npx skills add supabase/agent-skills --skill '*' -a grok -a gemini-cli -y`.

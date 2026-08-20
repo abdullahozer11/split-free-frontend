@@ -61,7 +61,7 @@ export const useProfileMember = (profileId: string, groupId: number) => {
 
 export const useUpdateMemberName = () => {
   return useMutation({
-    async mutationFn({ name, member_id }) {
+    async mutationFn({ name, member_id }: { name: string; member_id: number }) {
       const { error } = await supabase
         .from("members")
         .update({ name })
@@ -79,7 +79,7 @@ export const useUpdateMemberName = () => {
 
 export const useInsertMember = () => {
   return useMutation({
-    async mutationFn({ name, group_id }) {
+    async mutationFn({ name, group_id }: { name: string; group_id: number }) {
       const { error } = await supabase
         .from("members")
         .insert({ name, group_id });
@@ -94,7 +94,7 @@ export const useInsertMember = () => {
 
 export const useDeleteMember = () => {
   return useMutation({
-    async mutationFn(memberId) {
+    async mutationFn(memberId: number) {
       const { error } = await supabase
         .from("members")
         .delete()
