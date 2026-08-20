@@ -18,13 +18,17 @@ export default function UpdateProfile() {
   const { mutate: updateProfile } = useUpdateProfile();
 
   const { setSession, session } = useAuth();
-  const { data: profile, isLoading, isError } = useProfile(session?.user.id);
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useProfile(session?.user.id ?? "");
 
   useEffect(() => {
-    setFullName(profile?.full_name);
-    setWebsite(profile?.website);
-    setPhoneNumber(profile?.phone_number);
-    setImage(profile?.avatar_url);
+    setFullName(profile?.full_name ?? "");
+    setWebsite(profile?.website ?? "");
+    setPhoneNumber(profile?.phone_number ?? "");
+    setImage(profile?.avatar_url ?? "");
   }, [profile]);
 
   if (isLoading) {
@@ -37,9 +41,12 @@ export default function UpdateProfile() {
   }
 
   const handleSubmit = () => {
+    if (!profile?.id) {
+      return;
+    }
     updateProfile(
       {
-        id: profile?.id,
+        id: profile.id,
         full_name: fullName,
         website: website,
         phone_number: phoneNumber,
@@ -48,7 +55,7 @@ export default function UpdateProfile() {
       {
         onSuccess: async () => {
           navigation.goBack();
-          await queryClient.invalidateQueries(["profile"]);
+          await queryClient.invalidateQueries({ queryKey: ["profile"] });
         },
         onError: (error) => {
           console.error("Server error:", error);

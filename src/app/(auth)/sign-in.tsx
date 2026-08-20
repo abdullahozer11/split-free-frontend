@@ -43,7 +43,7 @@ const SignInScreen = () => {
   };
 
   async function debugSupabaseAuth() {
-    supabaseUrl = "http://192.168.1.151:54321";
+    const supabaseUrl = "http://192.168.1.151:54321";
     const authUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`; // Use your supabaseUrl var
     console.log("Debug: Attempting fetch to", authUrl);
     console.log("Debug: With email:", email); // Avoid logging password
@@ -77,11 +77,16 @@ const SignInScreen = () => {
         console.log("Debug: Parsed JSON:", JSON.stringify(json, null, 2));
         // If successful, handle session here
       } catch (parseErr) {
-        console.error("Debug: JSON parse failed:", parseErr.message);
+        console.error(
+          "Debug: JSON parse failed:",
+          parseErr instanceof Error ? parseErr.message : String(parseErr),
+        );
       }
     } catch (fetchErr) {
-      console.error("Debug: Fetch error:", fetchErr.name, fetchErr.message);
-      console.error("Debug: Full fetch error stack:", fetchErr.stack);
+      const err =
+        fetchErr instanceof Error ? fetchErr : new Error(String(fetchErr));
+      console.error("Debug: Fetch error:", err.name, err.message);
+      console.error("Debug: Full fetch error stack:", err.stack);
     }
   }
 

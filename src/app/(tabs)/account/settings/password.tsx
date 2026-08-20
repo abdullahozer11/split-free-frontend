@@ -90,7 +90,7 @@ const Password = () => {
     setLoading(true);
     // check if old password is correct
     const { error } = await supabase.auth.signInWithPassword({
-      email: session?.user.email,
+      email: session?.user.email ?? "",
       password: oldPassword,
     });
     if (error) {

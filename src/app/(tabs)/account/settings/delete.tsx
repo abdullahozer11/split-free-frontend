@@ -5,8 +5,8 @@ import React, { useState } from "react";
 import { useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { supabase } from "@/src/lib/supabase.ts";
-import { useAuth } from "@/src/providers/AuthProvider.tsx";
+import { supabase } from "@/src/lib/supabase";
+import { useAuth } from "@/src/providers/AuthProvider";
 
 const Delete = () => {
   const navigation = useNavigation();

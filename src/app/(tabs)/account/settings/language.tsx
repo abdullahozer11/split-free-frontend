@@ -10,11 +10,12 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { useProfile, useUpdateProfileSingleField } from "@/src/api/profiles";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSettings } from "@/src/providers/SettingsProvider";
+import { isLanguage, type Language } from "@/src/translations";
 
 const Languages = () => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
-  const [language, setLanguage] = useState(null);
+  const [language, setLanguage] = useState<Language | null>(null);
   const [isFocus, setIsFocus] = useState(false);
   const { settings, updateSettings } = useSettings();
 
@@ -30,13 +31,17 @@ const Languages = () => {
   ];
 
   const { setSession, session } = useAuth();
-  const { data: profile, isLoading, isError } = useProfile(session?.user.id);
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useProfile(session?.user.id ?? "");
 
   const { mutate: updateProfileSF } = useUpdateProfileSingleField();
 
   useEffect(() => {
     // Initialize language from profile data
-    if (profile?.language) {
+    if (isLanguage(profile?.language)) {
       setLanguage(profile.language);
       // Update settings context if profile language is different
       if (settings.language !== profile.language) {
@@ -60,7 +65,10 @@ const Languages = () => {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const handleValueChange = (newValue) => {
+  const handleValueChange = (newValue: Language) => {
+    if (!profile?.id) {
+      return;
+    }
     const lanTemp = language;
     setIsFocus(false);
     setLanguage(newValue);
@@ -74,13 +82,13 @@ const Languages = () => {
     // Update profile in database
     updateProfileSF(
       {
-        id: profile?.id,
+        id: profile.id,
         field: "language",
         value: newValue,
       },
       {
         onSuccess: async () => {
-          await queryClient.invalidateQueries(["profile"]);
+          await queryClient.invalidateQueries({ queryKey: ["profile"] });
         },
         onError: (error) => {
           // Revert both local state and settings on error
@@ -123,7 +131,9 @@ const Languages = () => {
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={(item) => {
-            handleValueChange(item.value);
+            if (isLanguage(item.value)) {
+              handleValueChange(item.value);
+            }
           }}
           renderLeftIcon={() => (
             <Feather name="globe" size={20} color="black" />

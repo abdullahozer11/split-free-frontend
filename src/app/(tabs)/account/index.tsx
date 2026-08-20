@@ -1,26 +1,27 @@
 import { View, Image, Pressable, TouchableOpacity } from "react-native";
-import { Text } from "@/src/components/Translated";
-import React from "react";
+import { Text, useTranslations } from "@/src/components/Translated";
+import React, { type ComponentProps } from "react";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useProfile } from "@/src/api/profiles";
 import { ActivityIndicator } from "react-native-paper";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider";
 
-const Card = ({ iconName, title, page }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+type AccountCardProps = {
+  iconName: ComponentProps<typeof Feather>["name"];
+  title: string;
+  page: "profile" | "settings";
+};
+
+const Card = ({ iconName, title, page }: AccountCardProps) => {
+  const { t } = useTranslations();
   return (
     <Link href={`/(tabs)/account/${page}`} asChild>
       <Pressable className="flex-1 mx-1 rounded-md border-2 border-gray-400 items-center bg-white justify-between py-5">
         <View />
         <Feather name={iconName} size={24} color="black" />
-        <Text className="text-lg font-semibold text-black">
-          {int[title] || title}
-        </Text>
+        <Text className="text-lg font-semibold text-black">{t(title)}</Text>
       </Pressable>
     </Link>
   );
@@ -29,7 +30,11 @@ const Card = ({ iconName, title, page }) => {
 const AccountScreen = () => {
   const navigation = useNavigation();
   const { setSession, session } = useAuth();
-  const { data: profile, isLoading, isError } = useProfile(session?.user.id);
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useProfile(session?.user.id ?? "");
 
   if (isLoading) {
     return <ActivityIndicator />;
@@ -65,7 +70,7 @@ const AccountScreen = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {profile.full_name}
+            {profile?.full_name}
           </Text>
           <Text
             className="text-md font-light"
@@ -73,7 +78,7 @@ const AccountScreen = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {profile.email}
+            {profile?.email}
           </Text>
         </View>
       </View>

@@ -15,13 +15,17 @@ const Notifications = () => {
   const [mobilePopups, setMobilePopups] = useState(false);
 
   const { session, setSession } = useAuth();
-  const { data: profile, isLoading, isError } = useProfile(session?.user.id);
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useProfile(session?.user.id ?? "");
 
   const { mutate: updateProfileSF } = useUpdateProfileSingleField();
 
   useEffect(() => {
-    setEmailNotifications(profile?.receive_emails);
-    setMobilePopups(profile?.receive_popups);
+    setEmailNotifications(profile?.receive_emails ?? false);
+    setMobilePopups(profile?.receive_popups ?? false);
   }, [profile]);
 
   if (isLoading) {
@@ -34,11 +38,14 @@ const Notifications = () => {
   }
 
   const handleEmailNotifChange = () => {
+    if (!profile?.id) {
+      return;
+    }
     const newValueTemp = !emailNotifications;
     setEmailNotifications(newValueTemp);
     updateProfileSF(
       {
-        id: profile?.id,
+        id: profile.id,
         field: "receive_emails",
         value: !emailNotifications,
       },
@@ -54,11 +61,14 @@ const Notifications = () => {
   };
 
   const handlePopupChange = () => {
+    if (!profile?.id) {
+      return;
+    }
     const newValueTemp = !mobilePopups;
     setMobilePopups(newValueTemp);
     updateProfileSF(
       {
-        id: profile?.id,
+        id: profile.id,
         field: "receive_popups",
         value: newValueTemp,
       },
