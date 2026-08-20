@@ -105,22 +105,25 @@ const GroupScreen = () => {
     saveAnchoredGroupIds(anchoredGroupIds);
   };
 
-  // Filter groups based on queryKey
-  const filteredGroups = groups?.filter((group) =>
-    group.title.toLowerCase().includes(queryKey.toLowerCase()),
+  const matchesQuery = (group) =>
+    group.title.toLowerCase().includes(queryKey.toLowerCase());
+
+  const filteredGroups = groups?.filter(matchesQuery) ?? [];
+  const filteredAnchoredGroups = anchoredGroups.filter(matchesQuery);
+  const otherGroups = filteredGroups.filter(
+    (g) => !anchoredGroups.some((ag) => ag.id === g.id),
   );
 
-  // Define sections for SectionList
   const sections = [];
-  if (anchoredGroups.length > 0) {
-    sections.push({ title: "Quick Access", data: anchoredGroups });
+  if (filteredAnchoredGroups.length > 0) {
+    sections.push({ title: "Quick Access", data: filteredAnchoredGroups });
   }
-  sections.push({
-    title: anchoredGroups.length > 0 ? "Other Groups" : "All Groups",
-    data: filteredGroups.filter(
-      (g) => !anchoredGroups.some((ag) => ag.id === g.id),
-    ),
-  });
+  if (otherGroups.length > 0) {
+    sections.push({
+      title: filteredAnchoredGroups.length > 0 ? "Other Groups" : "All Groups",
+      data: otherGroups,
+    });
+  }
 
   return (
     <View className={"flex-1"}>
