@@ -1,5 +1,8 @@
 import { supabase } from "@/src/lib/supabase";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import type { Database } from "@/src/database.types";
+
+type UpdateGroupArgs = Database["public"]["Functions"]["update_group"]["Args"];
 
 export const useGroupList = () => {
   return useQuery({
@@ -107,7 +110,7 @@ export const useInsertGroup = () => {
 
 export const useUpdateGroup = () => {
   return useMutation({
-    async mutationFn(newGroup) {
+    async mutationFn(newGroup: UpdateGroupArgs) {
       const { error } = await supabase.rpc("update_group", newGroup);
       if (error) {
         console.error("useUpdateGroup error:", error);

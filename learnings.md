@@ -15,6 +15,12 @@
 - Skip subscribe when filter ids are missing (`session?.user.id`, `group_id`).
 - TanStack Query v5 invalidation is `invalidateQueries({ queryKey })`, not `invalidateQueries(["key"])`.
 
+## update_group RPC signature (PGRST202)
+
+- PostgREST matches RPCs by **named argument set**, not by function name alone. Omitting a required arg yields `PGRST202` ("Could not find the function … in the schema cache") even when the function exists. The `hint` lists the names it *does* know, alphabetically.
+- Hosted `public.update_group` requires `currency_input` (plus `description_input`, `group_id_input`, `member_names_input`, `title_input`). `create_group` already takes `currency_input`; groups store `currency`. The update screen must send the current currency even if the UI does not edit it.
+- `CREATE OR REPLACE FUNCTION` cannot add an argument. Drop every `public.update_group` overload, then create the five-argument function, re-grant `EXECUTE`, and `NOTIFY pgrst, 'reload schema'`.
+
 ## group_invitations Data API exposure
 
 - `PGRST205` ("Could not find the table 'public.group_invitations' in the schema cache") is a PostgREST schema-cache miss, not an RLS empty result. The hosted project still had `groups` / `invite_tokens` / `friend_requests` on the Data API while `group_invitations` did not.

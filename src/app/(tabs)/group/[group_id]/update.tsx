@@ -87,6 +87,7 @@ const UpdateGroup = () => {
         title_input: title,
         description_input: description ?? "",
         member_names_input: namesOnly,
+        currency_input: existingGroup.currency ?? "EUR",
       },
       {
         onSuccess: async () => {
