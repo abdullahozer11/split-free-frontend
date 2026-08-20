@@ -725,6 +725,7 @@ export type Database = {
       }
       update_group: {
         Args: {
+          currency_input: string
           description_input: string
           group_id_input: number
           member_names_input: string[]
