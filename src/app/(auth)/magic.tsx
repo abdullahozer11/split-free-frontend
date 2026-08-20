@@ -2,6 +2,7 @@ import { Image, View } from "react-native";
 import { TextInput } from "@/src/components/Translated";
 import React, { useState, useEffect } from "react";
 import Button from "@/src/components/Button";
+import KeyboardAvoidingScreen from "@/src/components/KeyboardAvoidingScreen";
 import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
 import { makeRedirectUri } from "expo-auth-session";
@@ -47,7 +48,7 @@ const MagicScreen = () => {
   };
 
   return (
-    <View className="flex-1 justify-center p-5 bg-white">
+    <KeyboardAvoidingScreen>
       <StackScreen options={{ title: "Magic Link" }} />
       <Image
         source={require("@/assets/images/logo.png")}
@@ -72,7 +73,7 @@ const MagicScreen = () => {
               : buttonText
         }
       />
-    </View>
+    </KeyboardAvoidingScreen>
   );
 };
 

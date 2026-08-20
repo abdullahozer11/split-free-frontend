@@ -5,6 +5,7 @@ import { supabase } from "@/src/lib/supabase";
 import { ActivityIndicator } from "react-native-paper";
 import { TextInput } from "@/src/components/Translated";
 import Button from "@/src/components/Button";
+import KeyboardAvoidingScreen from "@/src/components/KeyboardAvoidingScreen";
 import { useNavigation } from "expo-router";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { Feather } from "@expo/vector-icons";
@@ -117,12 +118,16 @@ const Password = () => {
   };
 
   return (
-    <View className="p-4 bg-white flex-1 justify-center">
-      <View className="absolute top-12 left-0 right-0 h-16 justify-center px-4">
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="arrow-left" size={44} />
-        </TouchableOpacity>
-      </View>
+    <KeyboardAvoidingScreen
+      contentContainerClassName="flex-grow justify-center p-4"
+      header={
+        <View className="absolute top-12 left-0 right-0 z-10 h-16 justify-center px-4">
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Feather name="arrow-left" size={44} />
+          </TouchableOpacity>
+        </View>
+      }
+    >
       <View className="flex items-center justify-center">
         <Image
           source={require("@/assets/images/logo.png")}
@@ -186,7 +191,7 @@ const Password = () => {
           className="w-full bg-blue-500 text-white font-bold py-3 rounded-md mt-4 bg-black"
         />
       </View>
-    </View>
+    </KeyboardAvoidingScreen>
   );
 };
 

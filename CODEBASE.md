@@ -75,7 +75,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │   │       ├── friend.tsx         # Direct friendship/debts navigation screen
 │   │       ├── account/           # Profile changes, password updates, settings, language
 │   │       └── group/             # Dynamic routes and screens for group details, expenses, and stats
-│   ├── components/                # Reusable, modular UI components styled with NativeWind
+│   ├── components/                # Reusable UI (NativeWind); KeyboardAvoidingScreen for centered forms
 │   ├── constants/                 # Static configuration files, styling constants, and core theme colors
 │   ├── lib/                       # Client initializations (Supabase clients, realtime channel names, SecureStore adapters)
 │   │   ├── supabase.ts            # Typed supabase-js client and Expo SecureStore auth adapter
@@ -109,6 +109,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
   - `SettingsProvider.js`: Exposes user locale, app themes, and persist settings to `AsyncStorage`.
   - `QueryProvider.tsx`: Configures React Query query client and caching strategies.
 - **`src/components/Translated.tsx` (Localization System):** High-level wrapped React Native Paper components that dynamically query localization indices in `src/translations/index.js` to translate text automatically depending on selected active language context.
+- **`src/components/KeyboardAvoidingScreen.tsx`:** Shared `KeyboardAvoidingView` + `ScrollView` wrapper used by centered auth (and change-password) forms so focused inputs stay above the software keyboard.
 
 ---
 

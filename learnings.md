@@ -1,5 +1,12 @@
 # Learnings
 
+## Auth forms and the software keyboard (Expo SDK 54)
+
+- Centered `flex-1 justify-center` auth screens do not move when the keyboard opens. SDK 54 Android is edge-to-edge, so `adjustResize` no longer shrinks the window (it behaves like `adjustNothing`). iOS overlays the keyboard unless the view adds padding.
+- Use `KeyboardAvoidingView` (`padding` on iOS, `height` on Android) plus a `ScrollView` with `flexGrow` + `justifyContent: "center"`. Offset iOS by `useHeaderHeight()`. Do not add `react-native-keyboard-controller` unless the app is on a custom dev client again; Expo Go cannot load it.
+- `softwareKeyboardLayoutMode: "pan"` is for tab screens that get pushed above the keyboard. Leave the default on auth (no tabs).
+
+
 ## Dependabot npm alerts on Expo SDK 54
 
 - `npm audit fix --force` wants Expo 57. Stay on SDK 54 and pin patched transitives with `package.json` `overrides`.
