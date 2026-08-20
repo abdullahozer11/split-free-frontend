@@ -33,8 +33,9 @@
 
 ## CI typecheck scope
 
-- Full-app `tsc --noEmit` still fails on loosely typed `src/app` screens. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
-- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `expense_categories`, `helpers`, providers, the translation catalog, typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`), shared UI (`GroupItem`, `ExpenseItem`, `TransferItem`, `Person`, dropdowns, headers), `ExpenseForm`, and group create modals. Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Full-app `tsc --noEmit` still fails on loosely typed group, friends, and join screens. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
+- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `expense_categories`, `helpers`, providers, the translation catalog, typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`), shared UI (`GroupItem`, `ExpenseItem`, `TransferItem`, `Person`, dropdowns, headers), `ExpenseForm`, group create modals, and auth/account/global screens. Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Interval timers need `ReturnType<typeof setInterval>`. Expo Router `href` template strings only typecheck when the page segment is a literal union. Profile `language` is `string | null` in the DB — narrow with `isLanguage` before writing `Settings.language`.
 - `useState([])` infers `never[]`. Give member-name lists an explicit `string[]` bound. RPC optional text args are `string | undefined`, not `null` — omit `proof` / empty `description` instead of passing `null`.
 - Category dropdown `labelField` is an `ExpenseCategory` key. `Language` includes `de` and the catalog does not; map `de` to `en`. Missing catalog keys (`Select a category`) must go through `t()`, not `dictionary[key]`.
 - List-row props should be view models (selected query columns), not full `Tables["…"]["Row"]`. Nested `profile(...)` selects are objects; the members table `profile` column is a UUID.

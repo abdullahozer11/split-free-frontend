@@ -9,7 +9,11 @@ import { ActivityIndicator } from "react-native-paper";
 export default function ProfileScreen() {
   const navigation = useNavigation();
   const { setSession, session } = useAuth();
-  const { data: profile, isLoading, isError } = useProfile(session?.user.id);
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useProfile(session?.user.id ?? "");
 
   if (isLoading) {
     return <ActivityIndicator />;

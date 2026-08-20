@@ -1,16 +1,28 @@
 import { Pressable, View } from "react-native";
-import { Text } from "@/src/components/Translated";
-import React from "react";
+import { Text, useTranslations } from "@/src/components/Translated";
+import React, { type ComponentProps } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { supabase } from "@/src/lib/supabase";
 import { Link, useNavigation } from "expo-router";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider";
 
-const SettingsItem = ({ page, iconName, title, containerColor }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+type SettingsPage =
+  "notifications" | "language" | "faq" | "terms" | "password" | "delete";
+
+type SettingsItemProps = {
+  page: SettingsPage;
+  iconName: ComponentProps<typeof Feather>["name"];
+  title: string;
+  containerColor: string;
+};
+
+const SettingsItem = ({
+  page,
+  iconName,
+  title,
+  containerColor,
+}: SettingsItemProps) => {
+  const { t } = useTranslations();
   return (
     <Link href={`/(tabs)/account/settings/${page}`} asChild>
       <Pressable className="flex-row justify-between items-center p-2">
@@ -21,7 +33,7 @@ const SettingsItem = ({ page, iconName, title, containerColor }) => {
           >
             <Feather name={iconName} size={24} />
           </View>
-          <Text>{int[title] || title}</Text>
+          <Text>{t(title)}</Text>
         </View>
         <Feather name={"chevron-right"} size={28} />
       </Pressable>

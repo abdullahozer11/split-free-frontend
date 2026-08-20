@@ -15,7 +15,7 @@ const ForgotPasswordScreen = () => {
   const router = useRouter();
 
   useEffect(() => {
-    let timer;
+    let timer: ReturnType<typeof setInterval> | undefined;
     if (countdown > 0) {
       timer = setInterval(() => {
         setCountdown((prevCountdown) => prevCountdown - 1);
@@ -23,12 +23,16 @@ const ForgotPasswordScreen = () => {
     } else {
       setButtonText("Send Reset Link");
     }
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
   }, [countdown]);
 
-  const isValidEmail = (email) => {
+  const isValidEmail = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    return emailRegex.test(value);
   };
 
   async function resetPassword() {

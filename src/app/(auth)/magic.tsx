@@ -16,7 +16,7 @@ const MagicScreen = () => {
   const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
-    let timer;
+    let timer: ReturnType<typeof setInterval> | undefined;
     if (countdown > 0) {
       timer = setInterval(() => {
         setCountdown((prevCountdown) => prevCountdown - 1);
@@ -24,7 +24,11 @@ const MagicScreen = () => {
     } else {
       setButtonText("Send Magic Link");
     }
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
   }, [countdown]);
 
   const sendMagicLink = async () => {
