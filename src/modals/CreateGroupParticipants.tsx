@@ -3,7 +3,13 @@ import { TextInput, Text } from "@/src/components/Translated";
 import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 
-const Member = ({ name, onRemove, owner }) => {
+type MemberRowProps = {
+  name: string;
+  onRemove?: () => void;
+  owner?: boolean;
+};
+
+const Member = ({ name, onRemove, owner }: MemberRowProps) => {
   return (
     <View
       className="p-2.5 flex-row items-center rounded-lg bg-white pl-7"
@@ -23,9 +29,21 @@ const Member = ({ name, onRemove, owner }) => {
   );
 };
 
-const Participants = ({ isVisible, onClose, onSubmit, members: membersP }) => {
+type ParticipantsProps = {
+  isVisible: boolean;
+  onClose: () => void;
+  onSubmit: (members: string[]) => void;
+  members: string[];
+};
+
+const Participants = ({
+  isVisible,
+  onClose,
+  onSubmit,
+  members: membersP,
+}: ParticipantsProps) => {
   const [name, setName] = useState("");
-  const [members, setMembers] = useState(membersP);
+  const [members, setMembers] = useState<string[]>(membersP);
   const [error, setError] = useState("");
 
   const addMember = () => {
@@ -36,7 +54,7 @@ const Participants = ({ isVisible, onClose, onSubmit, members: membersP }) => {
     setName("");
   };
 
-  const removeMember = (memberName) => {
+  const removeMember = (memberName: string) => {
     setMembers(members.filter((member) => member !== memberName));
   };
 

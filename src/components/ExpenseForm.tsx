@@ -16,21 +16,56 @@ import {
 } from "react-native";
 import { getFormattedDate, formatDate } from "@/src/utils/helpers";
 import { ActivityIndicator, Avatar } from "react-native-paper";
-import { TextInput, Text } from "@/src/components/Translated";
+import { TextInput, Text, useTranslations } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
 import MyMultiSelect from "@/src/components/MultiSelectComponent";
 import { Feather, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { exp_cats } from "@/src/utils/expense_categories";
-import { supabase } from "@/src/lib/supabase.ts";
-import { translations } from "@/src/translations";
+import {
+  exp_cats,
+  otherCategory,
+  type ExpenseCategory,
+} from "@/src/utils/expense_categories";
+import { supabase } from "@/src/lib/supabase";
 import { useSettings } from "@/src/providers/SettingsProvider";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { resolveExpenseFormDefaults } from "@/src/utils/expenseFormDefaults";
 
-const renderCatItem = (item) => {
+export type UpdatingExpense = {
+  id: number;
+  amount: number | string;
+  date: string | number | Date;
+  payer_ids: number[];
+  participant_ids: number[];
+  title?: string | null;
+  description?: string | null;
+  category?: string | null;
+  group_id?: number;
+};
+
+type ExpenseFormProps = {
+  title: string;
+  groupId: number;
+  updatingExpense?: UpdatingExpense | null;
+};
+
+type ExpenseFormState = {
+  id?: number;
+  title: string;
+  description: string;
+  payers: number[];
+  participants: number[];
+  amount: string;
+  category: string;
+  group_id: number;
+  inputDate: Date;
+};
+
+const renderCatItem = (item: ExpenseCategory) => {
   return (
     <View className={"flex-row h-12 px-2 justify-between items-center"}>
       <Text variant={"titleSmall"}>{item.name}</Text>
@@ -39,42 +74,56 @@ const renderCatItem = (item) => {
   );
 };
 
+const initialFormState = (
+  groupId: number,
+  updatingExpense?: UpdatingExpense | null,
+): ExpenseFormState => {
+  if (!updatingExpense) {
+    return {
+      title: "",
+      description: "",
+      payers: [],
+      participants: [],
+      amount: "0",
+      category: otherCategory.name,
+      group_id: groupId,
+      inputDate: new Date(),
+    };
+  }
+
+  return {
+    id: updatingExpense.id,
+    title: updatingExpense.title ?? "",
+    description: updatingExpense.description ?? "",
+    payers: updatingExpense.payer_ids,
+    participants: updatingExpense.participant_ids,
+    amount: String(updatingExpense.amount),
+    category: updatingExpense.category ?? otherCategory.name,
+    group_id: updatingExpense.group_id ?? groupId,
+    inputDate: new Date(updatingExpense.date),
+  };
+};
+
 export default function ExpenseForm({
   title: headerTitle,
   groupId,
   updatingExpense,
-}) {
+}: ExpenseFormProps) {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const { session, loading: authLoading } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isFocus, setIsFocus] = useState(false);
-  const [isLoading, setLoading] = useState();
+  const [isLoading, setLoading] = useState(false);
   const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+  const { t } = useTranslations();
   const isUpdating = !!updatingExpense;
   const [hasAppliedDefaults, setHasAppliedDefaults] = useState(isUpdating);
+  const categoryLabelField =
+    settings.language === "de" ? "en" : settings.language;
 
-  const [formState, setFormState] = useState(
-    updatingExpense
-      ? {
-          ...updatingExpense,
-          id: updatingExpense.id,
-          amount: updatingExpense.amount.toString(),
-          payers: updatingExpense.payer_ids,
-          participants: updatingExpense.participant_ids,
-          inputDate: new Date(updatingExpense.date),
-        }
-      : {
-          title: "",
-          description: "",
-          payers: [],
-          participants: [],
-          amount: "0",
-          category: "Other",
-          group_id: groupId,
-          inputDate: new Date(),
-        },
+  const [formState, setFormState] = useState<ExpenseFormState>(() =>
+    initialFormState(groupId, updatingExpense),
   );
 
   const { mutate: insertExpense } = useInsertExpense();
@@ -148,11 +197,20 @@ export default function ExpenseForm({
     category,
   } = formState;
 
-  const onDateChange = (event, selectedDate) => {
-    if (event.type === "set") {
-      const date = selectedDate;
+  const handleInputChange = <K extends keyof ExpenseFormState>(
+    fieldName: K,
+    value: ExpenseFormState[K],
+  ) => {
+    setFormState((prevFormState) => ({
+      ...prevFormState,
+      [fieldName]: value,
+    }));
+  };
+
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (event.type === "set" && selectedDate) {
       setShowDatePicker(false);
-      handleInputChange("inputDate", date);
+      handleInputChange("inputDate", selectedDate);
     } else {
       setShowDatePicker(false);
     }
@@ -200,27 +258,33 @@ export default function ExpenseForm({
   };
 
   const onUpdate = async () => {
-    // console.log("Updating expense")
-    // console.log(groupId, "//", title,"//", description,"//", amount,"//", inputDate,"//", payers,"//", participants)
+    if (!updatingExpense) {
+      return;
+    }
     updateExpense(
       {
         id: updatingExpense.id,
-        amount: amount,
+        amount: parseFloat(amount),
         date: formatDate(inputDate),
-        description: description,
+        description: description || undefined,
         category: category,
         participants: participants,
         payers: payers,
-        proof: null,
         title: title,
       },
       {
         onSuccess: async () => {
           console.log("Successfully updated expense");
           navigation.goBack();
-          await queryClient.invalidateQueries(["group", group_id]);
-          await queryClient.invalidateQueries(["expense", updatingExpense.id]);
-          await queryClient.invalidateQueries(["expenses", group_id]);
+          await queryClient.invalidateQueries({
+            queryKey: ["group", group_id],
+          });
+          await queryClient.invalidateQueries({
+            queryKey: ["expense", updatingExpense.id],
+          });
+          await queryClient.invalidateQueries({
+            queryKey: ["expenses", group_id],
+          });
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -231,25 +295,26 @@ export default function ExpenseForm({
   };
 
   const onCreate = async () => {
-    // console.log(groupId, "//", title,"//", description,"//", amount,"//", inputDate,"//", payers,"//", participants)
     insertExpense(
       {
         group_id: groupId,
         title: title,
-        description: description ? description : null,
+        description: description || undefined,
         category: category,
-        amount: amount,
+        amount: parseFloat(amount),
         date: formatDate(inputDate),
-        proof: null,
         payers: payers,
         participants: participants,
       },
       {
         onSuccess: async () => {
-          // console.log("Successfully inserted expense");
           navigation.goBack();
-          await queryClient.invalidateQueries(["group", group_id]);
-          await queryClient.invalidateQueries(["expenses", group_id]);
+          await queryClient.invalidateQueries({
+            queryKey: ["group", group_id],
+          });
+          await queryClient.invalidateQueries({
+            queryKey: ["expenses", group_id],
+          });
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -260,14 +325,12 @@ export default function ExpenseForm({
   };
 
   const handleGenerateCat = async () => {
-    // check if title is not empty
     if (!title) {
       Alert.alert("You must enter a title first");
       return;
     }
 
     setLoading(true);
-    // make a call to the edge function
     const { data, error } = await supabase.functions.invoke("gemini", {
       body: JSON.stringify({ title: title }),
     });
@@ -278,21 +341,16 @@ export default function ExpenseForm({
       Alert.alert("Error", "Server error.");
       return;
     }
-    const exp_cat_names = exp_cats.map((exp_cat) => exp_cat?.name);
-    const newName = data?.name;
-    // console.log("new name is ", newName);
+    const exp_cat_names = exp_cats.map((exp_cat) => exp_cat.name);
+    const newName =
+      data && typeof data === "object" && "name" in data
+        ? String((data as { name?: unknown }).name ?? "")
+        : "";
     if (exp_cat_names.includes(newName)) {
       handleInputChange("category", newName);
     } else {
-      handleInputChange("category", "other");
+      handleInputChange("category", otherCategory.name);
     }
-  };
-
-  const handleInputChange = (fieldName, value) => {
-    setFormState((prevFormState) => ({
-      ...prevFormState,
-      [fieldName]: value,
-    }));
   };
 
   return (
@@ -383,9 +441,6 @@ export default function ExpenseForm({
               source={require("@/assets/images/blank-profile.png")}
             />
             <MyDropdown
-              labelField="name"
-              placeholder={int["Select item"]}
-              valueField="id"
               data={members}
               onChange={(payer) => {
                 handleInputChange("payers", [payer]);
@@ -397,8 +452,8 @@ export default function ExpenseForm({
           <MyMultiSelect
             selected={participants}
             members={members}
-            onChange={(participants) =>
-              handleInputChange("participants", participants)
+            onChange={(nextParticipants) =>
+              handleInputChange("participants", nextParticipants)
             }
           />
           <Text variant={"bodyLarge"}>
@@ -407,9 +462,9 @@ export default function ExpenseForm({
           <View className={"flex-row items-center"} style={{ gap: 8 }}>
             <Dropdown
               data={exp_cats}
-              labelField={settings.language}
+              labelField={categoryLabelField}
               valueField={"name"}
-              placeholder={!isFocus ? int["Select a category"] : "..."}
+              placeholder={!isFocus ? t("Select a category") : "..."}
               onChange={(item) => {
                 handleInputChange("category", item.name);
                 setIsFocus(false);
