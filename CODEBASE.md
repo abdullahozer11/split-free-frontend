@@ -11,7 +11,8 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 /workspaces/split-free-frontend/
 ├── .github/                       # GitHub Actions CI
 │   └── workflows/
-│       └── pr-checks.yml          # Jest, local Supabase flow, typecheck, ESLint, Prettier, typos
+│       ├── pr-checks.yml          # Jest, local Supabase flow, typecheck, ESLint, Prettier, typos
+│       └── preview-apk.yml        # Manual EAS Android preview APK (workflow_dispatch only)
 ├── .nvmrc                         # Node 20.19.4 for local and GitHub Actions jobs
 ├── .agents/                       # Canonical agent skills (Gemini CLI and other universal agents)
 │   └── skills/
@@ -117,4 +118,4 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 4. **Offline Persistence:** Settings, locale configurations, and custom indicators (e.g. anchored group lists) are saved to offline local storage using `@react-native-async-storage/async-storage`.
 5. **Secure Authentication Persistence:** Credentials and session profiles are stored in Expo's standard `SecureStore` using a custom secure adapter `ExpoSecureStoreAdapter` inside `src/lib/supabase.ts` that removes raw metadata properties prior to storage for improved performance and token economy.
 6. **Styling and Theme Integration:** Styling utilizes **NativeWind v4** (Tailwind CSS for React Native, Metro CSS via `global.css`) to ensure responsiveness and standard formatting across Android, iOS, and Web build platforms.
-7. **PR quality gates:** Pull requests targeting `master` must pass Jest (`npm test`), local Supabase complete flow (`npm run test:supabase`), TypeScript (`npm run typecheck` — API/lib/generated types via `tsconfig.typecheck.json`), ESLint (`npm run lint`), Prettier (`npm run format:check`), and `typos`. CI Node is `20.19.4` from `.nvmrc`. Format locally with `npm run format`. Never point `test:supabase` at a hosted project.
+7. **PR quality gates:** Pull requests targeting `master` must pass Jest (`npm test`), local Supabase complete flow (`npm run test:supabase`), TypeScript (`npm run typecheck` — API/lib/generated types via `tsconfig.typecheck.json`), ESLint (`npm run lint`), Prettier (`npm run format:check`), and `typos`. CI Node is `20.19.4` from `.nvmrc`. Format locally with `npm run format`. Never point `test:supabase` at a hosted project. Preview APKs are **not** a PR gate; use the manual **Preview APK** workflow (`workflow_dispatch`).

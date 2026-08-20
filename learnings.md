@@ -1,5 +1,11 @@
 # Learnings
 
+## Preview APK is manual, not a PR check
+
+- Testers need an installable APK rarely. Do not put `eas build` on `pull_request` or `push`. Use `workflow_dispatch` (Actions → Preview APK → Run workflow) so PR CI stays Jest / local Supabase / typecheck / lint.
+- The GitHub job only *triggers* EAS (`--non-interactive --no-wait`). Gradle runs on Expo's builders; Codespaces should not compile Android.
+- `.env` is gitignored, so EAS would not see local env. The workflow copies `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` from GitHub secrets into `eas.json` `build.preview.env` for that run. Also set `EXPO_TOKEN`.
+
 ## Local Supabase complete_flow in CI
 
 - `complete_flow` is the product contract (group RPC, expense create/update/delete, debt math, settle). Gate it with `npm run test:supabase` against **local** `supabase start`, never the hosted project. `jest.config.js` must not inject `EXPO_PUBLIC_SUPABASE_*` hosted defaults.

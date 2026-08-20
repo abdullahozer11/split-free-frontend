@@ -40,7 +40,7 @@ The app is an **Expo 54 / React Native** client (iOS, Android, and web) talking 
 | Jest + jest-expo | Unit tests on pull requests |
 | ESLint + Prettier | Lint and format gates |
 | typos | Spell-check in CI |
-| GitHub Actions | PR checks targeting `master` |
+| GitHub Actions | PR checks targeting `master`; manual **Preview APK** workflow |
 | EAS | Android/iOS builds and OTA updates |
 
 A snapshot of one development machine is in [`environment.txt`](./environment.txt).

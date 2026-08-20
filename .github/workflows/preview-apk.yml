@@ -1,0 +1,82 @@
+# Manual only: Actions → Preview APK → Run workflow (pick a branch).
+# Does not run on pull_request or push.
+#
+# Repo secrets (Settings → Secrets and variables → Actions):
+#   EXPO_TOKEN — expo.dev → Account settings → Access tokens
+#   EXPO_PUBLIC_SUPABASE_URL
+#   EXPO_PUBLIC_SUPABASE_ANON_KEY
+name: Preview APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: android preview apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          packager: npm
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Inject public env into EAS preview profile
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const url = (process.env.EXPO_PUBLIC_SUPABASE_URL || "").trim();
+          const key = (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "").trim();
+          const missing = [];
+          if (!url || url.includes("change_me")) missing.push("EXPO_PUBLIC_SUPABASE_URL");
+          if (!key || key.includes("change_me")) missing.push("EXPO_PUBLIC_SUPABASE_ANON_KEY");
+          if (missing.length) {
+            console.error(
+              "Set these GitHub Actions secrets before running Preview APK: " +
+                missing.join(", "),
+            );
+            process.exit(1);
+          }
+          const eas = JSON.parse(fs.readFileSync("eas.json", "utf8"));
+          const preview = eas.build.preview;
+          preview.env = {
+            ...(preview.env || {}),
+            EXPO_PUBLIC_SUPABASE_URL: url,
+            EXPO_PUBLIC_SUPABASE_ANON_KEY: key,
+          };
+          fs.writeFileSync("eas.json", JSON.stringify(eas, null, 2) + "\n");
+          NODE
+
+      - name: Build preview APK on EAS
+        run: eas build --profile preview --platform android --non-interactive --no-wait
+
+      - name: Point to the installable APK
+        run: |
+          {
+            echo "## Preview APK submitted"
+            echo
+            echo "EAS is compiling the Android APK on Expo's builders (this GitHub job does not wait)."
+            echo "Open the build URL printed by \`eas build\` above, wait until it finishes, then download the APK and sideload it."
+            echo
+            echo "This workflow is manual (\`workflow_dispatch\`) and does not run on pull requests."
+          } >> "$GITHUB_STEP_SUMMARY"
