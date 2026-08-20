@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { realtimeTopic } from "@/src/lib/realtime";
 import { supabase } from "@/src/lib/supabase";
 
 export const useFriendRequestSubscription = (uid?: string) => {
@@ -11,7 +12,7 @@ export const useFriendRequestSubscription = (uid?: string) => {
     }
 
     const freqSubscription = supabase
-      .channel(`public:friend_requests:receiver:${uid}`)
+      .channel(realtimeTopic(`public:friend_requests:receiver:${uid}`))
       .on(
         "postgres_changes",
         {

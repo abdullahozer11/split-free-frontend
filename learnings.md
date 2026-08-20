@@ -40,8 +40,8 @@
 ## Supabase realtime channels
 
 - `supabase.channel(name)` returns the existing channel for that topic. After `subscribe()`, adding another `postgres_changes` listener throws `cannot add postgres_changes callbacks ... after subscribe()`.
-- Every hook must use a unique channel name (do not share `table-filter-changes`). Cleanup with `supabase.removeChannel()` so React remounts can recreate the channel.
-- The same hook on two stacked screens (group details + Statistics) also collides if the topic is only `table:filter`. Include a per-instance suffix (`useId()`) so each subscriber gets its own channel.
+- `removeChannel()` only teardowns after `unsubscribe()` resolves, so the old topic is still in `getChannels()` during React remounts (Strict Mode, sign-in redirect onto Groups). A stable `useId()` suffix is not enough.
+- Generate the topic inside the effect (`realtimeTopic(prefix)` in `src/lib/realtime.ts`) so each `subscribe()` gets a new name. Cleanup with `supabase.removeChannel()`.
 - Skip subscribe when filter ids are missing (`session?.user.id`, `group_id`).
 - TanStack Query v5 invalidation is `invalidateQueries({ queryKey })`, not `invalidateQueries(["key"])`.
 
