@@ -2,6 +2,7 @@ import { View, Alert, Image } from "react-native";
 import { TextInput } from "@/src/components/Translated";
 import React, { useState } from "react";
 import Button from "@/src/components/Button";
+import KeyboardAvoidingScreen from "@/src/components/KeyboardAvoidingScreen";
 import { useRouter } from "expo-router";
 import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
@@ -57,7 +58,7 @@ const ResetPasswordScreen = () => {
   }
 
   return (
-    <View className="flex-1 justify-center p-5 bg-white">
+    <KeyboardAvoidingScreen>
       <StackScreen options={{ title: "Reset Password" }} />
       <Image
         source={require("@/assets/images/logo.png")}
@@ -96,7 +97,7 @@ const ResetPasswordScreen = () => {
         onPress={resetPassword}
         text={loading ? "Resetting password..." : "Reset Password"}
       />
-    </View>
+    </KeyboardAvoidingScreen>
   );
 };
 

@@ -3,6 +3,7 @@ import { Text } from "@/src/components/Translated";
 import { TextInput } from "@/src/components/Translated";
 import React, { useState } from "react";
 import Button from "@/src/components/Button";
+import KeyboardAvoidingScreen from "@/src/components/KeyboardAvoidingScreen";
 import { StackScreen } from "@/src/components/Translated";
 import { Link } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
@@ -98,7 +99,7 @@ const SignInScreen = () => {
   }
 
   return (
-    <View className="flex-1 justify-center p-5 bg-white">
+    <KeyboardAvoidingScreen>
       <StackScreen options={{ title: "Sign in" }} />
       <Image
         source={require("@/assets/images/logo.png")}
@@ -145,7 +146,7 @@ const SignInScreen = () => {
       >
         Send Magic Link
       </Link>
-    </View>
+    </KeyboardAvoidingScreen>
   );
 };
 

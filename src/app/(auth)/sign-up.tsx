@@ -2,6 +2,7 @@ import { View, Alert, Image } from "react-native";
 import { TextInput, Text } from "@/src/components/Translated";
 import React, { useState, useEffect, useCallback } from "react";
 import Button from "@/src/components/Button";
+import KeyboardAvoidingScreen from "@/src/components/KeyboardAvoidingScreen";
 import { Link, useRouter } from "expo-router";
 import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
@@ -94,7 +95,7 @@ const SignUpScreen = () => {
   };
 
   return (
-    <View className="flex-1 justify-center p-5 bg-white">
+    <KeyboardAvoidingScreen>
       <StackScreen options={{ title: "Sign up" }} />
       <Image
         source={require("@/assets/images/logo.png")}
@@ -172,7 +173,7 @@ const SignUpScreen = () => {
       <Link href="/sign-in" className="self-center font-bold text-blue-500">
         Sign in
       </Link>
-    </View>
+    </KeyboardAvoidingScreen>
   );
 };
 

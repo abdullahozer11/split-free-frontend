@@ -2,6 +2,7 @@ import { View, Alert, Image } from "react-native";
 import React, { useState, useEffect } from "react";
 import { TextInput } from "@/src/components/Translated";
 import Button from "@/src/components/Button";
+import KeyboardAvoidingScreen from "@/src/components/KeyboardAvoidingScreen";
 import { Link, useRouter } from "expo-router";
 import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
@@ -60,7 +61,7 @@ const ForgotPasswordScreen = () => {
   }
 
   return (
-    <View className="flex-1 justify-center p-5 bg-white">
+    <KeyboardAvoidingScreen>
       <StackScreen options={{ title: "Forgot Password" }} />
       <Image
         source={require("@/assets/images/logo.png")}
@@ -90,7 +91,7 @@ const ForgotPasswordScreen = () => {
       <Link href="/sign-in" className="self-center font-bold text-blue-500">
         Back to Sign in
       </Link>
-    </View>
+    </KeyboardAvoidingScreen>
   );
 };
 
