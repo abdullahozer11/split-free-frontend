@@ -145,7 +145,6 @@ const SignInScreen = () => {
       >
         Send Magic Link
       </Link>
-      {/* <GoogleSignIn /> */}
     </View>
   );
 };

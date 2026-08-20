@@ -28,7 +28,7 @@ The app is an **Expo 51 / React Native** client (iOS, Android, and web) talking 
 
 | Piece | Role |
 | --- | --- |
-| Supabase Auth | Sign-in, magic links, Google OAuth |
+| Supabase Auth | Sign-in, magic links |
 | PostgreSQL | Groups, expenses, members, transfers, and settlement RPCs |
 | Realtime | Live invalidation of React Query caches |
 | Edge Functions (Deno) | `gemini` and `openai` functions under `supabase/functions/` |
