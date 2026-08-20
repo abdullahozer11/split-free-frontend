@@ -3,6 +3,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 const PAGE_SIZE = 20;
+const EXPENSE_LIST_SELECT =
+  "id, title, amount, date, created_at, group_id, category, settled, " +
+  "payers:expense_payers(member), participants:expense_participants(member)";
 
 export const useLatestExpense = (group_id: number, enabled = true) => {
   return useQuery({
@@ -42,10 +45,7 @@ export const useExpenseList = (group_id: number) => {
         const to = from + PAGE_SIZE - 1;
         const { data, error } = await supabase
           .from("expenses")
-          .select(
-            "id, title, amount, date, created_at, group_id, category, settled, " +
-              "payers:expense_payers(member), participants:expense_participants(member)",
-          )
+          .select(EXPENSE_LIST_SELECT)
           .eq("group_id", group_id)
           .order("created_at", { ascending: false })
           .order("id", { ascending: false })
@@ -71,6 +71,30 @@ export const useExpenseList = (group_id: number) => {
       }
       return undefined;
     },
+  });
+};
+
+export const useExpenseListAll = (group_id: number) => {
+  return useQuery({
+    queryKey: ["expenses", group_id, "all"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("expenses")
+        .select(EXPENSE_LIST_SELECT)
+        .eq("group_id", group_id)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false });
+      if (error) {
+        console.error("useExpenseListAll query error:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw new Error(`Failed to fetch expenses: ${error.message}`);
+      }
+      return data ?? [];
+    },
+    enabled: Number.isFinite(group_id),
   });
 };
 
