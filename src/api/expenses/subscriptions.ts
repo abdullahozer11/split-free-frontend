@@ -2,12 +2,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/src/lib/supabase";
 
-export const useExpenseSubscription = (group_id) => {
+export const useExpenseSubscription = (group_id?: number) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    if (!group_id) {
+      return;
+    }
+
     const expenseSubscription = supabase
-      .channel("table-filter-changes")
+      .channel(`public:expenses:group:${group_id}`)
       .on(
         "postgres_changes",
         {
@@ -16,16 +20,17 @@ export const useExpenseSubscription = (group_id) => {
           table: "expenses",
           filter: "group_id=eq." + group_id,
         },
-        (payload) => {
-          // console.log('Change received!', payload);
-          queryClient.invalidateQueries(["expenses", group_id]);
-          queryClient.invalidateQueries(["groups"]);
+        () => {
+          queryClient.invalidateQueries({
+            queryKey: ["expenses", group_id],
+          });
+          queryClient.invalidateQueries({ queryKey: ["groups"] });
         },
       )
       .subscribe();
 
     return () => {
-      expenseSubscription.unsubscribe();
+      supabase.removeChannel(expenseSubscription);
     };
   }, [group_id, queryClient]);
 };

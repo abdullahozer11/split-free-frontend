@@ -2,12 +2,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/src/lib/supabase";
 
-export const useFriendRequestSubscription = (uid) => {
+export const useFriendRequestSubscription = (uid?: string) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    if (!uid) {
+      return;
+    }
+
     const freqSubscription = supabase
-      .channel("table-filter-changes")
+      .channel(`public:friend_requests:receiver:${uid}`)
       .on(
         "postgres_changes",
         {
@@ -16,15 +20,14 @@ export const useFriendRequestSubscription = (uid) => {
           table: "friend_requests",
           filter: "receiver=eq." + uid,
         },
-        (payload) => {
-          // console.log('Change received!', payload);
-          queryClient.invalidateQueries(["friend_requests"]);
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["friend_requests"] });
         },
       )
       .subscribe();
 
     return () => {
-      freqSubscription.unsubscribe();
+      supabase.removeChannel(freqSubscription);
     };
   }, [queryClient, uid]);
 };
