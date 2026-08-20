@@ -14,21 +14,30 @@ import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
 
+type EditableMember = {
+  id?: number;
+  name: string;
+  role?: string | null;
+  profile?: { id?: string | null; avatar_url?: string | null } | null;
+};
+
 const UpdateGroup = () => {
   const { group_id: idString } = useLocalSearchParams();
   const groupId = parseInt(
     typeof idString === "string" ? idString : idString[0],
   );
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [removingMemberId, setRemovingMemberId] = useState(null);
-  const [removingMemberName, setRemovingMemberName] = useState(null);
+  const [removingMemberId, setRemovingMemberId] = useState<number | null>(null);
+  const [removingMemberName, setRemovingMemberName] = useState<string | null>(
+    null,
+  );
   const navigation = useNavigation();
   const queryClient = useQueryClient();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [newMemberName, setNewMemberName] = useState("");
-  const [existingMembers, setExistingMembers] = useState([]);
+  const [existingMembers, setExistingMembers] = useState<EditableMember[]>([]);
   const [error, setError] = useState("");
 
   const {
@@ -40,16 +49,16 @@ const UpdateGroup = () => {
   const { mutate: updateGroup } = useUpdateGroup();
 
   useEffect(() => {
-    setTitle(existingGroup?.title);
-    setDescription(existingGroup?.description);
-    setExistingMembers(existingGroup?.members);
+    setTitle(existingGroup?.title ?? "");
+    setDescription(existingGroup?.description ?? "");
+    setExistingMembers(existingGroup?.members ?? []);
   }, [existingGroup]);
 
   if (isLoading) {
     return <ActivityIndicator />;
   }
 
-  if (fetchError) {
+  if (fetchError || !existingGroup) {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
@@ -62,8 +71,8 @@ const UpdateGroup = () => {
     return true;
   };
 
-  const validateMemberName = (name) => {
-    const found = existingMembers.some((member) => member.name === name);
+  const validateMemberName = (memberName: string) => {
+    const found = existingMembers.some((member) => member.name === memberName);
     if (found) {
       setError("Name is already in the list");
       return false;
@@ -93,12 +102,16 @@ const UpdateGroup = () => {
         onSuccess: async () => {
           console.log("Group updated successfully");
           navigation.goBack();
-          await queryClient.invalidateQueries(["groups"]);
-          await queryClient.invalidateQueries(["group", existingGroup.id]);
-          await queryClient.invalidateQueries(["members", existingGroup.id]);
+          await queryClient.invalidateQueries({ queryKey: ["groups"] });
+          await queryClient.invalidateQueries({
+            queryKey: ["group", existingGroup.id],
+          });
+          await queryClient.invalidateQueries({
+            queryKey: ["members", existingGroup.id],
+          });
         },
-        onError: (error) => {
-          console.error("Server error:", error);
+        onError: (err) => {
+          console.error("Server error:", err);
           Alert.alert(
             "Error",
             "There was an error updating the group. Please try again.",
@@ -122,15 +135,19 @@ const UpdateGroup = () => {
     }
   };
 
-  const onMemberDelete = (id, name) => {
-    setRemovingMemberId(id);
-    setRemovingMemberName(name);
+  const onMemberDelete = (id: number | undefined, memberName: string) => {
+    setRemovingMemberId(id ?? null);
+    setRemovingMemberName(memberName);
     setIsDialogVisible(true);
   };
 
   const handleRemoveMember = () => {
     setExistingMembers(
-      existingMembers.filter((member) => member.id !== removingMemberId),
+      existingMembers.filter((member) =>
+        removingMemberId != null
+          ? member.id !== removingMemberId
+          : member.name !== removingMemberName,
+      ),
     );
     setIsDialogVisible(false);
   };

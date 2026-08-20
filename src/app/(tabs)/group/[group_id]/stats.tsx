@@ -5,17 +5,22 @@ import React, { useMemo, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { exp_cats } from "@/src/utils/expense_categories";
+import {
+  exp_cats,
+  otherCategory,
+  type ExpenseCategory,
+} from "@/src/utils/expense_categories";
 import {
   ExpenseItem,
   GroupedExpenseItem,
-} from "@/src/components/ExpenseItem.tsx";
-import { useExpenseListAll } from "@/src/api/expenses/index.ts";
+  type ExpenseListItem,
+} from "@/src/components/ExpenseItem";
+import { useExpenseListAll } from "@/src/api/expenses";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
-import { useProfileMember } from "@/src/api/members/index.ts";
-import { useAuth } from "@/src/providers/AuthProvider.tsx";
-import PieChart from "react-native-pie-chart/src/index.tsx";
-import { inThisMonth } from "@/src/utils/helpers.ts";
+import { useProfileMember } from "@/src/api/members";
+import { useAuth } from "@/src/providers/AuthProvider";
+import PieChart from "react-native-pie-chart";
+import { inThisMonth } from "@/src/utils/helpers";
 import { currencyOptions } from "@/src/constants";
 import { useGroup } from "@/src/api/groups";
 
@@ -23,6 +28,60 @@ enum Selection {
   Month = "This Month",
   Global = "Global",
 }
+
+type StatsExpense = ExpenseListItem & {
+  date?: string | null;
+  payers?: { member: number }[] | null;
+  participants?: { member: number }[] | null;
+};
+
+type CategoryTotal = {
+  category: ExpenseCategory;
+  total: number;
+};
+
+type GroupedByCategory = Record<string, CategoryTotal>;
+
+const memberIsInvolved = (expense: StatsExpense, memberId?: number) =>
+  memberId != null &&
+  (expense.payers?.some((payer) => payer.member === memberId) ||
+    expense.participants?.some(
+      (participant) => participant.member === memberId,
+    ));
+
+const groupExpensesByCategory = (
+  expenses: readonly StatsExpense[],
+): GroupedByCategory => {
+  const grouped: GroupedByCategory = {};
+  for (const expense of expenses) {
+    const key = expense.category ?? otherCategory.name;
+    if (!grouped[key]) {
+      grouped[key] = {
+        category:
+          exp_cats.find((exp) => exp.name === expense.category) ??
+          otherCategory,
+        total: 0,
+      };
+    }
+    grouped[key].total += expense.amount ?? 0;
+  }
+  return Object.fromEntries(
+    Object.entries(grouped).sort((a, b) => b[1].total - a[1].total),
+  );
+};
+
+const largestExpense = (
+  expenses: readonly StatsExpense[],
+): StatsExpense | null => {
+  if (!expenses.length) {
+    return null;
+  }
+  return expenses.reduce(
+    (max, expense) =>
+      (expense.amount ?? 0) > (max.amount ?? 0) ? expense : max,
+    expenses[0],
+  );
+};
 
 const Stats = () => {
   const { group_id: idString } = useLocalSearchParams();
@@ -40,6 +99,7 @@ const Stats = () => {
 
   const navigation = useNavigation();
   const { session } = useAuth();
+  const userId = session?.user.id ?? "";
 
   const {
     data: expenses = [],
@@ -50,17 +110,13 @@ const Stats = () => {
     data: profileMember,
     isError: profileMemberError,
     isLoading: profileMemberLoading,
-  } = useProfileMember(session?.user.id, groupId);
+  } = useProfileMember(userId, groupId);
 
   useExpenseSubscription(groupId);
 
   const personalExpenses = useMemo(() => {
     if (!expenses.length) return [];
-    return expenses.filter(
-      (ex) =>
-        ex?.payers?.some((payer) => payer.member === profileMember?.id) ||
-        ex?.participants?.some((payer) => payer.member === profileMember?.id),
-    );
+    return expenses.filter((ex) => memberIsInvolved(ex, profileMember?.id));
   }, [expenses, profileMember?.id]);
 
   const expensesM = useMemo(() => {
@@ -70,156 +126,96 @@ const Stats = () => {
 
   const personalExpensesM = useMemo(() => {
     if (!expensesM.length) return [];
-    return expensesM.filter(
-      (ex) =>
-        ex?.payers?.some((payer) => payer.member === profileMember?.id) ||
-        ex?.participants?.some((payer) => payer.member === profileMember?.id),
-    );
+    return expensesM.filter((ex) => memberIsInvolved(ex, profileMember?.id));
   }, [profileMember?.id, expensesM]);
 
   const { groupedExpensesM, groupedExpensesPerM } = useMemo(() => {
-    if (!expensesM.length)
-      return { groupedExpensesM: [], groupedExpensesPerM: [] };
-
-    const grouped = expensesM.reduce((acc, expense) => {
-      if (!acc[expense?.category]) {
-        const exp_cat =
-          exp_cats.find((exp) => exp.name === expense?.category) ||
-          exp_cats.find((exp) => exp.name === "Other");
-        acc[expense?.category] = { category: exp_cat, total: 0 };
-      }
-      acc[expense?.category].total += expense.amount;
-      return acc;
-    }, {});
-
-    const groupedArray = Object.entries(grouped);
-    const sortedGroupedArray = groupedArray.sort(
-      (a, b) => b[1].total - a[1].total,
-    );
-    const sortedGrouped = Object.fromEntries(sortedGroupedArray);
-
-    const grouped2 = personalExpensesM.reduce((acc, expense) => {
-      if (!acc[expense?.category]) {
-        const exp_cat =
-          exp_cats.find((exp) => exp.name === expense?.category) ||
-          exp_cats.find((exp) => exp.name === "Other");
-        acc[expense?.category] = { category: exp_cat, total: 0 };
-      }
-      acc[expense?.category].total += expense.amount;
-      return acc;
-    }, {});
-
-    const groupedArray2 = Object.entries(grouped2);
-    const sortedGroupedArray2 = groupedArray2.sort(
-      (a, b) => b[1].total - a[1].total,
-    );
-    const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
-
+    if (!expensesM.length) {
+      return {
+        groupedExpensesM: {} as GroupedByCategory,
+        groupedExpensesPerM: {} as GroupedByCategory,
+      };
+    }
     return {
-      groupedExpensesM: sortedGrouped,
-      groupedExpensesPerM: sortedGrouped2,
+      groupedExpensesM: groupExpensesByCategory(expensesM),
+      groupedExpensesPerM: groupExpensesByCategory(personalExpensesM),
     };
   }, [expensesM, personalExpensesM]);
 
   const { groupedExpenses, groupedExpensesPer } = useMemo(() => {
-    if (!expenses.length)
-      return { groupedExpenses: [], groupedExpensesPer: [] };
-
-    const grouped = expenses.reduce((acc, expense) => {
-      if (!acc[expense?.category]) {
-        const exp_cat =
-          exp_cats.find((exp) => exp.name === expense?.category) ||
-          exp_cats.find((exp) => exp.name === "Other");
-        acc[expense?.category] = { category: exp_cat, total: 0 };
-      }
-      acc[expense?.category].total += expense.amount;
-      return acc;
-    }, {});
-
-    const groupedArray = Object.entries(grouped);
-    const sortedGroupedArray = groupedArray.sort(
-      (a, b) => b[1].total - a[1].total,
-    );
-    const sortedGrouped = Object.fromEntries(sortedGroupedArray);
-
-    const grouped2 = personalExpenses.reduce((acc, expense) => {
-      if (!acc[expense?.category]) {
-        const exp_cat =
-          exp_cats.find((exp) => exp.name === expense?.category) ||
-          exp_cats.find((exp) => exp.name === "Other");
-        acc[expense?.category] = { category: exp_cat, total: 0 };
-      }
-      acc[expense?.category].total += expense.amount;
-      return acc;
-    }, {});
-
-    const groupedArray2 = Object.entries(grouped2);
-    const sortedGroupedArray2 = groupedArray2.sort(
-      (a, b) => b[1].total - a[1].total,
-    );
-    const sortedGrouped2 = Object.fromEntries(sortedGroupedArray2);
-
+    if (!expenses.length) {
+      return {
+        groupedExpenses: {} as GroupedByCategory,
+        groupedExpensesPer: {} as GroupedByCategory,
+      };
+    }
     return {
-      groupedExpenses: sortedGrouped,
-      groupedExpensesPer: sortedGrouped2,
+      groupedExpenses: groupExpensesByCategory(expenses),
+      groupedExpensesPer: groupExpensesByCategory(personalExpenses),
     };
   }, [expenses, personalExpenses]);
 
   const { biggestExpense, biggestExpensePer } = useMemo(() => {
-    if (!expenses.length)
+    if (!expenses.length) {
       return { biggestExpense: null, biggestExpensePer: null };
-    const max1 = expenses.reduce(
-      (max, expense) => (expense.amount > max.amount ? expense : max),
-      expenses[0],
-    );
-    const max2 = personalExpenses.reduce(
-      (max, expense) => (expense.amount > max.amount ? expense : max),
-      personalExpenses[0],
-    );
-    return { biggestExpense: max1, biggestExpensePer: max2 };
+    }
+    return {
+      biggestExpense: largestExpense(expenses),
+      biggestExpensePer: largestExpense(personalExpenses),
+    };
   }, [personalExpenses, expenses]);
 
   const { biggestExpenseM, biggestExpensePerM } = useMemo(() => {
-    if (!expensesM.length)
+    if (!expensesM.length) {
       return { biggestExpenseM: null, biggestExpensePerM: null };
-    const max1 = expensesM.reduce(
-      (max, expense) => (expense.amount > max.amount ? expense : max),
-      expensesM[0],
-    );
-    const max2 = personalExpensesM.reduce(
-      (max, expense) => (expense.amount > max.amount ? expense : max),
-      personalExpensesM[0],
-    );
-    return { biggestExpenseM: max1, biggestExpensePerM: max2 };
+    }
+    return {
+      biggestExpenseM: largestExpense(expensesM),
+      biggestExpensePerM: largestExpense(personalExpensesM),
+    };
   }, [personalExpensesM, expensesM]);
 
   const { expenseTotal, expenseTotalPer, paidAmount } = useMemo(() => {
-    if (!expenses.length)
+    if (!expenses.length) {
       return { expenseTotal: 0, expenseTotalPer: 0, paidAmount: 0 };
-    const sum1 = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    }
+    const sum1 = expenses.reduce(
+      (sum, expense) => sum + (expense.amount ?? 0),
+      0,
+    );
     const sum2 = personalExpenses.reduce(
-      (sum, expense) => sum + expense.amount,
+      (sum, expense) => sum + (expense.amount ?? 0),
       0,
     );
     const expenses3 = personalExpenses.filter((ex) =>
-      ex?.payers?.some((payer) => payer.member === profileMember?.id),
+      ex.payers?.some((payer) => payer.member === profileMember?.id),
     );
-    const sum3 = expenses3.reduce((sum, expense) => sum + expense.amount, 0);
+    const sum3 = expenses3.reduce(
+      (sum, expense) => sum + (expense.amount ?? 0),
+      0,
+    );
     return { expenseTotal: sum1, expenseTotalPer: sum2, paidAmount: sum3 };
   }, [personalExpenses, profileMember, expenses]);
 
   const { expenseTotalM, expenseTotalPerM, paidAmountM } = useMemo(() => {
-    if (!expensesM.length)
+    if (!expensesM.length) {
       return { expenseTotalM: 0, expenseTotalPerM: 0, paidAmountM: 0 };
-    const sum1 = expensesM.reduce((sum, expense) => sum + expense.amount, 0);
+    }
+    const sum1 = expensesM.reduce(
+      (sum, expense) => sum + (expense.amount ?? 0),
+      0,
+    );
     const sum2 = personalExpensesM.reduce(
-      (sum, expense) => sum + expense.amount,
+      (sum, expense) => sum + (expense.amount ?? 0),
       0,
     );
     const expenses3 = personalExpensesM.filter((ex) =>
-      ex?.payers?.some((payer) => payer.member === profileMember?.id),
+      ex.payers?.some((payer) => payer.member === profileMember?.id),
     );
-    const sum3 = expenses3.reduce((sum, expense) => sum + expense.amount, 0);
+    const sum3 = expenses3.reduce(
+      (sum, expense) => sum + (expense.amount ?? 0),
+      0,
+    );
     return { expenseTotalM: sum1, expenseTotalPerM: sum2, paidAmountM: sum3 };
   }, [personalExpensesM, expensesM, profileMember?.id]);
 
@@ -256,14 +252,10 @@ const Stats = () => {
       ? biggestExpensePer
       : biggestExpensePerM;
 
-  const series = Object.keys(groupedExpensesF).map(
-    (category) => groupedExpensesF[category].total,
-  );
-  const sliceColor = Object.keys(groupedExpensesF).map(
-    (category) => groupedExpensesF[category].category.bg_color,
-  );
-
-  const categories = Object.keys(groupedExpensesF);
+  const groupedEntries = Object.entries(groupedExpensesF);
+  const series = groupedEntries.map(([, item]) => item.total);
+  const sliceColor = groupedEntries.map(([, item]) => item.category.bg_color);
+  const categories = groupedEntries.map(([category]) => category);
   const maxCategoriesPerColumn =
     categories.length > 6 ? categories.length / 2 : 5;
   const firstColumn = categories.slice(0, maxCategoriesPerColumn);
@@ -431,7 +423,7 @@ const Stats = () => {
           <View style={{ gap: 10 }}>
             <Text variant={"headlineMedium"}>Spending per category</Text>
             <View style={{ gap: 10 }}>
-              {Object.keys(groupedExpensesF).map((category) => (
+              {categories.map((category) => (
                 <GroupedExpenseItem
                   key={category}
                   total={groupedExpensesF[category].total}
@@ -445,7 +437,7 @@ const Stats = () => {
             <View style={{ gap: 10 }}>
               <Text variant={"headlineMedium"}>Largest Spending</Text>
               <ExpenseItem
-                key={biggestExpenseF?.id}
+                key={biggestExpenseF.id}
                 expense={biggestExpenseF}
                 currency_label={currency_label}
               />

@@ -141,7 +141,8 @@ export const Member = ({
 };
 
 type DeletableMemberProps = {
-  member: MemberView;
+  member: Pick<MemberView, "name"> &
+    Partial<Pick<MemberView, "id" | "role" | "profile">>;
   onDelete: () => void;
 };
 

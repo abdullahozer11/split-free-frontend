@@ -23,6 +23,13 @@ import { useDebt } from "@/src/api/debts";
 import { useQueryClient } from "@tanstack/react-query";
 import { currencyOptions } from "@/src/constants";
 
+function nestedRecord<T>(value: T | T[] | null | undefined): T | null {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  return value ?? null;
+}
+
 const MemberDetailsScreen = () => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
@@ -33,48 +40,52 @@ const MemberDetailsScreen = () => {
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [name, setName] = useState();
+  const [name, setName] = useState("");
 
   const { session } = useAuth();
+  const userId = session?.user.id ?? "";
 
   const {
     data: member,
     isError: memberError,
     isLoading: memberLoading,
   } = useMember(memberId);
+  const groupId = member?.group_id ?? 0;
   const {
     data: profileMember,
     isError: profileMemberError,
     isLoading: profileMemberLoading,
-  } = useProfileMember(session?.user.id, member?.group_id);
+  } = useProfileMember(userId, groupId);
   const {
     data: debt,
     isError: debtError,
     isLoading: debtLoading,
-  } = useDebt(memberId, profileMember?.id);
+  } = useDebt(memberId, profileMember?.id ?? 0);
   const {
     data: group,
     isError: groupError,
     isLoading: groupLoading,
-  } = useGroup(member?.group_id);
+  } = useGroup(groupId);
 
   const { mutate: updateMemberName } = useUpdateMemberName();
   const { mutate: deleteMember } = useDeleteMember();
 
   useEffect(() => {
-    setName(member?.name);
+    setName(member?.name ?? "");
   }, [member]);
 
   if (memberLoading || profileMemberLoading || debtLoading || groupLoading) {
     return <ActivityIndicator />;
   }
 
-  if (memberError || profileMemberError || debtError || groupError) {
+  if (memberError || profileMemberError || debtError || groupError || !member) {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const ownMember = member?.id === profileMember?.id;
-  const isEditable = !member?.profile || ownMember;
+  const memberProfile = nestedRecord(member.profile);
+  const memberGroup = nestedRecord(member.group);
+  const ownMember = member.id === profileMember?.id;
+  const isEditable = !memberProfile || ownMember;
 
   const handleNameSubmit = () => {
     updateMemberName(
@@ -86,8 +97,12 @@ const MemberDetailsScreen = () => {
         onSuccess: async () => {
           console.log("Member name update is dealt with success");
           setIsEditingName(false);
-          await queryClient.invalidateQueries(["member", memberId]);
-          await queryClient.invalidateQueries(["members", member.group_id]);
+          await queryClient.invalidateQueries({
+            queryKey: ["member", memberId],
+          });
+          await queryClient.invalidateQueries({
+            queryKey: ["members", member.group_id],
+          });
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -98,12 +113,13 @@ const MemberDetailsScreen = () => {
   };
 
   const handleDelete = () => {
-    deleteMember(member?.id, {
+    deleteMember(member.id, {
       onSuccess: async () => {
-        // console.log("Successfully deleted member");
         navigation.goBack();
-        await queryClient.invalidateQueries(["members", member?.group_id]);
-        await queryClient.invalidateQueries(["expense"]);
+        await queryClient.invalidateQueries({
+          queryKey: ["members", member.group_id],
+        });
+        await queryClient.invalidateQueries({ queryKey: ["expense"] });
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -116,6 +132,7 @@ const MemberDetailsScreen = () => {
     (opt) => opt.value === group?.currency,
   );
   const currency_label = currencyOption?.label || "$";
+  const debtAmount = debt?.amount ?? 0;
 
   return (
     <SafeAreaView className="flex-1">
@@ -129,15 +146,15 @@ const MemberDetailsScreen = () => {
                 <View className="justify-center items-center bg-transparent">
                   <Image
                     source={
-                      member.profile?.avatar_url
-                        ? { uri: member.profile.avatar_url }
+                      memberProfile?.avatar_url
+                        ? { uri: memberProfile.avatar_url }
                         : require("@/assets/images/blank-profile.png")
                     }
                     className="w-[160px] h-[160px] rounded-full"
                   />
                 </View>
                 <Text>
-                  <Text>Group</Text>: {member.group.title}
+                  <Text>Group</Text>: {memberGroup?.title}
                 </Text>
                 {!isEditingName && (
                   <View style={{ gap: 5 }} className="flex-row">
@@ -170,7 +187,7 @@ const MemberDetailsScreen = () => {
                 )}
                 <Text>
                   <Text>Attached to Profile</Text>:{" "}
-                  {member.profile?.email || "None"}
+                  {memberProfile?.email || "None"}
                 </Text>
                 <Text>
                   <Text>Role</Text>: <Text>{member.role}</Text>{" "}
@@ -191,15 +208,15 @@ const MemberDetailsScreen = () => {
                 </Text>
                 {!ownMember &&
                   debt &&
-                  (debt.amount >= 0 ? (
+                  (debtAmount >= 0 ? (
                     <Text>
                       <Text>Owes you</Text>: {currency_label}
-                      {debt.amount}
+                      {debtAmount}
                     </Text>
                   ) : (
                     <Text>
                       <Text>You owe</Text>: {currency_label}
-                      {debt.amount}
+                      {debtAmount}
                     </Text>
                   ))}
               </Card.Content>
@@ -224,7 +241,7 @@ const MemberDetailsScreen = () => {
                 className="mb-2 max-w-[70%]"
                 style={{ color: "#FFFFFF" }}
               >
-                {member?.name} {member.id === profileMember?.id && "(me)"}
+                {member.name} {member.id === profileMember?.id && "(me)"}
               </Text>
               <Text style={{ color: "#FFFFFF" }}>
                 <Text style={{ color: "#FFFFFF" }}>Created at:</Text>
