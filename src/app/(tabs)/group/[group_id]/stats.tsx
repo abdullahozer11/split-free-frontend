@@ -1,7 +1,7 @@
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import { MenuItem, Text, Button } from "@/src/components/Translated";
 import { ActivityIndicator, Menu } from "react-native-paper";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,7 +10,7 @@ import {
   ExpenseItem,
   GroupedExpenseItem,
 } from "@/src/components/ExpenseItem.tsx";
-import { useExpenseList } from "@/src/api/expenses/index.ts";
+import { useExpenseListAll } from "@/src/api/expenses/index.ts";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
 import { useProfileMember } from "@/src/api/members/index.ts";
 import { useAuth } from "@/src/providers/AuthProvider.tsx";
@@ -42,13 +42,10 @@ const Stats = () => {
   const { session } = useAuth();
 
   const {
-    data: expensePages,
+    data: expenses = [],
     isError,
     isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useExpenseList(groupId);
+  } = useExpenseListAll(groupId);
   const {
     data: profileMember,
     isError: profileMemberError,
@@ -56,17 +53,6 @@ const Stats = () => {
   } = useProfileMember(session?.user.id, groupId);
 
   useExpenseSubscription(groupId);
-
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage && !isError) {
-      fetchNextPage();
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, isError]);
-
-  const expenses = useMemo(
-    () => expensePages?.pages.flat() ?? [],
-    [expensePages],
-  );
 
   const personalExpenses = useMemo(() => {
     if (!expenses.length) return [];
@@ -291,13 +277,7 @@ const Stats = () => {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
-  if (
-    isLoading ||
-    hasNextPage ||
-    isFetchingNextPage ||
-    profileMemberLoading ||
-    groupLoading
-  ) {
+  if (isLoading || profileMemberLoading || groupLoading) {
     return <ActivityIndicator />;
   }
 
