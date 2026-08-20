@@ -42,5 +42,5 @@
 ## Paper Text on dark headers
 
 - `react-native-paper` `Text` sets `color` from `theme.colors.onSurface` (dark in the light theme). NativeWind `className="text-white"` on the `Translated` wrapper does not override that style.
-- On black collapsible headers, pass `style={{ color: "#FFFFFF" }}` so the title stays readable.
+- On black collapsible headers and the account profile header, pass `style={{ color: "#FFFFFF" }}` so the title stays readable.
 - `CollapsibleHeader` used `p-10` plus `overflow-hidden`. That padding consumed most of the min height and clipped the group name; keep padding in the header content and pin the title with `flex-1 justify-end` so collapse shrinks the spacer, not the title.
