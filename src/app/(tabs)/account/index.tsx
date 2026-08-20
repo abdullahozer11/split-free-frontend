@@ -58,11 +58,23 @@ const AccountScreen = () => {
           }
           className="w-20 h-20 rounded-full"
         />
-        <View>
-          <Text className="text-4xl font-medium text-white">
+        <View className="flex-1">
+          <Text
+            className="text-4xl font-medium"
+            style={{ color: "#FFFFFF" }}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {profile.full_name}
           </Text>
-          <Text className="text-md font-light text-white">{profile.email}</Text>
+          <Text
+            className="text-md font-light"
+            style={{ color: "#FFFFFF" }}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {profile.email}
+          </Text>
         </View>
       </View>
       <View className="bg-white flex-1 p-5">
