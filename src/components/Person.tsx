@@ -1,11 +1,35 @@
 import { View, TouchableOpacity, Pressable } from "react-native";
 import { Text, Button } from "@/src/components/Translated";
 import { Avatar, Divider } from "react-native-paper";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
-export const Payer = ({ payer, amount }) => {
+type PersonView = {
+  name: string;
+  avatar_url?: string | null;
+};
+
+type MemberProfile = {
+  id?: string | null;
+  email?: string | null;
+  avatar_url?: string | null;
+};
+
+export type MemberView = {
+  id: number;
+  name: string;
+  role?: string | null;
+  group_id?: number;
+  profile?: MemberProfile | null;
+};
+
+type PayerProps = {
+  payer: PersonView;
+  amount?: string | number | null;
+};
+
+export const Payer = ({ payer, amount }: PayerProps) => {
   return (
     <View className="bg-white flex-row px-2 py-3 items-center rounded-[15px] px-5">
       <View className="flex-row items-center flex-1">
@@ -28,7 +52,12 @@ export const Payer = ({ payer, amount }) => {
   );
 };
 
-export const Participant = ({ participant, amount }) => {
+type ParticipantProps = {
+  participant: PersonView;
+  amount?: string | number | null;
+};
+
+export const Participant = ({ participant, amount }: ParticipantProps) => {
   return (
     <View className="bg-white flex-row px-2 py-3 items-center rounded-[15px] px-5">
       <View className="flex-row items-center flex-1">
@@ -51,7 +80,19 @@ export const Participant = ({ participant, amount }) => {
   );
 };
 
-export const Member = ({ member, assignable, onAssign, myOwnMember }) => {
+type MemberProps = {
+  member: MemberView;
+  assignable?: boolean;
+  onAssign?: () => void;
+  myOwnMember?: boolean;
+};
+
+export const Member = ({
+  member,
+  assignable,
+  onAssign,
+  myOwnMember,
+}: MemberProps) => {
   return (
     <Link
       href={`/(tabs)/group/${member.group_id}/member/${member.id}/details`}
@@ -77,7 +118,11 @@ export const Member = ({ member, assignable, onAssign, myOwnMember }) => {
         </View>
         <View className="flex-row items-center">
           {myOwnMember && (
-            <Text variant={"labelMedium"} color={"green"} className="mr-1">
+            <Text
+              variant={"labelMedium"}
+              style={{ color: "green" }}
+              className="mr-1"
+            >
               Me
             </Text>
           )}
@@ -95,7 +140,12 @@ export const Member = ({ member, assignable, onAssign, myOwnMember }) => {
   );
 };
 
-export const DeletableMember = ({ member, onDelete }) => {
+type DeletableMemberProps = {
+  member: MemberView;
+  onDelete: () => void;
+};
+
+export const DeletableMember = ({ member, onDelete }: DeletableMemberProps) => {
   return (
     <View className="bg-white flex-row px-4 py-3 items-center rounded-[15px]">
       <View className="flex-row items-center flex-1">
@@ -120,14 +170,21 @@ export const DeletableMember = ({ member, onDelete }) => {
   );
 };
 
-export const Debt = ({ debt, members }) => {
-  const [lender, setLender] = useState(null);
-  const [borrower, setBorrower] = useState(null);
+export type DebtView = {
+  amount?: number | null;
+  borrower?: number;
+  lender?: number;
+};
 
-  useEffect(() => {
-    setLender(members?.find((member) => member.id === debt?.lender));
-    setBorrower(members?.find((member) => member.id === debt?.borrower));
-  }, [debt, members]);
+type DebtProps = {
+  debt: DebtView;
+  members?: readonly MemberView[] | null;
+};
+
+export const Debt = ({ debt, members }: DebtProps) => {
+  const lender = members?.find((member) => member.id === debt?.lender) ?? null;
+  const borrower =
+    members?.find((member) => member.id === debt?.borrower) ?? null;
 
   return (
     <View className="bg-white flex-row px-4 py-3 items-center rounded-[15px] mb-2">
@@ -163,7 +220,24 @@ export const Debt = ({ debt, members }) => {
   );
 };
 
-export const SearchProfile = ({ profile, onAdd, onCancel }) => {
+export type SearchableProfile = {
+  id: string;
+  email?: string | null;
+  avatar_url?: string | null;
+  friend_status?: string | null;
+};
+
+type SearchProfileProps = {
+  profile: SearchableProfile;
+  onAdd: (id: string) => void;
+  onCancel: (id: string) => void;
+};
+
+export const SearchProfile = ({
+  profile,
+  onAdd,
+  onCancel,
+}: SearchProfileProps) => {
   return (
     <View className="bg-white flex-row px-4 py-3 items-center rounded-[15px]">
       <View className="flex-row items-center flex-1">
@@ -203,7 +277,13 @@ export const SearchProfile = ({ profile, onAdd, onCancel }) => {
   );
 };
 
-export const Friend = ({ email, avatar_url, onRemove }) => {
+type FriendProps = {
+  email?: string | null;
+  avatar_url?: string | null;
+  onRemove: () => void;
+};
+
+export const Friend = ({ email, avatar_url, onRemove }: FriendProps) => {
   return (
     <View className="bg-white flex-row px-4 py-3 items-center rounded-[15px] mb-2">
       <View className="flex-row items-center flex-1">
@@ -226,7 +306,19 @@ export const Friend = ({ email, avatar_url, onRemove }) => {
   );
 };
 
-export const Friend2 = ({ email, avatar_url, onInvite, status }) => {
+type Friend2Props = {
+  email?: string | null;
+  avatar_url?: string | null;
+  onInvite: () => void;
+  status?: string | null;
+};
+
+export const Friend2 = ({
+  email,
+  avatar_url,
+  onInvite,
+  status,
+}: Friend2Props) => {
   return (
     <View className="bg-white flex-row px-4 py-3 items-center">
       <View className="flex-row items-center flex-1">
@@ -253,7 +345,13 @@ export const Friend2 = ({ email, avatar_url, onInvite, status }) => {
   );
 };
 
-export const NotifLine = ({ email, onAccept, onIgnore }) => {
+type NotifLineProps = {
+  email?: string | null;
+  onAccept: () => void;
+  onIgnore: () => void;
+};
+
+export const NotifLine = ({ email, onAccept, onIgnore }: NotifLineProps) => {
   return (
     <>
       <View className="py-2 px-1 flex-row justify-between items-center">

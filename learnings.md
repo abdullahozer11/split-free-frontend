@@ -33,8 +33,11 @@
 
 ## CI typecheck scope
 
-- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and remaining components. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
-- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `helpers`, providers, the translation catalog, and typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`). Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and `ExpenseForm`. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
+- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `expense_categories`, `helpers`, providers, the translation catalog, typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`), and shared UI (`GroupItem`, `ExpenseItem`, `TransferItem`, `Person`, dropdowns, headers). Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- List-row props should be view models (selected query columns), not full `Tables["…"]["Row"]`. Nested `profile(...)` selects are objects; the members table `profile` column is a UUID.
+- Paper `Text` has no `color` prop — use `style={{ color }}`. `MultiSelect` `renderRightIcon` must return `ReactElement | null`, not `false && <El/>`.
+- `exp_cats[].icon` must be a `MaterialIcons` glyph name or `ExpenseItem` cannot pass it to `name`.
 - Date helpers must type `toLocaleDateString` options as `Intl.DateTimeFormatOptions` (or `as const`). Bare `{ year: "numeric" }` infers `string` and misses the overload.
 - Empty-array defaults on untyped `mergeActivityWithFrontier` args infer `never[]`, so spreading a row is TS2698. Give the merge args an `ActivityRecord` bound (and default `= {}` on the object, not `= []` on the generic).
 - GitHub Actions Node must match `engines.node` (`>=20.19.4`). Pin via `.nvmrc` (`20.19.4`), not `node-version: 20`.

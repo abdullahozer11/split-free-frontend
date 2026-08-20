@@ -1,12 +1,19 @@
-import React, { useRef } from "react";
+import React, { useRef, type ReactNode } from "react";
 import { View, Animated, ScrollView } from "react-native";
+
+type CollapsibleHeaderProps = {
+  content: ReactNode;
+  headerContent: ReactNode;
+  H_MAX_HEIGHT: number;
+  H_MIN_HEIGHT: number;
+};
 
 const CollapsibleHeader = ({
   content,
   headerContent,
   H_MAX_HEIGHT,
   H_MIN_HEIGHT,
-}) => {
+}: CollapsibleHeaderProps) => {
   const H_SCROLL_DISTANCE = H_MAX_HEIGHT - H_MIN_HEIGHT;
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const headerScrollHeight = scrollOffsetY.interpolate({
