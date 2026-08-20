@@ -12,6 +12,12 @@
     "src/database.types.ts",
     "src/constants/**/*.ts",
     "src/utils/expenseFormDefaults.ts",
+    "src/translations/**/*.ts",
+    "src/providers/**/*.ts",
+    "src/providers/**/*.tsx",
+    "src/components/Translated.tsx",
+    "src/components/Button.tsx",
+    "src/components/KeyboardAvoidingScreen.tsx",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
   ]

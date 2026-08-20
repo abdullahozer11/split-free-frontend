@@ -11,11 +11,13 @@ import { Session } from "@supabase/auth-js";
 type AuthData = {
   session: Session | null;
   loading: boolean;
+  setSession: (session: Session | null) => void;
 };
 
 const AuthContext = createContext<AuthData>({
   session: null,
   loading: true,
+  setSession: () => {},
 });
 
 export default function AuthProvider({ children }: PropsWithChildren) {

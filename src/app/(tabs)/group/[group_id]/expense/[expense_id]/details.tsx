@@ -24,7 +24,7 @@ import { Feather } from "@expo/vector-icons";
 import { Participant, Payer } from "@/src/components/Person";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateString } from "@/src/utils/helpers";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 const Description = ({ text }) => {
   return (

@@ -9,7 +9,7 @@ import { useNavigation } from "expo-router";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useProfile, useUpdateProfileSingleField } from "@/src/api/profiles";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 const Languages = () => {
   const navigation = useNavigation();

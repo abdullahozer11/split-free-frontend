@@ -4,7 +4,7 @@ import { Text } from "@/src/components/Translated";
 import { MultiSelect } from "react-native-element-dropdown";
 import { Feather } from "@expo/vector-icons";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 const MyMultiSelect = ({ selected, members, onChange }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);

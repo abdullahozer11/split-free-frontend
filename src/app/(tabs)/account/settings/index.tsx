@@ -6,7 +6,7 @@ import { Feather } from "@expo/vector-icons";
 import { supabase } from "@/src/lib/supabase";
 import { Link, useNavigation } from "expo-router";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 const SettingsItem = ({ page, iconName, title, containerColor }) => {
   const { settings } = useSettings();

@@ -26,7 +26,7 @@ import { supabase } from "@/src/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFriendRequestSubscription } from "@/src/api/profiles/subscriptions";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 export default function FriendScreen() {
   const queryClient = useQueryClient();

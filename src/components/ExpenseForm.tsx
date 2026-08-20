@@ -26,7 +26,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { exp_cats } from "@/src/utils/expense_categories";
 import { supabase } from "@/src/lib/supabase.ts";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { resolveExpenseFormDefaults } from "@/src/utils/expenseFormDefaults";
 

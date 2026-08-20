@@ -8,7 +8,7 @@ import { Feather } from "@expo/vector-icons";
 import { useProfile } from "@/src/api/profiles";
 import { ActivityIndicator } from "react-native-paper";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 const Card = ({ iconName, title, page }) => {
   const { settings } = useSettings();

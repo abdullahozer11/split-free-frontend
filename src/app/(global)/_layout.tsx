@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 export default function AuthLayout() {
   const { settings } = useSettings();
