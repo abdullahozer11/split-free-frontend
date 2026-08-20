@@ -15,8 +15,14 @@ import {
   useNavigation,
   useRouter,
 } from "expo-router";
-import { ExpenseItem } from "@/src/components/ExpenseItem";
-import { TransferItem } from "@/src/components/TransferItem";
+import {
+  ExpenseItem,
+  type ExpenseListItem,
+} from "@/src/components/ExpenseItem";
+import {
+  TransferItem,
+  type TransferListItem,
+} from "@/src/components/TransferItem";
 import CollapsibleHeader from "@/src/components/CollapsibleHeader";
 import {
   groupElementsByDay,
@@ -42,12 +48,30 @@ import {
 } from "@/src/api/profiles";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useInsertMember, useProfileMember } from "@/src/api/members";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
 import { useSettings } from "@/src/providers/SettingsProvider";
 import { currencyOptions } from "@/src/constants";
 import QRCode from "react-native-qrcode-svg";
 import { generateInvite } from "@/src/api/invites";
+
+type FriendProfile = {
+  id: string;
+  email: string | null;
+  avatar_url: string | null;
+};
+
+type InvitableFriend = {
+  membershipStatus: string;
+  profile: FriendProfile;
+};
+
+function nestedRecord<T>(value: T | T[] | null | undefined): T | null {
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  return value ?? null;
+}
 
 const GroupDetailsScreen = () => {
   const { group_id: idString } = useLocalSearchParams();
@@ -79,16 +103,17 @@ const GroupDetailsScreen = () => {
     isFetchingNextPage: isFetchingNextTransfers,
   } = useTransferList(groupId);
   const { session } = useAuth();
+  const userId = session?.user.id ?? "";
   const {
     data: friends,
     isError: friendsError,
     isLoading: friendsLoading,
-  } = useFriends(session?.user.id);
+  } = useFriends(userId);
   const {
     data: profile,
     isError: profileError,
     isLoading: profileLoading,
-  } = useProfile(session?.user.id);
+  } = useProfile(userId);
   const {
     data: pendingInvites,
     isError: pInviteError,
@@ -98,7 +123,7 @@ const GroupDetailsScreen = () => {
     data: profileMember,
     isError: profileMemberError,
     isLoading: profileMemberLoading,
-  } = useProfileMember(profile?.id, groupId);
+  } = useProfileMember(profile?.id ?? "", groupId);
   const { data: expenseTotalM, isLoading: expenseTotalMLoading } =
     useExpenseTotalThisMonth(groupId);
   const [totalBalance, setTotalBalance] = useState(0);
@@ -129,11 +154,11 @@ const GroupDetailsScreen = () => {
   const [isDialog2Visible, setIsDialog2Visible] = useState(false);
 
   const expenses = useMemo(
-    () => expensePages?.pages.flat() ?? [],
+    () => (expensePages?.pages.flat() ?? []) as ExpenseListItem[],
     [expensePages],
   );
   const transfers = useMemo(
-    () => transferPages?.pages.flat() ?? [],
+    () => (transferPages?.pages.flat() ?? []) as TransferListItem[],
     [transferPages],
   );
   const {
@@ -155,36 +180,39 @@ const GroupDetailsScreen = () => {
     [visibleTransactions, settings.language],
   );
 
-  const [updatedFriends, setUpdatedFriends] = useState([]);
+  const [updatedFriends, setUpdatedFriends] = useState<InvitableFriend[]>([]);
 
   useEffect(() => {
     const _balance =
-      group?.members
-        .find((mb) => mb.profile && mb.profile.id === profile?.id)
-        ?.total_balance?.toFixed(2) || null;
+      group?.members.find((mb) => {
+        const memberProfile = nestedRecord(mb.profile);
+        return memberProfile && memberProfile.id === profile?.id;
+      })?.total_balance ?? 0;
     setTotalBalance(_balance);
   }, [group, profile?.id]);
 
   useEffect(() => {
-    // Create a list of member ids
-    const memberIds = group?.members?.map((member) => member.profile?.id) || [];
+    const memberIds =
+      group?.members?.map((member) => nestedRecord(member.profile)?.id) || [];
 
-    // Create a list of pending invite ids
     const pendingInviteIds = pendingInvites?.map(
-      (invite) => invite?.receiver_profile?.id,
+      (invite) => nestedRecord(invite.receiver_profile)?.id,
     );
 
-    // Update friends with membership status
-    const newUpdatedFriends = friends?.map((friend) => {
-      const friendId = friend.profile.id;
-      if (memberIds?.includes(friendId)) {
-        return { ...friend, membershipStatus: "member" };
-      } else if (pendingInviteIds?.includes(friendId)) {
-        return { ...friend, membershipStatus: "invited" };
-      } else {
-        return { ...friend, membershipStatus: "available" };
-      }
-    });
+    const newUpdatedFriends =
+      friends?.flatMap((friend) => {
+        const friendProfile = nestedRecord(friend.profile);
+        if (!friendProfile) {
+          return [];
+        }
+        const friendId = friendProfile.id;
+        const membershipStatus = memberIds?.includes(friendId)
+          ? "member"
+          : pendingInviteIds?.includes(friendId)
+            ? "invited"
+            : "available";
+        return [{ profile: friendProfile, membershipStatus }];
+      }) ?? [];
 
     setUpdatedFriends(newUpdatedFriends);
   }, [friends, pendingInvites, group]);
@@ -216,6 +244,10 @@ const GroupDetailsScreen = () => {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
+  if (!group) {
+    return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
+  }
+
   const promptDelete = () => {
     setIsDialogVisible(true);
   };
@@ -228,21 +260,28 @@ const GroupDetailsScreen = () => {
     await settleGroup(group.id, {
       onSuccess: async () => {
         // Locally update settled status for all expenses in this group
-        queryClient.setQueryData(["expenses", group.id], (oldData) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) =>
-              page.map((expense) => ({ ...expense, settled: true })),
-            ),
-          };
-        });
+        queryClient.setQueryData<InfiniteData<ExpenseListItem[]>>(
+          ["expenses", group.id],
+          (oldData) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) =>
+                page.map((expense) => ({ ...expense, settled: true })),
+              ),
+            };
+          },
+        );
 
         setIsDialog2Visible(false);
-        await queryClient.invalidateQueries(["groups"]);
-        await queryClient.invalidateQueries(["debts"]);
-        await queryClient.invalidateQueries(["expenses", group.id]);
-        await queryClient.invalidateQueries(["transfers", group.id]);
+        await queryClient.invalidateQueries({ queryKey: ["groups"] });
+        await queryClient.invalidateQueries({ queryKey: ["debts"] });
+        await queryClient.invalidateQueries({
+          queryKey: ["expenses", group.id],
+        });
+        await queryClient.invalidateQueries({
+          queryKey: ["transfers", group.id],
+        });
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -256,7 +295,7 @@ const GroupDetailsScreen = () => {
       onSuccess: async () => {
         // console.log('Successfully deleted group with id', group.id);
         navigation.goBack();
-        await queryClient.invalidateQueries(["groups"]);
+        await queryClient.invalidateQueries({ queryKey: ["groups"] });
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -280,16 +319,19 @@ const GroupDetailsScreen = () => {
   };
 
   const handleExitGroup = () => {
+    if (!userId) {
+      return;
+    }
     exitGroup(
       {
-        _profile_id: session?.user.id,
+        _profile_id: userId,
         _group_id: groupId,
       },
       {
         onSuccess: async () => {
           // console.log("Group exited successfully");
           navigation.goBack();
-          await queryClient.invalidateQueries(["groups"]);
+          await queryClient.invalidateQueries({ queryKey: ["groups"] });
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -302,10 +344,13 @@ const GroupDetailsScreen = () => {
     );
   };
 
-  const handleInvite = (id) => {
+  const handleInvite = (id: string) => {
+    if (!userId) {
+      return;
+    }
     insertGroupInvitation(
       {
-        sender: session?.user.id,
+        sender: userId,
         receiver: id,
         group_id: groupId,
         group_name: group.title,
@@ -326,7 +371,7 @@ const GroupDetailsScreen = () => {
     );
   };
 
-  const handleAssign = (memberId) => {
+  const handleAssign = (memberId: number) => {
     assignMember(
       {
         _member_id: memberId,
@@ -335,7 +380,9 @@ const GroupDetailsScreen = () => {
       {
         onSuccess: async () => {
           // console.log('Member assign is dealt with success');
-          await queryClient.invalidateQueries(["members", groupId]);
+          await queryClient.invalidateQueries({
+            queryKey: ["members", groupId],
+          });
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -357,7 +404,9 @@ const GroupDetailsScreen = () => {
           setNewMemberName("");
           setIsAddingNewName(false);
           setBigPlusVisible(true);
-          await queryClient.invalidateQueries(["members", groupId]);
+          await queryClient.invalidateQueries({
+            queryKey: ["members", groupId],
+          });
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -367,7 +416,7 @@ const GroupDetailsScreen = () => {
     );
   };
 
-  const isOwner = session?.user.id === group?.owner;
+  const isOwner = session?.user.id === group.owner;
 
   const currencyOption = currencyOptions.find(
     (opt) => opt.value === group?.currency,
@@ -692,7 +741,7 @@ const GroupDetailsScreen = () => {
               />
             ),
           )}
-        {!friends.length && (
+        {!friends?.length && (
           <View className="bg-white h-15 text-center pl-5">
             <Text variant={"headlineMedium"}>No friend is found</Text>
           </View>

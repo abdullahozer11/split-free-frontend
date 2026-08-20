@@ -9,7 +9,21 @@ import { ActivityIndicator } from "react-native-paper";
 import { formatDateString } from "@/src/utils/helpers";
 import { useSettings } from "@/src/providers/SettingsProvider";
 
-const TransferDetails = ({ sender, receiver, amount, created_at, lang }) => {
+type TransferDetailsProps = {
+  sender?: string | null;
+  receiver?: string | null;
+  amount?: number | null;
+  created_at?: string | null;
+  lang?: string | null;
+};
+
+const TransferDetails = ({
+  sender,
+  receiver,
+  amount,
+  created_at,
+  lang,
+}: TransferDetailsProps) => {
   return (
     <View className="bg-white rounded-[10px] p-4 m-4">
       <Text variant="labelLarge" className="underline">
@@ -30,7 +44,9 @@ const TransferDetails = ({ sender, receiver, amount, created_at, lang }) => {
         </View>
         <View className="flex-row justify-between">
           <Text variant="bodyLarge">Date:</Text>
-          <Text variant="bodyLarge">{formatDateString(created_at, lang)}</Text>
+          <Text variant="bodyLarge">
+            {created_at ? formatDateString(created_at, lang) : ""}
+          </Text>
         </View>
       </View>
     </View>
@@ -38,8 +54,7 @@ const TransferDetails = ({ sender, receiver, amount, created_at, lang }) => {
 };
 
 const TransferDetailsScreen = () => {
-  const { group_id: groupIdString, transfer_id: transferIdString } =
-    useLocalSearchParams();
+  const { transfer_id: transferIdString } = useLocalSearchParams();
   const id = parseInt(
     typeof transferIdString === "string"
       ? transferIdString
@@ -100,8 +115,9 @@ const TransferDetailsScreen = () => {
                 Transferred on
               </Text>
               <Text className="text-sm font-200" style={{ color: "#FFFFFF" }}>
-                {transfer &&
-                  formatDateString(transfer.created_at, settings.language)}
+                {transfer?.created_at
+                  ? formatDateString(transfer.created_at, settings.language)
+                  : ""}
               </Text>
             </View>
           </View>

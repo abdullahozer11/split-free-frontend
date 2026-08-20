@@ -44,8 +44,7 @@ const unknownErrorMessage = (err: unknown) =>
 
 const PAGE_SIZE = 20;
 const EXPENSE_LIST_SELECT =
-  "id, title, amount, date, created_at, group_id, category, settled, " +
-  "payers:expense_payers(member), participants:expense_participants(member)";
+  "id, title, amount, date, created_at, group_id, category, settled, payers:expense_payers(member), participants:expense_participants(member)";
 
 export const useLatestExpense = (group_id: number, enabled = true) => {
   return useQuery({
