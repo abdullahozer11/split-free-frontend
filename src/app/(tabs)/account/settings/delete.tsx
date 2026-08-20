@@ -59,7 +59,9 @@ const Delete = () => {
         </Text>
         <Text className="text-2xl mb-2">{"Please type," + " "}</Text>
         <Text className="font-bold">
-          "<Text className="font-bold">{verifText}</Text>"
+          {'"'}
+          <Text className="font-bold">{verifText}</Text>
+          {'"'}
         </Text>
         <TextInput
           value={verif}

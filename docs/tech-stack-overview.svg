@@ -52,7 +52,7 @@
     <rect x="80" y="240" width="10" height="214" rx="5" fill="#FCC157"/>
   </g>
   <text x="110" y="272" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6" fill="#A16207">APPLICATION</text>
-  <text x="110" y="298" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700" fill="#1C1917">Expo SDK 51 · React Native 0.74</text>
+  <text x="110" y="298" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700" fill="#1C1917">Expo SDK 54 · React Native 0.81</text>
   <text x="110" y="322" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#57534E">File-based routing, NativeWind styling, and React Query cache driven by live subscriptions.</text>
 
   <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1C1917">

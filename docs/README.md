@@ -8,17 +8,17 @@ This folder is the high-level project overview. For the source layout and coding
 
 ![SplitFree tech stack](./tech-stack-overview.svg)
 
-The app is an **Expo 51 / React Native** client (iOS, Android, and web) talking to **Supabase** for auth, Postgres, and realtime updates.
+The app is an **Expo 54 / React Native** client (iOS, Android, and web) talking to **Supabase** for auth, Postgres, and realtime updates.
 
 ### Client
 
 | Piece | Role |
 | --- | --- |
-| Expo SDK 51 | Managed workflow, native modules, EAS builds |
-| React Native 0.74 + React 18 | UI runtime |
+| Expo SDK 54 | Managed workflow, native modules, EAS builds |
+| React Native 0.81 + React 19 | UI runtime |
 | TypeScript | Typed app and generated database bindings |
 | Expo Router | File-based screens under `src/app/` |
-| NativeWind (Tailwind) | Cross-platform styling |
+| NativeWind v4 (Tailwind) | Cross-platform styling |
 | React Native Paper | Shared UI primitives |
 | TanStack Query | Server-state cache, invalidated by Supabase subscriptions |
 | Expo SecureStore | Auth session persistence |
