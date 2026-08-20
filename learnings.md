@@ -33,8 +33,10 @@
 
 ## CI typecheck scope
 
-- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and helpers. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
-- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, providers, the translation catalog, and typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`). Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and remaining components. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
+- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `helpers`, providers, the translation catalog, and typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`). Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Date helpers must type `toLocaleDateString` options as `Intl.DateTimeFormatOptions` (or `as const`). Bare `{ year: "numeric" }` infers `string` and misses the overload.
+- Empty-array defaults on untyped `mergeActivityWithFrontier` args infer `never[]`, so spreading a row is TS2698. Give the merge args an `ActivityRecord` bound (and default `= {}` on the object, not `= []` on the generic).
 - GitHub Actions Node must match `engines.node` (`>=20.19.4`). Pin via `.nvmrc` (`20.19.4`), not `node-version: 20`.
 
 ## Translation catalog and wrappers

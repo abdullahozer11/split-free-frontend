@@ -12,6 +12,7 @@
     "src/database.types.ts",
     "src/constants/**/*.ts",
     "src/utils/expenseFormDefaults.ts",
+    "src/utils/helpers.ts",
     "src/translations/**/*.ts",
     "src/providers/**/*.ts",
     "src/providers/**/*.tsx",
