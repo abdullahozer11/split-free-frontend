@@ -1,9 +1,19 @@
 import { View, ScrollView, TouchableOpacity, Alert } from "react-native";
-import { Text, Button, DialogTitle } from "@/src/components/Translated";
+import {
+  Text,
+  Button,
+  DialogTitle,
+  useTranslations,
+} from "@/src/components/Translated";
 import React, { useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import UnderlinedText from "@/src/components/UnderlinedText";
-import { Friend, NotifLine, SearchProfile } from "@/src/components/Person";
+import {
+  Friend,
+  NotifLine,
+  SearchProfile,
+  type SearchableProfile,
+} from "@/src/components/Person";
 import {
   ActivityIndicator,
   Searchbar,
@@ -25,35 +35,38 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { supabase } from "@/src/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFriendRequestSubscription } from "@/src/api/profiles/subscriptions";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider";
+
+type RemovingFriend = {
+  email: string | null;
+  id: string | null;
+};
 
 export default function FriendScreen() {
   const queryClient = useQueryClient();
+  const { t } = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<SearchableProfile[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [isNotifMenuVisible, setIsNotifMenuVisible] = useState(false);
-  const [removingFriend, setRemovingFriend] = useState({
+  const [removingFriend, setRemovingFriend] = useState<RemovingFriend>({
     email: null,
     id: null,
   });
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
 
   const { setSession, session } = useAuth();
+  const userId = session?.user.id ?? "";
   const {
     data: profile,
     isLoading: profileLoading,
     isError: profileError,
-  } = useProfile(session?.user.id);
-  const { data: friends, isError, isLoading } = useFriends(session?.user.id);
+  } = useProfile(userId);
+  const { data: friends, isError, isLoading } = useFriends(userId);
   const {
     data: freqs,
     isError: freqError,
     isLoading: freqIsLoading,
-  } = useFriendRequests(session?.user.id);
+  } = useFriendRequests(userId);
   const { mutate: insertFriendRequest } = useInsertFriendRequest();
   const { mutate: deleteFriendRequest } = useDeleteFriendRequest();
   const { mutate: unfriend } = useUnfriend();
@@ -75,10 +88,15 @@ export default function FriendScreen() {
     return <Text>Failed to fetch data</Text>;
   }
 
+  const friendRequests = freqs ?? [];
+
   const handleSearch = async () => {
     setSearchLoading(true);
 
-    const userId = session?.user.id;
+    if (!userId) {
+      setSearchLoading(false);
+      return;
+    }
 
     // Fetch matching profiles
     const { data: profiles, error: profilesError } = await supabase
@@ -100,8 +118,6 @@ export default function FriendScreen() {
       setSearchLoading(false);
       return;
     }
-
-    const profileIds = profiles.map((p) => p.id);
 
     // Fetch user's friends
     const { data: friendsData, error: friendsError } = await supabase
@@ -146,7 +162,7 @@ export default function FriendScreen() {
     const receivedIds = receivedData ? receivedData.map((r) => r.sender) : [];
 
     // Compute statuses
-    const results = profiles.map((p) => ({
+    const results: SearchableProfile[] = profiles.map((p) => ({
       id: p.id,
       email: p.email,
       avatar_url: p.avatar_url,
@@ -163,20 +179,23 @@ export default function FriendScreen() {
     setSearchLoading(false);
   };
 
-  const handleAddFriend = (friend_id_input) => {
+  const handleAddFriend = (friend_id_input: string) => {
+    if (!userId) {
+      return;
+    }
     insertFriendRequest(
       {
-        sender_id: session?.user.id,
+        sender_id: userId,
         receiver_id: friend_id_input,
       },
       {
         onSuccess: async () => {
           console.log("Friend request is created.");
-          const newSearchResults = searchResults;
-          newSearchResults.find(
-            (sr) => sr.id === friend_id_input,
-          ).friend_status = "SENT";
-          setSearchResults(newSearchResults);
+          setSearchResults((current) =>
+            current.map((sr) =>
+              sr.id === friend_id_input ? { ...sr, friend_status: "SENT" } : sr,
+            ),
+          );
         },
         onError: (error) => {
           console.error("Server error:", error);
@@ -186,10 +205,13 @@ export default function FriendScreen() {
     );
   };
 
-  const handleCancelFriendReq = (receiver_id) => {
+  const handleCancelFriendReq = (receiver_id: string) => {
+    if (!userId) {
+      return;
+    }
     deleteFriendRequest(
       {
-        sender: session?.user.id,
+        sender: userId,
         receiver: receiver_id,
       },
       {
@@ -204,13 +226,11 @@ export default function FriendScreen() {
     );
   };
 
-  const handleRemove = (friend_id) => {
-    // console.log("Removing friend", friend_id);
+  const handleRemove = (friend_id: string) => {
     unfriend(friend_id, {
       onSuccess: async () => {
-        // console.log("Successfully unfriended", friend_id);
         setIsDialogVisible(false);
-        await queryClient.invalidateQueries(["friends"]);
+        await queryClient.invalidateQueries({ queryKey: ["friends"] });
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -219,13 +239,13 @@ export default function FriendScreen() {
     });
   };
 
-  const handleAccept = async (sender_uid) => {
+  const handleAccept = async (sender_uid: string) => {
     acceptFriend(sender_uid, {
       onSuccess: async () => {
         console.log("Friend request is accepted");
         setIsNotifMenuVisible(false);
-        await queryClient.invalidateQueries(["friends"]);
-        await queryClient.invalidateQueries(["friend_requests"]);
+        await queryClient.invalidateQueries({ queryKey: ["friends"] });
+        await queryClient.invalidateQueries({ queryKey: ["friend_requests"] });
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -234,13 +254,13 @@ export default function FriendScreen() {
     });
   };
 
-  const handleIgnore = (sender_uid) => {
+  const handleIgnore = (sender_uid: string) => {
     rejectFriend(sender_uid, {
       onSuccess: async () => {
         console.log("Friend request is rejected");
         setIsNotifMenuVisible(false);
-        await queryClient.invalidateQueries(["friends"]);
-        await queryClient.invalidateQueries(["friend_requests"]);
+        await queryClient.invalidateQueries({ queryKey: ["friends"] });
+        await queryClient.invalidateQueries({ queryKey: ["friend_requests"] });
       },
       onError: (error) => {
         console.error("Server error:", error);
@@ -259,24 +279,25 @@ export default function FriendScreen() {
           onPress={() => {
             setIsNotifMenuVisible(!isNotifMenuVisible);
           }}
-          disabled={!freqs?.length}
-          asChild
+          disabled={!friendRequests.length}
         >
           <Feather name={"bell"} size={36} />
-          {!!freqs?.length && (
+          {!!friendRequests.length && (
             <View className="absolute top-0 right-0 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center">
-              <Text className="text-white text-xs">{freqs?.length}</Text>
+              <Text className="text-white text-xs">
+                {friendRequests.length}
+              </Text>
             </View>
           )}
         </TouchableOpacity>
       </SafeAreaView>
       <View className="p-4 bg-gray-100 h-screen">
-        {isNotifMenuVisible && !!freqs.length && (
+        {isNotifMenuVisible && !!friendRequests.length && (
           <View className="absolute top-0 right-0 bg-white border rounded-lg border-gray-400 p-2 mr-2 z-10">
-            {freqs.map((freq) => (
+            {friendRequests.map((freq) => (
               <NotifLine
                 key={freq.id}
-                email={freq.sender_profile.email}
+                email={freq.sender_profile?.email}
                 onAccept={() => handleAccept(freq.sender)}
                 onIgnore={() => handleIgnore(freq.sender)}
               />
@@ -285,24 +306,24 @@ export default function FriendScreen() {
         )}
         <View className="mb-4">
           <Searchbar
-            placeholder={int["Search"] || "Search"}
+            placeholder={t("Search")}
             onChangeText={setSearchQuery}
             value={searchQuery}
             mode="view"
             className="bg-white"
-            onClearIconPress={() => setSearchQuery(null)}
+            onClearIconPress={() => setSearchQuery("")}
             onIconPress={handleSearch}
             loading={searchLoading}
           />
           <ScrollView className={"bg-white"}>
             {searchResults?.map(
-              (profile) =>
-                profile.id !== session?.user.id && (
-                  <View key={profile.id}>
+              (result) =>
+                result.id !== session?.user.id && (
+                  <View key={result.id}>
                     <SearchProfile
                       onAdd={handleAddFriend}
                       onCancel={handleCancelFriendReq}
-                      profile={profile}
+                      profile={result}
                     />
                   </View>
                 ),
@@ -327,7 +348,7 @@ export default function FriendScreen() {
             <View className={"items-end"}>
               <Text className={"text-2xl"}>Total Payable</Text>
               <Text className={"text-2xl font-bold"}>
-                - €{Math.abs(profile?.total_payable.toFixed(2))}
+                - €{Math.abs(profile?.total_payable ?? 0).toFixed(2)}
               </Text>
             </View>
           </View>
@@ -337,20 +358,29 @@ export default function FriendScreen() {
             <UnderlinedText text="All Friends" fontSize={32} fontWeight="700" />
           </View>
           <View className="p-4 gap-4">
-            {friends?.map(({ profile: { id, email, avatar_url } }) => (
-              <Friend
-                key={id}
-                email={email}
-                avatar_url={avatar_url}
-                onRemove={() => {
-                  setRemovingFriend({
-                    id,
-                    email,
-                  });
-                  setIsDialogVisible(true);
-                }}
-              />
-            ))}
+            {friends?.map((row) => {
+              const friendProfile = Array.isArray(row.profile)
+                ? row.profile[0]
+                : row.profile;
+              if (!friendProfile) {
+                return null;
+              }
+              const { id, email, avatar_url } = friendProfile;
+              return (
+                <Friend
+                  key={id}
+                  email={email}
+                  avatar_url={avatar_url}
+                  onRemove={() => {
+                    setRemovingFriend({
+                      id,
+                      email,
+                    });
+                    setIsDialogVisible(true);
+                  }}
+                />
+              );
+            })}
           </View>
         </View>
         <Portal>
@@ -370,7 +400,13 @@ export default function FriendScreen() {
             </Dialog.Content>
             <Dialog.Actions>
               <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
-              <Button onPress={() => handleRemove(removingFriend.id)}>
+              <Button
+                onPress={() => {
+                  if (removingFriend.id) {
+                    handleRemove(removingFriend.id);
+                  }
+                }}
+              >
                 Ok
               </Button>
             </Dialog.Actions>
