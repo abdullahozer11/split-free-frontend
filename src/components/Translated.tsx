@@ -123,7 +123,7 @@ export const useTranslations = () => {
   const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
-  const t = (key, fallback) => int[key] || fallback || key;
+  const t = (key, fallback = undefined) => int[key] || fallback || key;
 
   return { t, translations: int };
 };
@@ -139,6 +139,7 @@ export const Link = ({ children, ...props }) => {
   return <ERLink {...props}>{translatedChildren}</ERLink>;
 };
 
+/** Translates Stack.Screen option strings. Use inside a screen, not as a layout child — Expo Router layouts require `Stack.Screen` by component identity. */
 export const StackScreen = ({ options, ...props }) => {
   const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;

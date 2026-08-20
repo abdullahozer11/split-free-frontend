@@ -1,16 +1,24 @@
 import React from "react";
 import { Stack } from "expo-router";
-import { StackScreen } from "@/src/components/Translated";
+import { useTranslations } from "@/src/components/Translated";
 
 export default function SettingsStack() {
+  const { t } = useTranslations();
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <StackScreen name="index" options={{ title: "Settings" }} />
-      <StackScreen name="notifications" options={{ title: "Notifications" }} />
-      <StackScreen name="language" options={{ title: "Language" }} />
-      <StackScreen name="terms" options={{ title: "Terms and conditions" }} />
-      <StackScreen name="faq" options={{ title: "FAQ" }} />
-      <StackScreen name="password" options={{ title: "Password" }} />
+      <Stack.Screen name="index" options={{ title: t("Settings") }} />
+      <Stack.Screen
+        name="notifications"
+        options={{ title: t("Notifications") }}
+      />
+      <Stack.Screen name="language" options={{ title: t("Language") }} />
+      <Stack.Screen
+        name="terms"
+        options={{ title: t("Terms and conditions") }}
+      />
+      <Stack.Screen name="faq" options={{ title: t("FAQ") }} />
+      <Stack.Screen name="password" options={{ title: t("Password") }} />
     </Stack>
   );
 }
