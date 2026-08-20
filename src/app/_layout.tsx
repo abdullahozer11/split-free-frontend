@@ -1,3 +1,4 @@
+import "../../global.css";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { SettingsProvider } from "@/src/providers/SettingsProvider.js";
 import { Stack } from "expo-router";
