@@ -1,5 +1,10 @@
 # Learnings
 
+## Supabase env var names
+
+- Expo inlines `EXPO_PUBLIC_*` from `.env` at bundle time. `createClient` in `src/lib/supabase.ts` requires `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
+- A mismatched name (`EXPO_PUBLIC_SUPABASE_KEY` or `EXPO_PUBLIC_SUPABASE_ANON`) becomes `""` and supabase-js throws `supabaseKey is required`. Keep `.env.sample` in sync with the code.
+
 ## Expo SDK 54 upgrade (from 51)
 
 - Jumping SDK 51 → 54 also moves React 18.2 → 19.1 and React Native 0.74 → 0.81. `npx expo install expo@^54.0.0 --fix` updates `package.json`, but a single `npm install` can fail on mixed React 18/19 peer ranges. Installing with `legacy-peer-deps` (project `.npmrc`) is required for `npm ci` as well.

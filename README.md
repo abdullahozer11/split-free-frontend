@@ -48,6 +48,16 @@ Follow these steps to get started with the SplitFree app:
 npm install
 ```
 
+### Configure environment variables
+
+Copy `.env.sample` to `.env` and set the hosted or local Supabase values:
+
+```bash
+cp .env.sample .env
+```
+
+`src/lib/supabase.ts` reads `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Restart Expo after changing `.env`.
+
 ### Start the Expo development server
 
 ```
