@@ -1,7 +1,8 @@
 const { supabase } = require("../../jest.setup");
 
-// Mock data for test
-const email = "jest@splitfree.xyz";
+jest.setTimeout(30000);
+
+const email = `jest.${Date.now()}@splitfree.xyz`;
 const password = "jestjest";
 let groupId = 0;
 let expenseId = 0;
@@ -12,23 +13,27 @@ let Alice = null;
 let Michael = null;
 let John = null;
 
+const memberIdByName = (name) => {
+  const member = group.members.find((row) => row.name === name);
+  expect(member).toBeDefined();
+  return member.id;
+};
+
 describe("Flow complete", () => {
   test("should create new user", async () => {
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     expect(error).toBeNull();
+    expect(data.session).toBeDefined();
+    expect(data.session.access_token).toBeDefined();
   });
 
   test("user session should exist", async () => {
-    try {
-      const { data, error } = await supabase.auth.getSession();
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.session).toBeDefined();
-      expect(data.session.access_token).toBeDefined();
-      expect(data.session.refresh_token).toBeDefined();
-    } catch (error) {
-      console.error("Error getting session:", error.message);
-    }
+    const { data, error } = await supabase.auth.getSession();
+    expect(error).toBeNull();
+    expect(data).toBeDefined();
+    expect(data.session).toBeDefined();
+    expect(data.session.access_token).toBeDefined();
+    expect(data.session.refresh_token).toBeDefined();
   });
 
   test("should sign out successfully after signing up", async () => {
@@ -45,13 +50,9 @@ describe("Flow complete", () => {
   });
 
   test("user session should not exist", async () => {
-    try {
-      const { data, error } = await supabase.auth.getSession();
-      expect(error).toBeNull();
-      expect(data).toBeNull();
-    } catch (error) {
-      console.error("Error getting session:", error.message);
-    }
+    const { data, error } = await supabase.auth.getSession();
+    expect(error).toBeNull();
+    expect(data.session).toBeNull();
   });
 
   test("should sign in successfully with correct credentials", async () => {
@@ -78,6 +79,7 @@ describe("Flow complete", () => {
       const { data: _groupId, error } = await supabase.rpc("create_group", {
         member_names_input: member_names,
         title_input: title,
+        currency_input: "EUR",
       });
       expect(error).toBeNull();
       expect(_groupId).toBeDefined();
@@ -155,9 +157,9 @@ describe("Flow complete", () => {
         .single();
       expect(error).toBeNull();
       group = _Group;
-      Alice = group.members[0].id;
-      Michael = group.members[1].id;
-      John = group.members[2].id;
+      Alice = memberIdByName("Alice");
+      Michael = memberIdByName("Michael");
+      John = memberIdByName("John");
       expect(group).toBeDefined();
       expect(group.id).toBe(groupId);
       expect(group.members.length).toEqual(3);
@@ -174,8 +176,7 @@ describe("Flow complete", () => {
         "create_expense",
         {
           amount_input: 30,
-          currency_input: "EUR",
-          date_input: new Date(),
+          date_input: new Date().toISOString(),
           category_input: "Shopping",
           description_input: "",
           group_id_input: groupId,
@@ -193,8 +194,7 @@ describe("Flow complete", () => {
         "create_expense",
         {
           amount_input: 90,
-          currency_input: "EUR",
-          date_input: new Date(),
+          date_input: new Date().toISOString(),
           category_input: "Entertainment",
           description_input: "",
           group_id_input: groupId,
@@ -226,6 +226,7 @@ describe("Flow complete", () => {
       expect(group.settled).toBeFalsy();
     } catch (error) {
       console.error("Error setting group settled status:", error.message);
+      throw error;
     }
   });
 
@@ -896,20 +897,20 @@ describe("Flow complete", () => {
   });
 
   test("user can delete itself", async () => {
-    try {
-      await supabase.auth.signInWithPassword({ email, password });
-      const { data, error: error3 } = await supabase.auth.getSession();
-      expect(error3).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.session.access_token).toBeDefined();
-      expect(data.session.refresh_token).toBeDefined();
-      const { error } = await supabase.rpc("deleteuser");
-      expect(error).toBeNull();
-      const { data: data2, error: error2 } = await supabase.auth.getSession();
-      expect(error2).toBeNull();
-      expect(data2).toBeNull();
-    } catch (error) {
-      console.error("Error getting session:", error.message);
-    }
+    const { data, error: sessionError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+    expect(sessionError).toBeNull();
+    expect(data.session).toBeDefined();
+    const { error } = await supabase.rpc("deleteuser");
+    expect(error).toBeNull();
+    await supabase.auth.signOut();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    expect(signInError).not.toBeNull();
   });
 });

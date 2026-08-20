@@ -32,6 +32,44 @@ jobs:
       - name: Run tests
         run: npm test -- --ci --watchAll=false --coverage=false
 
+  supabase:
+    name: supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.115.0
+
+      - name: Start local Supabase
+        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,realtime,storage-api,edge-runtime,postgres-meta,supavisor
+
+      - name: Export local credentials
+        run: |
+          eval "$(supabase status -o env)"
+          echo "EXPO_PUBLIC_SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
+          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${ANON_KEY}" >> "$GITHUB_ENV"
+
+      - name: Run complete flow
+        run: npm run test:supabase
+
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop
+
   typecheck:
     name: typecheck
     runs-on: ubuntu-latest

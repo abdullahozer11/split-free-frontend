@@ -11,7 +11,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 /workspaces/split-free-frontend/
 ├── .github/                       # GitHub Actions CI
 │   └── workflows/
-│       └── pr-checks.yml          # Jest, typecheck, ESLint, Prettier, and typos on PRs targeting master
+│       └── pr-checks.yml          # Jest, local Supabase flow, typecheck, ESLint, Prettier, typos
 ├── .nvmrc                         # Node 20.19.4 for local and GitHub Actions jobs
 ├── .agents/                       # Canonical agent skills (Gemini CLI and other universal agents)
 │   └── skills/
@@ -20,6 +20,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ├── .grok/                         # Grok-native skill links (relative symlinks into .agents/skills)
 │   └── skills/
 ├── eslint.config.js               # ESLint flat config (expo + prettier + jest)
+├── jest.supabase.config.js        # Jest config for local Supabase complete_flow tests
 ├── .npmrc                         # npm legacy-peer-deps so React 19 peer ranges resolve
 ├── .prettierrc.json               # Prettier options shared with ESLint
 ├── .prettierignore                # Prettier exclusions (lockfile, generated types, docs)
@@ -42,7 +43,8 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ├── __tests__/                     # Test suite (unit, integration, mock storage adapters)
 │   ├── App.test.js                # Root layout snapshot
 │   ├── InMemoryStorageAdapter.js  # Auth storage stub for tests
-│   ├── usecase/                   # End-to-end supabase flow coverage
+│   ├── usecase/                   # Local Supabase complete_flow (npm run test:supabase)
+│   │   └── complete_flow.test.js  # Auth, group, expense, debt, settle, delete contract
 │   └── utils/                     # Pure helper unit tests (expense form defaults, activity frontier merge)
 ├── ai/                            # Python benchmarking scripts for AI evaluation
 ├── assets/                        # Static typography and branding graphics
@@ -84,8 +86,9 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │       └── helpers.ts
 └── supabase/                      # Local and cloud Supabase backend configuration
     ├── config.toml                # Supabase system configuration
+    ├── seed.sql                   # Empty seed; integration tests create their own rows
     ├── functions/                 # Backend edge functions (Deno-based Gemini and OpenAI APIs)
-    └── migrations/                # Database migrations (PostgreSQL schema setups, RPCs, trigger functions)
+    └── migrations/                # Database migrations (PostgreSQL schema, RPCs, auth profile trigger)
 ```
 
 ---
@@ -114,4 +117,4 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 4. **Offline Persistence:** Settings, locale configurations, and custom indicators (e.g. anchored group lists) are saved to offline local storage using `@react-native-async-storage/async-storage`.
 5. **Secure Authentication Persistence:** Credentials and session profiles are stored in Expo's standard `SecureStore` using a custom secure adapter `ExpoSecureStoreAdapter` inside `src/lib/supabase.ts` that removes raw metadata properties prior to storage for improved performance and token economy.
 6. **Styling and Theme Integration:** Styling utilizes **NativeWind v4** (Tailwind CSS for React Native, Metro CSS via `global.css`) to ensure responsiveness and standard formatting across Android, iOS, and Web build platforms.
-7. **PR quality gates:** Pull requests targeting `master` must pass Jest (`npm test`), TypeScript (`npm run typecheck` — API/lib/generated types via `tsconfig.typecheck.json`), ESLint (`npm run lint`), Prettier (`npm run format:check`), and `typos`. CI Node is `20.19.4` from `.nvmrc`. Format locally with `npm run format`.
+7. **PR quality gates:** Pull requests targeting `master` must pass Jest (`npm test`), local Supabase complete flow (`npm run test:supabase`), TypeScript (`npm run typecheck` — API/lib/generated types via `tsconfig.typecheck.json`), ESLint (`npm run lint`), Prettier (`npm run format:check`), and `typos`. CI Node is `20.19.4` from `.nvmrc`. Format locally with `npm run format`. Never point `test:supabase` at a hosted project.
