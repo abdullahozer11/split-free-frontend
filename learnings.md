@@ -86,6 +86,7 @@
 
 - NativeWind v4 only maps `className` onto React Native core views. `react-native-element-dropdown` (`Dropdown`, `MultiSelect`) ignores it, so `flex-1`, `bg-white`, and `mt-[30px]` never applied. Style those with the library's `style` / `placeholderStyle` / `selectedTextStyle` props.
 - Paper `Text` still wins on color and alignment over `className`. Use `style` for Save labels and any text that must be centered or tinted.
+- Paper `TextInput` is not a core view. Without `cssInterop`, `className` (`bg-white`, `border`) lands on the inner native field. Flat mode still fills the Paper container with MD3 `surfaceVariant` (lavender). A trailing `TextInput.Icon` sits in that gutter, and Paper's `IconButton` can paint its own fill. Map `className` → `style` on the wrapper, default the Paper container to white, make the inner field transparent, and clone icons with `containerColor="transparent"` so the `adornment.type === TextInput.Icon` check still matches.
 
 ## Expo Router layout children
 
