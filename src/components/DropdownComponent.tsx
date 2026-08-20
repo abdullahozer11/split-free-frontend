@@ -11,16 +11,12 @@ const MyDropdown = ({ selected, label, data, onChange }) => {
   const int = translations[settings.language] || translations.en;
 
   return (
-    <View className="bg-white border-[0.5px] rounded flex-1">
-      <Text
-        variant="titleMedium"
-        className="absolute left-[10px] bg-white top-[8px] z-999 px-2"
-      >
+    <View className="bg-white border-[0.5px] rounded flex-1 p-2">
+      <Text variant="titleMedium" style={styles.label}>
         {label}
       </Text>
       <Dropdown
-        style={isFocus && { borderColor: "blue" }}
-        className="pl-[30px] pr-[8px] mt-[30px]"
+        style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
@@ -47,6 +43,15 @@ const MyDropdown = ({ selected, label, data, onChange }) => {
 export default MyDropdown;
 
 const styles = StyleSheet.create({
+  label: {
+    paddingLeft: 8,
+    paddingTop: 4,
+  },
+  dropdown: {
+    paddingHorizontal: 8,
+    marginTop: 4,
+    minHeight: 40,
+  },
   placeholderStyle: {
     fontSize: 16,
   },

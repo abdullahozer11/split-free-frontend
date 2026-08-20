@@ -10,12 +10,13 @@ import {
   Alert,
   Pressable,
   ScrollView,
+  StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import { getFormattedDate, formatDate } from "@/src/utils/helpers";
-import { ActivityIndicator, Avatar, Tooltip } from "react-native-paper";
-import { Button, TextInput, Text } from "@/src/components/Translated";
+import { ActivityIndicator, Avatar } from "react-native-paper";
+import { TextInput, Text } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import MyDropdown from "@/src/components/DropdownComponent";
@@ -294,11 +295,6 @@ export default function ExpenseForm({
     }));
   };
 
-  // Get the translated category name for display
-  const getDisplayCategoryName = (categoryKey) => {
-    return int[categoryKey] || categoryKey;
-  };
-
   return (
     <ScrollView className={"flex-1"}>
       <View
@@ -408,7 +404,7 @@ export default function ExpenseForm({
           <Text variant={"bodyLarge"}>
             Pick expense category or use AI to generate
           </Text>
-          <View className={"flex-row gap-4"}>
+          <View className={"flex-row items-center"} style={{ gap: 8 }}>
             <Dropdown
               data={exp_cats}
               labelField={settings.language}
@@ -418,43 +414,72 @@ export default function ExpenseForm({
                 handleInputChange("category", item.name);
                 setIsFocus(false);
               }}
-              className={"flex-1 rounded-md text-xl text-pink-300 bg-white p-2"}
-              selectedTextStyle={{ marginLeft: 10 }}
+              style={styles.categoryDropdown}
+              selectedTextStyle={styles.categorySelectedText}
               renderItem={renderCatItem}
-              getDisplayText={(item) => getDisplayCategoryName(item.name)}
               value={category}
               dropdownPosition={"top"}
             />
-            <Tooltip title="Auto generate">
-              <Button
-                className={"bg-white justify-center rounded-md flex-1"}
-                onPress={handleGenerateCat}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator />
-                ) : (
-                  <FontAwesome6
-                    name={"wand-magic-sparkles"}
-                    size={18}
-                    color={"black"}
-                  />
-                )}
-              </Button>
-            </Tooltip>
+            <TouchableOpacity
+              style={styles.aiButton}
+              onPress={handleGenerateCat}
+              disabled={isLoading}
+              accessibilityLabel="Auto generate"
+            >
+              {isLoading ? (
+                <ActivityIndicator />
+              ) : (
+                <FontAwesome6
+                  name={"wand-magic-sparkles"}
+                  size={18}
+                  color={"black"}
+                />
+              )}
+            </TouchableOpacity>
           </View>
           <TouchableOpacity
             className={"bg-white rounded-md border-2 border-green-500"}
+            style={styles.saveButton}
             onPress={() => {
               onSubmit();
             }}
           >
-            <Text className={"font-bold text-center py-4 text-green-500"}>
-              Save
-            </Text>
+            <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  categoryDropdown: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    minHeight: 48,
+  },
+  categorySelectedText: {
+    fontSize: 16,
+    marginLeft: 4,
+  },
+  aiButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  saveButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+  },
+  saveButtonText: {
+    fontWeight: "700",
+    color: "#22c55e",
+    fontSize: 16,
+  },
+});

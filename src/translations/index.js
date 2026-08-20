@@ -132,8 +132,8 @@ export const translations = {
     "Enter expense description (optional)":
       "Enter expense description (optional)",
     Save: "Save",
-    "Who paid?": "Who paid??",
-    "Who shares this expense?": "Who shares this expense??",
+    "Who paid?": "Who paid?",
+    "Who shares this expense?": "Who shares this expense?",
     "Pick expense category or use AI to generate":
       "Pick expense category or use AI to generate",
     "Select item": "Select item",

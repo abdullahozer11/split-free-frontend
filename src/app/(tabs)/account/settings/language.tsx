@@ -1,4 +1,4 @@
-import { Alert, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "@/src/components/Translated";
 import { ActivityIndicator } from "react-native-paper";
 import React, { useEffect, useState } from "react";
@@ -107,11 +107,11 @@ const Languages = () => {
       <View className="flex-1 justify-center items-center px-6 gap-6">
         <Text className="text-3xl font-semibold">Select Language</Text>
         <Dropdown
-          className="w-full border-gray-300 border rounded-md px-4 h-20"
-          placeholderStyle="text-gray-500 text-base"
-          selectedTextStyle="text-base"
-          inputSearchStyle="h-10 text-base"
-          iconStyle="w-5 h-5"
+          style={styles.dropdown}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          iconStyle={styles.iconStyle}
           data={data}
           search
           maxHeight={300}
@@ -126,7 +126,7 @@ const Languages = () => {
             handleValueChange(item.value);
           }}
           renderLeftIcon={() => (
-            <Feather name="globe" size={20} className="text-black" />
+            <Feather name="globe" size={20} color="black" />
           )}
         />
       </View>
@@ -135,3 +135,29 @@ const Languages = () => {
 };
 
 export default Languages;
+
+const styles = StyleSheet.create({
+  dropdown: {
+    width: "100%",
+    height: 80,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 6,
+    paddingHorizontal: 16,
+  },
+  placeholderStyle: {
+    color: "#6b7280",
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+});
