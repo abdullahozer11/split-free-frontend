@@ -19,8 +19,8 @@ export const useDebt = (memberId: number, profileMemberId: number) => {
         return null;
       }
 
-      // console.log("useDebt success: ", data);
-      return data;
+      // Pairwise member debt is one row; the details screen reads amount.
+      return data[0];
     },
     enabled: !!memberId && !!profileMemberId && memberId !== profileMemberId,
   });

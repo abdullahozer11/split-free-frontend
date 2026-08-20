@@ -33,8 +33,8 @@
 
 ## CI typecheck scope
 
-- Full-app `tsc --noEmit` still fails on loosely typed group stats, member details, and group update. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
-- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `expense_categories`, `helpers`, providers, the translation catalog, typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`), shared UI (`GroupItem`, `ExpenseItem`, `TransferItem`, `Person`, dropdowns, headers), `ExpenseForm`, group create modals, auth/account/global screens, friends, join, the group list, group details, expenses, and transfers. Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Full-app `tsc --noEmit` is clean after typing group stats, member details, and group update. Gate PRs on `npm run typecheck` (`tsconfig.typecheck.json` now includes those remaining group screens). Expand the include list if new untyped files appear.
+- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `expense_categories`, `helpers`, providers, the translation catalog, typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`), shared UI (`GroupItem`, `ExpenseItem`, `TransferItem`, `Person`, dropdowns, headers), `ExpenseForm`, group create modals, auth/account/global screens, friends, join, the group list, group details/stats/update, expenses, transfers, and member details. Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
 - Interval timers need `ReturnType<typeof setInterval>`. Expo Router `href` template strings only typecheck when the page segment is a literal union. Profile `language` is `string | null` in the DB — narrow with `isLanguage` before writing `Settings.language`.
 - `useState([])` infers `never[]`. Give member-name lists an explicit `string[]` bound, search results a `SearchableProfile[]` bound, and anchored groups a `GroupListItem[]` bound. RPC optional text args are `string | undefined`, not `null` — omit `proof` / empty `description` instead of passing `null`.
 - Expo Router has no `/(tabs)` href; send join-flow fallbacks to `/(tabs)/group`. Dynamic group screens need `{ pathname: "/(tabs)/group/[group_id]/details", params: { group_id } }`, not a trailing-slash list path. Nested `profile:friend(...)` / `sender_profile:sender(...)` / `profile(...)` selects are objects (or object arrays) — unwrap before reading `id` / `email`.
@@ -46,6 +46,8 @@
 - Date helpers must type `toLocaleDateString` options as `Intl.DateTimeFormatOptions` (or `as const`). Bare `{ year: "numeric" }` infers `string` and misses the overload.
 - Empty-array defaults on untyped `mergeActivityWithFrontier` args infer `never[]`, so spreading a row is TS2698. Give the merge args an `ActivityRecord` bound (and default `= {}` on the object, not `= []` on the generic).
 - GitHub Actions Node must match `engines.node` (`>=20.19.4`). Pin via `.nvmrc` (`20.19.4`), not `node-version: 20`.
+- Category totals need a `Record<string, { category: ExpenseCategory; total: number }>` accumulator. Empty `{}` infers `never[]` when the empty path returns `[]`, so Object.keys cannot index `.category` / `.total`. Import `react-native-pie-chart` from the package entry; `src/index.tsx` is not covered by `skipLibCheck`.
+- `useDebt` returns one pairwise row (or null), not the select array. Member name state is `string`. New group-update members have no `id` yet — `DeletableMember` must not require it, and delete-from-list should fall back to name.
 
 ## Translation catalog and wrappers
 
