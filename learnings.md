@@ -51,6 +51,11 @@
 - Use `SafeAreaView` / `useSafeAreaInsets` from `react-native-safe-area-context` (already a dependency). Expo Router supplies `SafeAreaProvider`.
 - `no-restricted-imports` in `eslint.config.js` blocks the core export.
 
+## NativeWind className on third-party components
+
+- NativeWind v4 only maps `className` onto React Native core views. `react-native-element-dropdown` (`Dropdown`, `MultiSelect`) ignores it, so `flex-1`, `bg-white`, and `mt-[30px]` never applied. Style those with the library's `style` / `placeholderStyle` / `selectedTextStyle` props.
+- Paper `Text` still wins on color and alignment over `className`. Use `style` for Save labels and any text that must be centered or tinted.
+
 ## Paper Text on dark headers
 
 - `react-native-paper` `Text` sets `color` from `theme.colors.onSurface` (dark in the light theme). NativeWind `className="text-white"` on the `Translated` wrapper does not override that style.

@@ -28,11 +28,11 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
 
   return (
     <View className={"rounded-md border-[0.5px] bg-white p-2"}>
-      <Text variant={"titleMedium"} className={"pl-2 pt-2"}>
+      <Text variant={"titleMedium"} style={styles.label}>
         Who shares this expense?
       </Text>
       <MultiSelect
-        className={"pl-7 pr-2 mt-2"}
+        style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
@@ -70,6 +70,16 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
 export default MyMultiSelect;
 
 const styles = StyleSheet.create({
+  label: {
+    paddingLeft: 8,
+    paddingTop: 8,
+  },
+  dropdown: {
+    paddingLeft: 28,
+    paddingRight: 8,
+    marginTop: 8,
+    minHeight: 40,
+  },
   placeholderStyle: {
     fontSize: 16,
   },
