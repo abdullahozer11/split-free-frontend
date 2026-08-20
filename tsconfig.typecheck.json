@@ -33,6 +33,9 @@
     "src/components/UnderlinedText.tsx",
     "src/components/useClientOnlyValue.ts",
     "src/components/useClientOnlyValue.web.ts",
+    "src/components/ExpenseForm.tsx",
+    "src/modals/**/*.ts",
+    "src/modals/**/*.tsx",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
   ]

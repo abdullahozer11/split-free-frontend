@@ -33,8 +33,10 @@
 
 ## CI typecheck scope
 
-- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and `ExpenseForm`. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
-- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `expense_categories`, `helpers`, providers, the translation catalog, typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`), and shared UI (`GroupItem`, `ExpenseItem`, `TransferItem`, `Person`, dropdowns, headers). Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Full-app `tsc --noEmit` still fails on loosely typed `src/app` screens. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
+- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, `expense_categories`, `helpers`, providers, the translation catalog, typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`), shared UI (`GroupItem`, `ExpenseItem`, `TransferItem`, `Person`, dropdowns, headers), `ExpenseForm`, and group create modals. Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- `useState([])` infers `never[]`. Give member-name lists an explicit `string[]` bound. RPC optional text args are `string | undefined`, not `null` — omit `proof` / empty `description` instead of passing `null`.
+- Category dropdown `labelField` is an `ExpenseCategory` key. `Language` includes `de` and the catalog does not; map `de` to `en`. Missing catalog keys (`Select a category`) must go through `t()`, not `dictionary[key]`.
 - List-row props should be view models (selected query columns), not full `Tables["…"]["Row"]`. Nested `profile(...)` selects are objects; the members table `profile` column is a UUID.
 - Paper `Text` has no `color` prop — use `style={{ color }}`. `MultiSelect` `renderRightIcon` must return `ReactElement | null`, not `false && <El/>`.
 - `exp_cats[].icon` must be a `MaterialIcons` glyph name or `ExpenseItem` cannot pass it to `name`.

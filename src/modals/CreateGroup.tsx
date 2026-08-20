@@ -10,7 +10,15 @@ import { ActivityIndicator } from "react-native-paper";
 import { useQueryClient } from "@tanstack/react-query";
 import { currencyOptions } from "@/src/constants";
 
-const CreateGroupModal = ({ isVisible, onClose }) => {
+type CreateGroupModalProps = {
+  isVisible: boolean;
+  onClose: () => void;
+};
+
+const ownerName = (fullName: string | null | undefined): string[] =>
+  fullName ? [fullName] : [];
+
+const CreateGroupModal = ({ isVisible, onClose }: CreateGroupModalProps) => {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [currency, setCurrency] = useState("EUR");
@@ -21,11 +29,15 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
   const { mutate: insertGroup } = useInsertGroup();
 
   const { setSession, session } = useAuth();
-  const { data: profile, isLoading, isError } = useProfile(session?.user.id);
-  const [members, setMembers] = useState([]);
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useProfile(session?.user.id ?? "");
+  const [members, setMembers] = useState<string[]>([]);
 
   useEffect(() => {
-    setMembers([profile?.full_name]);
+    setMembers(ownerName(profile?.full_name));
   }, [profile]);
 
   if (isLoading) {
@@ -37,15 +49,15 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
     return <Text>Failed to fetch data</Text>;
   }
 
-  const handleParticipantsSubmit = (members) => {
+  const handleParticipantsSubmit = (nextMembers: string[]) => {
     setShowParticipantsModal(false);
-    setMembers(members);
+    setMembers(nextMembers);
   };
 
   const resetFields = () => {
     setTitle("");
     setCurrency("EUR");
-    setMembers([profile?.full_name]);
+    setMembers(ownerName(profile?.full_name));
   };
 
   const handleCreateGroup = async () => {
@@ -64,7 +76,7 @@ const CreateGroupModal = ({ isVisible, onClose }) => {
         onSuccess: async () => {
           resetFields();
           onClose();
-          await queryClient.invalidateQueries(["groups"]);
+          await queryClient.invalidateQueries({ queryKey: ["groups"] });
         },
         onError: (error) => {
           console.error("Server error:", error);
