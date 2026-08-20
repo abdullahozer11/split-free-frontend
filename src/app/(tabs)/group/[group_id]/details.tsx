@@ -310,7 +310,9 @@ const GroupDetailsScreen = () => {
         onSuccess: () => {
           // console.log('Successfully inserted group invitation');
           setIsFriendSelectorVisible(false);
-          queryClient.invalidateQueries(["group_invites_for_group"]);
+          queryClient.invalidateQueries({
+            queryKey: ["group_invites_for_group"],
+          });
         },
         onError: (error) => {
           console.error("Server error:", error);
