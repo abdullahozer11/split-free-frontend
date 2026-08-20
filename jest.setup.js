@@ -1,4 +1,5 @@
 const { createClient } = require("@supabase/supabase-js");
+const WebSocket = require("ws");
 const InMemoryStorageAdapter = require("./__tests__/InMemoryStorageAdapter");
 
 const LOCAL_URL = "http://127.0.0.1:54321";
@@ -25,6 +26,8 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
+  // Node 20 has no global WebSocket; supabase-js still constructs RealtimeClient.
+  realtime: { transport: WebSocket },
 });
 
 module.exports = { supabase };
