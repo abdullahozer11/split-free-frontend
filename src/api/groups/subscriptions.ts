@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { realtimeTopic } from "@/src/lib/realtime";
 import { supabase } from "@/src/lib/supabase";
 
 export const useGroupSubscriptions = () => {
@@ -7,7 +8,7 @@ export const useGroupSubscriptions = () => {
 
   useEffect(() => {
     const groupSubscription = supabase
-      .channel("public:groups")
+      .channel(realtimeTopic("public:groups"))
       .on(
         "postgres_changes",
         {
@@ -36,7 +37,7 @@ export const useGroupInviteSubscriptions = (profile_id?: string) => {
     }
 
     const groupInviteSubscription = supabase
-      .channel(`public:group_invitations:receiver:${profile_id}`)
+      .channel(realtimeTopic(`public:group_invitations:receiver:${profile_id}`))
       .on(
         "postgres_changes",
         {

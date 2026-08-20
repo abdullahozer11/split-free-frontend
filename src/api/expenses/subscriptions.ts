@@ -1,10 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useId } from "react";
+import { useEffect } from "react";
+import { realtimeTopic } from "@/src/lib/realtime";
 import { supabase } from "@/src/lib/supabase";
 
 export const useExpenseSubscription = (group_id?: number) => {
   const queryClient = useQueryClient();
-  const instanceId = useId().replace(/:/g, "");
 
   useEffect(() => {
     if (!group_id) {
@@ -12,7 +12,7 @@ export const useExpenseSubscription = (group_id?: number) => {
     }
 
     const expenseSubscription = supabase
-      .channel(`public:expenses:group:${group_id}:${instanceId}`)
+      .channel(realtimeTopic(`public:expenses:group:${group_id}`))
       .on(
         "postgres_changes",
         {
@@ -33,5 +33,5 @@ export const useExpenseSubscription = (group_id?: number) => {
     return () => {
       supabase.removeChannel(expenseSubscription);
     };
-  }, [group_id, queryClient, instanceId]);
+  }, [group_id, queryClient]);
 };

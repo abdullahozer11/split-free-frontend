@@ -77,7 +77,9 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │   │       └── group/             # Dynamic routes and screens for group details, expenses, and stats
 │   ├── components/                # Reusable, modular UI components styled with NativeWind
 │   ├── constants/                 # Static configuration files, styling constants, and core theme colors
-│   ├── lib/                       # Client initializations (Supabase clients and custom SecureStore storage adapters)
+│   ├── lib/                       # Client initializations (Supabase clients, realtime channel names, SecureStore adapters)
+│   │   ├── supabase.ts            # Typed supabase-js client and Expo SecureStore auth adapter
+│   │   └── realtime.ts            # Unique channel topics so postgres_changes is not added after subscribe()
 │   ├── modals/                    # App-wide overlay modals (group forms, participant selectors)
 │   ├── providers/                 # React Context providers managing Auth, React Query, and App settings
 │   ├── translations/              # Static multi-language translation databases (JSON mapping key-to-locale values)
