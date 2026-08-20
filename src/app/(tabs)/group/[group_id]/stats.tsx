@@ -1,7 +1,7 @@
 import { View, TouchableOpacity, ScrollView } from "react-native";
 import { MenuItem, Text, Button } from "@/src/components/Translated";
 import { ActivityIndicator, Menu } from "react-native-paper";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,6 +11,7 @@ import {
   GroupedExpenseItem,
 } from "@/src/components/ExpenseItem.tsx";
 import { useExpenseList } from "@/src/api/expenses/index.ts";
+import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
 import { useProfileMember } from "@/src/api/members/index.ts";
 import { useAuth } from "@/src/providers/AuthProvider.tsx";
 import PieChart from "react-native-pie-chart/src/index.tsx";
@@ -40,12 +41,32 @@ const Stats = () => {
   const navigation = useNavigation();
   const { session } = useAuth();
 
-  const { data: expenses, isError, isLoading } = useExpenseList(groupId);
+  const {
+    data: expensePages,
+    isError,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useExpenseList(groupId);
   const {
     data: profileMember,
     isError: profileMemberError,
     isLoading: profileMemberLoading,
   } = useProfileMember(session?.user.id, groupId);
+
+  useExpenseSubscription(groupId);
+
+  useEffect(() => {
+    if (hasNextPage && !isFetchingNextPage && !isError) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, isError]);
+
+  const expenses = useMemo(
+    () => expensePages?.pages.flat() ?? [],
+    [expensePages],
+  );
 
   const personalExpenses = useMemo(() => {
     if (!expenses.length) return [];
@@ -173,7 +194,8 @@ const Stats = () => {
   }, [personalExpenses, expenses]);
 
   const { biggestExpenseM, biggestExpensePerM } = useMemo(() => {
-    if (!expensesM) return { biggestExpenseM: null, biggestExpensePerM: null };
+    if (!expensesM.length)
+      return { biggestExpenseM: null, biggestExpensePerM: null };
     const max1 = expensesM.reduce(
       (max, expense) => (expense.amount > max.amount ? expense : max),
       expensesM[0],
@@ -265,12 +287,18 @@ const Stats = () => {
   );
   const lh = categories.length > 10 ? 16 : 20;
 
-  if (isLoading || profileMemberLoading || groupLoading) {
-    return <ActivityIndicator />;
-  }
-
   if (isError || profileMemberError || groupError) {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
+  }
+
+  if (
+    isLoading ||
+    hasNextPage ||
+    isFetchingNextPage ||
+    profileMemberLoading ||
+    groupLoading
+  ) {
+    return <ActivityIndicator />;
   }
 
   const currencyOption = currencyOptions.find(
@@ -335,18 +363,18 @@ const Stats = () => {
           </View>
           <View className="flex-row justify-between items-center rounded-[15px] overflow-hidden">
             <Button
-              textColor={toggleOnGroup ? "gray" : "white"}
-              onPress={() => setToggleOnGroup(false)}
-              className="flex-1 rounded-[0px]"
-              style={{ backgroundColor: toggleOnGroup ? "lightgray" : "black" }}
-            >
-              Group
-            </Button>
-            <Button
               textColor={toggleOnGroup ? "white" : "gray"}
               onPress={() => setToggleOnGroup(true)}
               className="flex-1 rounded-[0px]"
               style={{ backgroundColor: toggleOnGroup ? "black" : "lightgray" }}
+            >
+              Group
+            </Button>
+            <Button
+              textColor={toggleOnGroup ? "gray" : "white"}
+              onPress={() => setToggleOnGroup(false)}
+              className="flex-1 rounded-[0px]"
+              style={{ backgroundColor: toggleOnGroup ? "lightgray" : "black" }}
             >
               Personal
             </Button>
