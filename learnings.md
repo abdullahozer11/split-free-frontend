@@ -39,6 +39,12 @@
 - Expo Router 6 depends on React Navigation **7**. Leaving `@react-navigation/native` at v6 as a direct dependency can hoist the wrong version.
 - SDK 54 minimum Node is **20.19.4**. New Architecture is the default; JSC is gone.
 
+## Deprecated React Native SafeAreaView
+
+- Importing `SafeAreaView` from `react-native` hits a getter that `warnOnce`s: "SafeAreaView has been deprecated... use react-native-safe-area-context".
+- Use `SafeAreaView` / `useSafeAreaInsets` from `react-native-safe-area-context` (already a dependency). Expo Router supplies `SafeAreaProvider`.
+- `no-restricted-imports` in `eslint.config.js` blocks the core export.
+
 ## Paper Text on dark headers
 
 - `react-native-paper` `Text` sets `color` from `theme.colors.onSurface` (dark in the light theme). NativeWind `className="text-white"` on the `Translated` wrapper does not override that style.

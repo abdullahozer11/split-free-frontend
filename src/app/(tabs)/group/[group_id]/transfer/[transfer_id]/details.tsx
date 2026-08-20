@@ -1,4 +1,5 @@
-import { View, SafeAreaView } from "react-native";
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/src/components/Translated";
 import React from "react";
 import { useLocalSearchParams } from "expo-router";

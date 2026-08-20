@@ -1,10 +1,5 @@
-import {
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from "react-native";
+import { View, TouchableOpacity, Image, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Button,
   TextInput,

@@ -23,6 +23,19 @@ module.exports = defineConfig([
           endOfLine: "auto",
         },
       ],
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "react-native",
+              importNames: ["SafeAreaView"],
+              message:
+                "Import SafeAreaView from react-native-safe-area-context. The React Native export is deprecated.",
+            },
+          ],
+        },
+      ],
     },
   },
   {
