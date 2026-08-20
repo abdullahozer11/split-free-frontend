@@ -56,6 +56,11 @@
 - NativeWind v4 only maps `className` onto React Native core views. `react-native-element-dropdown` (`Dropdown`, `MultiSelect`) ignores it, so `flex-1`, `bg-white`, and `mt-[30px]` never applied. Style those with the library's `style` / `placeholderStyle` / `selectedTextStyle` props.
 - Paper `Text` still wins on color and alignment over `className`. Use `style` for Save labels and any text that must be centered or tinted.
 
+## Expo Router layout children
+
+- `Stack` layouts keep only children whose type is `Screen` (`child.type === Screen`). Wrappers such as `StackScreen` in `Translated.tsx` are ignored and log: `Layout children must be of type Screen... Update Layout Route at: "app/(tabs)/account/profile/_layout"`.
+- In `_layout` files, use `Stack.Screen` and translate titles with `useTranslations()`. Keep `StackScreen` for setting options from inside a screen (auth, not-found).
+
 ## Paper Text on dark headers
 
 - `react-native-paper` `Text` sets `color` from `theme.colors.onSurface` (dark in the light theme). NativeWind `className="text-white"` on the `Translated` wrapper does not override that style.
