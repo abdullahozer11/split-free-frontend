@@ -16,7 +16,7 @@ const CollapsibleHeader = ({
   });
 
   return (
-    <View className={"flex-1"}>
+    <View className="flex-1">
       <ScrollView
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }],
@@ -24,13 +24,11 @@ const CollapsibleHeader = ({
         )}
         scrollEventThrottle={16}
       >
-        <View style={{ paddingTop: H_MAX_HEIGHT }} className={"min-h-900"}>
-          {content}
-        </View>
+        <View style={{ paddingTop: H_MAX_HEIGHT }}>{content}</View>
       </ScrollView>
       <Animated.View
         style={{ height: headerScrollHeight }}
-        className="absolute left-0 right-0 top-0 w-full overflow-hidden z-999 p-10 bg-black"
+        className="absolute left-0 right-0 top-0 w-full overflow-hidden z-[999] bg-black"
       >
         {headerContent}
       </Animated.View>

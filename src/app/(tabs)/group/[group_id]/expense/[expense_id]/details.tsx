@@ -246,14 +246,15 @@ const ExpenseDetailsScreen = () => {
             <View className="justify-between items-center">
               <Text
                 variant={"displaySmall"}
-                className="text-white mb-2 max-w-[70%]"
+                className="mb-2 max-w-[70%]"
+                style={{ color: "#FFFFFF" }}
               >
                 {expense?.title}
               </Text>
-              <Text className="text-sm font-200 text-white">
+              <Text className="text-sm font-200" style={{ color: "#FFFFFF" }}>
                 Last modified on
               </Text>
-              <Text className="text-sm font-200 text-white">
+              <Text className="text-sm font-200" style={{ color: "#FFFFFF" }}>
                 {expense &&
                   formatDateString(expense.last_modified, settings.language)}
               </Text>

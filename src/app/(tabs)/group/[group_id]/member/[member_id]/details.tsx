@@ -226,12 +226,13 @@ const MemberDetailsScreen = () => {
             <View className="justify-between items-center">
               <Text
                 variant={"displaySmall"}
-                className="text-white mb-2 mw-[70%]"
+                className="mb-2 max-w-[70%]"
+                style={{ color: "#FFFFFF" }}
               >
                 {member?.name} {member.id === profileMember?.id && "(me)"}
               </Text>
-              <Text className="text-white">
-                <Text className="text-white">Created at:</Text>
+              <Text style={{ color: "#FFFFFF" }}>
+                <Text style={{ color: "#FFFFFF" }}>Created at:</Text>
                 {" " + new Date(member.created_at).toLocaleString()}
               </Text>
             </View>

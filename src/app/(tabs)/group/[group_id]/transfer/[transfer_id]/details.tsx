@@ -90,14 +90,15 @@ const TransferDetailsScreen = () => {
             <View className="justify-between items-center">
               <Text
                 variant="displaySmall"
-                className="text-white mb-2 max-w-[70%]"
+                className="mb-2 max-w-[70%]"
+                style={{ color: "#FFFFFF" }}
               >
                 {`${transfer?.sender} to ${transfer?.receiver}`}
               </Text>
-              <Text className="text-sm font-200 text-white">
+              <Text className="text-sm font-200" style={{ color: "#FFFFFF" }}>
                 Transferred on
               </Text>
-              <Text className="text-sm font-200 text-white">
+              <Text className="text-sm font-200" style={{ color: "#FFFFFF" }}>
                 {transfer &&
                   formatDateString(transfer.created_at, settings.language)}
               </Text>

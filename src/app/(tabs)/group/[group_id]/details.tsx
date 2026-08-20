@@ -1,4 +1,5 @@
 import { View, TouchableOpacity, Pressable, Alert, Share } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DialogTitle, MenuItem, Text } from "@/src/components/Translated";
 import React, { useEffect, useMemo, useState } from "react";
 import { Feather } from "@expo/vector-icons";
@@ -108,6 +109,9 @@ const GroupDetailsScreen = () => {
   const { mutate: assignMember } = useAssignMember();
   const { mutate: insertGroupInvitation } = useInsertGroupInvitation();
   const { settings } = useSettings();
+  const insets = useSafeAreaInsets();
+  const headerMinHeight = insets.top + 118;
+  const headerMaxHeight = insets.top + 176;
 
   // menu related
   const [visible, setVisible] = useState(false);
@@ -373,8 +377,8 @@ const GroupDetailsScreen = () => {
   return (
     <View className="bg-[#F6F6F6FF] flex-1">
       <CollapsibleHeader
-        H_MIN_HEIGHT={150}
-        H_MAX_HEIGHT={240}
+        H_MIN_HEIGHT={headerMinHeight}
+        H_MAX_HEIGHT={headerMaxHeight}
         content={
           <View className="flex-1">
             {/*First Section*/}
@@ -518,9 +522,8 @@ const GroupDetailsScreen = () => {
           </View>
         }
         headerContent={
-          <View className="justify-center items-center px-4">
-            {/* Navigation and Menu Row */}
-            <View className="flex-row justify-between items-center w-full h-[50px] mt-5">
+          <View className="flex-1 px-4" style={{ paddingTop: insets.top }}>
+            <View className="flex-row justify-between items-center w-full h-[50px]">
               <TouchableOpacity
                 onPress={() => {
                   navigation.goBack();
@@ -593,16 +596,17 @@ const GroupDetailsScreen = () => {
               </View>
             </View>
 
-            {/* Group Title - Separate row with proper spacing */}
-            <View className="w-full px-4 mt-4">
+            <View className="flex-1 justify-end px-2 pb-3">
               <Text
                 variant={
                   group.title.length > 20 ? "headlineSmall" : "headlineMedium"
                 }
-                className="text-white text-center"
+                className="text-center font-semibold"
+                style={{ color: "#FFFFFF" }}
                 numberOfLines={2}
-                adjustsFontSizeToFit={true}
-                minimumFontScale={0.8}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+                ellipsizeMode="tail"
               >
                 {group.title}
               </Text>
