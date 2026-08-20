@@ -80,6 +80,7 @@
 - Importing `SafeAreaView` from `react-native` hits a getter that `warnOnce`s: "SafeAreaView has been deprecated... use react-native-safe-area-context".
 - Use `SafeAreaView` / `useSafeAreaInsets` from `react-native-safe-area-context` (already a dependency). Expo Router supplies `SafeAreaProvider`.
 - `no-restricted-imports` in `eslint.config.js` blocks the core export.
+- Default `SafeAreaView` insets include `bottom`. On a tab screen that already has a tab bar, that extra padding plus a non-content background (`bg-black` on Account) shows as a colored strip above the tabs. Pass `edges={["top"]}` when only the status bar needs insetting.
 
 ## NativeWind className on third-party components
 

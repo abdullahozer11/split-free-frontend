@@ -41,7 +41,7 @@ const AccountScreen = () => {
   }
 
   return (
-    <SafeAreaView className={"flex-1 bg-black"}>
+    <SafeAreaView className="flex-1 bg-black" edges={["top"]}>
       <View className="h-44 bg-black z-10 flex-row gap-4 px-6 items-center">
         <TouchableOpacity
           onPress={() => {
