@@ -1,5 +1,12 @@
 # Learnings
 
+## Supabase realtime channels
+
+- `supabase.channel(name)` returns the existing channel for that topic. After `subscribe()`, adding another `postgres_changes` listener throws `cannot add postgres_changes callbacks ... after subscribe()`.
+- Every hook must use a unique channel name (do not share `table-filter-changes`). Cleanup with `supabase.removeChannel()` so React remounts can recreate the channel.
+- Skip subscribe when filter ids are missing (`session?.user.id`, `group_id`).
+- TanStack Query v5 invalidation is `invalidateQueries({ queryKey })`, not `invalidateQueries(["key"])`.
+
 ## Supabase env var names
 
 - Expo inlines `EXPO_PUBLIC_*` from `.env` at bundle time. `createClient` in `src/lib/supabase.ts` requires `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`.

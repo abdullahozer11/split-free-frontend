@@ -7,7 +7,7 @@ export const useGroupSubscriptions = () => {
 
   useEffect(() => {
     const groupSubscription = supabase
-      .channel("table-filter-changes")
+      .channel("public:groups")
       .on(
         "postgres_changes",
         {
@@ -15,42 +15,44 @@ export const useGroupSubscriptions = () => {
           schema: "public",
           table: "groups",
         },
-        (payload) => {
-          // console.log('Change received!', payload);
-          queryClient.invalidateQueries(["groups"]);
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["groups"] });
         },
       )
       .subscribe();
 
     return () => {
-      groupSubscription.unsubscribe();
+      supabase.removeChannel(groupSubscription);
     };
   }, [queryClient]);
 };
 
-export const useGroupInviteSubscriptions = (profile_id) => {
+export const useGroupInviteSubscriptions = (profile_id?: string) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    if (!profile_id) {
+      return;
+    }
+
     const groupInviteSubscription = supabase
-      .channel("table-filter-changes")
+      .channel(`public:group_invitations:receiver:${profile_id}`)
       .on(
         "postgres_changes",
         {
-          event: "insert",
+          event: "INSERT",
           schema: "public",
           table: "group_invitations",
           filter: "receiver=eq." + profile_id,
         },
-        (payload) => {
-          // console.log('Change received!', payload);
-          queryClient.invalidateQueries(["groups"]);
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["groups"] });
         },
       )
       .subscribe();
 
     return () => {
-      groupInviteSubscription.unsubscribe();
+      supabase.removeChannel(groupInviteSubscription);
     };
   }, [profile_id, queryClient]);
 };
