@@ -7,6 +7,7 @@
 - `auth.getSession()` returns `{ session: null }`, not `data: null`. `deleteuser` does not clear the client session; assert a later password sign-in fails.
 - Look up members by `name`, not array index. `config.toml` seed path must exist (`supabase/seed.sql`) or `supabase start` / `db reset` fails.
 - `handle_new_user()` existed in the dumped schema without a trigger on `auth.users`. Local sign-up then skips `public.profiles` and `create_group` fails with `public_groups_owner_fkey`. Attach `on_auth_user_created`.
+- CI Node is 20.19.4 (no global `WebSocket`). `createClient` still constructs RealtimeClient, so `jest.setup.js` must pass `realtime.transport` from `ws`.
 
 ## CI typecheck scope
 
