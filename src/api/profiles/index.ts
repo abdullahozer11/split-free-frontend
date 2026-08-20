@@ -170,7 +170,8 @@ export const useInsertGroupInvitation = () => {
 
 export const usePendingGroupInvitesForGroup = (groupId) => {
   return useQuery({
-    queryKey: ["group_invites_for_group"],
+    queryKey: ["group_invites_for_group", groupId],
+    enabled: Number.isFinite(groupId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("group_invitations")

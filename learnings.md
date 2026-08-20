@@ -14,6 +14,12 @@
 - Skip subscribe when filter ids are missing (`session?.user.id`, `group_id`).
 - TanStack Query v5 invalidation is `invalidateQueries({ queryKey })`, not `invalidateQueries(["key"])`.
 
+## group_invitations Data API exposure
+
+- `PGRST205` ("Could not find the table 'public.group_invitations' in the schema cache") is a PostgREST schema-cache miss, not an RLS empty result. The hosted project still had `groups` / `invite_tokens` / `friend_requests` on the Data API while `group_invitations` did not.
+- New tables (and tables whose grants were revoked) need explicit `GRANT` to `anon` / `authenticated` plus RLS. Then `NOTIFY pgrst, 'reload schema'` so the Data API caches the table.
+- Friend-to-group invites still use `group_invitations`; token invite links use `invite_tokens`. Both must stay in the schema.
+
 ## Supabase env var names
 
 - Expo inlines `EXPO_PUBLIC_*` from `.env` at bundle time. `createClient` in `src/lib/supabase.ts` requires `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
