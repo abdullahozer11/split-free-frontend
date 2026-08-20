@@ -6,64 +6,81 @@ import {
   Button as RNButton,
   Dialog as RNDialog,
 } from "react-native-paper";
-import { Alert as RNAlert } from "react-native";
+import {
+  Alert as RNAlert,
+  type AlertButton,
+  type AlertOptions,
+  type AlertType,
+} from "react-native";
 import { cssInterop } from "nativewind";
 import { Link as ERLink, Stack as ERStack } from "expo-router";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import {
+  getActiveDictionary,
+  getDictionary,
+  lookupMessage,
+} from "@/src/translations";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
-function withTransparentIcon(adornment) {
+type TextInputIconProps = React.ComponentProps<typeof RNTextInput.Icon>;
+
+function withTransparentIcon(adornment?: React.ReactNode): React.ReactNode {
   if (!React.isValidElement(adornment) || adornment.type !== RNTextInput.Icon) {
     return adornment;
   }
 
-  return React.cloneElement(adornment, {
-    containerColor: adornment.props.containerColor ?? "transparent",
+  const icon = adornment as React.ReactElement<TextInputIconProps>;
+  return React.cloneElement(icon, {
+    containerColor: icon.props.containerColor ?? "transparent",
   });
 }
 
-export const Text = ({ children, ...textProps }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+function translateButtons(buttons?: AlertButton[]): AlertButton[] | undefined {
+  if (!buttons) {
+    return buttons;
+  }
+  const dictionary = getActiveDictionary();
+  return buttons.map((button) => ({
+    ...button,
+    text: button.text ? lookupMessage(dictionary, button.text) : button.text,
+  }));
+}
 
-  // If translationKey is provided, use translation
-  // Otherwise, use children as fallback
-  const displayText = int[children] || children;
+export const Text = ({
+  children,
+  ...textProps
+}: React.ComponentProps<typeof RNText>) => {
+  const { t } = useTranslations();
+  const displayText = typeof children === "string" ? t(children) : children;
 
   return <RNText {...textProps}>{displayText}</RNText>;
+};
+
+type TextInputProps = React.ComponentProps<typeof RNTextInput> & {
+  helperText?: string;
 };
 
 function TextInputComponent({
   label,
   placeholder,
   error,
-  helperText,
+  helperText: _helperText,
   style,
   contentStyle,
   left,
   right,
   ...textInputProps
-}) {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
-
-  // Translate label, placeholder, error, and helperText if they exist
-  const translatedLabel = label ? int[label] || label : undefined;
-  const translatedPlaceholder = placeholder
-    ? int[placeholder] || placeholder
-    : undefined;
-  const translatedError = error ? int[error] || error : undefined;
-  const translatedHelperText = helperText
-    ? int[helperText] || helperText
-    : undefined;
+}: TextInputProps) {
+  const { t } = useTranslations();
+  const translatedLabel = typeof label === "string" ? t(label) : label;
+  const translatedPlaceholder =
+    typeof placeholder === "string" ? t(placeholder) : placeholder;
 
   return (
     <RNTextInput
       {...textInputProps}
       label={translatedLabel}
       placeholder={translatedPlaceholder}
-      error={translatedError}
-      helperText={translatedHelperText}
+      error={Boolean(error)}
       left={withTransparentIcon(left)}
       right={withTransparentIcon(right)}
       style={[{ backgroundColor: "white" }, style]}
@@ -72,68 +89,56 @@ function TextInputComponent({
   );
 }
 
+type StyledTextInput = typeof TextInputComponent & {
+  Icon: typeof RNTextInput.Icon;
+  Affix: typeof RNTextInput.Affix;
+};
+
 export const TextInput = cssInterop(TextInputComponent, {
   className: "style",
-});
+}) as StyledTextInput;
 
-// Attach static subcomponents from the original TextInput
 TextInput.Icon = RNTextInput.Icon;
 TextInput.Affix = RNTextInput.Affix;
 
 export const Alert = {
-  alert: (title, message, buttons, options) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks -- RN Alert wrapper, not a component
-    const { settings } = useSettings();
-    const int = translations[settings.language] || translations.en;
-
-    // Translate title and message
-    const translatedTitle = title ? int[title] || title : title;
-    const translatedMessage = message ? int[message] || message : message;
-
-    // Translate button texts if buttons array is provided
-    const translatedButtons = buttons?.map((button) => ({
-      ...button,
-      text: button.text ? int[button.text] || button.text : button.text,
-    }));
-
+  alert: (
+    title?: string,
+    message?: string,
+    buttons?: AlertButton[],
+    options?: AlertOptions,
+  ) => {
+    const dictionary = getActiveDictionary();
     return RNAlert.alert(
-      translatedTitle,
-      translatedMessage,
-      translatedButtons,
+      title ? lookupMessage(dictionary, title) : "",
+      message ? lookupMessage(dictionary, message) : message,
+      translateButtons(buttons),
       options,
     );
   },
 
   prompt: (
-    title,
-    message,
-    callbackOrButtons,
-    type,
-    defaultValue,
-    keyboardType,
+    title?: string,
+    message?: string,
+    callbackOrButtons?: AlertButton[] | ((text: string) => void),
+    type?: AlertType,
+    defaultValue?: string,
+    keyboardType?: string,
   ) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks -- RN Alert wrapper, not a component
-    const { settings } = useSettings();
-    const int = translations[settings.language] || translations.en;
+    const dictionary = getActiveDictionary();
+    const translatedTitle = title ? lookupMessage(dictionary, title) : "";
+    const translatedMessage = message
+      ? lookupMessage(dictionary, message)
+      : message;
 
-    // Translate title and message
-    const translatedTitle = title ? int[title] || title : title;
-    const translatedMessage = message ? int[message] || message : message;
-
-    // Handle different parameter combinations for prompt
-    let translatedButtons;
-    if (Array.isArray(callbackOrButtons)) {
-      // If second parameter is buttons array, translate button texts
-      translatedButtons = callbackOrButtons.map((button) => ({
-        ...button,
-        text: button.text ? int[button.text] || button.text : button.text,
-      }));
-    }
+    const translatedButtons = Array.isArray(callbackOrButtons)
+      ? translateButtons(callbackOrButtons)
+      : callbackOrButtons;
 
     return RNAlert.prompt(
       translatedTitle,
       translatedMessage,
-      translatedButtons || callbackOrButtons,
+      translatedButtons,
       type,
       defaultValue,
       keyboardType,
@@ -141,98 +146,93 @@ export const Alert = {
   },
 };
 
-// Hook for accessing translations directly in components
 export const useTranslations = () => {
   const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+  const dictionary = getDictionary(settings.language);
 
-  const t = (key, fallback = undefined) => int[key] || fallback || key;
+  const t = (key: string, fallback?: string) =>
+    lookupMessage(dictionary, key, fallback);
 
-  return { t, translations: int };
+  return { t, translations: dictionary, language: settings.language };
 };
 
-export const Link = ({ children, ...props }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
-
-  // Translate children if it's a string and translation exists
+export const Link = ({
+  children,
+  ...props
+}: React.ComponentProps<typeof ERLink>) => {
+  const { t } = useTranslations();
   const translatedChildren =
-    typeof children === "string" ? int[children] || children : children;
+    typeof children === "string" ? t(children) : children;
 
   return <ERLink {...props}>{translatedChildren}</ERLink>;
 };
 
-/** Translates Stack.Screen option strings. Use inside a screen, not as a layout child — Expo Router layouts require `Stack.Screen` by component identity. */
-export const StackScreen = ({ options, ...props }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+type StackScreenProps = React.ComponentProps<typeof ERStack.Screen>;
 
-  // Helper function to recursively translate options
-  const translateOptions = (opts) => {
-    if (!opts || typeof opts !== "object") return opts;
+function translateOptionStrings<T extends Record<string, unknown>>(
+  opts: T,
+  t: (key: string) => string,
+): T {
+  const translated = { ...opts };
+  const keys = [
+    "title",
+    "headerTitle",
+    "headerBackTitle",
+    "tabBarLabel",
+  ] as const;
 
-    const translated = { ...opts };
-
-    // Translate common option properties
-    if (translated.title && typeof translated.title === "string") {
-      translated.title = int[translated.title] || translated.title;
+  for (const key of keys) {
+    const value = translated[key];
+    if (typeof value === "string") {
+      (translated as Record<string, unknown>)[key] = t(value);
     }
+  }
 
-    if (translated.headerTitle && typeof translated.headerTitle === "string") {
-      translated.headerTitle =
-        int[translated.headerTitle] || translated.headerTitle;
-    }
+  return translated;
+}
 
-    if (
-      translated.headerBackTitle &&
-      typeof translated.headerBackTitle === "string"
-    ) {
-      translated.headerBackTitle =
-        int[translated.headerBackTitle] || translated.headerBackTitle;
-    }
+export const StackScreen = ({ options, ...props }: StackScreenProps) => {
+  const { t } = useTranslations();
 
-    // Translate tabBarLabel for tab screens
-    if (translated.tabBarLabel && typeof translated.tabBarLabel === "string") {
-      translated.tabBarLabel =
-        int[translated.tabBarLabel] || translated.tabBarLabel;
-    }
-
-    return translated;
-  };
-
-  const translatedOptions = options ? translateOptions(options) : undefined;
+  let translatedOptions = options;
+  if (options && typeof options === "object") {
+    translatedOptions = translateOptionStrings(
+      options as Record<string, unknown>,
+      t,
+    ) as typeof options;
+  }
 
   return <ERStack.Screen {...props} options={translatedOptions} />;
 };
 
-export const MenuItem = ({ title, ...menuItemProps }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
-
-  // Translate the title if it exists
-  const translatedTitle = title ? int[title] || title : title;
+export const MenuItem = ({
+  title,
+  ...menuItemProps
+}: React.ComponentProps<typeof RNMenu.Item>) => {
+  const { t } = useTranslations();
+  const translatedTitle = typeof title === "string" ? t(title) : title;
 
   return <RNMenu.Item {...menuItemProps} title={translatedTitle} />;
 };
 
-export const Button = ({ children, ...buttonProps }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
-
-  // Translate children if it's a string and translation exists
+export const Button = ({
+  children,
+  ...buttonProps
+}: React.ComponentProps<typeof RNButton>) => {
+  const { t } = useTranslations();
   const translatedChildren =
-    typeof children === "string" ? int[children] || children : children;
+    typeof children === "string" ? t(children) : children;
 
   return <RNButton {...buttonProps}>{translatedChildren}</RNButton>;
 };
 
-export const DialogTitle = ({ children, ...titleProps }) => {
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
-
-  // Translate children if it's a string and translation exists
+export const DialogTitle = ({
+  children,
+  ...titleProps
+}: React.ComponentProps<typeof RNDialog.Title>) => {
+  const { t } = useTranslations();
   const translatedChildren =
-    typeof children === "string" ? int[children] || children : children;
+    typeof children === "string" ? t(children) : children;
 
   return <RNDialog.Title {...titleProps}>{translatedChildren}</RNDialog.Title>;
 };

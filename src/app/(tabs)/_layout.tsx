@@ -4,7 +4,7 @@ import Colors from "@/src/constants/Colors";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { Feather } from "@expo/vector-icons";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof Feather>["name"];

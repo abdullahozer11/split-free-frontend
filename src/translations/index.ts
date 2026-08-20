@@ -1527,3 +1527,42 @@ export const translations = {
     Cancel: "Annulla",
   },
 };
+
+export type Language = keyof typeof translations;
+export type TranslationKey = keyof typeof translations.en;
+export type Dictionary = (typeof translations)[Language];
+
+export function isLanguage(value: unknown): value is Language {
+  return typeof value === "string" && value in translations;
+}
+
+export function getDictionary(language?: string | null): Dictionary {
+  if (isLanguage(language)) {
+    return translations[language];
+  }
+  return translations.en;
+}
+
+let activeLanguage: Language = "en";
+
+export function setActiveLanguage(language: Language) {
+  activeLanguage = language;
+}
+
+export function getActiveDictionary(): Dictionary {
+  return translations[activeLanguage];
+}
+
+export function lookupMessage(
+  dictionary: Dictionary,
+  key: unknown,
+  fallback?: string,
+): string {
+  if (typeof key === "string" && key in dictionary) {
+    return dictionary[key as TranslationKey];
+  }
+  if (fallback !== undefined) {
+    return fallback;
+  }
+  return typeof key === "string" ? key : "";
+}

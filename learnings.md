@@ -33,9 +33,17 @@
 
 ## CI typecheck scope
 
-- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and helpers (implicit `any`, untyped Paper wrappers). Do not gate PRs on `tsconfig.json` until those files are typed.
-- `npm run typecheck` uses `tsconfig.typecheck.json` for `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, and `expenseFormDefaults`. Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
+- Full-app `tsc --noEmit` still fails on loosely typed screens, modals, and helpers. Do not gate PRs on `tsconfig.json` until those files are typed. Expand `tsconfig.typecheck.json` one batch at a time.
+- `npm run typecheck` covers `src/api`, `src/lib`, `src/constants`, `src/database.types.ts`, `expenseFormDefaults`, providers, the translation catalog, and typed wrappers (`Translated`, `Button`, `KeyboardAvoidingScreen`). Mutation hooks must take explicit variables so `useMutation` is not inferred as `void`.
 - GitHub Actions Node must match `engines.node` (`>=20.19.4`). Pin via `.nvmrc` (`20.19.4`), not `node-version: 20`.
+
+## Translation catalog and wrappers
+
+- Keep the English-as-key catalog (`src/translations/index.ts`). 169 keys × 8 locales is too small to justify i18next; typed `Language` / `getDictionary` / `lookupMessage` is enough.
+- `SettingsProvider` must be TypeScript. A JS provider makes `settings.language` `any`, which then cannot index the catalog (TS7053) and poisons every `translations[settings.language]` call site.
+- `Translated.tsx` wrappers must use `ComponentProps` of the Paper / Expo component. Untyped destructuring makes every named prop required, and `cssInterop` drops `TextInput.Icon` / `Affix` unless they are reattached on a typed object.
+- Do not call `useSettings()` inside `Alert.alert` / `prompt`. Those are not components. Keep the active locale in `setActiveLanguage` from the provider and read it with `getActiveDictionary()`.
+- Paper `TextInput` `error` is a boolean. Do not pass a translated string through as `error`.
 
 ## Supabase agent skills
 

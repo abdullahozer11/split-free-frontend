@@ -44,7 +44,7 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { useInsertMember, useProfileMember } from "@/src/api/members";
 import { useQueryClient } from "@tanstack/react-query";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 import { currencyOptions } from "@/src/constants";
 import QRCode from "react-native-qrcode-svg";
 import { generateInvite } from "@/src/api/invites";

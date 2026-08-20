@@ -1,6 +1,20 @@
-import { Pressable, View } from "react-native";
+import {
+  Pressable,
+  View,
+  type PressableProps,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 import { Text } from "@/src/components/Translated";
 import React from "react";
+
+type ButtonProps = PressableProps & {
+  text: string;
+  accessoryLeft?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+};
 
 const Button = ({
   text,
@@ -8,7 +22,7 @@ const Button = ({
   style,
   textStyle,
   ...pressableProps
-}) => {
+}: ButtonProps) => {
   return (
     <Pressable
       {...pressableProps}

@@ -7,7 +7,7 @@ import CollapsibleHeader from "@/src/components/CollapsibleHeader";
 import { useTransfer } from "@/src/api/transfers";
 import { ActivityIndicator } from "react-native-paper";
 import { formatDateString } from "@/src/utils/helpers";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 const TransferDetails = ({ sender, receiver, amount, created_at, lang }) => {
   return (

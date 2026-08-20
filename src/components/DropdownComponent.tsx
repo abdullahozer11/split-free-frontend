@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Text } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
 import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider.js";
+import { useSettings } from "@/src/providers/SettingsProvider";
 
 const MyDropdown = ({ selected, label, data, onChange }) => {
   const [isFocus, setIsFocus] = useState<boolean>(false);
