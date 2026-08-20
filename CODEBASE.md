@@ -17,6 +17,8 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ├── .prettierrc.json               # Prettier options shared with ESLint
 ├── .prettierignore                # Prettier exclusions (lockfile, generated types, docs)
 ├── _typos.toml                    # Typo-check exclusions for generated and localized files
+├── AGENTS.md                      # Coding-agent instructions (issues/PRs, commits, verification)
+├── CODEBASE.md                    # This map: directory tree, modules, and conventions
 ├── cheat-sheets/                  # CLI command references (Expo, Supabase, Docker, WSL)
 │   ├── README.md                  # Index of command sheets
 │   ├── docker.md

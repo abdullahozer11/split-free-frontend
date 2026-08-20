@@ -16,6 +16,7 @@ Welcome to the **SplitFree** app! This app is designed to help you split expense
 - [Project overview and tech stack](./docs/README.md)
 - [Cheat sheets](./cheat-sheets/README.md) (Expo, Supabase, Docker, WSL)
 - [Codebase map](./CODEBASE.md)
+- [Coding-agent instructions](./AGENTS.md)
 
 ![SplitFree tech stack](./docs/tech-stack-overview.svg)
 
