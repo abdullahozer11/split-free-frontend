@@ -50,3 +50,6 @@ Land work on `master` through an issue and a pull request. Do not wait for the u
 - Commit with the signed-off-by template in section 5.
 - Push the branch and open a pull request targeting `master`. The PR body must include `Fixes #<issue>`.
 - This repository cannot enable GitHub auto-merge. After CI is green, the user merges the PR. Do not leave the work only as a local branch.
+
+## 7. Agent Skills
+This repo vendors official Supabase skills under `.agents/skills/` (Grok also sees relative links in `.grok/skills/`). Use `supabase` for Auth, Realtime, Edge Functions, CLI, MCP, and supabase-js work. Use `supabase-postgres-best-practices` before schema, migration, RLS, index, or SQL changes. Section 3 still applies: do not run functional tests. Refresh with `npx skills update`.

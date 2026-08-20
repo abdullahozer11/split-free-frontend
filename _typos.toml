@@ -5,6 +5,8 @@ extend-exclude = [
   "src/translations/**",
   "src/utils/expense_categories.ts",
   "supabase/**",
+  ".agents/**",
+  ".grok/skills/**",
   "android/**",
   "ios/**",
   "coverage/**",

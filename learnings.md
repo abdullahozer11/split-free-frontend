@@ -1,5 +1,12 @@
 # Learnings
 
+## Supabase agent skills
+
+- Installed at project scope with `npx skills add supabase/agent-skills --skill '*' -a grok -a gemini-cli -y`.
+- Canonical files live in `.agents/skills/`. `.grok/skills/` holds relative symlinks so Grok's native skill path also resolves.
+- `skills-lock.json` pins content hashes. Refresh later with `npx skills update`.
+- Skills cover Auth, Realtime, Edge Functions, CLI/MCP, RLS, and Postgres schema/index/query guidance — the areas this app actually uses.
+
 ## Supabase realtime channels
 
 - `supabase.channel(name)` returns the existing channel for that topic. After `subscribe()`, adding another `postgres_changes` listener throws `cannot add postgres_changes callbacks ... after subscribe()`.

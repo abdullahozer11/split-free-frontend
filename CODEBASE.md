@@ -12,6 +12,12 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ├── .github/                       # GitHub Actions CI
 │   └── workflows/
 │       └── pr-checks.yml          # Jest, ESLint, Prettier, and typos on PRs targeting master
+├── .agents/                       # Canonical agent skills (Gemini CLI and other universal agents)
+│   └── skills/
+│       ├── supabase/              # Official Supabase skill (Auth, Realtime, CLI, RLS, Edge Functions)
+│       └── supabase-postgres-best-practices/  # Postgres/RLS/index/schema rules from Supabase
+├── .grok/                         # Grok-native skill links (relative symlinks into .agents/skills)
+│   └── skills/
 ├── eslint.config.js               # ESLint flat config (expo + prettier + jest)
 ├── .npmrc                         # npm legacy-peer-deps so React 19 peer ranges resolve
 ├── .prettierrc.json               # Prettier options shared with ESLint
@@ -20,6 +26,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ├── AGENTS.md                      # Coding-agent instructions (issues/PRs, commits, verification)
 ├── CODEBASE.md                    # This map: directory tree, modules, and conventions
 ├── learnings.md                   # Architectural notes from completed changes
+├── skills-lock.json               # Pinned hashes for installed agent skills
 ├── cheat-sheets/                  # CLI command references (Expo, Supabase, Docker, WSL)
 │   ├── README.md                  # Index of command sheets
 │   ├── docker.md
@@ -84,6 +91,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 ## Module Breakdown
 
 ### Core Modules
+- **`.agents/skills/` (Agent Skills):** Official [Supabase agent skills](https://github.com/supabase/agent-skills) installed at project scope. Load `supabase` for Auth, Realtime, Edge Functions, CLI, MCP, and client-library work. Load `supabase-postgres-best-practices` before writing or changing Postgres schema, migrations, RLS, indexes, or SQL. `.grok/skills/` are relative symlinks to the same folders. Refresh with `npx skills update`.
 - **`src/app/` (Routing):** Utilizes Expo Router to drive app screens. Organized into `(auth)` for registration and magic-link actions, `(tabs)` for main app experiences, and nested dynamic subfolders like `group/[group_id]` representing detailed functional views.
 - **`src/api/` (Data Fetching & Subscriptions):** Separated cleanly by entity (e.g., `groups`, `expenses`). Contains:
   - `index.ts`: Custom React hooks wrapping `@tanstack/react-query`'s `useQuery` and `useMutation` to encapsulate API interactions.
