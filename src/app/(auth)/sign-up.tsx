@@ -5,7 +5,7 @@ import Button from "@/src/components/Button";
 import { Link, useRouter } from "expo-router";
 import { StackScreen } from "@/src/components/Translated";
 import { supabase } from "@/src/lib/supabase";
-import { CheckBox } from "react-native-elements";
+import { Checkbox } from "react-native-paper";
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState("");
@@ -153,7 +153,10 @@ const SignUpScreen = () => {
         ) : null}
       </View>
       <View className="flex-row items-center">
-        <CheckBox checked={acceptance} onPress={toggleAcceptance} />
+        <Checkbox
+          status={acceptance ? "checked" : "unchecked"}
+          onPress={toggleAcceptance}
+        />
         <Text>
           I agree to{" "}
           <Link href="/(global)/terms" className="underline">
