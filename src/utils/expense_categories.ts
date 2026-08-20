@@ -1,4 +1,21 @@
-export const exp_cats = [
+import type { ComponentProps } from "react";
+import type { MaterialIcons } from "@expo/vector-icons";
+
+export type ExpenseCategory = {
+  name: string;
+  en: string;
+  es: string;
+  fr: string;
+  tr: string;
+  gr: string;
+  it: string;
+  ru: string;
+  icon: ComponentProps<typeof MaterialIcons>["name"];
+  icon_color: string;
+  bg_color: string;
+};
+
+export const exp_cats: ExpenseCategory[] = [
   {
     name: "Car & Transportation",
     en: "Car & Transportation",
@@ -195,3 +212,6 @@ export const exp_cats = [
     bg_color: "#9b72e3",
   },
 ];
+
+export const otherCategory: ExpenseCategory =
+  exp_cats.find((category) => category.name === "Other") ?? exp_cats[0];

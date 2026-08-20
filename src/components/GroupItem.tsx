@@ -4,8 +4,22 @@ import React, { useState } from "react";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
-const GroupItem = ({ group, onAnchor }) => {
-  const [anchored, setAnchored] = useState(group.anchored);
+export type GroupListItem = {
+  id: number;
+  title: string;
+  settled?: boolean | null;
+  member_count?: number | null;
+  expense_count?: number | null;
+  anchored?: boolean;
+};
+
+type GroupItemProps = {
+  group: GroupListItem;
+  onAnchor: (anchored: boolean) => void;
+};
+
+const GroupItem = ({ group, onAnchor }: GroupItemProps) => {
+  const [anchored, setAnchored] = useState(Boolean(group.anchored));
 
   const handleAnchor = async () => {
     onAnchor(!anchored);

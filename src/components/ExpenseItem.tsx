@@ -1,14 +1,30 @@
 import { View, Pressable } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { Text, Link } from "@/src/components/Translated";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link } from "@/src/components/Translated";
-import { exp_cats } from "@/src/utils/expense_categories";
+import {
+  otherCategory,
+  exp_cats,
+  type ExpenseCategory,
+} from "@/src/utils/expense_categories";
 
-export const ExpenseItem = ({ expense, currency_label }) => {
+export type ExpenseListItem = {
+  id: number;
+  group_id: number;
+  title: string;
+  amount?: number | null;
+  category?: string | null;
+  settled?: boolean | null;
+};
+
+type ExpenseItemProps = {
+  expense: ExpenseListItem;
+  currency_label: string;
+};
+
+export const ExpenseItem = ({ expense, currency_label }: ExpenseItemProps) => {
   const exp_cat =
-    exp_cats.find((exp) => exp.name === expense.category) ||
-    exp_cats.find((exp) => exp.name === "Other");
+    exp_cats.find((exp) => exp.name === expense.category) ?? otherCategory;
   return (
     <Link
       href={`/(tabs)/group/${expense.group_id}/expense/${expense.id}/details`}
@@ -49,7 +65,17 @@ export const ExpenseItem = ({ expense, currency_label }) => {
   );
 };
 
-export const GroupedExpenseItem = ({ total, exp_cat, currency_label }) => {
+type GroupedExpenseItemProps = {
+  total?: number | null;
+  exp_cat: ExpenseCategory;
+  currency_label: string;
+};
+
+export const GroupedExpenseItem = ({
+  total,
+  exp_cat,
+  currency_label,
+}: GroupedExpenseItemProps) => {
   return (
     <View className="bg-white py-3 px-1 pr-4 rounded-lg gap-x-4 items-center mx-1 flex flex-row justify-between">
       <View

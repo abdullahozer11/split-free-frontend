@@ -1,15 +1,41 @@
 import { View, Pressable } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { Text, Link } from "@/src/components/Translated";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link } from "@/src/components/Translated";
+
+export type TransferMember = {
+  id: number;
+  name?: string | null;
+  profile?: {
+    id?: string | null;
+    email?: string | null;
+    avatar_url?: string | null;
+  } | null;
+};
+
+export type TransferListItem = {
+  id: number;
+  group_id: number;
+  sender: number | string;
+  receiver: number | string;
+  amount?: number | null;
+  description?: string | null;
+  settled?: boolean | null;
+};
+
+type TransferItemProps = {
+  transfer: TransferListItem;
+  members?: readonly TransferMember[] | null;
+  currentUserId?: string | number | null;
+  currency_label: string;
+};
 
 export const TransferItem = ({
   transfer,
   members,
   currentUserId,
   currency_label,
-}) => {
+}: TransferItemProps) => {
   // Find sender and receiver member details
   const senderMember = members?.find(
     (member) =>
@@ -36,7 +62,7 @@ export const TransferItem = ({
   };
 
   // Helper function to truncate names with ellipsis
-  const truncateName = (name, maxLength = 12) => {
+  const truncateName = (name: string, maxLength = 12) => {
     if (name.length <= maxLength) return name;
     return name.substring(0, maxLength - 3) + "...";
   };

@@ -1,8 +1,18 @@
-import { View } from "react-native";
+import { View, type TextStyle } from "react-native";
 import { Text } from "@/src/components/Translated";
 import React from "react";
 
-const UnderlinedText = ({ text, fontSize, fontWeight }) => {
+type UnderlinedTextProps = {
+  text: string;
+  fontSize: number;
+  fontWeight?: TextStyle["fontWeight"];
+};
+
+const UnderlinedText = ({
+  text,
+  fontSize,
+  fontWeight,
+}: UnderlinedTextProps) => {
   return (
     <View className="items-center mb-4">
       <Text style={{ fontSize: fontSize, fontWeight: fontWeight }}>{text}</Text>

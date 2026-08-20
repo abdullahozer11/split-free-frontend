@@ -1,14 +1,28 @@
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { Text, useTranslations } from "@/src/components/Translated";
 import { Dropdown } from "react-native-element-dropdown";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider";
 
-const MyDropdown = ({ selected, label, data, onChange }) => {
-  const [isFocus, setIsFocus] = useState<boolean>(false);
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+export type DropdownItem = {
+  id: string | number;
+  name: string;
+};
+
+type MyDropdownProps<T extends DropdownItem = DropdownItem> = {
+  selected?: T["id"] | null;
+  label: string;
+  data?: readonly T[] | null;
+  onChange: (id: T["id"]) => void;
+};
+
+const MyDropdown = <T extends DropdownItem>({
+  selected,
+  label,
+  data,
+  onChange,
+}: MyDropdownProps<T>) => {
+  const [isFocus, setIsFocus] = useState(false);
+  const { t } = useTranslations();
 
   return (
     <View className="bg-white border-[0.5px] rounded flex-1 p-2">
@@ -21,13 +35,13 @@ const MyDropdown = ({ selected, label, data, onChange }) => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={[...(data ?? [])]}
         search
         maxHeight={300}
         labelField="name"
         valueField="id"
-        placeholder={int["Select item"]}
-        searchPlaceholder={int["Search..."]}
+        placeholder={t("Select item")}
+        searchPlaceholder={t("Search...")}
         value={selected}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}

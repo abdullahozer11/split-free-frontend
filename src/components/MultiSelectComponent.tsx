@@ -1,25 +1,34 @@
 import React, { useState } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { Text } from "@/src/components/Translated";
+import { Text, useTranslations } from "@/src/components/Translated";
 import { MultiSelect } from "react-native-element-dropdown";
 import { Feather } from "@expo/vector-icons";
-import { translations } from "@/src/translations";
-import { useSettings } from "@/src/providers/SettingsProvider";
+import type { DropdownItem } from "@/src/components/DropdownComponent";
 
-const MyMultiSelect = ({ selected, members, onChange }) => {
+type MyMultiSelectProps<T extends DropdownItem = DropdownItem> = {
+  selected?: readonly T["id"][] | null;
+  members?: readonly T[] | null;
+  onChange: (ids: T["id"][]) => void;
+};
+
+const MyMultiSelect = <T extends DropdownItem>({
+  selected,
+  members,
+  onChange,
+}: MyMultiSelectProps<T>) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const { settings } = useSettings();
-  const int = translations[settings.language] || translations.en;
+  const { t } = useTranslations();
+  const selectedIds = selected ?? [];
 
   const handleDone = () => {
     setIsDropdownVisible(false);
   };
 
-  const renderItem = (item) => {
+  const renderItem = (item: T) => {
     return (
       <View className={"flex-row h-16 px-3 py-2 justify-between items-center"}>
         <Text variant={"bodyLarge"}>{item.name}</Text>
-        {selected.includes(item.id) && (
+        {selectedIds.includes(item.id) && (
           <Feather color="green" name="check" size={24} />
         )}
       </View>
@@ -38,30 +47,30 @@ const MyMultiSelect = ({ selected, members, onChange }) => {
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         search
-        data={members}
+        data={[...(members ?? [])]}
         labelField="name"
         valueField="id"
-        placeholder={int["Select participants"]}
-        searchPlaceholder={int["Search..."]}
-        value={selected}
+        placeholder={t("Select participants")}
+        searchPlaceholder={t("Search...")}
+        value={[...selectedIds] as string[]}
         onChange={(item) => {
-          onChange(item);
+          onChange(item as T["id"][]);
         }}
         renderItem={renderItem}
         renderRightIcon={() => {
+          if (!isDropdownVisible) {
+            return null;
+          }
           return (
-            isDropdownVisible && (
-              <TouchableOpacity onPress={handleDone}>
-                <Text variant={"labelLarge"} className={"mr-3"}>
-                  Close
-                </Text>
-              </TouchableOpacity>
-            )
+            <TouchableOpacity onPress={handleDone}>
+              <Text variant={"labelLarge"} className={"mr-3"}>
+                Close
+              </Text>
+            </TouchableOpacity>
           );
         }}
         onFocus={() => setIsDropdownVisible(true)}
         onBlur={() => setIsDropdownVisible(false)}
-        visible={isDropdownVisible}
       />
     </View>
   );

@@ -4,7 +4,17 @@ import React from "react";
 import { Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CustomHeader = ({ handleSearch, setIsModalVisible, title }) => {
+type CustomHeaderProps = {
+  handleSearch: () => void;
+  setIsModalVisible: (visible: boolean) => void;
+  title: string;
+};
+
+const CustomHeader = ({
+  handleSearch,
+  setIsModalVisible,
+  title,
+}: CustomHeaderProps) => {
   return (
     <SafeAreaView
       className={
