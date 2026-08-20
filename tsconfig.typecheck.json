@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/api/**/*.ts",
+    "src/api/**/*.tsx",
+    "src/lib/**/*.ts",
+    "src/lib/**/*.tsx",
+    "src/database.types.ts",
+    "src/constants/**/*.ts",
+    "src/utils/expenseFormDefaults.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ]
+}

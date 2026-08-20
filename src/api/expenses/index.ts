@@ -1,6 +1,46 @@
 import { supabase } from "@/src/lib/supabase";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import type { Database } from "@/src/database.types";
+
+type CreateExpenseArgs =
+  Database["public"]["Functions"]["create_expense"]["Args"];
+type UpdateExpenseArgs =
+  Database["public"]["Functions"]["update_expense"]["Args"];
+type SettleExpenseArgs =
+  Database["public"]["Functions"]["settle_expense"]["Args"];
+
+type InsertExpenseInput = {
+  amount?: CreateExpenseArgs["amount_input"];
+  date?: CreateExpenseArgs["date_input"];
+  category?: CreateExpenseArgs["category_input"];
+  description?: CreateExpenseArgs["description_input"];
+  group_id: CreateExpenseArgs["group_id_input"];
+  participants: CreateExpenseArgs["participants_input"];
+  payers: CreateExpenseArgs["payers_input"];
+  proof?: CreateExpenseArgs["proof_input"];
+  title: CreateExpenseArgs["title_input"];
+};
+
+type UpdateExpenseInput = {
+  id: UpdateExpenseArgs["expense_id"];
+  amount?: UpdateExpenseArgs["amount_input"];
+  category?: UpdateExpenseArgs["category_input"];
+  date?: UpdateExpenseArgs["date_input"];
+  description?: UpdateExpenseArgs["description_input"];
+  participants?: UpdateExpenseArgs["participants_input"];
+  payers?: UpdateExpenseArgs["payers_input"];
+  proof?: UpdateExpenseArgs["proof_input"];
+  title?: UpdateExpenseArgs["title_input"];
+};
+
+type SettleExpenseInput = {
+  id: SettleExpenseArgs["expense_id"];
+  group_id: SettleExpenseArgs["_group_id"];
+};
+
+const unknownErrorMessage = (err: unknown) =>
+  err instanceof Error ? err.message : String(err);
 
 const PAGE_SIZE = 20;
 const EXPENSE_LIST_SELECT =
@@ -61,7 +101,9 @@ export const useExpenseList = (group_id: number) => {
         return data;
       } catch (err) {
         console.error("useExpenseList unexpected error:", err);
-        throw new Error(`Unexpected error fetching expenses: ${err.message}`);
+        throw new Error(
+          `Unexpected error fetching expenses: ${unknownErrorMessage(err)}`,
+        );
       }
     },
     initialPageParam: 0,
@@ -239,7 +281,7 @@ export const useExpense = (id: number) => {
 
 export const useInsertExpense = () => {
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(data: InsertExpenseInput) {
       const { data: newExpenseID, error } = await supabase.rpc(
         "create_expense",
         {
@@ -266,7 +308,7 @@ export const useInsertExpense = () => {
 
 export const useUpdateExpense = () => {
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(data: UpdateExpenseInput) {
       const { error } = await supabase.rpc("update_expense", {
         expense_id: data.id,
         amount_input: data.amount,
@@ -290,7 +332,7 @@ export const useUpdateExpense = () => {
 
 export const useDeleteExpense = () => {
   return useMutation({
-    async mutationFn(id: bigint) {
+    async mutationFn(id: number) {
       const { error } = await supabase.from("expenses").delete().eq("id", id);
       if (error) {
         console.error("useDeleteExpense error: ", error.message);
@@ -304,7 +346,7 @@ export const useDeleteExpense = () => {
 
 export const useSettleExpense = () => {
   return useMutation({
-    async mutationFn(expense) {
+    async mutationFn(expense: SettleExpenseInput) {
       const { error } = await supabase.rpc("settle_expense", {
         expense_id: expense.id,
         _group_id: expense.group_id,
@@ -354,7 +396,7 @@ export const useExpenseTotalThisMonth = (group_id: number) => {
       } catch (err) {
         console.error("useExpenseTotalThisMonth unexpected error:", err);
         throw new Error(
-          `Unexpected error fetching monthly expense total: ${err.message}`,
+          `Unexpected error fetching monthly expense total: ${unknownErrorMessage(err)}`,
         );
       }
     },

@@ -1,10 +1,15 @@
 import { supabase } from "@/src/lib/supabase";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { uuid } from "expo-modules-core";
+import type { Database } from "@/src/database.types";
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+type GroupInvitationInsert =
+  Database["public"]["Tables"]["group_invitations"]["Insert"];
+type SelfAssignArgs = Database["public"]["Functions"]["self_assign_to"]["Args"];
 
 export const useUpdateProfile = () => {
   return useMutation({
-    async mutationFn(profile) {
+    async mutationFn(profile: ProfileUpdate & { id: string }) {
       const { error } = await supabase
         .from("profiles")
         .update(profile)
@@ -18,7 +23,7 @@ export const useUpdateProfile = () => {
   });
 };
 
-export const useProfile = (uid) => {
+export const useProfile = (uid: string) => {
   return useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
@@ -37,7 +42,7 @@ export const useProfile = (uid) => {
   });
 };
 
-export const useFriends = (uid) => {
+export const useFriends = (uid: string) => {
   return useQuery({
     queryKey: ["friends"],
     queryFn: async () => {
@@ -55,7 +60,7 @@ export const useFriends = (uid) => {
   });
 };
 
-export const useFriendRequests = (uid) => {
+export const useFriendRequests = (uid: string) => {
   return useQuery({
     queryKey: ["friend_requests"],
     queryFn: async () => {
@@ -75,10 +80,10 @@ export const useFriendRequests = (uid) => {
 
 export const useInsertFriendRequest = () => {
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(data: { sender_id: string; receiver_id: string }) {
       const { error } = await supabase.from("friend_requests").insert({
-        sender: data?.sender_id,
-        receiver: data?.receiver_id,
+        sender: data.sender_id,
+        receiver: data.receiver_id,
       });
       if (error) {
         console.error("useInsertFriendRequest error:", error.message);
@@ -91,7 +96,7 @@ export const useInsertFriendRequest = () => {
 
 export const useDeleteFriendRequest = () => {
   return useMutation({
-    async mutationFn(req) {
+    async mutationFn(req: { sender: string; receiver: string }) {
       console.log("profile is: ", req.sender);
       console.log("receiver is: ", req.receiver);
       const { error } = await supabase
@@ -110,7 +115,7 @@ export const useDeleteFriendRequest = () => {
 
 export const useUnfriend = () => {
   return useMutation({
-    async mutationFn(friend_id: uuid) {
+    async mutationFn(friend_id: string) {
       const { error } = await supabase
         .from("friends")
         .delete()
@@ -126,7 +131,7 @@ export const useUnfriend = () => {
 
 export const useAcceptFriend = () => {
   return useMutation({
-    async mutationFn(sender_uid) {
+    async mutationFn(sender_uid: string) {
       const { error } = await supabase.rpc("accept_friend_request", {
         sender_uid: sender_uid,
       });
@@ -141,7 +146,7 @@ export const useAcceptFriend = () => {
 
 export const useRejectFriend = () => {
   return useMutation({
-    async mutationFn(uid) {
+    async mutationFn(uid: string) {
       const { error } = await supabase
         .from("friend_requests")
         .delete()
@@ -157,7 +162,7 @@ export const useRejectFriend = () => {
 
 export const useInsertGroupInvitation = () => {
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(data: GroupInvitationInsert) {
       const { error } = await supabase.from("group_invitations").insert(data);
       if (error) {
         console.error("useInsertGroupInvitation error: ", error.message);
@@ -168,7 +173,7 @@ export const useInsertGroupInvitation = () => {
   });
 };
 
-export const usePendingGroupInvitesForGroup = (groupId) => {
+export const usePendingGroupInvitesForGroup = (groupId: number) => {
   return useQuery({
     queryKey: ["group_invites_for_group", groupId],
     enabled: Number.isFinite(groupId),
@@ -189,7 +194,7 @@ export const usePendingGroupInvitesForGroup = (groupId) => {
 
 export const useAssignMember = () => {
   return useMutation({
-    async mutationFn(data) {
+    async mutationFn(data: SelfAssignArgs) {
       const { error } = await supabase.rpc("self_assign_to", data);
       if (error) {
         console.error("useAssignMember error: ", error.message);
@@ -202,12 +207,18 @@ export const useAssignMember = () => {
 
 export const useUpdateProfileSingleField = () => {
   return useMutation({
-    mutationFn: async ({ id, field, value }) => {
-      const updates = {};
-      updates[field] = value;
+    mutationFn: async ({
+      id,
+      field,
+      value,
+    }: {
+      id: string;
+      field: keyof ProfileUpdate;
+      value: ProfileUpdate[keyof ProfileUpdate];
+    }) => {
       const { error } = await supabase
         .from("profiles")
-        .update(updates)
+        .update({ [field]: value } as ProfileUpdate)
         .eq("id", id);
       if (error) {
         console.log("useUpdateProfileSingleField error: ", error);

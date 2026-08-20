@@ -30,7 +30,9 @@ export const useTransferList = (group_id: number) => {
         return data;
       } catch (err) {
         console.error("useTransferList unexpected error:", err);
-        throw new Error(`Unexpected error fetching transfers: ${err.message}`);
+        throw new Error(
+          `Unexpected error fetching transfers: ${err instanceof Error ? err.message : String(err)}`,
+        );
       }
     },
     initialPageParam: 0,
