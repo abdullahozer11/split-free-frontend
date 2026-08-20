@@ -1,5 +1,14 @@
 # Learnings
 
+## Dependabot npm alerts on Expo SDK 54
+
+- `npm audit fix --force` wants Expo 57. Stay on SDK 54 and pin patched transitives with `package.json` `overrides`.
+- Direct `ws` (Jest Realtime transport) must be `>= 8.21.1` (`8.18.3` is the uninitialized-memory and fragment-DoS range). Do **not** globally override `ws`: React Native still needs `ws@6` / `ws@7`.
+- `postcss` `>= 8.5.23` covers the sourceMappingURL file-read chain and `</style>` stringify XSS. Tailwind 3.4 accepts PostCSS 8.5.
+- `react-native-markdown-display` still depends on `markdown-it@^10`. Override `markdown-it` to `14.3.0` (CJS `require` still works; default `{ typographer: true }` is the smartquotes DoS path) and `linkify-it` to `5.0.2`.
+- `xcode` uses `require('uuid').v4()`. Override to `uuid@11.1.1` (CJS `exports.node.require`). Do not use 13+/14 (ESM-only).
+- `image-size` has **no published patch** (`2.0.3` never shipped; upstream archived). `@expo/metro` 54 pulls `metro@0.83.3` which still depends on it. Override the `metro@0.83.*` family to `0.83.8` (already used by RN 0.81.5; inlined image parsing). That is the only way to drop `image-size` from the lockfile so Dependabot can close those alerts.
+
 ## Preview APK is manual, not a PR check
 
 - Testers need an installable APK rarely. Do not put `eas build` on `pull_request` or `push`. Use `workflow_dispatch` (Actions → Preview APK → Run workflow) so PR CI stays Jest / local Supabase / typecheck / lint.
