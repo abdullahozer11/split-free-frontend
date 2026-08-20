@@ -1,10 +1,5 @@
-import {
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  Alert,
-  Pressable,
-} from "react-native";
+import { View, TouchableOpacity, Alert, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   MenuItem,
   Text,
