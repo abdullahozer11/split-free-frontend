@@ -7,9 +7,20 @@ import {
   Dialog as RNDialog,
 } from "react-native-paper";
 import { Alert as RNAlert } from "react-native";
+import { cssInterop } from "nativewind";
 import { Link as ERLink, Stack as ERStack } from "expo-router";
 import { translations } from "@/src/translations";
 import { useSettings } from "@/src/providers/SettingsProvider.js";
+
+function withTransparentIcon(adornment) {
+  if (!React.isValidElement(adornment) || adornment.type !== RNTextInput.Icon) {
+    return adornment;
+  }
+
+  return React.cloneElement(adornment, {
+    containerColor: adornment.props.containerColor ?? "transparent",
+  });
+}
 
 export const Text = ({ children, ...textProps }) => {
   const { settings } = useSettings();
@@ -22,13 +33,17 @@ export const Text = ({ children, ...textProps }) => {
   return <RNText {...textProps}>{displayText}</RNText>;
 };
 
-export const TextInput = ({
+function TextInputComponent({
   label,
   placeholder,
   error,
   helperText,
+  style,
+  contentStyle,
+  left,
+  right,
   ...textInputProps
-}) => {
+}) {
   const { settings } = useSettings();
   const int = translations[settings.language] || translations.en;
 
@@ -49,9 +64,17 @@ export const TextInput = ({
       placeholder={translatedPlaceholder}
       error={translatedError}
       helperText={translatedHelperText}
+      left={withTransparentIcon(left)}
+      right={withTransparentIcon(right)}
+      style={[{ backgroundColor: "white" }, style]}
+      contentStyle={[{ backgroundColor: "transparent" }, contentStyle]}
     />
   );
-};
+}
+
+export const TextInput = cssInterop(TextInputComponent, {
+  className: "style",
+});
 
 // Attach static subcomponents from the original TextInput
 TextInput.Icon = RNTextInput.Icon;
