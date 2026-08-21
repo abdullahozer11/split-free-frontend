@@ -208,15 +208,15 @@ const MemberDetailsScreen = () => {
                 </Text>
                 {!ownMember &&
                   debt &&
-                  (debtAmount >= 0 ? (
+                  (debt.borrower === memberId ? (
                     <Text>
                       <Text>Owes you</Text>: {currency_label}
-                      {debtAmount}
+                      {debtAmount.toFixed(2)}
                     </Text>
                   ) : (
                     <Text>
                       <Text>You owe</Text>: {currency_label}
-                      {debtAmount}
+                      {debtAmount.toFixed(2)}
                     </Text>
                   ))}
               </Card.Content>

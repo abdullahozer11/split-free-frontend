@@ -46,6 +46,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │   ├── InMemoryStorageAdapter.js  # Auth storage stub for tests
 │   ├── usecase/                   # Local Supabase complete_flow (npm run test:supabase)
 │   │   └── complete_flow.test.js  # Auth, group, expense, debt, settle, delete contract
+│   ├── api/                       # Pure API helper unit tests (pairwise debt PostgREST filter)
 │   └── utils/                     # Pure helper unit tests (expense form defaults, activity frontier merge)
 ├── ai/                            # Python benchmarking scripts for AI evaluation
 ├── assets/                        # Static typography and branding graphics
