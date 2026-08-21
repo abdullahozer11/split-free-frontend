@@ -106,7 +106,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
   - `index.ts`: Custom React hooks wrapping `@tanstack/react-query`'s `useQuery` and `useMutation` to encapsulate API interactions.
   - `subscriptions.ts`: Custom React hooks subscribing to Supabase real-time postgres changes using standard PostgreSQL filters. They invalidate corresponding React Query cache keys upon updates.
 - **`src/providers/` (State Management):**
-  - `AuthProvider.tsx`: Subscribes to Supabase auth state changes, manages user session variables, and exposes an auth context globally.
+  - `AuthProvider.tsx`: Subscribes to Supabase auth state changes, manages user session variables, and exposes an auth context globally. The `onAuthStateChange` effect returns `subscription.unsubscribe()` so Fast Refresh / unmount does not leak the listener.
   - `SettingsProvider.tsx`: Exposes typed user locale (`Language`), app themes, and persist settings to `AsyncStorage`.
   - `QueryProvider.tsx`: Configures React Query query client and caching strategies.
 - **`src/components/Translated.tsx` (Localization System):** Paper / Expo wrappers that look up English-as-key strings in `src/translations/index.ts` for the active `Language`. Wrappers keep the underlying component prop types (`TextInput.Icon`, optional rest props). Use `useTranslations().t()` for titles and other non-wrapped strings.
