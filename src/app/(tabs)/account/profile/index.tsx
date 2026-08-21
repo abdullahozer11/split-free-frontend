@@ -4,24 +4,23 @@ import { Link, useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useProfile } from "@/src/api/profiles";
-import { ActivityIndicator } from "react-native-paper";
+import { profileQueryFallback } from "@/src/components/FetchError";
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const { setSession, session } = useAuth();
-  const {
-    data: profile,
+  const { session } = useAuth();
+  const userId = session?.user.id ?? "";
+  const { data: profile, isLoading, isError, refetch } = useProfile(userId);
+
+  const profileFallback = profileQueryFallback({
+    uid: userId,
     isLoading,
     isError,
-  } = useProfile(session?.user.id ?? "");
-
-  if (isLoading) {
-    return <ActivityIndicator />;
-  }
-
-  if (isError) {
-    setSession(null);
-    return <Text>Failed to fetch data</Text>;
+    profile,
+    refetch,
+  });
+  if (profileFallback) {
+    return profileFallback;
   }
 
   return (

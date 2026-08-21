@@ -49,6 +49,12 @@
 - Category totals need a `Record<string, { category: ExpenseCategory; total: number }>` accumulator. Empty `{}` infers `never[]` when the empty path returns `[]`, so Object.keys cannot index `.category` / `.total`. Import `react-native-pie-chart` from the package entry; `src/index.tsx` is not covered by `skipLibCheck`.
 - `useDebt` returns one pairwise row (or null), not the select array. Two chained `.or()` filters are joined with AND by PostgREST; use a single `or('and(borrower.eq.A,lender.eq.B),and(borrower.eq.B,lender.eq.A)')` and `maybeSingle()` so extra rows error instead of `data[0]`. Amount is unsigned with direction in borrower/lender — member details labels from those ids, not the sign. Member name state is `string`. New group-update members have no `id` yet — `DeletableMember` must not require it, and delete-from-list should fall back to name.
 
+## Profile fetch errors must not sign the user out
+
+- `useProfile` uses `maybeSingle()` so a missing `profiles` row (new user / `handle_new_user` gap) is `null`, not `isError`. Network and RLS failures still throw.
+- Friends, account, notifications, language, profile, and create-group used to call `setSession(null)` on `isError`. That looks like a ban after a timeout. Show `FetchError` with Retry instead. Missing row uses "Profile not found".
+- Explicit sign-out (`supabase.auth.signOut` on Settings) and account deletion still clear the session.
+
 ## Translation catalog and wrappers
 
 - Keep the English-as-key catalog (`src/translations/index.ts`). 169 keys × 8 locales is too small to justify i18next; typed `Language` / `getDictionary` / `lookupMessage` is enough.

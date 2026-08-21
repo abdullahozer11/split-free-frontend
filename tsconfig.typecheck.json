@@ -34,6 +34,7 @@
     "src/components/useClientOnlyValue.ts",
     "src/components/useClientOnlyValue.web.ts",
     "src/components/ExpenseForm.tsx",
+    "src/components/FetchError.tsx",
     "src/modals/**/*.ts",
     "src/modals/**/*.tsx",
     "src/app/(auth)/**/*.ts",

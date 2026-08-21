@@ -76,7 +76,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │   │       ├── friend.tsx         # Direct friendship/debts navigation screen
 │   │       ├── account/           # Profile changes, password updates, settings, language
 │   │       └── group/             # Dynamic routes and screens for group details, expenses, and stats
-│   ├── components/                # Reusable UI (NativeWind); KeyboardAvoidingScreen for centered forms
+│   ├── components/                # Reusable UI (NativeWind); KeyboardAvoidingScreen for centered forms; FetchError for query retry
 │   ├── constants/                 # Static configuration files, styling constants, and core theme colors
 │   ├── lib/                       # Client initializations (Supabase clients, realtime channel names, SecureStore adapters)
 │   │   ├── supabase.ts            # Typed supabase-js client and Expo SecureStore auth adapter
@@ -111,6 +111,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
   - `QueryProvider.tsx`: Configures React Query query client and caching strategies.
 - **`src/components/Translated.tsx` (Localization System):** Paper / Expo wrappers that look up English-as-key strings in `src/translations/index.ts` for the active `Language`. Wrappers keep the underlying component prop types (`TextInput.Icon`, optional rest props). Use `useTranslations().t()` for titles and other non-wrapped strings.
 - **`src/components/KeyboardAvoidingScreen.tsx`:** Shared `KeyboardAvoidingView` + `ScrollView` wrapper used by centered auth (and change-password) forms so focused inputs stay above the software keyboard.
+- **`src/components/FetchError.tsx`:** Retry UI for failed queries. `profileQueryFallback` maps a missing profile row vs a network error so screens do not call `setSession(null)`.
 
 ---
 

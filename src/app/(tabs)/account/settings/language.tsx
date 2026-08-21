@@ -1,6 +1,6 @@
 import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "@/src/components/Translated";
-import { ActivityIndicator } from "react-native-paper";
+import { profileQueryFallback } from "@/src/components/FetchError";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dropdown } from "react-native-element-dropdown";
@@ -30,12 +30,9 @@ const Languages = () => {
     { label: "Русский", value: "ru" },
   ];
 
-  const { setSession, session } = useAuth();
-  const {
-    data: profile,
-    isLoading,
-    isError,
-  } = useProfile(session?.user.id ?? "");
+  const { session } = useAuth();
+  const userId = session?.user.id ?? "";
+  const { data: profile, isLoading, isError, refetch } = useProfile(userId);
 
   const { mutate: updateProfileSF } = useUpdateProfileSingleField();
 
@@ -56,13 +53,15 @@ const Languages = () => {
     }
   }, [profile?.language, settings.language]);
 
-  if (isLoading) {
-    return <ActivityIndicator />;
-  }
-
-  if (isError) {
-    setSession(null);
-    return <Text>Failed to fetch data</Text>;
+  const profileFallback = profileQueryFallback({
+    uid: userId,
+    isLoading,
+    isError,
+    profile,
+    refetch,
+  });
+  if (profileFallback) {
+    return profileFallback;
   }
 
   const handleValueChange = (newValue: Language) => {

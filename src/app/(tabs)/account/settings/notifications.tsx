@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Text } from "@/src/components/Translated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Switch, ActivityIndicator } from "react-native-paper";
+import { Switch } from "react-native-paper";
+import { profileQueryFallback } from "@/src/components/FetchError";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useProfile, useUpdateProfileSingleField } from "@/src/api/profiles";
 import { Feather } from "@expo/vector-icons";
@@ -14,12 +15,9 @@ const Notifications = () => {
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [mobilePopups, setMobilePopups] = useState(false);
 
-  const { session, setSession } = useAuth();
-  const {
-    data: profile,
-    isLoading,
-    isError,
-  } = useProfile(session?.user.id ?? "");
+  const { session } = useAuth();
+  const userId = session?.user.id ?? "";
+  const { data: profile, isLoading, isError, refetch } = useProfile(userId);
 
   const { mutate: updateProfileSF } = useUpdateProfileSingleField();
 
@@ -28,13 +26,15 @@ const Notifications = () => {
     setMobilePopups(profile?.receive_popups ?? false);
   }, [profile]);
 
-  if (isLoading) {
-    return <ActivityIndicator />;
-  }
-
-  if (isError) {
-    setSession(null);
-    return <Text>Failed to fetch data</Text>;
+  const profileFallback = profileQueryFallback({
+    uid: userId,
+    isLoading,
+    isError,
+    profile,
+    refetch,
+  });
+  if (profileFallback) {
+    return profileFallback;
   }
 
   const handleEmailNotifChange = () => {
