@@ -35,6 +35,7 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { supabase } from "@/src/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFriendRequestSubscription } from "@/src/api/profiles/subscriptions";
+import { profileQueryFallback } from "@/src/components/FetchError";
 
 type RemovingFriend = {
   email: string | null;
@@ -54,12 +55,13 @@ export default function FriendScreen() {
     id: null,
   });
 
-  const { setSession, session } = useAuth();
+  const { session } = useAuth();
   const userId = session?.user.id ?? "";
   const {
     data: profile,
     isLoading: profileLoading,
     isError: profileError,
+    refetch: refetchProfile,
   } = useProfile(userId);
   const { data: friends, isError, isLoading } = useFriends(userId);
   const {
@@ -75,13 +77,19 @@ export default function FriendScreen() {
 
   useFriendRequestSubscription(session?.user.id);
 
-  if (isLoading || profileLoading || freqIsLoading) {
+  if (isLoading || freqIsLoading) {
     return <ActivityIndicator />;
   }
 
-  if (profileError) {
-    setSession(null);
-    return <Text>Failed to fetch data</Text>;
+  const profileFallback = profileQueryFallback({
+    uid: userId,
+    isLoading: profileLoading,
+    isError: profileError,
+    profile,
+    refetch: refetchProfile,
+  });
+  if (profileFallback) {
+    return profileFallback;
   }
 
   if (isError || freqError) {

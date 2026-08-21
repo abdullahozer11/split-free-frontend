@@ -6,7 +6,7 @@ import Participants from "@/src/modals/CreateGroupParticipants";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { useInsertGroup } from "@/src/api/groups";
 import { useProfile } from "@/src/api/profiles";
-import { ActivityIndicator } from "react-native-paper";
+import { profileQueryFallback } from "@/src/components/FetchError";
 import { useQueryClient } from "@tanstack/react-query";
 import { currencyOptions } from "@/src/constants";
 
@@ -28,25 +28,24 @@ const CreateGroupModal = ({ isVisible, onClose }: CreateGroupModalProps) => {
 
   const { mutate: insertGroup } = useInsertGroup();
 
-  const { setSession, session } = useAuth();
-  const {
-    data: profile,
-    isLoading,
-    isError,
-  } = useProfile(session?.user.id ?? "");
+  const { session } = useAuth();
+  const userId = session?.user.id ?? "";
+  const { data: profile, isLoading, isError, refetch } = useProfile(userId);
   const [members, setMembers] = useState<string[]>([]);
 
   useEffect(() => {
     setMembers(ownerName(profile?.full_name));
   }, [profile]);
 
-  if (isLoading) {
-    return <ActivityIndicator />;
-  }
-
-  if (isError) {
-    setSession(null);
-    return <Text>Failed to fetch data</Text>;
+  const profileFallback = profileQueryFallback({
+    uid: userId,
+    isLoading,
+    isError,
+    profile,
+    refetch,
+  });
+  if (profileFallback) {
+    return profileFallback;
   }
 
   const handleParticipantsSubmit = (nextMembers: string[]) => {

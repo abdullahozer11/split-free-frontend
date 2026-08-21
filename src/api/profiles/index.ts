@@ -31,14 +31,15 @@ export const useProfile = (uid: string) => {
         .from("profiles")
         .select("*")
         .eq("id", uid)
-        .single();
+        .maybeSingle();
       if (error) {
         console.log("useProfile error is ", error.message);
         throw new Error(error.message);
       }
-      // console.log("Fetched profile is :", profile);
+      // Missing row (new user / trigger gap) is null, not an error.
       return profile;
     },
+    enabled: !!uid,
   });
 };
 

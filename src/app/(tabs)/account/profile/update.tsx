@@ -5,7 +5,7 @@ import { useNavigation } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useProfile, useUpdateProfile } from "@/src/api/profiles";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { ActivityIndicator } from "react-native-paper";
+import { profileQueryFallback } from "@/src/components/FetchError";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function UpdateProfile() {
@@ -17,12 +17,9 @@ export default function UpdateProfile() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const { mutate: updateProfile } = useUpdateProfile();
 
-  const { setSession, session } = useAuth();
-  const {
-    data: profile,
-    isLoading,
-    isError,
-  } = useProfile(session?.user.id ?? "");
+  const { session } = useAuth();
+  const userId = session?.user.id ?? "";
+  const { data: profile, isLoading, isError, refetch } = useProfile(userId);
 
   useEffect(() => {
     setFullName(profile?.full_name ?? "");
@@ -31,13 +28,15 @@ export default function UpdateProfile() {
     setImage(profile?.avatar_url ?? "");
   }, [profile]);
 
-  if (isLoading) {
-    return <ActivityIndicator />;
-  }
-
-  if (isError) {
-    setSession(null);
-    return <Text>Failed to fetch data</Text>;
+  const profileFallback = profileQueryFallback({
+    uid: userId,
+    isLoading,
+    isError,
+    profile,
+    refetch,
+  });
+  if (profileFallback) {
+    return profileFallback;
   }
 
   const handleSubmit = () => {
