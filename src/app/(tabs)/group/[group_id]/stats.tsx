@@ -10,17 +10,14 @@ import {
   otherCategory,
   type ExpenseCategory,
 } from "@/src/utils/expense_categories";
+import { ExpenseItem, GroupedExpenseItem } from "@/src/components/ExpenseItem";
 import {
-  ExpenseItem,
-  GroupedExpenseItem,
-  type ExpenseListItem,
-} from "@/src/components/ExpenseItem";
-import { useExpenseListAll } from "@/src/api/expenses";
+  useGroupExpenseStats,
+  type ExpenseStatsCategoryTotal,
+  type ExpenseStatsSlice,
+} from "@/src/api/expenses";
 import { useExpenseSubscription } from "@/src/api/expenses/subscriptions";
-import { useProfileMember } from "@/src/api/members";
-import { useAuth } from "@/src/providers/AuthProvider";
 import PieChart from "react-native-pie-chart";
-import { inThisMonth } from "@/src/utils/helpers";
 import { currencyOptions } from "@/src/constants";
 import { useGroup } from "@/src/api/groups";
 
@@ -29,12 +26,6 @@ enum Selection {
   Global = "Global",
 }
 
-type StatsExpense = ExpenseListItem & {
-  date?: string | null;
-  payers?: { member: number }[] | null;
-  participants?: { member: number }[] | null;
-};
-
 type CategoryTotal = {
   category: ExpenseCategory;
   total: number;
@@ -42,45 +33,24 @@ type CategoryTotal = {
 
 type GroupedByCategory = Record<string, CategoryTotal>;
 
-const memberIsInvolved = (expense: StatsExpense, memberId?: number) =>
-  memberId != null &&
-  (expense.payers?.some((payer) => payer.member === memberId) ||
-    expense.participants?.some(
-      (participant) => participant.member === memberId,
-    ));
-
-const groupExpensesByCategory = (
-  expenses: readonly StatsExpense[],
-): GroupedByCategory => {
-  const grouped: GroupedByCategory = {};
-  for (const expense of expenses) {
-    const key = expense.category ?? otherCategory.name;
-    if (!grouped[key]) {
-      grouped[key] = {
-        category:
-          exp_cats.find((exp) => exp.name === expense.category) ??
-          otherCategory,
-        total: 0,
-      };
-    }
-    grouped[key].total += expense.amount ?? 0;
-  }
-  return Object.fromEntries(
-    Object.entries(grouped).sort((a, b) => b[1].total - a[1].total),
-  );
+const emptySlice: ExpenseStatsSlice = {
+  total: 0,
+  categories: [],
+  largest: null,
 };
 
-const largestExpense = (
-  expenses: readonly StatsExpense[],
-): StatsExpense | null => {
-  if (!expenses.length) {
-    return null;
+const groupedFromTotals = (
+  categories: readonly ExpenseStatsCategoryTotal[],
+): GroupedByCategory => {
+  const grouped: GroupedByCategory = {};
+  for (const row of categories) {
+    grouped[row.category] = {
+      category:
+        exp_cats.find((exp) => exp.name === row.category) ?? otherCategory,
+      total: row.total,
+    };
   }
-  return expenses.reduce(
-    (max, expense) =>
-      (expense.amount ?? 0) > (max.amount ?? 0) ? expense : max,
-    expenses[0],
-  );
+  return grouped;
 };
 
 const Stats = () => {
@@ -98,160 +68,33 @@ const Stats = () => {
   const [selected, setSelected] = useState(Selection.Global);
 
   const navigation = useNavigation();
-  const { session } = useAuth();
-  const userId = session?.user.id ?? "";
-
-  const {
-    data: expenses = [],
-    isError,
-    isLoading,
-  } = useExpenseListAll(groupId);
-  const {
-    data: profileMember,
-    isError: profileMemberError,
-    isLoading: profileMemberLoading,
-  } = useProfileMember(userId, groupId);
+  const { data: stats, isError, isLoading } = useGroupExpenseStats(groupId);
 
   useExpenseSubscription(groupId);
 
-  const personalExpenses = useMemo(() => {
-    if (!expenses.length) return [];
-    return expenses.filter((ex) => memberIsInvolved(ex, profileMember?.id));
-  }, [expenses, profileMember?.id]);
-
-  const expensesM = useMemo(() => {
-    if (!expenses.length) return [];
-    return expenses.filter((ex) => inThisMonth(ex?.date));
-  }, [expenses]);
-
-  const personalExpensesM = useMemo(() => {
-    if (!expensesM.length) return [];
-    return expensesM.filter((ex) => memberIsInvolved(ex, profileMember?.id));
-  }, [profileMember?.id, expensesM]);
-
-  const { groupedExpensesM, groupedExpensesPerM } = useMemo(() => {
-    if (!expensesM.length) {
-      return {
-        groupedExpensesM: {} as GroupedByCategory,
-        groupedExpensesPerM: {} as GroupedByCategory,
-      };
+  const slice = useMemo((): ExpenseStatsSlice => {
+    if (!stats) {
+      return emptySlice;
     }
-    return {
-      groupedExpensesM: groupExpensesByCategory(expensesM),
-      groupedExpensesPerM: groupExpensesByCategory(personalExpensesM),
-    };
-  }, [expensesM, personalExpensesM]);
-
-  const { groupedExpenses, groupedExpensesPer } = useMemo(() => {
-    if (!expenses.length) {
-      return {
-        groupedExpenses: {} as GroupedByCategory,
-        groupedExpensesPer: {} as GroupedByCategory,
-      };
+    if (toggleOnGroup) {
+      return selected === Selection.Global
+        ? stats.group_all
+        : stats.group_month;
     }
-    return {
-      groupedExpenses: groupExpensesByCategory(expenses),
-      groupedExpensesPer: groupExpensesByCategory(personalExpenses),
-    };
-  }, [expenses, personalExpenses]);
+    return selected === Selection.Global
+      ? stats.personal_all
+      : stats.personal_month;
+  }, [stats, toggleOnGroup, selected]);
 
-  const { biggestExpense, biggestExpensePer } = useMemo(() => {
-    if (!expenses.length) {
-      return { biggestExpense: null, biggestExpensePer: null };
-    }
-    return {
-      biggestExpense: largestExpense(expenses),
-      biggestExpensePer: largestExpense(personalExpenses),
-    };
-  }, [personalExpenses, expenses]);
+  const paidAmountF =
+    selected === Selection.Global
+      ? (stats?.paid_all ?? 0)
+      : (stats?.paid_month ?? 0);
 
-  const { biggestExpenseM, biggestExpensePerM } = useMemo(() => {
-    if (!expensesM.length) {
-      return { biggestExpenseM: null, biggestExpensePerM: null };
-    }
-    return {
-      biggestExpenseM: largestExpense(expensesM),
-      biggestExpensePerM: largestExpense(personalExpensesM),
-    };
-  }, [personalExpensesM, expensesM]);
-
-  const { expenseTotal, expenseTotalPer, paidAmount } = useMemo(() => {
-    if (!expenses.length) {
-      return { expenseTotal: 0, expenseTotalPer: 0, paidAmount: 0 };
-    }
-    const sum1 = expenses.reduce(
-      (sum, expense) => sum + (expense.amount ?? 0),
-      0,
-    );
-    const sum2 = personalExpenses.reduce(
-      (sum, expense) => sum + (expense.amount ?? 0),
-      0,
-    );
-    const expenses3 = personalExpenses.filter((ex) =>
-      ex.payers?.some((payer) => payer.member === profileMember?.id),
-    );
-    const sum3 = expenses3.reduce(
-      (sum, expense) => sum + (expense.amount ?? 0),
-      0,
-    );
-    return { expenseTotal: sum1, expenseTotalPer: sum2, paidAmount: sum3 };
-  }, [personalExpenses, profileMember, expenses]);
-
-  const { expenseTotalM, expenseTotalPerM, paidAmountM } = useMemo(() => {
-    if (!expensesM.length) {
-      return { expenseTotalM: 0, expenseTotalPerM: 0, paidAmountM: 0 };
-    }
-    const sum1 = expensesM.reduce(
-      (sum, expense) => sum + (expense.amount ?? 0),
-      0,
-    );
-    const sum2 = personalExpensesM.reduce(
-      (sum, expense) => sum + (expense.amount ?? 0),
-      0,
-    );
-    const expenses3 = personalExpensesM.filter((ex) =>
-      ex.payers?.some((payer) => payer.member === profileMember?.id),
-    );
-    const sum3 = expenses3.reduce(
-      (sum, expense) => sum + (expense.amount ?? 0),
-      0,
-    );
-    return { expenseTotalM: sum1, expenseTotalPerM: sum2, paidAmountM: sum3 };
-  }, [personalExpensesM, expensesM, profileMember?.id]);
-
-  const openMenu = () => {
-    setVisible(true);
-  };
-  const closeMenu = () => {
-    setVisible(false);
-  };
-
-  const expenseTotalF = toggleOnGroup
-    ? selected === Selection.Global
-      ? expenseTotal
-      : expenseTotalM
-    : selected === Selection.Global
-      ? expenseTotalPer
-      : expenseTotalPerM;
-
-  const paidAmountF = selected === Selection.Global ? paidAmount : paidAmountM;
-
-  const groupedExpensesF = toggleOnGroup
-    ? selected === Selection.Global
-      ? groupedExpenses
-      : groupedExpensesM
-    : selected === Selection.Global
-      ? groupedExpensesPer
-      : groupedExpensesPerM;
-
-  const biggestExpenseF = toggleOnGroup
-    ? selected === Selection.Global
-      ? biggestExpense
-      : biggestExpenseM
-    : selected === Selection.Global
-      ? biggestExpensePer
-      : biggestExpensePerM;
-
+  const groupedExpensesF = useMemo(
+    () => groupedFromTotals(slice.categories),
+    [slice.categories],
+  );
   const groupedEntries = Object.entries(groupedExpensesF);
   const series = groupedEntries.map(([, item]) => item.total);
   const sliceColor = groupedEntries.map(([, item]) => item.category.bg_color);
@@ -265,11 +108,18 @@ const Stats = () => {
   );
   const lh = categories.length > 10 ? 16 : 20;
 
-  if (isError || profileMemberError || groupError) {
+  const openMenu = () => {
+    setVisible(true);
+  };
+  const closeMenu = () => {
+    setVisible(false);
+  };
+
+  if (isError || groupError) {
     return <Text variant={"displayLarge"}>Failed to fetch data</Text>;
   }
 
-  if (isLoading || profileMemberLoading || groupLoading) {
+  if (isLoading || groupLoading) {
     return <ActivityIndicator />;
   }
 
@@ -356,7 +206,7 @@ const Stats = () => {
               <Text variant={"headlineMedium"}>Spent</Text>
               <Text variant={"headlineSmall"}>
                 {currency_label}
-                {expenseTotalF.toFixed(2)}
+                {slice.total.toFixed(2)}
               </Text>
             </View>
             <View>
@@ -433,12 +283,12 @@ const Stats = () => {
               ))}
             </View>
           </View>
-          {biggestExpenseF && (
+          {slice.largest && (
             <View style={{ gap: 10 }}>
               <Text variant={"headlineMedium"}>Largest Spending</Text>
               <ExpenseItem
-                key={biggestExpenseF.id}
-                expense={biggestExpenseF}
+                key={slice.largest.id}
+                expense={slice.largest}
                 currency_label={currency_label}
               />
             </View>

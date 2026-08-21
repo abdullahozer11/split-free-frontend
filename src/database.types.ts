@@ -662,6 +662,10 @@ export type Database = {
         Args: { _group_id: number; _profile_id: string }
         Returns: undefined
       }
+      get_group_expense_stats: {
+        Args: { group_id_input: number; month_start?: string }
+        Returns: Json
+      }
       get_groups_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -708,6 +712,10 @@ export type Database = {
       settle_group: {
         Args: { _id: number }
         Returns: undefined
+      }
+      sum_group_expenses: {
+        Args: { end_date: string; group_id_input: number; start_date: string }
+        Returns: number
       }
       update_expense: {
         Args: {

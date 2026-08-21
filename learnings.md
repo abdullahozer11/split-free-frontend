@@ -93,7 +93,7 @@
 
 - `useExpenseList` and `useTransferList` return TanStack Query infinite-query data (`{ pages, pageParams }`), not a flat row array.
 - Screens that aggregate or render the full list must flatten with `data?.pages.flat() ?? []`. Treating `data` as an array makes `.length` undefined and totals/charts render as empty (the Statistics screen bug).
-- Do not drain `useExpenseList` pages on Statistics or treat `hasNextPage` as a loading gate. That query is shared with group details (`staleTime` 0), so mount refetch + `fetchNextPage` can leave `hasNextPage` true and spin forever. Stats uses `useExpenseListAll` (`["expenses", groupId, "all"]`) instead.
+- Do not drain `useExpenseList` pages on Statistics or treat `hasNextPage` as a loading gate. That query is shared with group details (`staleTime` 0), so mount refetch + `fetchNextPage` can leave `hasNextPage` true and spin forever. Stats uses `get_group_expense_stats` (`["expenses", groupId, "stats", monthStart]`); the monthly header total uses `sum_group_expenses`. Neither downloads the expense list.
 
 ## Expo SDK 54 upgrade (from 51)
 

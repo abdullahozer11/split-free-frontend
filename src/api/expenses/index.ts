@@ -1,7 +1,7 @@
 import { supabase } from "@/src/lib/supabase";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import type { Database } from "@/src/database.types";
+import { useQuery, useMutation, useInfiniteQuery } from "@tanstack/react-query";
+import type { Database, Json } from "@/src/database.types";
+import { localMonthStart } from "@/src/utils/helpers";
 
 type CreateExpenseArgs =
   Database["public"]["Functions"]["create_expense"]["Args"];
@@ -115,25 +115,127 @@ export const useExpenseList = (group_id: number) => {
   });
 };
 
-export const useExpenseListAll = (group_id: number) => {
+export type ExpenseStatsItem = {
+  id: number;
+  group_id: number;
+  title: string;
+  amount: number | null;
+  category: string | null;
+  settled: boolean | null;
+};
+
+export type ExpenseStatsCategoryTotal = {
+  category: string;
+  total: number;
+};
+
+export type ExpenseStatsSlice = {
+  total: number;
+  categories: ExpenseStatsCategoryTotal[];
+  largest: ExpenseStatsItem | null;
+};
+
+export type GroupExpenseStats = {
+  group_all: ExpenseStatsSlice;
+  group_month: ExpenseStatsSlice;
+  personal_all: ExpenseStatsSlice;
+  personal_month: ExpenseStatsSlice;
+  paid_all: number;
+  paid_month: number;
+};
+
+const emptyStatsSlice = (): ExpenseStatsSlice => ({
+  total: 0,
+  categories: [],
+  largest: null,
+});
+
+const emptyGroupExpenseStats = (): GroupExpenseStats => ({
+  group_all: emptyStatsSlice(),
+  group_month: emptyStatsSlice(),
+  personal_all: emptyStatsSlice(),
+  personal_month: emptyStatsSlice(),
+  paid_all: 0,
+  paid_month: 0,
+});
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const asFiniteNumber = (value: unknown): number =>
+  typeof value === "number" && Number.isFinite(value) ? value : 0;
+
+const parseLargestExpense = (value: unknown): ExpenseStatsItem | null => {
+  if (!isRecord(value) || typeof value.id !== "number") {
+    return null;
+  }
+  return {
+    id: value.id,
+    group_id: typeof value.group_id === "number" ? value.group_id : 0,
+    title: typeof value.title === "string" ? value.title : "",
+    amount: typeof value.amount === "number" ? value.amount : null,
+    category: typeof value.category === "string" ? value.category : null,
+    settled: typeof value.settled === "boolean" ? value.settled : null,
+  };
+};
+
+const parseCategoryTotals = (value: unknown): ExpenseStatsCategoryTotal[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.flatMap((row) => {
+    if (!isRecord(row) || typeof row.category !== "string") {
+      return [];
+    }
+    return [{ category: row.category, total: asFiniteNumber(row.total) }];
+  });
+};
+
+const parseStatsSlice = (value: unknown): ExpenseStatsSlice => {
+  if (!isRecord(value)) {
+    return emptyStatsSlice();
+  }
+  return {
+    total: asFiniteNumber(value.total),
+    categories: parseCategoryTotals(value.categories),
+    largest: parseLargestExpense(value.largest),
+  };
+};
+
+export const parseGroupExpenseStats = (
+  value: Json | null,
+): GroupExpenseStats => {
+  if (!isRecord(value)) {
+    return emptyGroupExpenseStats();
+  }
+  return {
+    group_all: parseStatsSlice(value.group_all),
+    group_month: parseStatsSlice(value.group_month),
+    personal_all: parseStatsSlice(value.personal_all),
+    personal_month: parseStatsSlice(value.personal_month),
+    paid_all: asFiniteNumber(value.paid_all),
+    paid_month: asFiniteNumber(value.paid_month),
+  };
+};
+
+export const useGroupExpenseStats = (group_id: number) => {
+  const monthStart = localMonthStart();
   return useQuery({
-    queryKey: ["expenses", group_id, "all"],
+    queryKey: ["expenses", group_id, "stats", monthStart],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("expenses")
-        .select(EXPENSE_LIST_SELECT)
-        .eq("group_id", group_id)
-        .order("created_at", { ascending: false })
-        .order("id", { ascending: false });
+      const { data, error } = await supabase.rpc("get_group_expense_stats", {
+        group_id_input: group_id,
+        month_start: monthStart,
+      });
       if (error) {
-        console.error("useExpenseListAll query error:", {
+        console.error("useGroupExpenseStats query error:", {
           message: error.message,
           details: error.details,
           hint: error.hint,
         });
-        throw new Error(`Failed to fetch expenses: ${error.message}`);
+        throw new Error(`Failed to fetch expense stats: ${error.message}`);
       }
-      return data ?? [];
+      return parseGroupExpenseStats(data);
     },
     enabled: Number.isFinite(group_id),
   });
@@ -361,23 +463,20 @@ export const useSettleExpense = () => {
 };
 
 export const useExpenseTotalThisMonth = (group_id: number) => {
+  const now = new Date();
+  const startOfMonth = localMonthStart(now);
+  const endOfMonth = localMonthStart(
+    new Date(now.getFullYear(), now.getMonth() + 1, 1),
+  );
   return useQuery({
-    queryKey: ["expense_total_month", group_id],
+    queryKey: ["expenses", group_id, "month", startOfMonth],
     queryFn: async () => {
       try {
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-          .toISOString()
-          .split("T")[0];
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-          .toISOString()
-          .split("T")[0];
-        const { data, error } = await supabase
-          .from("expenses")
-          .select("amount")
-          .eq("group_id", group_id)
-          .gte("date", startOfMonth)
-          .lt("date", endOfMonth);
+        const { data, error } = await supabase.rpc("sum_group_expenses", {
+          group_id_input: group_id,
+          start_date: startOfMonth,
+          end_date: endOfMonth,
+        });
         if (error) {
           console.error("useExpenseTotalThisMonth query error:", {
             message: error.message,
@@ -388,10 +487,9 @@ export const useExpenseTotalThisMonth = (group_id: number) => {
             `Failed to fetch monthly expense total: ${error.message}`,
           );
         }
-        const total = data
-          .reduce((sum, item) => sum + item.amount, 0)
-          .toFixed(2);
-        return total;
+        const total =
+          typeof data === "number" && Number.isFinite(data) ? data : 0;
+        return total.toFixed(2);
       } catch (err) {
         console.error("useExpenseTotalThisMonth unexpected error:", err);
         throw new Error(
@@ -399,5 +497,6 @@ export const useExpenseTotalThisMonth = (group_id: number) => {
         );
       }
     },
+    enabled: Number.isFinite(group_id),
   });
 };
