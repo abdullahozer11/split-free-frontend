@@ -57,7 +57,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │   ├── log.ts                     # Logging wrapper utility
 │   ├── api/                       # API clients with React Query hooks and real-time listeners
 │   │   ├── debts/                 # Debt-related actions & calculations queries
-│   │   ├── expenses/              # Individual expense creation/update & subscriptions
+│   │   ├── expenses/              # Expense CRUD, paginated lists, stats RPCs, and subscriptions
 │   │   ├── groups/                # Group operations, RPC triggers, and state subscriptions
 │   │   ├── invites/               # Invite systems and requests
 │   │   ├── members/               # Group member lists, balances, and real-time updates
