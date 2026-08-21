@@ -49,6 +49,13 @@
 - Category totals need a `Record<string, { category: ExpenseCategory; total: number }>` accumulator. Empty `{}` infers `never[]` when the empty path returns `[]`, so Object.keys cannot index `.category` / `.total`. Import `react-native-pie-chart` from the package entry; `src/index.tsx` is not covered by `skipLibCheck`.
 - `useDebt` returns one pairwise row (or null), not the select array. Two chained `.or()` filters are joined with AND by PostgREST; use a single `or('and(borrower.eq.A,lender.eq.B),and(borrower.eq.B,lender.eq.A)')` and `maybeSingle()` so extra rows error instead of `data[0]`. Amount is unsigned with direction in borrower/lender — member details labels from those ids, not the sign. Member name state is `string`. New group-update members have no `id` yet — `DeletableMember` must not require it, and delete-from-list should fall back to name.
 
+## AuthProvider must unsubscribe onAuthStateChange
+
+- `supabase.auth.onAuthStateChange` returns `{ data: { subscription } }`. The effect must `return () => subscription.unsubscribe()` or Fast Refresh / unmount leaks the listener and `setSession` runs on an unmounted provider.
+- Skip `setSession` after cleanup with a `cancelled` flag so an in-flight `getSession()` cannot write after unmount.
+- Keep the callback sync. Async `onAuthStateChange` handlers can deadlock if they trigger a nested token refresh from `TOKEN_REFRESHED`.
+- Sign-in, sign-out, and token refresh still flow through the same listener (`SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`).
+
 ## Profile fetch errors must not sign the user out
 
 - `useProfile` uses `maybeSingle()` so a missing `profiles` row (new user / `handle_new_user` gap) is `null`, not `isError`. Network and RLS failures still throw.

@@ -25,18 +25,33 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchSession = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+      if (cancelled) {
+        return;
+      }
       setSession(session);
       setLoading(false);
     };
 
     fetchSession();
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) {
+        return;
+      }
       setSession(session);
     });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Function to update session in context
