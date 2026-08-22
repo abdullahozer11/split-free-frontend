@@ -63,19 +63,21 @@ const JoinScreen = () => {
 
     try {
       console.log("Fetching invite for token:", inviteToken);
-      const { data: invite, error: inviteError } = await supabase
-        .from("invite_tokens")
-        .select("group_id")
-        .eq("token", inviteToken)
-        .single();
+      const { data: fetchedGroupId, error: inviteError } = await supabase.rpc(
+        "get_invite_group_id",
+        { p_token: inviteToken },
+      );
 
-      console.log("Invite data:", invite, "Invite error:", inviteError);
+      console.log(
+        "Invite group id:",
+        fetchedGroupId,
+        "Invite error:",
+        inviteError,
+      );
 
-      if (inviteError || !invite) {
+      if (inviteError || fetchedGroupId == null) {
         throw new Error(inviteError?.message || "Invalid invite token.");
       }
-
-      const fetchedGroupId = invite.group_id;
       console.log("Fetched groupId:", fetchedGroupId);
 
       console.log(

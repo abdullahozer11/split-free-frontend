@@ -662,6 +662,10 @@ export type Database = {
         Args: { _group_id: number; _profile_id: string }
         Returns: undefined
       }
+      generate_invite_token: {
+        Args: { group_id_input: number }
+        Returns: string
+      }
       get_group_expense_stats: {
         Args: { group_id_input: number; month_start?: string }
         Returns: Json
@@ -675,6 +679,10 @@ export type Database = {
           expense_count: number
           member_count: number
         }[]
+      }
+      get_invite_group_id: {
+        Args: { p_token: string }
+        Returns: number
       }
       get_unbound_members_for_token: {
         Args: { p_token: string }

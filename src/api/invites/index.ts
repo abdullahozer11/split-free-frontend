@@ -1,27 +1,20 @@
 import { supabase } from "@/src/lib/supabase";
-import * as Crypto from "expo-crypto";
 
 export const generateInvite = async (groupId: number) => {
-  const token = Crypto.randomUUID(); // Generates a random UUID v4 string
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7); // Optional: Expires in 7 days
-
-  const { error } = await supabase
-    .from("invite_tokens")
-    .insert({
-      group_id: groupId,
-      token,
-      expires_at: expiresAt.toISOString(),
-    })
-    .select()
-    .single();
+  const { data: token, error } = await supabase.rpc("generate_invite_token", {
+    group_id_input: groupId,
+  });
 
   if (error) {
     console.error("Error generating invite:", error);
     throw error;
   }
 
-  // Deep link: Use token only, or include group_id if you want
+  if (!token) {
+    throw new Error("Failed to generate invite token.");
+  }
+
+  // Deep link: token only. Group id is resolved server-side on join.
   const inviteLink = `https://split-free-next.vercel.app/join?token=${token}`;
-  return inviteLink; // Use this for QR code or sharing
+  return inviteLink;
 };

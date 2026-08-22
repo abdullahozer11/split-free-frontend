@@ -49,6 +49,12 @@
 - Category totals need a `Record<string, { category: ExpenseCategory; total: number }>` accumulator. Empty `{}` infers `never[]` when the empty path returns `[]`, so Object.keys cannot index `.category` / `.total`. Import `react-native-pie-chart` from the package entry; `src/index.tsx` is not covered by `skipLibCheck`.
 - `useDebt` returns one pairwise row (or null), not the select array. Two chained `.or()` filters are joined with AND by PostgREST; use a single `or('and(borrower.eq.A,lender.eq.B),and(borrower.eq.B,lender.eq.A)')` and `maybeSingle()` so extra rows error instead of `data[0]`. Amount is unsigned with direction in borrower/lender — member details labels from those ids, not the sign. Member name state is `string`. New group-update members have no `id` yet — `DeletableMember` must not require it, and delete-from-list should fall back to name.
 
+## Invite tokens are minted in Postgres
+
+- Do not insert `invite_tokens` from the client. `generate_invite_token(group_id_input)` assigns `token` (`gen_random_uuid()`) and `expires_at` (`now() + 7 days`) and requires a `members` row for `auth.uid()`.
+- `invite_tokens` has RLS. `anon` / `authenticated` have no table GRANT (no client-chosen token or expiry). Join resolves `join?token=` with `get_invite_group_id`, then `get_unbound_members_for_token` / `join_group_with_token` (all SECURITY DEFINER).
+- Direct Data API inserts would still trust `token` and `expires_at` even with a membership INSERT policy, so minting stays on the RPC.
+
 ## AuthProvider must unsubscribe onAuthStateChange
 
 - `supabase.auth.onAuthStateChange` returns `{ data: { subscription } }`. The effect must `return () => subscription.unsubscribe()` or Fast Refresh / unmount leaks the listener and `setSession` runs on an unmounted provider.

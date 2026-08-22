@@ -60,7 +60,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
 │   │   ├── debts/                 # Debt-related actions & calculations queries
 │   │   ├── expenses/              # Expense CRUD, paginated lists, stats RPCs, and subscriptions
 │   │   ├── groups/                # Group operations, RPC triggers, and state subscriptions
-│   │   ├── invites/               # Invite systems and requests
+│   │   ├── invites/               # QR/link invite mint (`generate_invite_token` RPC)
 │   │   ├── members/               # Group member lists, balances, and real-time updates
 │   │   ├── profiles/              # User profiles, search, and activity bindings
 │   │   └── transfers/             # Money transfer details and transaction status
@@ -92,7 +92,7 @@ SplitFree is a collaborative, real-time bill-splitting mobile application built 
     ├── config.toml                # Supabase system configuration
     ├── seed.sql                   # Empty seed; integration tests create their own rows
     ├── functions/                 # Backend edge functions (Deno-based Gemini and OpenAI APIs)
-    └── migrations/                # Database migrations (PostgreSQL schema, RPCs, auth profile trigger)
+    └── migrations/                # Database migrations (PostgreSQL schema, RPCs, auth profile trigger, invite token mint)
 ```
 
 ---
